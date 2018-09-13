@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace TestDiscordBot
 {
@@ -34,7 +35,15 @@ namespace TestDiscordBot
             client = new DiscordSocketClient();
             client.Log += Log;
 
-            string token = "NDYwNDkwMTI2NjA3Mzg0NTc2.DliljA.oGET_enkz63j959BJiBmNhuwDHA";
+            if (config.Default.BotToken.StartsWith("<INSERT BOT TOKEN HERE>"))
+            {
+                config.Default.BotToken = config.Default.BotToken + "*";
+                config.Default.Save();
+                MessageBox.Show("Oi! I cant start without a bot token ya cunt.");
+                return;
+            }
+
+            string token = config.Default.BotToken;
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
             client.MessageReceived += MessageReceived;
@@ -210,7 +219,7 @@ namespace TestDiscordBot
                         if (commands[i].command == message.Content.Split(' ')[0])
                             await commands[i].execute(message);
                 }
-                // Default Cannels
+                // Default Channels
                 else
                 {
                     for (int i = 0; i < commands.Length; i++)

@@ -33,5 +33,17 @@ namespace TestDiscordBot {
                 this["ChannelsWrittenOn"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<INSERT BOT TOKEN HERE>")]
+        public string BotToken {
+            get {
+                return ((string)(this["BotToken"]));
+            }
+            set {
+                this["BotToken"] = value;
+            }
+        }
     }
 }
