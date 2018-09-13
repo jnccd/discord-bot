@@ -5,5 +5,8 @@
     <Setting Name="ChannelsWrittenOn" Type="System.UInt64[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="BotToken" Type="System.String" Scope="User">
+      <Value Profile="(Default)">&lt;INSERT BOT TOKEN HERE&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
