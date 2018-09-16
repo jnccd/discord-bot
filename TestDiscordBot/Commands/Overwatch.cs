@@ -12,7 +12,9 @@ namespace TestDiscordBot.Commands
 {
     public class Overwatch : Command
     {
-        public Overwatch() : base("overwatch", true)
+        string url = "";
+
+        public Overwatch() : base("overwatch", "gets a post from /r/overwatch", true)
         {
 
         }
@@ -22,74 +24,32 @@ namespace TestDiscordBot.Commands
             try
             {
                 // Resutls
-                string ResultURL = "", ResultPicURL = "", ResultTitle = "", ResultHoursAgo = "0", ResultPoints = "";
-                string postLink;
+                string ResultURL = "", ResultPicURL = "", ResultTitle = "", ResultTimestamp = "0", ResultPoints = "";
+                string postJson;
 
                 // Getting a subreddit
-                string url = "https://www.reddit.com/r/Overwatch/";
+                url = "https://www.reddit.com/r/Overwatch/";
 
                 // Getting a post
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-                req.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
-                //req.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate, br");
-                req.Headers.Add(HttpRequestHeader.AcceptLanguage, "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7");
-                req.Referer = "https://www.google.de/";
-                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36 OPR/55.0.2994.44";
-                req.KeepAlive = true;
+                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url + ".json?limit=100");
+                req.KeepAlive = false;
                 WebResponse W = req.GetResponse();
                 using (StreamReader sr = new StreamReader(W.GetResponseStream()))
                 {
                     string html = sr.ReadToEnd();
 
-                    html = html.Remove(0, html.AllIndexesOf("</div><!-- SC_ON --></div></div>").Last());
-                    html = html.Remove(html.IndexOf("Community Details"));
-
-                    List<int> Posts = html.AllIndexesOf("href=\"" + url + "comments");
-                    string cuthtml = html.Remove(0, Posts[Global.RDM.Next(Posts.Count)]);
-                    List<int> index = cuthtml.AllIndexesOf("\"");
-                    postLink = cuthtml.Remove(index[1]);
+                    List<int> Posts = html.AllIndexesOf("{\"kind\": \"t3\",");
+                    string cuthtml = html.Remove(0, Posts[Posts.Count - Global.RDM.Next(100)]);
+                    List<int> index = cuthtml.AllIndexesOf("}},");
+                    postJson = cuthtml.Remove(index[1]);
                 }
 
-                // Looking into a post
-                url = postLink.Remove(0, 5).Trim('"');
-                req = (HttpWebRequest)HttpWebRequest.Create(url);
-                req.KeepAlive = false;
-                W = req.GetResponse();
-                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                {
-                    string html = sr.ReadToEnd();
-
-                    ResultPicURL = html.Remove(0, html.IndexOf("href=\"https://i.redd.it") + "href=\"".Length);
-                    ResultPicURL = ResultPicURL.Remove(ResultPicURL.IndexOf("\"")).Trim('"');
-                    Uri output = null;
-                    if (Uri.TryCreate("", UriKind.Absolute, out output))
-                    {
-                        ResultPicURL = output.AbsoluteUri;
-                    }
-                    else
-                    {
-                        Console.CursorLeft = 0;
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Stupid discord cant handle normal image links: " + ResultPicURL);
-                        Console.ForegroundColor = ConsoleColor.White;
-                        await execute(commandmessage);
-                        return;
-                    }
-
-                    ResultPoints = html.Remove(0, html.IndexOf("style=\"color:#1A1A1B\">") + "style=\"color:#1A1A1B\">".Length);
-                    ResultPoints = ResultPoints.Remove(ResultPoints.IndexOf("<"));
-
-                    ResultTitle = html.Remove(0, html.IndexOf(":{\"title\":\"") + ":{\"title\":\"".Length);
-                    ResultTitle = ResultTitle.Remove(ResultTitle.IndexOf(":"));
-
-                    if (html.Contains("hours ago</a>"))
-                    {
-                        ResultHoursAgo = html.Remove(0, html.IndexOf("target=\"_blank\" rel=\"nofollow noopener\">") + "target=\"_blank\" rel=\"nofollow noopener\">".Length);
-                        ResultHoursAgo = ResultHoursAgo.Remove(ResultHoursAgo.IndexOf(" hours ago</a>"));
-                    }
-
-                    ResultURL = url;
-                }
+                // Looking into the json
+                ResultURL = "https://www.reddit.com" + postJson.GetEverythingBetween("\"permalink\": \"", "\", ");
+                ResultTitle = postJson.GetEverythingBetween("\"title\": \"", "\", ");
+                ResultTimestamp = postJson.GetEverythingBetween("\"created\": ", ", ");
+                ResultPoints = postJson.GetEverythingBetween("\"score\": ", ", ");
+                ResultPicURL = postJson.GetEverythingBetween("\"images\": [{\"source\": {\"url\": \"", "\", ");
 
                 EmbedBuilder Embed = new EmbedBuilder();
 
@@ -97,10 +57,11 @@ namespace TestDiscordBot.Commands
                 Embed.WithTitle(ResultTitle);
                 Embed.WithImageUrl(ResultPicURL);
                 Embed.WithColor(0, 128, 255);
-                if (ResultHoursAgo != "0")
+                if (ResultTimestamp != "0" && ResultTimestamp != "")
                 {
-                    DateTime postDate = DateTime.Now.AddHours(-Convert.ToInt32(ResultHoursAgo)).AddMinutes(-DateTime.Now.Minute);
-                    Embed.WithTimestamp(postDate);
+                    DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                    dtDateTime = dtDateTime.AddSeconds(Convert.ToDouble(ResultTimestamp.Replace('.', ','))).AddHours(-10);
+                    Embed.WithTimestamp(new DateTimeOffset(dtDateTime));
                 }
                 Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points"));
 
@@ -114,11 +75,11 @@ namespace TestDiscordBot.Commands
             }
             catch (Exception e)
             {
-                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkey at our headquarters is working VEWY HAWD to fix this!", commandmessage.Channel);
+                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", commandmessage.Channel);
 
                 Console.CursorLeft = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e);
+                Console.WriteLine(e + "\n\nOn: " + url);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("$");
             }

@@ -222,11 +222,18 @@ namespace TestDiscordBot
             {
                 if (message.Content == Global.commandString + "help")
                 {
-                    string output = "Current comamnds:\n";
+                    EmbedBuilder Embed = new EmbedBuilder();
+                    Embed.WithColor(0, 128, 255);
                     for (int i = 0; i < commands.Length; i++)
-                        output += (commands[i].command == "" ? "" : Global.commandString) + commands[i].command + 
-                            (commands[i].desc == null ? "" : " | " + commands[i].desc) + (commands[i].isExperimental ? " | (EXPERIMENTAL)" : "") + "\n";
-                    await Global.SendText(output, message.Channel);
+                        if (commands[i].command != "")
+                        {
+                            string desc = ((commands[i].desc == null ? "" : commands[i].desc + " ") + (commands[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
+                            Embed.AddField(Global.commandString + commands[i].command, desc == null || desc == "" ? "-" : desc);
+                        }
+                    Embed.WithDescription("Made by <@300699566041202699>\n\nCommands:");
+                    Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
+
+                    await Global.SendEmbed(Embed, message.Channel);
                 }
                 // Experimental
                 else if (message.Channel.Id == 473991188974927884) // Channel ID from my server

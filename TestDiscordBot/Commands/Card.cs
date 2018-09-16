@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class Card : Command
     {
-        public Card() : base("card", false)
+        public Card() : base("card", "Posts a random yugioh card", false)
         {
 
         }
