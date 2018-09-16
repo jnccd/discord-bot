@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot.Commands
 {
-    public class Anime : Command
+    public class AnimeQuote : Command
     {
-        public Anime() : base("animeQuote", false)
+        public AnimeQuote() : base("animeQuote", false)
         {
 
         }
@@ -19,7 +19,7 @@ namespace TestDiscordBot.Commands
         {
             try
             {
-                string[] Files = Directory.GetFiles(@"D:\Eigene Dateien\Medien\Bilder\Reactions\Anime Quote");
+                string[] Files = Directory.GetFiles(@"D:\Eigene Dateien\Medien\Bilder\Bot\Anime Quote");
                 List<string> SendableFiles = new List<string>();
                 foreach (string s in Files)
                 {

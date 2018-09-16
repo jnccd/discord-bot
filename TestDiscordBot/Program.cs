@@ -20,10 +20,11 @@ namespace TestDiscordBot
         bool clientReady = false;
         DiscordSocketClient client;
         Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                           from assemblyType in domainAssembly.GetTypes()
-                           where assemblyType.IsSubclassOf(typeof(Command))
-                           select assemblyType).ToArray();
+                               from assemblyType in domainAssembly.GetTypes()
+                               where assemblyType.IsSubclassOf(typeof(Command))
+                               select assemblyType).ToArray();
         Command[] commands;
+        int clearYcoords;
 
         static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
@@ -32,6 +33,9 @@ namespace TestDiscordBot
         {
             #region startup
             Global.P = this;
+            try {
+                Console.WriteLine("Build from: " + File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\BuildDate.txt").TrimEnd('\n'));
+            } catch { }
             client = new DiscordSocketClient();
             client.Log += Log;
 
@@ -42,9 +46,8 @@ namespace TestDiscordBot
                 MessageBox.Show("Oi! I cant start without a bot token ya cunt.");
                 return;
             }
-
-            string token = config.Default.BotToken;
-            await client.LoginAsync(TokenType.Bot, token);
+            
+            await client.LoginAsync(TokenType.Bot, config.Default.BotToken);
             await client.StartAsync();
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
@@ -55,13 +58,14 @@ namespace TestDiscordBot
 
             while (!clientReady) { Thread.Sleep(20); }
 
-            await client.SetGameAsync("Type !help");
+            await client.SetGameAsync("Type " + Global.commandString + "help");
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(CurrentChannel);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Awaiting your commands: ");
+            clearYcoords = Console.CursorTop;
             #endregion
 
             #region commands
@@ -167,6 +171,17 @@ namespace TestDiscordBot
                         }
                     }
                 }
+                else if (input == "/clear")
+                {
+                    Console.CursorTop = clearYcoords;
+                    Console.CursorLeft = 0;
+                    string large = "";
+                    for (int i = 0; i < (Console.BufferHeight - clearYcoords - 2) * Console.BufferWidth; i++)
+                        large += " ";
+                    Console.WriteLine(large);
+                    Console.CursorTop = clearYcoords;
+                    Console.CursorLeft = 0;
+                }
                 else if(input == "/test")
                 {
                     IEnumerable<IMessage> messages = await CurrentChannel.GetMessagesAsync(int.MaxValue).Flatten();
@@ -209,15 +224,16 @@ namespace TestDiscordBot
                 {
                     string output = "Current comamnds:\n";
                     for (int i = 0; i < commands.Length; i++)
-                        output += (commands[i].command == "" ? "" : Global.commandString) + commands[i].command + (commands[i].desc == null ? "" : " | " + commands[i].desc) + (commands[i].isExperimental ? " | (EXPERIMENTAL)" : "") + "\n";
+                        output += (commands[i].command == "" ? "" : Global.commandString) + commands[i].command + 
+                            (commands[i].desc == null ? "" : " | " + commands[i].desc) + (commands[i].isExperimental ? " | (EXPERIMENTAL)" : "") + "\n";
                     await Global.SendText(output, message.Channel);
                 }
                 // Experimental
                 else if (message.Channel.Id == 473991188974927884) // Channel ID from my server
                 {
                     for (int i = 0; i < commands.Length; i++)
-                        if (commands[i].command == message.Content.Split(' ')[0])
-                            await commands[i].execute(message);
+                        if (Global.commandString + commands[i].command == message.Content.Split(' ')[0])
+                            try { await commands[i].execute(message); } catch {  }
                 }
                 // Default Channels
                 else

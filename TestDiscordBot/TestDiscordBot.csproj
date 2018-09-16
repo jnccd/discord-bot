@@ -56,6 +56,10 @@
       <HintPath>..\packages\Discord.Net.WebSocket.1.0.2\lib\net45\Discord.Net.WebSocket.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.8.7.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.8.7\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.1.1.1\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
       <Private>True</Private>
@@ -95,10 +99,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\aaaTemplate.cs" />
-    <Compile Include="Commands\Anime.cs" />
+    <Compile Include="Commands\AnimeQuote.cs" />
     <Compile Include="Commands\Card.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Commands\Meme.cs" />
+    <Compile Include="Commands\Overwatch.cs" />
     <Compile Include="Commands\Reaction.cs" />
     <Compile Include="config.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -120,7 +125,15 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="BuildDate.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>echo %25date%25 %25time%25 &gt; "$(ProjectDir)\BuildDate.txt"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
