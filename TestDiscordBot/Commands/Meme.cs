@@ -14,8 +14,15 @@ namespace TestDiscordBot.Commands
     public class Meme : Command
     {
         string url = "";
+        public static string[] Subreddits = new string[] { "https://www.reddit.com/r/anime_irl/", "https://www.reddit.com/r/Animemes/",
+            "https://www.reddit.com/r/gay_irl/", "https://www.reddit.com/r/greentext/", "https://www.reddit.com/r/hmmm/",
+            "https://www.reddit.com/r/KOTORmemes/", "https://www.reddit.com/r/marvelmemes/", "https://www.reddit.com/r/me_irl/",
+            "https://www.reddit.com/r/MemeEconomy/", "https://www.reddit.com/r/MemeWorldWar/", "https://www.reddit.com/r/mildlyinfuriating/",
+            "https://www.reddit.com/r/Overwatch_Memes/", "https://www.reddit.com/r/Perfectfit/", "https://www.reddit.com/r/PrequelMemes/",
+            "https://www.reddit.com/r/ProgrammerHumor/", "https://www.reddit.com/r/pyrocynical/", "https://www.reddit.com/r/SequelMemes/",
+            "https://www.reddit.com/r/starterpacks/", "https://www.reddit.com/r/SuddenlyGay/", "https://www.reddit.com/r/Warframe/" };
 
-        public Meme() : base("meme", "this works sometimes, which is better than not at all", false)
+        public Meme() : base("meme", "posts a random meme from a random subreddit, has tendency to crash", false)
         {
 
         }
@@ -29,20 +36,7 @@ namespace TestDiscordBot.Commands
                 string postJson;
 
                 // Getting a subreddit
-                switch (Global.RDM.Next(3))
-                {
-                    case 0:
-                        url = "https://www.reddit.com/r/me_irl/";
-                        break;
-
-                    case 1:
-                        url = "https://www.reddit.com/r/Animemes/";
-                        break;
-
-                    case 2:
-                        url = "https://www.reddit.com/r/PrequelMemes/";
-                        break;
-                }
+                url = Subreddits[Global.RDM.Next(Subreddits.Length)];
 
                 // Getting a post
                 HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url + ".json?limit=100");
@@ -77,7 +71,7 @@ namespace TestDiscordBot.Commands
                     dtDateTime = dtDateTime.AddSeconds(Convert.ToDouble(ResultTimestamp.Replace('.', ','))).AddHours(-10);
                     Embed.WithTimestamp(new DateTimeOffset(dtDateTime));
                 }
-                Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points"));
+                Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + url.Remove(0, "https://www.reddit.com".Length)));
 
                 await Global.SendEmbed(Embed, commandmessage.Channel);
 
