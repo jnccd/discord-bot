@@ -103,6 +103,7 @@
   <ItemGroup>
     <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\AnimeQuote.cs" />
+    <Compile Include="Commands\Ball.cs" />
     <Compile Include="Commands\Card.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Commands\Meme.cs" />
