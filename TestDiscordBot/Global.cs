@@ -2,7 +2,9 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +15,7 @@ namespace TestDiscordBot
         public static Random RDM = new Random();
         public static Program P;
         public static string commandString = "!";
+        public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static async Task SendFile(string path, ISocketMessageChannel Channel)
         {
@@ -68,10 +71,13 @@ namespace TestDiscordBot
         public static string GetEverythingBetween(this string str, string left, string right)
         {
             int leftIndex = str.IndexOf(left);
-            int rightIndex = str.IndexOf(right, leftIndex);
+            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex);
 
             if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
-                throw new Exception("String doesnt contain left or right borders!");
+            {
+                //throw new Exception("String doesnt contain left or right borders!");
+                return "";
+            }
 
             try
             {
