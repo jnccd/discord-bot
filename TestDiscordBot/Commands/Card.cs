@@ -35,6 +35,8 @@ namespace TestDiscordBot.Commands
             }
             catch (Exception e)
             {
+                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", commandmessage.Channel);
+
                 Console.CursorLeft = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(e);
