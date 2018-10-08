@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace TestDiscordBot
     {
         ISocketMessageChannel CurrentChannel;
         bool clientReady = false;
-        DiscordSocketClient client;
+        public DiscordSocketClient client;
         Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
@@ -33,9 +34,11 @@ namespace TestDiscordBot
         {
             #region startup
             Global.P = this;
-            try {
+            try
+            {
                 Console.WriteLine("Build from: " + File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\BuildDate.txt").TrimEnd('\n'));
-            } catch { }
+            }
+            catch { }
             client = new DiscordSocketClient();
             client.Log += Log;
 
@@ -46,11 +49,12 @@ namespace TestDiscordBot
                 MessageBox.Show("Oi! I cant start without a bot token ya cunt.");
                 return;
             }
-            
+
             await client.LoginAsync(TokenType.Bot, config.Default.BotToken);
             await client.StartAsync();
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
+            client.Disconnected += Client_Disconnected;
 
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
@@ -66,6 +70,7 @@ namespace TestDiscordBot
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
+            ShowWindow(GetConsoleWindow(), 2);
             #endregion
 
             #region commands
@@ -76,7 +81,7 @@ namespace TestDiscordBot
 
                 if (input == "exit")
                     break;
-                
+
                 if (!input.StartsWith("/"))
                 {
                     if (CurrentChannel == null)
@@ -182,14 +187,9 @@ namespace TestDiscordBot
                     Console.CursorTop = clearYcoords;
                     Console.CursorLeft = 0;
                 }
-                else if(input == "/test")
+                else if (input == "/test")
                 {
-                    IEnumerable<IMessage> messages = await CurrentChannel.GetMessagesAsync(int.MaxValue).Flatten();
-                    foreach (IMessage m in messages)
-                    {
-                        if (m.Author.Id == client.CurrentUser.Id)
-                            GetHashCode();
-                    }
+                    await UserExtensions.SendMessageAsync(client.GetUser(200696875056103425), "TELL SILNCE IF THIS WORKED");
                 }
                 else
                 {
@@ -197,7 +197,7 @@ namespace TestDiscordBot
                     Console.WriteLine("I dont know that command.");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
-                
+
             }
             #endregion
 
@@ -205,6 +205,16 @@ namespace TestDiscordBot
             await client.LogoutAsync();
         }
 
+        private async Task Client_Disconnected(Exception arg)
+        {
+            Console.WriteLine("Disconeect");
+            if (arg.Message.Contains("Server missed last heartbeat"))
+            {
+                await client.LogoutAsync();
+                await client.LoginAsync(TokenType.Bot, config.Default.BotToken);
+                await client.StartAsync();
+            }
+        }
         private Task Client_Ready()
         {
             clientReady = true;
@@ -256,5 +266,11 @@ namespace TestDiscordBot
                 }
             }
         }
+
+        // Imports
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }
