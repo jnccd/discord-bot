@@ -12,19 +12,20 @@ namespace TestDiscordBot.Commands
     {
         Timer leetTimer;
 
-        public LeetTimeEvent() : base("toggleLeetEvents", false)
+        public LeetTimeEvent() : base("toggleLeetEvents", "Dooms this channel for all eternity (can only be used by server owners)", false)
         {
             TimerCallback callback = new TimerCallback(OnLeetTime);
             DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 37, 0);
-            if (DateTime.Now < dt)
-                leetTimer = new Timer(callback, null, dt - DateTime.Now, TimeSpan.FromHours(24));
+            if (DateTime.Now > dt)
+                dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + 1, 13, 37, 0);
+            leetTimer = new Timer(callback, null, dt - DateTime.Now, TimeSpan.FromHours(24));
         }
 
         public override async Task execute(SocketMessage commandmessage)
         {
             try
             {
-                if (commandmessage.Author.Id == 300699566041202699)
+                if (commandmessage.Author.Id == 300699566041202699 || ((SocketGuildUser)commandmessage.Author) == ((SocketGuildUser)commandmessage.Author).Guild.Owner)
                 {
                     if (config.Default.LeetEventChannels == null)
                         config.Default.LeetEventChannels = new ulong[0];
@@ -33,16 +34,16 @@ namespace TestDiscordBot.Commands
                         List<ulong> channelList = new List<ulong>();
                         channelList.Remove(commandmessage.Channel.Id);
                         config.Default.LeetEventChannels = channelList.ToArray();
+                        await Global.SendText("This Channel isn't Leet anymore!", commandmessage.Channel);
                     }
                     else
                     {
                         List<ulong> channelList = new List<ulong>();
                         channelList.Add(commandmessage.Channel.Id);
                         config.Default.LeetEventChannels = channelList.ToArray();
+                        await Global.SendText("Set as Leet Channel!", commandmessage.Channel);
                     }
                     config.Default.Save();
-
-                    await Global.SendText("Set new Leet Server!", commandmessage.Channel);
                 }
                 else
                 {
@@ -50,7 +51,7 @@ namespace TestDiscordBot.Commands
                 }
 
                 Console.CursorLeft = 0;
-                Console.WriteLine("Literally nothing in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);
+                Console.WriteLine("Leet switch in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);
                 Console.Write("$");
             }
             catch (Exception e)

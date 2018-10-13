@@ -11,7 +11,7 @@ namespace TestDiscordBot.Commands
     {
         string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball", "Uhm... I have no idea", "Possibly" };
 
-        public Ball() : base("9ball", false)
+        public Ball() : base("9ball", "Decides your fate", false)
         {
 
         }
