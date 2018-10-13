@@ -35,6 +35,13 @@ namespace TestDiscordBot
 
             SaveChannel(Channel);
         }
+        public static async Task SendText(string text, ulong ChannelID)
+        {
+            ISocketMessageChannel Channel = (ISocketMessageChannel)P.client.GetChannel(ChannelID);
+            await Channel.SendMessageAsync(text);
+
+            SaveChannel(Channel);
+        }
         public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
         {
             await Channel.SendMessageAsync("", false, Embed.Build());

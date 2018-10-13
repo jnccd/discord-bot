@@ -8,5 +8,8 @@
     <Setting Name="BotToken" Type="System.String" Scope="User">
       <Value Profile="(Default)">&lt;INSERT BOT TOKEN HERE&gt;</Value>
     </Setting>
+    <Setting Name="LeetEventChannels" Type="System.UInt64[]" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
