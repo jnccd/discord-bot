@@ -20,8 +20,7 @@ namespace TestDiscordBot
     {
         ISocketMessageChannel CurrentChannel;
         bool clientReady = false;
-        public DiscordSocketClient client;
-        System.Threading.Timer leetTimer;
+        DiscordSocketClient client;
         Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
@@ -30,12 +29,11 @@ namespace TestDiscordBot
         int clearYcoords;
 
         static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+            => Global.P.MainAsync().GetAwaiter().GetResult();
 
         async Task MainAsync()
         {
             #region startup
-            Global.P = this;
             try
             {
                 Console.WriteLine("Build from: " + File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\BuildDate.txt").TrimEnd('\n'));
@@ -61,12 +59,7 @@ namespace TestDiscordBot
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
                 commands[i] = (Command)Activator.CreateInstance(commandTypes[i]);
-
-            TimerCallback callback = new TimerCallback(((LeetTimeEvent)commands.First(x => x.isLeet == true)).OnLeetTime);
-            DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 37, 0);
-            if (DateTime.Now < dt)
-                leetTimer = new System.Threading.Timer(callback, null, dt - DateTime.Now, TimeSpan.FromHours(24));
-
+            
             while (!clientReady) { Thread.Sleep(20); }
 
             await client.SetGameAsync("Type " + Global.commandString + "help");
@@ -232,7 +225,6 @@ namespace TestDiscordBot
             Console.WriteLine(msg.ToString());
             return Task.FromResult(0);
         }
-
         private async Task MessageReceived(SocketMessage message)
         {
             if (message.Content.StartsWith(Global.commandString))
@@ -274,10 +266,19 @@ namespace TestDiscordBot
             }
         }
 
+        public SocketChannel getChannelFromID(ulong ChannelID)
+        {
+            return client.GetChannel(ChannelID);
+        }
+        public SocketSelfUser getSelf()
+        {
+            return client.CurrentUser;
+        }
+
         // Imports
         [DllImport("kernel32.dll")]
-        public static extern IntPtr GetConsoleWindow();
+        private static extern IntPtr GetConsoleWindow();
         [DllImport("user32.dll")]
-        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }

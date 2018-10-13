@@ -105,7 +105,7 @@
     <Compile Include="Commands\AnimeQuote.cs" />
     <Compile Include="Commands\Ball.cs" />
     <Compile Include="Commands\Card.cs" />
-    <Compile Include="Command.cs" />
+    <Compile Include="Base\Command.cs" />
     <Compile Include="Commands\LeetTimeEvent.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\Overwatch.cs" />
@@ -115,10 +115,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>config.settings</DependentUpon>
     </Compile>
-    <Compile Include="Global.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Base\Global.cs" />
+    <Compile Include="Base\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reddit.cs" />
+    <Compile Include="Base\Reddit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

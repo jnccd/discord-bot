@@ -13,7 +13,7 @@ namespace TestDiscordBot
     public static class Global
     {
         public static Random RDM = new Random();
-        public static Program P;
+        public static Program P = new Program();
         public static string commandString = "!";
         public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -37,7 +37,7 @@ namespace TestDiscordBot
         }
         public static async Task SendText(string text, ulong ChannelID)
         {
-            ISocketMessageChannel Channel = (ISocketMessageChannel)P.client.GetChannel(ChannelID);
+            ISocketMessageChannel Channel = (ISocketMessageChannel)P.getChannelFromID(ChannelID);
             await Channel.SendMessageAsync(text);
 
             SaveChannel(Channel);
