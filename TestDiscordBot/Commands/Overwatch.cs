@@ -23,53 +23,13 @@ namespace TestDiscordBot.Commands
         {
             try
             {
-                // Resutls
-                string ResultURL = "", ResultPicURL = "", ResultTitle = "", ResultTimestamp = "0", ResultPoints = "";
-                string postJson;
-
-                // Getting a subreddit
                 url = "https://www.reddit.com/r/Overwatch/";
-
-                // Getting a post
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url + ".json?limit=100");
-                req.KeepAlive = false;
-                WebResponse W = req.GetResponse();
-                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                {
-                    string html = sr.ReadToEnd();
-
-                    List<int> Posts = html.AllIndexesOf("{\"kind\": \"t3\",");
-                    string cuthtml = html.Remove(0, Posts[Posts.Count - Global.RDM.Next(100)]);
-                    List<int> index = cuthtml.AllIndexesOf("}},");
-                    postJson = cuthtml.Remove(index[1]);
-                }
-
-                // Looking into the json
-                ResultURL = "https://www.reddit.com" + postJson.GetEverythingBetween("\"permalink\": \"", "\", ");
-                ResultTitle = postJson.GetEverythingBetween("\"title\": \"", "\", ");
-                ResultTimestamp = postJson.GetEverythingBetween("\"created\": ", ", ");
-                ResultPoints = postJson.GetEverythingBetween("\"score\": ", ", ");
-                ResultPicURL = postJson.GetEverythingBetween("\"images\": [{\"source\": {\"url\": \"", "\", ");
-
-                EmbedBuilder Embed = new EmbedBuilder();
-
-                Embed.WithUrl(ResultURL);
-                Embed.WithTitle(ResultTitle);
-                Embed.WithImageUrl(ResultPicURL);
-                Embed.WithColor(0, 128, 255);
-                if (ResultTimestamp != "0" && ResultTimestamp != "")
-                {
-                    DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                    dtDateTime = dtDateTime.AddSeconds(Convert.ToDouble(ResultTimestamp.Replace('.', ','))).AddHours(-10);
-                    Embed.WithTimestamp(new DateTimeOffset(dtDateTime));
-                }
-                Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points"));
-
-                await Global.SendEmbed(Embed, commandmessage.Channel);
+                string postJson = Reddit.GetPostJsonFromSubreddit(url);
+                await Reddit.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author);
 
                 Console.CursorLeft = 0;
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Send meme in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);
+                Console.WriteLine("Send overwatch post in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("$");
             }

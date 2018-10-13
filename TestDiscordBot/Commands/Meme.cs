@@ -49,6 +49,12 @@ namespace TestDiscordBot.Commands
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
+
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Send meme in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
             }
             catch (Exception e)
             {
