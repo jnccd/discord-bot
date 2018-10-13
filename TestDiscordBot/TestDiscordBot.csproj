@@ -106,6 +106,7 @@
     <Compile Include="Commands\Ball.cs" />
     <Compile Include="Commands\Card.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="Commands\LeetTimeEvent.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\Overwatch.cs" />
     <Compile Include="Commands\Reaction.cs" />

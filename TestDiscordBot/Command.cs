@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestDiscordBot.Commands;
 
 namespace TestDiscordBot
 {
@@ -12,6 +13,13 @@ namespace TestDiscordBot
         public string desc;
         public string command;
         public bool isExperimental;
+        public bool isLeet
+        {
+            get
+            {
+                return GetType() == typeof(LeetTimeEvent);
+            }
+        }
 
         public Command(string command, bool isExperimental)
         {

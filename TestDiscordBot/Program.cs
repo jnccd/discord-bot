@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TestDiscordBot.Commands;
 
 namespace TestDiscordBot
 {
@@ -20,6 +21,7 @@ namespace TestDiscordBot
         ISocketMessageChannel CurrentChannel;
         bool clientReady = false;
         public DiscordSocketClient client;
+        System.Threading.Timer leetTimer;
         Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
@@ -59,6 +61,11 @@ namespace TestDiscordBot
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
                 commands[i] = (Command)Activator.CreateInstance(commandTypes[i]);
+
+            TimerCallback callback = new TimerCallback(((LeetTimeEvent)commands.First(x => x.isLeet == true)).OnLeetTime);
+            DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 37, 0);
+            if (DateTime.Now < dt)
+                leetTimer = new System.Threading.Timer(callback, null, dt - DateTime.Now, TimeSpan.FromHours(24));
 
             while (!clientReady) { Thread.Sleep(20); }
 

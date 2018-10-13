@@ -19,7 +19,7 @@ namespace TestDiscordBot.Commands
         {
             try
             {
-                await Global.SendText("no u", commandmessage.Channel);
+                // <Insert command code here>
 
                 Console.CursorLeft = 0;
                 Console.WriteLine("Literally nothing in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);

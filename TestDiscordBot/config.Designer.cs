@@ -45,5 +45,16 @@ namespace TestDiscordBot {
                 this["BotToken"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public ulong[] LeetEventChannels {
+            get {
+                return ((ulong[])(this["LeetEventChannels"]));
+            }
+            set {
+                this["LeetEventChannels"] = value;
+            }
+        }
     }
 }
