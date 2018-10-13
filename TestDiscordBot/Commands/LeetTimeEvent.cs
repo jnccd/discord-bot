@@ -20,6 +20,8 @@ namespace TestDiscordBot.Commands
             {
                 if (commandmessage.Author.Id == 300699566041202699)
                 {
+                    if (config.Default.LeetEventChannels == null)
+                        config.Default.LeetEventChannels = new ulong[0];
                     if (config.Default.LeetEventChannels.Contains(commandmessage.Channel.Id))
                     {
                         List<ulong> channelList = new List<ulong>();
