@@ -9,7 +9,7 @@ namespace TestDiscordBot.Commands
 {
     public class Ball : Command
     {
-        string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball",  };
+        string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball", "Uhm... I have no idea", "Possibly" };
 
         public Ball() : base("9ball", false)
         {
@@ -21,12 +21,19 @@ namespace TestDiscordBot.Commands
             try
             {
                 string m = commandmessage.Content;
-                long sum = 0;
-                for (int i = 0; i < m.Length; i++)
-                    sum += m.ToCharArray()[i] << i;
+                if (m.Split(' ').Length > 1 && m.Contains("?"))
+                {
+                    long sum = 0;
+                    for (int i = 0; i < m.Length; i++)
+                        sum += m.ToCharArray()[i] << i;
 
-                int answerIndex = (int)(sum % answers.Length);
-                await Global.SendText(answers[answerIndex], commandmessage.Channel);
+                    int answerIndex = (int)(sum % answers.Length);
+                    await Global.SendText(answers[answerIndex], commandmessage.Channel);
+                }
+                else
+                {
+                    await Global.SendText("Thats not a question!", commandmessage.Channel);
+                }
 
                 Console.CursorLeft = 0;
                 Console.WriteLine("Send 9ball in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);

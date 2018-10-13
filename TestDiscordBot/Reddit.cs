@@ -51,7 +51,7 @@ namespace TestDiscordBot
             return postJson;
         }
 
-        public static async Task SendPostJsonToDiscordChannel(string postJson, string url, ISocketMessageChannel Channel, SocketUser Author)
+        public static async Task SendPostJsonToDiscordChannel(string postJson, string subUrl, ISocketMessageChannel Channel, SocketUser Author)
         {
             // Resutls
             string ResultURL = "", ResultPicURL = "", ResultTitle = "", ResultTimestamp = "0", ResultPoints = "";
@@ -87,7 +87,7 @@ namespace TestDiscordBot
 
                 // send post
                 await Global.SendFile(videofile, ResultTitle, Channel);
-                await Global.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + url.Remove(0, "https://www.reddit.com".Length)), Channel);
+                await Global.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
 
                 // delete "Sending video post. Please wait..." message
                 IEnumerable<IMessage> messages = await Channel.GetMessagesAsync().Flatten();
@@ -115,16 +115,10 @@ namespace TestDiscordBot
                     dtDateTime = dtDateTime.AddSeconds(Convert.ToDouble(ResultTimestamp.Replace('.', ','))).AddHours(-10);
                     Embed.WithTimestamp(new DateTimeOffset(dtDateTime));
                 }
-                Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + url.Remove(0, "https://www.reddit.com".Length)));
+                Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point on " : " fake internet points on ") + subUrl.Remove(0, "https://www.reddit.com".Length));
 
                 await Global.SendEmbed(Embed, Channel);
             }
-
-            Console.CursorLeft = 0;
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Send meme in " + Channel.Name + " for " + Author.Username);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("$");
         }
     }
 }
