@@ -31,14 +31,14 @@ namespace TestDiscordBot.Commands
                         config.Default.LeetEventChannels = new ulong[0];
                     if (config.Default.LeetEventChannels.Contains(commandmessage.Channel.Id))
                     {
-                        List<ulong> channelList = new List<ulong>();
+                        List<ulong> channelList = config.Default.LeetEventChannels.ToList();
                         channelList.Remove(commandmessage.Channel.Id);
                         config.Default.LeetEventChannels = channelList.ToArray();
                         await Global.SendText("This Channel isn't Leet anymore!", commandmessage.Channel);
                     }
                     else
                     {
-                        List<ulong> channelList = new List<ulong>();
+                        List<ulong> channelList = config.Default.LeetEventChannels.ToList();
                         channelList.Add(commandmessage.Channel.Id);
                         config.Default.LeetEventChannels = channelList.ToArray();
                         await Global.SendText("Set as Leet Channel!", commandmessage.Channel);
