@@ -27,23 +27,17 @@ namespace TestDiscordBot.Commands
             {
                 if (commandmessage.Author.Id == 300699566041202699 || ((SocketGuildUser)commandmessage.Author) == ((SocketGuildUser)commandmessage.Author).Guild.Owner)
                 {
-                    if (config.Default.LeetEventChannels == null)
-                        config.Default.LeetEventChannels = new ulong[0];
-                    if (config.Default.LeetEventChannels.Contains(commandmessage.Channel.Id))
+                    if (config.Data.LeetEventChannels.Contains(commandmessage.Channel.Id))
                     {
-                        List<ulong> channelList = config.Default.LeetEventChannels.ToList();
-                        channelList.Remove(commandmessage.Channel.Id);
-                        config.Default.LeetEventChannels = channelList.ToArray();
+                        config.Data.LeetEventChannels.Remove(commandmessage.Channel.Id);
                         await Global.SendText("This Channel isn't Leet anymore!", commandmessage.Channel);
                     }
                     else
                     {
-                        List<ulong> channelList = config.Default.LeetEventChannels.ToList();
-                        channelList.Add(commandmessage.Channel.Id);
-                        config.Default.LeetEventChannels = channelList.ToArray();
+                        config.Data.LeetEventChannels.Add(commandmessage.Channel.Id);
                         await Global.SendText("Set as Leet Channel!", commandmessage.Channel);
                     }
-                    config.Default.Save();
+                    config.Save();
                 }
                 else
                 {
@@ -68,8 +62,8 @@ namespace TestDiscordBot.Commands
 
         public void OnLeetTime(object obj)
         {
-            for (int i = 0; i < config.Default.LeetEventChannels.Length; i++)
-                Global.SendText("LEET TIME!", config.Default.LeetEventChannels[i]);
+            for (int i = 0; i < config.Data.LeetEventChannels.Count; i++)
+                Global.SendText("LEET TIME!", config.Data.LeetEventChannels[i]);
         }
     }
 }
