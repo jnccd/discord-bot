@@ -187,9 +187,32 @@ namespace TestDiscordBot
                     Console.CursorTop = clearYcoords;
                     Console.CursorLeft = 0;
                 }
-                else if (input == "/test")
+                else if (input == "/config")
                 {
-                    await UserExtensions.SendMessageAsync(client.GetUser(200696875056103425), "TELL SILNCE IF THIS WORKED");
+                    PropertyInfo[] Infos = config.Default.GetType().GetProperties().Where(x => x.PropertyType.IsArray).ToArray();
+                    foreach (PropertyInfo info in Infos)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(info.Name + ": ");
+                        Array a = (Array)info.GetValue(config.Default);
+                        for (int i = 0; i < a.Length; i++)
+                        {
+                            object o = a.GetValue(i);
+                            Console.Write(o);
+
+                            if (o.GetType() == typeof(ulong))
+                            {
+                                try
+                                {
+                                    ISocketMessageChannel Channel = (ISocketMessageChannel)getChannelFromID((ulong)o);
+                                    Console.WriteLine(" - Name: " + Channel.Name + " - Server: " + ((SocketGuildChannel)Channel).Name);
+                                }
+                                catch { Console.WriteLine(); }
+                            }
+                            else
+                                Console.WriteLine();
+                        }
+                    }
                 }
                 else
                 {
