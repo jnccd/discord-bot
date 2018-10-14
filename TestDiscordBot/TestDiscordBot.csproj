@@ -82,6 +82,7 @@
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive.Async, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Interactive.Async.3.1.1\lib\net45\System.Interactive.Async.dll</HintPath>
       <Private>True</Private>
@@ -101,6 +102,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\config.cs" />
+    <Compile Include="Base\stringDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Base\stringDialog.Designer.cs">
+      <DependentUpon>stringDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\AnimeQuote.cs" />
     <Compile Include="Commands\Ball.cs" />
@@ -110,11 +118,6 @@
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\Overwatch.cs" />
     <Compile Include="Commands\Reaction.cs" />
-    <Compile Include="config.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>config.settings</DependentUpon>
-    </Compile>
     <Compile Include="Base\Global.cs" />
     <Compile Include="Base\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -122,10 +125,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="config.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>config.Designer.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

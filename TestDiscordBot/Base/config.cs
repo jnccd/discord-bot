@@ -1,0 +1,110 @@
+﻿using Discord.WebSocket;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
+
+namespace TestDiscordBot
+{
+    public static class config
+    {
+        static string configPath = Global.CurrentExecutablePath + "\\config.xml";
+        static bool performingOperation = false;
+        public static configData Data = new configData();
+        static Loader L = new Loader();
+        
+        public static bool Exists()
+        {
+            return File.Exists(configPath);
+        }
+        public static void Save()
+        {
+            while (false) { }
+
+            performingOperation = true;
+            XmlSerializer serializer = new XmlSerializer(typeof(configData));
+            using (TextWriter writer = new StreamWriter(configPath))
+                serializer.Serialize(writer, Data);
+            performingOperation = false;
+        }
+        public static void Load()
+        {
+            while (false) { }
+
+            performingOperation = true;
+            XmlSerializer deserializer = new XmlSerializer(typeof(configData));
+            using (TextReader reader = new StreamReader(configPath))
+                Data = (configData)deserializer.Deserialize(reader);
+            performingOperation = false;
+        }
+        public static new string ToString()
+        {
+            string output = "";
+
+            FieldInfo[] Infos = typeof(configData).GetFields();
+            foreach (FieldInfo info in Infos)
+            {
+                output += "\n" + info.Name + ": ";
+
+                if (info.FieldType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(info.FieldType))
+                {
+                    output += "\n";
+                    IEnumerable a = (IEnumerable)info.GetValue(Data);
+                    IEnumerator e = a.GetEnumerator();
+                    e.Reset();
+                    while (e.MoveNext())
+                    {
+                        output += e.Current;
+                        if (e.Current.GetType() == typeof(ulong))
+                        {
+                            try
+                            {
+                                ISocketMessageChannel Channel = (ISocketMessageChannel)Global.P.getChannelFromID((ulong)e.Current);
+                                output += " - Name: " + Channel.Name + " - Server: " + ((SocketGuildChannel)Channel).Guild.Name + "\n";
+                            }
+                            catch { output += "\n"; }
+                        }
+                        else
+                            output += "\n";
+                    }
+                }
+                else
+                {
+                    output += info.GetValue(Data) + "\n";
+                }
+            }
+
+            return output;
+        }
+    }
+    public class configData
+    {
+        // Add your variables here
+        public string BotToken;
+        public List<ulong> ChannelsWrittenOn = new List<ulong>();
+        public List<ulong> LeetEventChannels = new List<ulong>();
+        
+        public configData()
+        {
+            // Add initilization logic here
+        }
+    }
+    public class Loader
+    {
+        public Loader()
+        {
+            if (config.Exists())
+                config.Load();
+            else
+            {
+                config.Data.BotToken = "<INSERT BOT TOKEN HERE>";
+            }
+        }
+    }
+}

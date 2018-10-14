@@ -50,15 +50,10 @@ namespace TestDiscordBot
         }
         public static void SaveChannel(ISocketMessageChannel Channel)
         {
-            if (config.Default.ChannelsWrittenOn == null)
-                config.Default.ChannelsWrittenOn = new ulong[0];
-            List<ulong> longs = config.Default.ChannelsWrittenOn.ToList();
-            if (!longs.Contains(Channel.Id))
-            {
-                longs.Add(Channel.Id);
-                config.Default.ChannelsWrittenOn = longs.ToArray();
-                config.Default.Save();
-            }
+            if (config.Data.ChannelsWrittenOn == null)
+                config.Data.ChannelsWrittenOn = new List<ulong>();
+            config.Data.ChannelsWrittenOn.Add(Channel.Id);
+            config.Save();
         }
 
         // Extensions

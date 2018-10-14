@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace TestDiscordBot
     {
         ISocketMessageChannel CurrentChannel;
         bool clientReady = false;
+        bool gotWorkingToken = false;
         DiscordSocketClient client;
         Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                from assemblyType in domainAssembly.GetTypes()
@@ -36,22 +38,32 @@ namespace TestDiscordBot
             #region startup
             try
             {
-                Console.WriteLine("Build from: " + File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\BuildDate.txt").TrimEnd('\n'));
+                Console.WriteLine("Build from: " + File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n'));
             }
             catch { }
             client = new DiscordSocketClient();
             client.Log += Log;
-
-            if (config.Default.BotToken.StartsWith("<INSERT BOT TOKEN HERE>"))
+            
+            while (!gotWorkingToken)
             {
-                config.Default.BotToken = config.Default.BotToken + "*";
-                config.Default.Save();
-                MessageBox.Show("Oi! I cant start without a bot token ya cunt.");
-                return;
+                try
+                {
+                    if (config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
+                    {
+                        stringDialog dialog = new stringDialog("Gimme a Bot Token!", "");
+                        dialog.ShowDialog();
+                        config.Data.BotToken = dialog.result;
+                        config.Save();
+                    }
+
+                    await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
+                    await client.StartAsync();
+
+                    gotWorkingToken = true;
+                }
+                catch { config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
             }
 
-            await client.LoginAsync(TokenType.Bot, config.Default.BotToken);
-            await client.StartAsync();
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
             client.Disconnected += Client_Disconnected;
@@ -166,7 +178,7 @@ namespace TestDiscordBot
                 }
                 else if (input == "/PANIKDELETE")
                 {
-                    foreach (ulong ChannelID in config.Default.ChannelsWrittenOn)
+                    foreach (ulong ChannelID in config.Data.ChannelsWrittenOn)
                     {
                         IEnumerable<IMessage> messages = await ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).Flatten();
                         foreach (IMessage m in messages)
@@ -189,30 +201,7 @@ namespace TestDiscordBot
                 }
                 else if (input == "/config")
                 {
-                    PropertyInfo[] Infos = config.Default.GetType().GetProperties().Where(x => x.PropertyType.IsArray).ToArray();
-                    foreach (PropertyInfo info in Infos)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(info.Name + ": ");
-                        Array a = (Array)info.GetValue(config.Default);
-                        for (int i = 0; i < a.Length; i++)
-                        {
-                            object o = a.GetValue(i);
-                            Console.Write(o);
-
-                            if (o.GetType() == typeof(ulong))
-                            {
-                                try
-                                {
-                                    ISocketMessageChannel Channel = (ISocketMessageChannel)getChannelFromID((ulong)o);
-                                    Console.WriteLine(" - Name: " + Channel.Name + " - Server: " + ((SocketGuildChannel)Channel).Name);
-                                }
-                                catch { Console.WriteLine(); }
-                            }
-                            else
-                                Console.WriteLine();
-                        }
-                    }
+                    Console.WriteLine(config.ToString());
                 }
                 else
                 {
@@ -233,8 +222,11 @@ namespace TestDiscordBot
             Console.WriteLine("Disconeect");
             if (arg.Message.Contains("Server missed last heartbeat"))
             {
-                await client.LogoutAsync();
-                await client.LoginAsync(TokenType.Bot, config.Default.BotToken);
+                try
+                {
+                    await client.LogoutAsync();
+                } catch { }
+                await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
                 await client.StartAsync();
             }
         }
