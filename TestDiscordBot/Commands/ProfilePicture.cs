@@ -19,13 +19,19 @@ namespace TestDiscordBot.Commands
             try
             {
                 SocketUser Target;
-
                 if (commandmessage.MentionedUsers.Count > 0)
                     Target = commandmessage.MentionedUsers.ElementAt(0);
                 else
                     Target = commandmessage.Author;
 
-                await Global.SendText(Target.GetAvatarUrl(), commandmessage.Channel);
+                ushort size = 128;
+                try
+                {
+                    size = Convert.ToUInt16(commandmessage.Content.Split(' ')[1]);
+                }
+                catch { }
+
+                await Global.SendText(Target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel);
 
                 Console.CursorLeft = 0;
                 Console.WriteLine("Profile picture in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);

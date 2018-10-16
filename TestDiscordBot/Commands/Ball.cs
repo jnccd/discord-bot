@@ -23,7 +23,7 @@ namespace TestDiscordBot.Commands
                 string m = commandmessage.Content;
                 if (m.Split(' ').Length > 4 && m.Contains("?"))
                 {
-                    if (m.Contains("Why") || m.Contains("What") || m.Contains("Who") || m.Contains("Warum") || m.Contains("Was") || m.Contains("Wieso"))
+                    if (!m.Contains("Why ") && !m.Contains("What ") && !m.Contains("Who ") && !m.Contains("Warum ") && !m.Contains("Was ") && !m.Contains("Wieso "))
                     {
                         long sum = 0;
                         for (int i = 0; i < m.Length; i++)
