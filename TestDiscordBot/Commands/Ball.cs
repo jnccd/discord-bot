@@ -21,7 +21,7 @@ namespace TestDiscordBot.Commands
             try
             {
                 string m = commandmessage.Content;
-                if (m.Split(' ').Length > 4 && m.Contains("?"))
+                if (m.Split(' ').Length >= 4 && m.Contains("?"))
                 {
                     if (!m.Contains("Why ") && !m.Contains("What ") && !m.Contains("Who ") && !m.Contains("Warum ") && !m.Contains("Was ") && !m.Contains("Wieso "))
                     {
@@ -30,7 +30,7 @@ namespace TestDiscordBot.Commands
                             sum += m.ToCharArray()[i] << i;
 
                         int answerIndex = (int)(sum % answers.Length);
-                        await Global.SendText(answers[answerIndex], commandmessage.Channel);
+                        await Global.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel);
                     }
                     else
                     {
