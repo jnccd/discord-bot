@@ -19,17 +19,18 @@ namespace TestDiscordBot
 {
     public class Program
     {
-        ISocketMessageChannel CurrentChannel;
+        int clearYcoords;
         bool clientReady = false;
         bool gotWorkingToken = false;
+        ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
+        ISocketMessageChannel CurrentChannel;
         DiscordSocketClient client;
+        Command[] commands;
         Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
                                select assemblyType).ToArray();
-        Command[] commands;
-        int clearYcoords;
-
+        
         static void Main(string[] args)
             => Global.P.MainAsync().GetAwaiter().GetResult();
 
@@ -246,21 +247,29 @@ namespace TestDiscordBot
             {
                 if (message.Content == Global.commandString + "help")
                 {
-                    EmbedBuilder Embed = new EmbedBuilder();
-                    Embed.WithColor(0, 128, 255);
-                    for (int i = 0; i < commands.Length; i++)
-                        if (commands[i].command != "")
-                        {
-                            string desc = ((commands[i].desc == null ? "" : commands[i].desc + " ") + (commands[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                            Embed.AddField(Global.commandString + commands[i].command, desc == null || desc == "" ? "-" : desc);
-                        }
-                    Embed.WithDescription("Made by <@300699566041202699>\n\nCommands:");
-                    Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
+                    List<Command> commandsLeft = commands.ToList();
 
-                    await Global.SendEmbed(Embed, message.Channel);
+                    while (commandsLeft.Count > 0)
+                    {
+                        EmbedBuilder Embed = new EmbedBuilder();
+                        Embed.WithColor(0, 128, 255);
+                        for (int i = 0; i < 24 && i < commandsLeft.Count; i++)
+                        {
+                            if (commandsLeft[i].command != "")
+                            {
+                                string desc = ((commandsLeft[i].desc == null ? "" : commandsLeft[i].desc + " ") + (commandsLeft[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
+                                Embed.AddField(Global.commandString + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
+                            }
+                            commandsLeft.RemoveAt(i);
+                            i--;
+                        }
+                        Embed.WithDescription("Made by <@300699566041202699>\n\nCommands:");
+                        Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
+                        await Global.SendEmbed(Embed, message.Channel);
+                    }
                 }
                 // Experimental
-                else if (message.Channel.Id == 473991188974927884) // Channel ID from my server
+                else if (ExperimentalChannels.Contains(message.Channel.Id)) // Channel ID from my server
                 {
                     for (int i = 0; i < commands.Length; i++)
                         if (Global.commandString + commands[i].command == message.Content.Split(' ')[0])
