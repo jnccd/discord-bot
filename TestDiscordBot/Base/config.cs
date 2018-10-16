@@ -93,6 +93,7 @@ namespace TestDiscordBot
         public configData()
         {
             // Add initilization logic here
+
         }
     }
     public class Loader

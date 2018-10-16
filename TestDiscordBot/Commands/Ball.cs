@@ -21,14 +21,21 @@ namespace TestDiscordBot.Commands
             try
             {
                 string m = commandmessage.Content;
-                if (m.Split(' ').Length > 1 && m.Contains("?"))
+                if (m.Split(' ').Length > 4 && m.Contains("?"))
                 {
-                    long sum = 0;
-                    for (int i = 0; i < m.Length; i++)
-                        sum += m.ToCharArray()[i] << i;
+                    if (m.Contains("Why") || m.Contains("What") || m.Contains("Who") || m.Contains("Warum") || m.Contains("Was") || m.Contains("Wieso"))
+                    {
+                        long sum = 0;
+                        for (int i = 0; i < m.Length; i++)
+                            sum += m.ToCharArray()[i] << i;
 
-                    int answerIndex = (int)(sum % answers.Length);
-                    await Global.SendText(answers[answerIndex], commandmessage.Channel);
+                        int answerIndex = (int)(sum % answers.Length);
+                        await Global.SendText(answers[answerIndex], commandmessage.Channel);
+                    }
+                    else
+                    {
+                        await Global.SendText("I can only answer yes no questions!", commandmessage.Channel);
+                    }
                 }
                 else
                 {
