@@ -243,7 +243,7 @@ namespace TestDiscordBot
         }
         private async Task MessageReceived(SocketMessage message)
         {
-            if (message.Content.StartsWith(Global.commandString))
+            if (message.Content.StartsWith(Global.commandString) && !message.Author.IsBot)
             {
                 if (message.Content == Global.commandString + "help")
                 {
