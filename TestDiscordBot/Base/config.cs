@@ -93,7 +93,7 @@ namespace TestDiscordBot
         public configData()
         {
             // Add initilization logic here
-
+            BotToken = "<INSERT BOT TOKEN HERE>";
         }
     }
     public class Loader
@@ -103,9 +103,7 @@ namespace TestDiscordBot
             if (config.Exists())
                 config.Load();
             else
-            {
-                config.Data.BotToken = "<INSERT BOT TOKEN HERE>";
-            }
+                config.Data = new configData();
         }
     }
 }

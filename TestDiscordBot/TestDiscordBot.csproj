@@ -117,6 +117,7 @@
     <Compile Include="Commands\LeetTimeEvent.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\Overwatch.cs" />
+    <Compile Include="Commands\ProfilePicture.cs" />
     <Compile Include="Commands\Reaction.cs" />
     <Compile Include="Base\Global.cs" />
     <Compile Include="Base\Program.cs" />
