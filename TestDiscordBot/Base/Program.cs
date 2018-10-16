@@ -44,6 +44,7 @@ namespace TestDiscordBot
             catch { }
             client = new DiscordSocketClient();
             client.Log += Log;
+            client.JoinedGuild += Client_JoinedGuild;
             
             while (!gotWorkingToken)
             {
@@ -204,6 +205,10 @@ namespace TestDiscordBot
                 {
                     Console.WriteLine(config.ToString());
                 }
+                else if (input == "/test")
+                {
+                    
+                }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -218,6 +223,13 @@ namespace TestDiscordBot
             await client.LogoutAsync();
         }
 
+        private async Task Client_JoinedGuild(SocketGuild arg)
+        {
+            try
+            {
+                await Global.SendText("Yall gay", arg.DefaultChannel);
+            } catch { }
+        }
         private async Task Client_Disconnected(Exception arg)
         {
             Console.WriteLine("Disconeect");

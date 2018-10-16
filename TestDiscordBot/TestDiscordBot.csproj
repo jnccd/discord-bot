@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\AnimeQuote.cs" />
+    <Compile Include="Commands\AreYouSureAboutDat.cs" />
     <Compile Include="Commands\Ball.cs" />
     <Compile Include="Commands\Card.cs" />
     <Compile Include="Base\Command.cs" />

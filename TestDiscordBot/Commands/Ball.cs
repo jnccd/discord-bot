@@ -29,7 +29,7 @@ namespace TestDiscordBot.Commands
                         for (int i = 0; i < m.Length; i++)
                             sum += m.ToCharArray()[i] << i;
 
-                        int answerIndex = (int)(sum % answers.Length);
+                        int answerIndex = Math.Abs((int)(sum % answers.Length));
                         await Global.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel);
                     }
                     else
