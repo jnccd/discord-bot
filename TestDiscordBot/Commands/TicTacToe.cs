@@ -24,7 +24,7 @@ namespace TestDiscordBot.Commands
                 if (commandmessage.Content.Split(' ').Length < 2 || commandmessage.Content.Split(' ')[1] == "help")
                 {
                     await Global.SendText("Usage: \n\"" + 
-                        Global.commandCharacter + command + " newGame\" and 1 mentioned user to paly against \n\"" +
+                        Global.commandCharacter + command + " newGame\" and 1 mentioned user to play against \n\"" +
                         Global.commandCharacter + command + " set\" and then coordinates in the form of x,y \n\"" +
                         Global.commandCharacter + command + " game\" prints the game you currently in" , commandmessage.Channel);
                 }
