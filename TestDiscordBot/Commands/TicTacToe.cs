@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,10 +24,14 @@ namespace TestDiscordBot.Commands
             {
                 if (commandmessage.Content.Split(' ').Length < 2 || commandmessage.Content.Split(' ')[1] == "help")
                 {
-                    await Global.SendText("Usage: \n\"" + 
-                        Global.commandCharacter + command + " newGame\" and 1 mentioned user to play against \n\"" +
-                        Global.commandCharacter + command + " set\" and then coordinates in the form of x,y \n\"" +
-                        Global.commandCharacter + command + " game\" prints the game you currently in" , commandmessage.Channel);
+                    EmbedBuilder Embed = new EmbedBuilder();
+                    Embed.WithColor(0, 128, 255);
+                    Embed.AddField(Global.commandCharacter + command + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+                    Embed.AddField(Global.commandCharacter + command + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " + 
+                        "no spaces allowed eg. " + Global.commandCharacter + command + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
+                    Embed.AddField(Global.commandCharacter + command + " game", "Prints the game you are currently in");
+                    Embed.WithDescription("TicTacToe Commands:");
+                    await Global.SendEmbed(Embed, commandmessage.Channel);
                 }
                 else if (commandmessage.Content.Split(' ')[1] == "newGame")
                 {
@@ -48,14 +53,21 @@ namespace TestDiscordBot.Commands
                         {
                             if (commandmessage.MentionedUsers.ElementAt(0).IsBot)
                             {
-                                if (commandmessage.MentionedUsers.ElementAt(0) == Global.P.getSelf())
+                                if (commandmessage.MentionedUsers.ElementAt(0).Id == Global.P.getSelf().Id)
                                     await Global.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel);
                                 else
                                     await Global.SendText("You cant play with a bot!", commandmessage.Channel);
                             }
                             else
                             {
-                                Games.Add(new TicTacToeGame(commandmessage.MentionedUsers.ElementAt(0), commandmessage.Author));
+                                if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
+                                    await Global.SendText("You cant play against yourself", commandmessage.Channel);
+                                else
+                                {
+                                    Games.Add(new TicTacToeGame(commandmessage.MentionedUsers.ElementAt(0), commandmessage.Author));
+                                    await Global.SendText("Created new game against " + commandmessage.MentionedUsers.ElementAt(0) + " successfully!", commandmessage.Channel);
+                                    await Global.SendText(Games.Last().ToString(), commandmessage.Channel);
+                                }
                             }
                         }
                     }
@@ -96,7 +108,7 @@ namespace TestDiscordBot.Commands
 
                                     if (x == 0 || y == 0)
                                     {
-                                        await Global.SendText("You cant put your symbol there!", commandmessage.Channel);
+                                        await Global.SendText("You cant put your symbol there!\nRemember Coordinates start at 1, not 0.", commandmessage.Channel);
                                         return;
                                     }
 
