@@ -12,6 +12,7 @@ namespace TestDiscordBot
 {
     public static class Global
     {
+        public static SocketUser Master;
         public static Random RDM = new Random();
         public static Program P = new Program();
         public static string commandCharacter = "!";

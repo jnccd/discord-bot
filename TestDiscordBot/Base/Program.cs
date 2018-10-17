@@ -66,17 +66,20 @@ namespace TestDiscordBot
                 }
                 catch { config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
             }
-
+            
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
             client.Disconnected += Client_Disconnected;
-
+            
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
                 commands[i] = (Command)Activator.CreateInstance(commandTypes[i]);
+
+            commands = commands.OrderBy(x => x.command).ToArray(); // Sort commands in alphabetical order
             
             while (!clientReady) { Thread.Sleep(20); }
 
+            Global.Master = client.GetUser(300699566041202699);
             await client.SetGameAsync("Type " + Global.commandCharacter + "help");
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.Write("Default channel is: ");
@@ -280,7 +283,7 @@ namespace TestDiscordBot
                             commandsLeft.RemoveAt(i);
                             i--;
                         }
-                        Embed.WithDescription("Made by <@300699566041202699>\n\nCommands:");
+                        Embed.WithDescription("Made by " + Global.Master.Mention + "\n\nCommands:");
                         Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
                         await Global.SendEmbed(Embed, message.Channel);
                     }

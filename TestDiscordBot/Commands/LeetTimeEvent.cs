@@ -25,7 +25,7 @@ namespace TestDiscordBot.Commands
         {
             try
             {
-                if (commandmessage.Author.Id == 300699566041202699 || ((SocketGuildUser)commandmessage.Author) == ((SocketGuildUser)commandmessage.Author).Guild.Owner)
+                if (commandmessage.Author.Id == Global.Master.Id || ((SocketGuildUser)commandmessage.Author) == ((SocketGuildUser)commandmessage.Author).Guild.Owner)
                 {
                     if (config.Data.LeetEventChannels.Contains(commandmessage.Channel.Id))
                     {
