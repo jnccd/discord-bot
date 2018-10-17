@@ -102,6 +102,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\SourceCode.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
     <Compile Include="Helper Classes\config.cs" />
     <Compile Include="Helper Classes\RuntimeCompile.cs" />
