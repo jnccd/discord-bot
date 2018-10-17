@@ -61,7 +61,7 @@ namespace TestDiscordBot.Commands
                             else
                             {
                                 if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
-                                    await Global.SendText("You cant play against yourself", commandmessage.Channel);
+                                    await Global.SendText("You can't play against yourself!", commandmessage.Channel);
                                 else
                                 {
                                     Games.Add(new TicTacToeGame(commandmessage.MentionedUsers.ElementAt(0), commandmessage.Author));
