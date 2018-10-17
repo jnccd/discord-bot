@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TestDiscordBot.Commands;
+using TestDiscordBot.Helper_Classes;
 
 namespace TestDiscordBot
 {
@@ -76,7 +77,7 @@ namespace TestDiscordBot
             
             while (!clientReady) { Thread.Sleep(20); }
 
-            await client.SetGameAsync("Type " + Global.commandString + "help");
+            await client.SetGameAsync("Type " + Global.commandCharacter + "help");
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -207,7 +208,11 @@ namespace TestDiscordBot
                 }
                 else if (input == "/test")
                 {
-                    
+                    try
+                    {
+                        RuntimeCompile.writeLine("Global.RDM");
+                    }
+                    catch (Exception e) { Console.WriteLine(e); }
                 }
                 else
                 {
@@ -255,9 +260,9 @@ namespace TestDiscordBot
         }
         private async Task MessageReceived(SocketMessage message)
         {
-            if (message.Content.StartsWith(Global.commandString) && !message.Author.IsBot)
+            if (message.Content.StartsWith(Global.commandCharacter) && !message.Author.IsBot)
             {
-                if (message.Content == Global.commandString + "help")
+                if (message.Content == Global.commandCharacter + "help")
                 {
                     List<Command> commandsLeft = commands.ToList();
 
@@ -270,7 +275,7 @@ namespace TestDiscordBot
                             if (commandsLeft[i].command != "")
                             {
                                 string desc = ((commandsLeft[i].desc == null ? "" : commandsLeft[i].desc + " ") + (commandsLeft[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                                Embed.AddField(Global.commandString + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
+                                Embed.AddField(Global.commandCharacter + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
                             }
                             commandsLeft.RemoveAt(i);
                             i--;
@@ -284,14 +289,14 @@ namespace TestDiscordBot
                 else if (ExperimentalChannels.Contains(message.Channel.Id)) // Channel ID from my server
                 {
                     for (int i = 0; i < commands.Length; i++)
-                        if (Global.commandString + commands[i].command == message.Content.Split(' ')[0])
+                        if (Global.commandCharacter + commands[i].command == message.Content.Split(' ')[0])
                             try { await commands[i].execute(message); } catch {  }
                 }
                 // Default Channels
                 else
                 {
                     for (int i = 0; i < commands.Length; i++)
-                        if (Global.commandString + commands[i].command == message.Content.Split(' ')[0])
+                        if (Global.commandCharacter + commands[i].command == message.Content.Split(' ')[0])
                         {
                             if (commands[i].isExperimental)
                                 await Global.SendText("Experimental commands cant be used here!", message.Channel);

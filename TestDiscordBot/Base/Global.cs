@@ -14,7 +14,7 @@ namespace TestDiscordBot
     {
         public static Random RDM = new Random();
         public static Program P = new Program();
-        public static string commandString = "!";
+        public static string commandCharacter = "!";
         public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static async Task SendFile(string path, ISocketMessageChannel Channel)
