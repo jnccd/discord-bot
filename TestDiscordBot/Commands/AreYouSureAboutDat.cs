@@ -9,7 +9,7 @@ namespace TestDiscordBot.Commands
 {
     public class AreYouSureAboutDat : Command
     {
-        public AreYouSureAboutDat() : base("usure", "Send if some people are too sure about themselves", false)
+        public AreYouSureAboutDat() : base("usure", "Send if some people are too sure about themselves.", false)
         {
 
         }

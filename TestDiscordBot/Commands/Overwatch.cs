@@ -14,7 +14,7 @@ namespace TestDiscordBot.Commands
     {
         string url = "";
 
-        public Overwatch() : base("overwatch", "gets a post from /r/overwatch", true)
+        public Overwatch() : base("overwatch", "Gets a post from /r/overwatch.", true)
         {
 
         }

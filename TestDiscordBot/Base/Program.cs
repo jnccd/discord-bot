@@ -90,7 +90,7 @@ namespace TestDiscordBot
             clearYcoords = Console.CursorTop;
             ShowWindow(GetConsoleWindow(), 2);
             #endregion
-
+            
             #region commands
             while (true)
             {
@@ -170,9 +170,23 @@ namespace TestDiscordBot
                     try
                     {
                         string[] splits = input.Split(' ');
+                        IMessage M = null;
+                        bool DeletionComplete = false;
 
-                        var M = await CurrentChannel.GetMessageAsync(Convert.ToUInt64(splits[1]));
-                        await M.DeleteAsync();
+                        for (int i = 0; !DeletionComplete; i++)
+                        {
+                            M = await ((ISocketMessageChannel)getChannelFromID(config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1]));
+
+                            if (M != null)
+                            {
+                                try
+                                {
+                                    await M.DeleteAsync();
+                                    DeletionComplete = true;
+                                }
+                                catch { }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
@@ -228,6 +242,7 @@ namespace TestDiscordBot
             #endregion
 
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
+            await client.SetStatusAsync(UserStatus.DoNotDisturb);
             await client.LogoutAsync();
         }
 

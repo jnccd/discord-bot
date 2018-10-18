@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class Reaction : Command
     {
-        public Reaction() : base("reaction", "Posts a random reaction image", false)
+        public Reaction() : base("reaction", "Posts a random reaction image.", false)
         {
 
         }

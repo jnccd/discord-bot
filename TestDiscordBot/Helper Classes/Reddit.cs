@@ -63,11 +63,13 @@ namespace TestDiscordBot
             ResultTimestamp = postJson.GetEverythingBetween("\"created\": ", ", ");
             ResultPoints = postJson.GetEverythingBetween("\"score\": ", ", ");
             ResultPicURL = postJson.GetEverythingBetween("\"images\": [{\"source\": {\"url\": \"", "\", ");
-            if (ResultPicURL == "")
+            if (ResultPicURL == "" || !IsReachable(ResultPicURL))
                 ResultPicURL = postJson.GetEverythingBetween("\"variants\": {\"gif\": {\"source\": {\"url\": \"", "\"");
-            if (ResultPicURL == "")
+            if (ResultPicURL == "" || !IsReachable(ResultPicURL))
+                ResultPicURL = postJson.GetEverythingBetween("\"thumbnail\": \"", "\", ");
+            if (ResultPicURL == "" || !IsReachable(ResultPicURL))
                 ResultPicURL = postJson.GetEverythingBetween("\"url\": \"", "\",");
-            if (ResultPicURL == "")
+            if (ResultPicURL == "" || !IsReachable(ResultPicURL))
                 throw new Exception("Faulty URL: " + ResultURL, new Exception(postJson));
             string temp = postJson.GetEverythingBetween(", \"is_video\": ", "}");
             try { IsVideo = Convert.ToBoolean(temp); }
@@ -118,6 +120,25 @@ namespace TestDiscordBot
                 Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point on " : " fake internet points on ") + subUrl.Remove(0, "https://www.reddit.com".Length));
 
                 await Global.SendEmbed(Embed, Channel);
+            }
+        }
+
+        public static bool IsReachable(string url)
+        {
+            // from https://stackoverflow.com/questions/5378429/check-if-a-url-is-reachable-help-in-optimizing-a-class
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Timeout = 15000;
+            request.Method = "HEAD"; // As per Lasse's comment
+            try
+            {
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                {
+                    return response.StatusCode == HttpStatusCode.OK;
+                }
+            }
+            catch (WebException e)
+            {
+                return false;
             }
         }
     }
