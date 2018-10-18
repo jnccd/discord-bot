@@ -22,7 +22,7 @@ namespace TestDiscordBot.Commands
             "https://www.reddit.com/r/pyrocynical/", "https://www.reddit.com/r/SequelMemes/",
             "https://www.reddit.com/r/starterpacks/", "https://www.reddit.com/r/memeframe/" };
 
-        public Meme() : base("meme", "Posts a random meme from a random subreddit, might send some weird ass shit so be advised.", false)
+        public Meme() : base("meme", "Posts a random meme from a random subreddit, might send some weird ass shit so be advised. Takes Subreddit names as argument if you want specific subreddits.", false)
         {
 
         }
@@ -32,8 +32,19 @@ namespace TestDiscordBot.Commands
             try
             {
                 // Getting a subreddit
-                url = Subreddits[Global.RDM.Next(Subreddits.Length)];
                 bool worked = false;
+
+                if (commandmessage.Content.Split(' ').Length > 1)
+                {
+                    url = "https://www.reddit.com/r/" + commandmessage.Content.Split(' ')[1] + "/";
+                    if (!Reddit.IsReachable(url))
+                    {
+                        await Global.SendText("Thats not a valid subreddit!", commandmessage.Channel);
+                        return;
+                    }
+                }
+                else
+                    url = Subreddits[Global.RDM.Next(Subreddits.Length)];
 
                 while (!worked)
                 {
