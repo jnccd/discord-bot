@@ -9,7 +9,7 @@ namespace TestDiscordBot.Commands
 {
     public class ProfilePicture : Command
     {
-        public ProfilePicture() : base("profilePicture", "Gets the profile picture of a mentioned target or yourself if you dont mention anyone", false)
+        public ProfilePicture() : base("profilePicture", "Gets the profile picture of a mentioned target or yourself if you dont mention anyone.", false)
         {
 
         }

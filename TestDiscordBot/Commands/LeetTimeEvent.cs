@@ -12,7 +12,7 @@ namespace TestDiscordBot.Commands
     {
         Timer leetTimer;
 
-        public LeetTimeEvent() : base("toggleLeetEvents", "Dooms this channel for all eternity (can only be used by server owners)", false)
+        public LeetTimeEvent() : base("toggleLeetEvents", "Dooms this channel for all eternity. (can only be used by server owners)", false)
         {
             TimerCallback callback = new TimerCallback(OnLeetTime);
             DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 37, 0);

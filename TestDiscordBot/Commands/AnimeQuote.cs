@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class AnimeQuote : Command
     {
-        public AnimeQuote() : base("animeQuote", "Posts a random anime quote", false)
+        public AnimeQuote() : base("animeQuote", "Posts a random anime quote.", false)
         {
 
         }
