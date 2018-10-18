@@ -87,10 +87,17 @@ namespace TestDiscordBot
                 WebClient client = new WebClient();
                 client.DownloadFile(postJson.GetEverythingBetween("\"media\": {\"reddit_video\": {\"fallback_url\": \"", "\","), videofile);
 
-                // send post
-                await Global.SendFile(videofile, ResultTitle, Channel);
-                await Global.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
-
+                if (new FileInfo(videofile).Length > 8 * 1024 * 1024)
+                {
+                    await Global.SendText("That video is too big for discords puny 8MB limit!", Channel);
+                }
+                else
+                {
+                    // send post
+                    await Global.SendFile(videofile, ResultTitle, Channel);
+                    await Global.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
+                }
+                
                 // delete "Sending video post. Please wait..." message
                 IEnumerable<IMessage> messages = await Channel.GetMessagesAsync().Flatten();
                 foreach (IMessage m in messages)
