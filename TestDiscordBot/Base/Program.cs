@@ -82,6 +82,7 @@ namespace TestDiscordBot
             Global.Master = client.GetUser(300699566041202699);
             await client.SetGameAsync("Type " + Global.commandCharacter + "help");
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
+            Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(CurrentChannel);
@@ -255,7 +256,7 @@ namespace TestDiscordBot
         }
         private async Task Client_Disconnected(Exception arg)
         {
-            Console.WriteLine("Disconeect");
+            Console.WriteLine("Disconect!");
             if (arg.Message.Contains("Server missed last heartbeat"))
             {
                 try
@@ -273,7 +274,10 @@ namespace TestDiscordBot
         }
         private Task Log(LogMessage msg)
         {
+            Console.CursorLeft = 0;
             Console.WriteLine(msg.ToString());
+            if (clientReady)
+                Console.Write("$");
             return Task.FromResult(0);
         }
         private async Task MessageReceived(SocketMessage message)
@@ -304,11 +308,30 @@ namespace TestDiscordBot
                     }
                 }
                 // Experimental
-                else if (ExperimentalChannels.Contains(message.Channel.Id)) // Channel ID from my server
+                else if (ExperimentalChannels.Contains(message.Channel.Id))
                 {
                     for (int i = 0; i < commands.Length; i++)
                         if (Global.commandCharacter + commands[i].command == message.Content.Split(' ')[0])
-                            try { await commands[i].execute(message); } catch {  }
+                            try
+                            {
+                                await commands[i].execute(message);
+
+                                Console.CursorLeft = 0;
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("$");
+                            }
+                            catch (Exception e)
+                            {
+                                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+
+                                Console.CursorLeft = 0;
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine(e);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("$");
+                            }
                 }
                 // Default Channels
                 else
@@ -319,7 +342,26 @@ namespace TestDiscordBot
                             if (commands[i].isExperimental)
                                 await Global.SendText("Experimental commands cant be used here!", message.Channel);
                             else
-                                await commands[i].execute(message);
+                                try
+                                {
+                                    await commands[i].execute(message);
+
+                                    Console.CursorLeft = 0;
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    Console.Write("$");
+                                }
+                                catch (Exception e)
+                                {
+                                    await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+
+                                    Console.CursorLeft = 0;
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine(e);
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    Console.Write("$");
+                                }
                         }
                 }
             }

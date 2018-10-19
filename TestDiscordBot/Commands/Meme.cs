@@ -29,53 +29,37 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            try
+            // Getting a subreddit
+            bool worked = false;
+
+            if (commandmessage.Content.Split(' ').Length > 1)
             {
-                // Getting a subreddit
-                bool worked = false;
-
-                if (commandmessage.Content.Split(' ').Length > 1)
+                url = "https://www.reddit.com/r/" + commandmessage.Content.Split(' ')[1] + "/";
+                if (!Reddit.IsReachable(url))
                 {
-                    url = "https://www.reddit.com/r/" + commandmessage.Content.Split(' ')[1] + "/";
-                    if (!Reddit.IsReachable(url))
-                    {
-                        await Global.SendText("Thats not a valid subreddit!", commandmessage.Channel);
-                        return;
-                    }
+                    await Global.SendText("Thats not a valid subreddit!", commandmessage.Channel);
+                    return;
                 }
-                else
-                    url = Subreddits[Global.RDM.Next(Subreddits.Length)];
-
-                while (!worked)
-                {
-                    try
-                    {
-                        string postJson = Reddit.GetPostJsonFromSubreddit(url);
-                        await Reddit.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author);
-                        worked = true;
-                    } catch (Exception e) {
-                        Console.CursorLeft = 0;
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(e);
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                }
-
-                Console.CursorLeft = 0;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Send meme in " + commandmessage.Channel.Name + " for " + commandmessage.Author.Username);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
             }
-            catch (Exception e)
-            {
-                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", commandmessage.Channel);
+            else
+                url = Subreddits[Global.RDM.Next(Subreddits.Length)];
 
-                Console.CursorLeft = 0;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e + "\n\nOn: " + url);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
+            while (!worked)
+            {
+                try
+                {
+                    string postJson = Reddit.GetPostJsonFromSubreddit(url);
+                    await Reddit.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author);
+                    worked = true;
+                }
+                catch (Exception e)
+                {
+                    Console.CursorLeft = 0;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(e);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("$");
+                }
             }
         }
     }

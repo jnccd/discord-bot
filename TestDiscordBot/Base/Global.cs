@@ -39,7 +39,7 @@ namespace TestDiscordBot
         public static async Task SendText(string text, ulong ChannelID)
         {
             ISocketMessageChannel Channel = (ISocketMessageChannel)P.getChannelFromID(ChannelID);
-            await Channel.SendMessageAsync(text);
+            await SendText(text, Channel);
 
             SaveChannel(Channel);
         }
@@ -56,19 +56,6 @@ namespace TestDiscordBot
             if (!config.Data.ChannelsWrittenOn.Contains(Channel.Id))
                 config.Data.ChannelsWrittenOn.Add(Channel.Id);
             config.Save();
-        }
-        public static void eliminateDoublesInChannelsWrittenOn()
-        {
-            for (int i = 0; i < config.Data.ChannelsWrittenOn.Count; i++)
-                for (int j = 0; j < config.Data.ChannelsWrittenOn.Count; j++)
-                {
-                    if (i != j && config.Data.ChannelsWrittenOn[i] == config.Data.ChannelsWrittenOn[j])
-                    {
-                        config.Data.ChannelsWrittenOn.RemoveAt(j);
-                        i--;
-                        j--;
-                    }
-                }
         }
 
         // Extensions
