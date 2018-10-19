@@ -15,7 +15,6 @@ namespace TestDiscordBot
     public static class config
     {
         static string configPath = Global.CurrentExecutablePath + "\\config.xml";
-        static bool performingOperation = false;
         public static configData Data = new configData();
         static Loader L = new Loader();
         
@@ -25,23 +24,15 @@ namespace TestDiscordBot
         }
         public static void Save()
         {
-            while (false) { }
-
-            performingOperation = true;
             XmlSerializer serializer = new XmlSerializer(typeof(configData));
             using (TextWriter writer = new StreamWriter(configPath))
                 serializer.Serialize(writer, Data);
-            performingOperation = false;
         }
         public static void Load()
         {
-            while (false) { }
-
-            performingOperation = true;
             XmlSerializer deserializer = new XmlSerializer(typeof(configData));
             using (TextReader reader = new StreamReader(configPath))
                 Data = (configData)deserializer.Deserialize(reader);
-            performingOperation = false;
         }
         public static new string ToString()
         {
@@ -88,7 +79,6 @@ namespace TestDiscordBot
         // Add your variables here
         public string BotToken;
         public List<ulong> ChannelsWrittenOn = new List<ulong>();
-        public List<ulong> LeetEventChannels = new List<ulong>();
         
         public configData()
         {

@@ -13,29 +13,15 @@ namespace TestDiscordBot
         public string desc;
         public string command;
         public bool isExperimental;
-        public bool isLeet
-        {
-            get
-            {
-                return GetType() == typeof(LeetTimeEvent);
-            }
-        }
-
-        public Command(string command, bool isExperimental)
-        {
-            this.command = command;
-            this.isExperimental = isExperimental;
-        }
+        
         public Command(string command, string desc, bool isExperimental)
         {
             this.desc = desc;
             this.command = command;
             this.isExperimental = isExperimental;
         }
-
-#pragma warning disable CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
+        
         public virtual async Task execute(SocketMessage commandmessage)
-#pragma warning restore CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
         {
 
         }
