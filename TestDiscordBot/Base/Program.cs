@@ -23,6 +23,7 @@ namespace TestDiscordBot
         bool clientReady = false;
         bool gotWorkingToken = false;
         ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
+        string[] commandPrefixes;
         ISocketMessageChannel CurrentChannel;
         DiscordSocketClient client;
         Command[] commands;
@@ -73,6 +74,14 @@ namespace TestDiscordBot
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
                 commands[i] = (Command)Activator.CreateInstance(commandTypes[i]);
+
+            List<string> prefixes = new List<string>();
+            for (int i = 0; i < commands.Length; i++)
+                if (!prefixes.Contains(commands[i].prefix))
+                    prefixes.Add(commands[i].prefix);
+            if (!prefixes.Contains(Global.prefix))
+                prefixes.Add(Global.prefix);
+            commandPrefixes = prefixes.ToArray();
 
             commands = commands.OrderBy(x => x.command).ToArray(); // Sort commands in alphabetical order
             
@@ -281,7 +290,7 @@ namespace TestDiscordBot
         }
         private async Task MessageReceived(SocketMessage message)
         {
-            if (!message.Author.IsBot)
+            if (!message.Author.IsBot && message.Content.StartsWith(commandPrefixes))
             {
                 if (message.Content == Global.prefix + "help")
                 {
@@ -296,7 +305,7 @@ namespace TestDiscordBot
                             if (commandsLeft[i].command != "")
                             {
                                 string desc = ((commandsLeft[i].desc == null ? "" : commandsLeft[i].desc + " ") + (commandsLeft[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                                Embed.AddField(Global.prefix + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
+                                Embed.AddField(commandsLeft[i].prefix + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
                             }
                             commandsLeft.RemoveAt(i);
                             i--;
