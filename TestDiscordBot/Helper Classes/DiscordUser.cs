@@ -10,17 +10,17 @@ namespace TestDiscordBot
     public class DiscordUser
     {
         public ulong UserID;
-        public int currency;
+        public int Moneys;
 
         public DiscordUser()
         {
             UserID = 0;
-            currency = 0;
+            Moneys = 0;
         }
         public DiscordUser(ulong UserID)
         {
             this.UserID = UserID;
-            currency = 0;
+            Moneys = 0;
         }
 
         public bool Equals(SocketUser User)
