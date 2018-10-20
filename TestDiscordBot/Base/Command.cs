@@ -11,6 +11,7 @@ namespace TestDiscordBot
     public class Command
     {
         public string desc;
+        public string prefix;
         public string command;
         public bool isExperimental;
         
@@ -19,6 +20,7 @@ namespace TestDiscordBot
             this.desc = desc;
             this.command = command;
             this.isExperimental = isExperimental;
+            prefix = Global.prefix;
         }
         
         public virtual async Task execute(SocketMessage commandmessage)

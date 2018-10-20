@@ -15,40 +15,34 @@ namespace TestDiscordBot
         public static SocketUser Master;
         public static Random RDM = new Random();
         public static Program P = new Program();
-        public static string commandCharacter = "!";
+        public const string prefix = "!";
         public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         public static async Task SendFile(string path, ISocketMessageChannel Channel)
         {
             await Channel.SendFileAsync(path);
-
             SaveChannel(Channel);
         }
         public static async Task SendFile(string path, string text, ISocketMessageChannel Channel)
         {
             await Channel.SendFileAsync(path, text);
-
             SaveChannel(Channel);
         }
         public static async Task SendText(string text, ISocketMessageChannel Channel)
         {
             await Channel.SendMessageAsync(text);
-
             SaveChannel(Channel);
         }
         public static async Task SendText(string text, ulong ChannelID)
         {
-            ISocketMessageChannel Channel = (ISocketMessageChannel)P.getChannelFromID(ChannelID);
-            await SendText(text, Channel);
-
-            SaveChannel(Channel);
+            await SendText(text, (ISocketMessageChannel)P.getChannelFromID(ChannelID));
         }
         public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
         {
             await Channel.SendMessageAsync("", false, Embed.Build());
-
             SaveChannel(Channel);
         }
+
         public static void SaveChannel(ISocketMessageChannel Channel)
         {
             if (config.Data.ChannelsWrittenOn == null)
@@ -56,6 +50,11 @@ namespace TestDiscordBot
             if (!config.Data.ChannelsWrittenOn.Contains(Channel.Id))
                 config.Data.ChannelsWrittenOn.Add(Channel.Id);
             config.Save();
+        }
+        public static void SaveUser(ulong UserID)
+        {
+            if (!config.Data.UserList.Exists(x => x.UserID == UserID))
+                config.Data.UserList.Add(new DiscordUser(UserID));
         }
 
         // Extensions

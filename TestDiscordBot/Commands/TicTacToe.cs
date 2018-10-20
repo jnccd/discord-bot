@@ -24,10 +24,10 @@ namespace TestDiscordBot.Commands
             {
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
-                Embed.AddField(Global.commandCharacter + command + " newGame + a mentioned user", "Creates a new game against the mentioned user");
-                Embed.AddField(Global.commandCharacter + command + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " +
-                    "no spaces allowed eg. " + Global.commandCharacter + command + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
-                Embed.AddField(Global.commandCharacter + command + " game", "Prints the game you are currently in");
+                Embed.AddField(Global.prefix + command + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+                Embed.AddField(Global.prefix + command + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " +
+                    "no spaces allowed eg. " + Global.prefix + command + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
+                Embed.AddField(Global.prefix + command + " game", "Prints the game you are currently in");
                 Embed.WithDescription("TicTacToe Commands:");
                 await Global.SendEmbed(Embed, commandmessage.Channel);
             }
