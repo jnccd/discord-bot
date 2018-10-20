@@ -12,6 +12,25 @@ using System.Xml.Serialization;
 
 namespace TestDiscordBot
 {
+    public class configData
+    {
+        // TODO: Add your variables here
+        public string BotToken;
+        public List<ulong> ChannelsWrittenOn;
+        public List<DiscordUser> UserList;
+        public DateTime LastLeetedDay;
+
+        public configData()
+        {
+            // TODO: Add initilization logic here
+            BotToken = "<INSERT BOT TOKEN HERE>";
+            ChannelsWrittenOn = new List<ulong>();
+            UserList = new List<DiscordUser>();
+            LastLeetedDay = DateTime.Now.Subtract(new TimeSpan(24, 0, 0));
+        }
+    }
+
+    #region Backend Stuff
     public static class config
     {
         static string configPath = Global.CurrentExecutablePath + "\\config.xml";
@@ -74,18 +93,6 @@ namespace TestDiscordBot
             return output;
         }
     }
-    public class configData
-    {
-        // Add your variables here
-        public string BotToken;
-        public List<ulong> ChannelsWrittenOn = new List<ulong>();
-        
-        public configData()
-        {
-            // Add initilization logic here
-            BotToken = "<INSERT BOT TOKEN HERE>";
-        }
-    }
     public class Loader
     {
         public Loader()
@@ -96,4 +103,5 @@ namespace TestDiscordBot
                 config.Data = new configData();
         }
     }
+    #endregion
 }

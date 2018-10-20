@@ -7,14 +7,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using TestDiscordBot.Commands;
-using TestDiscordBot.Helper_Classes;
 
 namespace TestDiscordBot
 {
@@ -53,9 +52,9 @@ namespace TestDiscordBot
                 {
                     if (config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
                     {
-                        stringDialog dialog = new stringDialog("Gimme a Bot Token!", "");
-                        dialog.ShowDialog();
-                        config.Data.BotToken = dialog.result;
+                        SystemSounds.Exclamation.Play();
+                        Console.Write("Give me a Bot Token: ");
+                        config.Data.BotToken = Console.ReadLine();
                         config.Save();
                     }
 
@@ -80,7 +79,7 @@ namespace TestDiscordBot
             while (!clientReady) { Thread.Sleep(20); }
 
             Global.Master = client.GetUser(300699566041202699);
-            await client.SetGameAsync("Type " + Global.commandCharacter + "help");
+            await client.SetGameAsync("Type " + Global.prefix + "help");
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
@@ -228,7 +227,7 @@ namespace TestDiscordBot
                 {
                     try
                     {
-                        RuntimeCompile.writeLine("Global.RDM");
+                        // TODO: Insert Testing Code here
                     }
                     catch (Exception e) { Console.WriteLine(e); }
                 }
@@ -282,9 +281,9 @@ namespace TestDiscordBot
         }
         private async Task MessageReceived(SocketMessage message)
         {
-            if (message.Content.StartsWith(Global.commandCharacter) && !message.Author.IsBot)
+            if (!message.Author.IsBot)
             {
-                if (message.Content == Global.commandCharacter + "help")
+                if (message.Content == Global.prefix + "help")
                 {
                     List<Command> commandsLeft = commands.ToList();
 
@@ -297,7 +296,7 @@ namespace TestDiscordBot
                             if (commandsLeft[i].command != "")
                             {
                                 string desc = ((commandsLeft[i].desc == null ? "" : commandsLeft[i].desc + " ") + (commandsLeft[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                                Embed.AddField(Global.commandCharacter + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
+                                Embed.AddField(Global.prefix + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
                             }
                             commandsLeft.RemoveAt(i);
                             i--;
@@ -311,7 +310,7 @@ namespace TestDiscordBot
                 else if (ExperimentalChannels.Contains(message.Channel.Id))
                 {
                     for (int i = 0; i < commands.Length; i++)
-                        if (Global.commandCharacter + commands[i].command == message.Content.Split(' ')[0])
+                        if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
                             try
                             {
                                 await commands[i].execute(message);
@@ -337,13 +336,14 @@ namespace TestDiscordBot
                 else
                 {
                     for (int i = 0; i < commands.Length; i++)
-                        if (Global.commandCharacter + commands[i].command == message.Content.Split(' ')[0])
+                        if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
                         {
                             if (commands[i].isExperimental)
                                 await Global.SendText("Experimental commands cant be used here!", message.Channel);
                             else
                                 try
                                 {
+                                    Global.SaveUser(message.Author.Id);
                                     await commands[i].execute(message);
 
                                     Console.CursorLeft = 0;
