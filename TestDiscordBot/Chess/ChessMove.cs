@@ -4,26 +4,26 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace XNAChessAI
+namespace TestDiscordBot.Chess
 {
-    public class Move : ICloneable
+    public class ChessMove : ICloneable
     {
         public Point From, To;
         public int rating;
 
-        public Move()
+        public ChessMove()
         {
             this.From = Point.Zero;
             this.To = Point.Zero;
             this.rating = 0;
         }
-        public Move(Point From, Point To)
+        public ChessMove(Point From, Point To)
         {
             this.From = From;
             this.To = To;
             this.rating = 0;
         }
-        public Move(Point From, Point To, int rating)
+        public ChessMove(Point From, Point To, int rating)
         {
             this.From = From;
             this.To = To;
@@ -32,7 +32,7 @@ namespace XNAChessAI
 
         public object Clone()
         {
-            Move re = new Move(new Point(), new Point(), rating);
+            ChessMove re = new ChessMove(new Point(), new Point(), rating);
             re.From.X = From.X;
             re.From.Y = From.Y;
             re.To.X = To.X;

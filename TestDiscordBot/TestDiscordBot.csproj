@@ -120,8 +120,10 @@
     <Compile Include="Chess\ChessBoard.cs" />
     <Compile Include="Chess\ChessPiece.cs" />
     <Compile Include="Chess\ChessPlayer.cs" />
+    <Compile Include="Chess\ChessPlayerDiscord.cs" />
     <Compile Include="Chess\ChessPlayerMinMax.cs" />
-    <Compile Include="Chess\Move.cs" />
+    <Compile Include="Chess\ChessMove.cs" />
+    <Compile Include="Commands\Chess.cs" />
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\SourceCode.cs" />
     <Compile Include="Commands\TicTacToe.cs" />

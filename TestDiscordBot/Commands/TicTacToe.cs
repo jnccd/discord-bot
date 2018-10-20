@@ -260,7 +260,7 @@ namespace TestDiscordBot.Commands
         {
             string re = "";
 
-            re += Player1.Mention + " vs. " + Player2.Mention + "\n\n";
+            re += Player1.Mention + " (X) vs. " + Player2.Mention + " (O)\n\n";
 
             re += "```\n";
             re += "╔═══╦═══╦═══╗\n";

@@ -88,7 +88,11 @@ namespace TestDiscordBot
             while (!clientReady) { Thread.Sleep(20); }
 
             Global.Master = client.GetUser(300699566041202699);
+#if DEBUG
+            await client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
+#else
             await client.SetGameAsync("Type " + Global.prefix + "help");
+#endif
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
@@ -98,9 +102,9 @@ namespace TestDiscordBot
             Console.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
             ShowWindow(GetConsoleWindow(), 2);
-            #endregion
+#endregion
             
-            #region commands
+#region commands
             while (true)
             {
                 Console.Write("$");
@@ -140,7 +144,7 @@ namespace TestDiscordBot
                 }
                 else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
                 {
-                    #region set channel code
+#region set channel code
                     try
                     {
                         string[] splits = input.Split(' ');
@@ -171,11 +175,11 @@ namespace TestDiscordBot
                         Console.WriteLine("Couldn't set new channel!");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
-                    #endregion
+#endregion
                 }
                 else if (input.StartsWith("/del "))
                 {
-                    #region deletion code
+#region deletion code
                     try
                     {
                         string[] splits = input.Split(' ');
@@ -203,7 +207,7 @@ namespace TestDiscordBot
                         Console.WriteLine(e);
                         Console.ForegroundColor = ConsoleColor.White;
                     }
-                    #endregion
+#endregion
                 }
                 else if (input == "/PANIKDELETE")
                 {
@@ -248,7 +252,7 @@ namespace TestDiscordBot
                 }
 
             }
-            #endregion
+#endregion
 
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
@@ -376,6 +380,10 @@ namespace TestDiscordBot
             }
         }
 
+        public SocketUser getUserFromId(ulong UserId)
+        {
+            return client.GetUser(UserId);
+        }
         public SocketChannel getChannelFromID(ulong ChannelID)
         {
             return client.GetChannel(ChannelID);
