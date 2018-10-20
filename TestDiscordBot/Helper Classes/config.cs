@@ -18,7 +18,6 @@ namespace TestDiscordBot
         public string BotToken;
         public List<ulong> ChannelsWrittenOn;
         public List<DiscordUser> UserList;
-        public DateTime LastLeetedDay;
 
         public configData()
         {

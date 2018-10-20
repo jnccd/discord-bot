@@ -93,5 +93,12 @@ namespace TestDiscordBot
                 return "";
             }
         }
+        public static bool StartsWith(this string str, string[] values)
+        {
+            foreach (string s in values)
+                if (str.StartsWith(s))
+                    return true;
+            return false;
+        }
     }
 }
