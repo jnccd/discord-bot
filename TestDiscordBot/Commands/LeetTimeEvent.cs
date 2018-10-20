@@ -19,7 +19,7 @@ namespace TestDiscordBot.Commands
         {
             if (DateTime.Now.TimeOfDay > new TimeSpan(13, 37, 0) && DateTime.Now.TimeOfDay < new TimeSpan(13, 38, 0))
             {
-                await Global.SendText("Succsessful Leet-Time Detected!", commandmessage.Channel);
+                await Global.SendText("Succsessful Leet-Time detected!", commandmessage.Channel);
             }
             else
             {

@@ -25,7 +25,6 @@ namespace TestDiscordBot
             BotToken = "<INSERT BOT TOKEN HERE>";
             ChannelsWrittenOn = new List<ulong>();
             UserList = new List<DiscordUser>();
-            LastLeetedDay = DateTime.Now.Subtract(new TimeSpan(24, 0, 0));
         }
     }
 
