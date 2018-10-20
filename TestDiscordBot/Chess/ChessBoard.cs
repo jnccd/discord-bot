@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-namespace XNAChessAI
+namespace TestDiscordBot.Chess
 {
     public class InvalidChessPiece : System.Exception { }
 
@@ -804,7 +804,7 @@ namespace XNAChessAI
             else
                 throw new ArgumentException();
         }
-        public void MovePiece(Move M)
+        public void MovePiece(ChessMove M)
         {
             if (slow)
                 Thread.Sleep(1000);

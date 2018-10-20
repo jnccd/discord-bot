@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XNAChessAI
+namespace TestDiscordBot.Chess
 {
     public enum ChessPieceType
     {

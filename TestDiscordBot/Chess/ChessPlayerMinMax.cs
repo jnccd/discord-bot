@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using TestDiscordBot;
 
-namespace XNAChessAI
+namespace TestDiscordBot.Chess
 {
     class ChessPlayerMinMax : ChessPlayer
     {
@@ -65,9 +65,9 @@ namespace XNAChessAI
  20, 20,  0,  0,  0,  0, 20, 20,
  20, 30, 10,  0,  0, 10, 30, 20 };
         
-        public Move[] GetAllMoves(ChessBoard Board, ChessPlayer Player)
+        public ChessMove[] GetAllMoves(ChessBoard Board, ChessPlayer Player)
         {
-            List<Move> moves = new List<Move>(8 * 8);
+            List<ChessMove> moves = new List<ChessMove>(8 * 8);
             for (int x = 0; x < 8; x++)
                 for (int y = 0; y < 8; y++)
                 {
@@ -75,7 +75,7 @@ namespace XNAChessAI
                     {
                         Point[] targets = Board.GetAllPossibleMovesForPiece(x, y);
                         for (int i = 0; i < targets.Length; i++)
-                            moves.Add(new Move(new Point(x, y), targets[i]));
+                            moves.Add(new ChessMove(new Point(x, y), targets[i]));
                     }
                 }
             return moves.ToArray();
@@ -195,19 +195,19 @@ namespace XNAChessAI
                 }
             return re;
         }
-        public Move MiniMax(int depth, ChessBoard Board, Move lastMove, bool maximising)
+        public ChessMove MiniMax(int depth, ChessBoard Board, ChessMove lastMove, bool maximising)
         {
             if (depth == 0)
             {
-                Move m = new Move();
+                ChessMove m = new ChessMove();
                 m.rating = EvaluationFunction(Board);
                 return m;
             }
-            Move[] Moves;
+            ChessMove[] Moves;
             if (maximising)
             {
                 Moves = GetAllMoves(Board, this);
-                Move bestMove = new Move();
+                ChessMove bestMove = new ChessMove();
                 bestMove.rating = int.MinValue;
                 for (int i = 0; i < Moves.Length; i++)
                 {
@@ -219,8 +219,8 @@ namespace XNAChessAI
                     if (Moves[i].rating < lastMove.rating)
                         continue;
                     if (Clone.Winner == this)
-                        return new Move(Moves[i].From, Moves[i].To, int.MaxValue);
-                    Move minimax = MiniMax(depth - 1, Clone, Moves[i], !maximising);
+                        return new ChessMove(Moves[i].From, Moves[i].To, int.MaxValue);
+                    ChessMove minimax = MiniMax(depth - 1, Clone, Moves[i], !maximising);
                     if (minimax.rating > bestMove.rating)
                         bestMove = Moves[i];
                 }
@@ -231,18 +231,18 @@ namespace XNAChessAI
             else
             {
                 Moves = GetAllMoves(Board, Board.GetOponent(this));
-                Move bestMove = new Move();
+                ChessMove bestMove = new ChessMove();
                 bestMove.rating = int.MaxValue;
                 for (int i = 0; i < Moves.Length; i++)
                 {
                     ChessBoard Clone = (ChessBoard)Board.Clone();
                     Clone.MovePiece(Moves[i].From, Moves[i].To);
                     if (Clone.GameEnded && Clone.Winner != this)
-                        return new Move(Moves[i].From, Moves[i].To, int.MinValue);
+                        return new ChessMove(Moves[i].From, Moves[i].To, int.MinValue);
                     Moves[i].rating = EvaluationFunction(Clone);
                     if (Moves[i].rating > lastMove.rating)
                         continue;
-                    Move minimax = MiniMax(depth - 1, Clone, Moves[i], !maximising);
+                    ChessMove minimax = MiniMax(depth - 1, Clone, Moves[i], !maximising);
                     if (minimax.rating < bestMove.rating)
                         bestMove = Moves[i];
                 }
@@ -254,11 +254,11 @@ namespace XNAChessAI
         
         public override void Update()
         {
-            Move minimax = MiniMax(3, Parent, new Move(), true);
+            ChessMove minimax = MiniMax(3, Parent, new ChessMove(), true);
             if (minimax.From == Point.Zero && minimax.To == Point.Zero)
             {
                 Debug.WriteLine("I dunnu wat im doin!");
-                Move[] moves = GetAllMoves(Parent, this);
+                ChessMove[] moves = GetAllMoves(Parent, this);
                 minimax = moves[Global.RDM.Next(moves.Length)];
             }
             Parent.MovePiece(minimax);
