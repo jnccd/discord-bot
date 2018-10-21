@@ -6,22 +6,22 @@ namespace TestDiscordBot.Chess
 {
     public class ChessMove : ICloneable
     {
-        public Point From, To;
+        public ChessPoint From, To;
         public int rating;
 
         public ChessMove()
         {
-            this.From = Point.Zero;
-            this.To = Point.Zero;
+            this.From = ChessPoint.Zero;
+            this.To = ChessPoint.Zero;
             this.rating = 0;
         }
-        public ChessMove(Point From, Point To)
+        public ChessMove(ChessPoint From, ChessPoint To)
         {
             this.From = From;
             this.To = To;
             this.rating = 0;
         }
-        public ChessMove(Point From, Point To, int rating)
+        public ChessMove(ChessPoint From, ChessPoint To, int rating)
         {
             this.From = From;
             this.To = To;
@@ -30,7 +30,7 @@ namespace TestDiscordBot.Chess
 
         public object Clone()
         {
-            ChessMove re = new ChessMove(new Point(), new Point(), rating);
+            ChessMove re = new ChessMove(new ChessPoint(), new ChessPoint(), rating);
             re.From.X = From.X;
             re.From.Y = From.Y;
             re.To.X = To.X;

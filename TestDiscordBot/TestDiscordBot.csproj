@@ -107,8 +107,9 @@
     <Compile Include="Chess\ChessPlayerDiscord.cs" />
     <Compile Include="Chess\ChessPlayerMinMax.cs" />
     <Compile Include="Chess\ChessMove.cs" />
-    <Compile Include="Chess\Point.cs" />
+    <Compile Include="Chess\ChessPoint.cs" />
     <Compile Include="Commands\Chess.cs" />
+    <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\SourceCode.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
@@ -142,6 +143,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="imageres_25.ico" />
+    <Content Include="place.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

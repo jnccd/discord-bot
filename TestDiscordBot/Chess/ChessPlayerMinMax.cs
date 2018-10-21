@@ -72,9 +72,9 @@ namespace TestDiscordBot.Chess
                 {
                     if (Board.GetChessPieceFromPoint(x, y) != null && Board.GetChessPieceFromPoint(x, y).Parent == Player)
                     {
-                        Point[] targets = Board.GetAllPossibleMovesForPiece(x, y);
+                        ChessPoint[] targets = Board.GetAllPossibleMovesForPiece(x, y);
                         for (int i = 0; i < targets.Length; i++)
-                            moves.Add(new ChessMove(new Point(x, y), targets[i]));
+                            moves.Add(new ChessMove(new ChessPoint(x, y), targets[i]));
                     }
                 }
             return moves.ToArray();
@@ -254,7 +254,7 @@ namespace TestDiscordBot.Chess
         public override void Update()
         {
             ChessMove minimax = MiniMax(3, Parent, new ChessMove(), true);
-            if (minimax.From == Point.Zero && minimax.To == Point.Zero)
+            if (minimax.From == ChessPoint.Zero && minimax.To == ChessPoint.Zero)
             {
                 Debug.WriteLine("I dunnu wat im doin!");
                 ChessMove[] moves = GetAllMoves(Parent, this);

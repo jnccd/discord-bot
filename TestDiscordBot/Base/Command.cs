@@ -10,20 +10,79 @@ namespace TestDiscordBot
 {
     public class Command
     {
-        public string desc;
-        public string prefix;
-        public string command;
-        public bool isExperimental;
-        
+        private string descP;
+        private string prefixP;
+        private string commandP;
+        private bool isExperimentalP;
+        private bool isHiddenP;
+
+        public string desc
+        {
+            get
+            {
+                return descP;
+            }
+        }
+        public string prefix
+        {
+            get
+            {
+                return prefixP;
+            }
+        }
+        public string command
+        {
+            get
+            {
+                return commandP;
+            }
+        }
+        public bool isExperimental
+        {
+            get
+            {
+                return isExperimentalP;
+            }
+        }
+        public bool isHidden
+        {
+            get
+            {
+                return isHiddenP;
+            }
+        }
+
         public Command(string command, string desc, bool isExperimental)
         {
-            this.desc = desc;
-            this.command = command;
-            this.isExperimental = isExperimental;
-            prefix = Global.prefix;
+            descP = desc;
+            commandP = command;
+            isExperimentalP = isExperimental;
+            isHiddenP = false;
+            prefixP = Global.prefix;
         }
-        
+        public Command(string command, string desc, bool isExperimental, bool isHidden)
+        {
+            descP = desc;
+            commandP = command;
+            isExperimentalP = isExperimental;
+            isHiddenP = isHidden;
+            prefixP = Global.prefix;
+        }
+        public Command(string command, string desc, string prefix, bool isExperimental)
+        {
+            descP = desc;
+            commandP = command;
+            isExperimentalP = isExperimental;
+            isHiddenP = false;
+            prefixP = prefix;
+        }
+
         public virtual async Task execute(SocketMessage commandmessage)
+        {
+
+        }
+
+        public virtual void onExit()
         {
 
         }
