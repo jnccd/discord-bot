@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TestDiscordBot.Commands;
+using TestDiscordBot.XML;
 
 namespace TestDiscordBot
 {

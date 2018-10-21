@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot
+namespace TestDiscordBot.XML
 {
     public class DiscordUser
     {

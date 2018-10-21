@@ -130,7 +130,7 @@ namespace TestDiscordBot.Commands
 
                 try
                 {
-                    Board.MovePiece(new Microsoft.Xna.Framework.Point(x1, y1), new Microsoft.Xna.Framework.Point(x2, y2));
+                    Board.MovePiece(new Point(x1, y1), new Point(x2, y2));
                 }
                 catch
                 {

@@ -10,25 +10,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace TestDiscordBot
+namespace TestDiscordBot.XML
 {
-    public class configData
-    {
-        // TODO: Add your variables here
-        public string BotToken;
-        public List<ulong> ChannelsWrittenOn;
-        public List<DiscordUser> UserList;
-
-        public configData()
-        {
-            // TODO: Add initilization logic here
-            BotToken = "<INSERT BOT TOKEN HERE>";
-            ChannelsWrittenOn = new List<ulong>();
-            UserList = new List<DiscordUser>();
-        }
-    }
-
-    #region Backend Stuff
     public static class config
     {
         static string configPath = Global.CurrentExecutablePath + "\\config.xml";
@@ -101,5 +84,4 @@ namespace TestDiscordBot
                 config.Data = new configData();
         }
     }
-    #endregion
 }

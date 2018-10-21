@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -26,7 +24,6 @@ namespace TestDiscordBot.Chess
         public const int ChessStatusBarHeight = 30;
         public const int ChessAIStatusDisplayWidth = 400;
         public const int ChessFieldSize = 80;
-        public Point MouseSelection;
         public List<int> GameLengths = new List<int>();
         protected int Turns = 0;
         public int EndedGameBecauseOfRecurrance = 0;
