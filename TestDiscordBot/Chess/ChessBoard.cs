@@ -131,25 +131,25 @@ namespace TestDiscordBot.Chess
             TopKing = Pieces[3, 0];
             BottomKing = Pieces[3, 7];
         }
-        public Point[] GetAllPossibleMovesForPiece(Point From)
+        public ChessPoint[] GetAllPossibleMovesForPiece(ChessPoint From)
         {
             if (From.X < 0 || From.Y < 0 || From.X >= 8 || From.Y >= 8 || Pieces[From.X, From.Y] == null)
-                return new Point[0];
+                return new ChessPoint[0];
 
-            List<Point> PossibleMoves = new List<Point>();
-            Point UpLeft = new Point();
-            Point UpRight = new Point();
-            Point DownLeft = new Point();
-            Point DownRight = new Point();
-            Point RightUp = new Point();
-            Point RightDown = new Point();
-            Point LeftUp = new Point();
-            Point LeftDown = new Point();
-            Point Right = new Point();
-            Point Down = new Point();
-            Point Up = new Point();
-            Point Left = new Point();
-            Point P = new Point();
+            List<ChessPoint> PossibleMoves = new List<ChessPoint>();
+            ChessPoint UpLeft = new ChessPoint();
+            ChessPoint UpRight = new ChessPoint();
+            ChessPoint DownLeft = new ChessPoint();
+            ChessPoint DownRight = new ChessPoint();
+            ChessPoint RightUp = new ChessPoint();
+            ChessPoint RightDown = new ChessPoint();
+            ChessPoint LeftUp = new ChessPoint();
+            ChessPoint LeftDown = new ChessPoint();
+            ChessPoint Right = new ChessPoint();
+            ChessPoint Down = new ChessPoint();
+            ChessPoint Up = new ChessPoint();
+            ChessPoint Left = new ChessPoint();
+            ChessPoint P = new ChessPoint();
 
             switch (Pieces[From.X, From.Y].Type)
             {
@@ -158,21 +158,21 @@ namespace TestDiscordBot.Chess
                     {
                         if (Pieces[From.X, From.Y].HasMoved)
                         {
-                            if (IsFieldVacant(new Point(From.X, From.Y + 1)))
-                                PossibleMoves.Add(new Point(From.X, From.Y + 1));
+                            if (IsFieldVacant(new ChessPoint(From.X, From.Y + 1)))
+                                PossibleMoves.Add(new ChessPoint(From.X, From.Y + 1));
                         }
                         else
                         {
-                            if (IsFieldVacant(new Point(From.X, From.Y + 1)))
+                            if (IsFieldVacant(new ChessPoint(From.X, From.Y + 1)))
                             {
-                                PossibleMoves.Add(new Point(From.X, From.Y + 1));
-                                if (IsFieldVacant(new Point(From.X, From.Y + 2)))
-                                    PossibleMoves.Add(new Point(From.X, From.Y + 2));
+                                PossibleMoves.Add(new ChessPoint(From.X, From.Y + 1));
+                                if (IsFieldVacant(new ChessPoint(From.X, From.Y + 2)))
+                                    PossibleMoves.Add(new ChessPoint(From.X, From.Y + 2));
                             }
                         }
 
-                        Left = new Point(From.X - 1, From.Y + 1);
-                        Right = new Point(From.X + 1, From.Y + 1);
+                        Left = new ChessPoint(From.X - 1, From.Y + 1);
+                        Right = new ChessPoint(From.X + 1, From.Y + 1);
 
                         if (IsFieldInBounds(Left) && GetChessPieceFromPoint(Left) != null && Pieces[Left.X, Left.Y].Parent == PlayerBottom)
                             PossibleMoves.Add(Left);
@@ -183,21 +183,21 @@ namespace TestDiscordBot.Chess
                     {
                         if (Pieces[From.X, From.Y].HasMoved)
                         {
-                            if (IsFieldVacant(new Point(From.X, From.Y - 1)))
-                                PossibleMoves.Add(new Point(From.X, From.Y - 1));
+                            if (IsFieldVacant(new ChessPoint(From.X, From.Y - 1)))
+                                PossibleMoves.Add(new ChessPoint(From.X, From.Y - 1));
                         }
                         else
                         {
-                            if (IsFieldVacant(new Point(From.X, From.Y - 1)))
+                            if (IsFieldVacant(new ChessPoint(From.X, From.Y - 1)))
                             {
-                                PossibleMoves.Add(new Point(From.X, From.Y - 1));
-                                if (IsFieldVacant(new Point(From.X, From.Y - 2)))
-                                    PossibleMoves.Add(new Point(From.X, From.Y - 2));
+                                PossibleMoves.Add(new ChessPoint(From.X, From.Y - 1));
+                                if (IsFieldVacant(new ChessPoint(From.X, From.Y - 2)))
+                                    PossibleMoves.Add(new ChessPoint(From.X, From.Y - 2));
                             }
                         }
 
-                        Left = new Point(From.X - 1, From.Y - 1);
-                        Right = new Point(From.X + 1, From.Y - 1);
+                        Left = new ChessPoint(From.X - 1, From.Y - 1);
+                        Right = new ChessPoint(From.X + 1, From.Y - 1);
 
                         if (IsFieldInBounds(Left) && GetChessPieceFromPoint(Left) != null && Pieces[Left.X, Left.Y].Parent == PlayerTop)
                             PossibleMoves.Add(Left);
@@ -207,14 +207,14 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Knight:
-                    UpLeft = new Point(From.X - 1, From.Y - 2);
-                    UpRight = new Point(From.X + 1, From.Y - 2);
-                    DownLeft = new Point(From.X - 1, From.Y + 2);
-                    DownRight = new Point(From.X + 1, From.Y + 2);
-                    RightUp = new Point(From.X + 2, From.Y - 1);
-                    RightDown = new Point(From.X + 2, From.Y + 1);
-                    LeftUp = new Point(From.X - 2, From.Y - 1);
-                    LeftDown = new Point(From.X - 2, From.Y + 1);
+                    UpLeft = new ChessPoint(From.X - 1, From.Y - 2);
+                    UpRight = new ChessPoint(From.X + 1, From.Y - 2);
+                    DownLeft = new ChessPoint(From.X - 1, From.Y + 2);
+                    DownRight = new ChessPoint(From.X + 1, From.Y + 2);
+                    RightUp = new ChessPoint(From.X + 2, From.Y - 1);
+                    RightDown = new ChessPoint(From.X + 2, From.Y + 1);
+                    LeftUp = new ChessPoint(From.X - 2, From.Y - 1);
+                    LeftDown = new ChessPoint(From.X - 2, From.Y + 1);
 
                     if (CanPlayerMoveThere(PlayerWhoHasTheMove(), UpLeft))
                         PossibleMoves.Add(UpLeft);
@@ -235,14 +235,14 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.King:
-                    UpLeft = new Point(From.X - 1, From.Y - 1);
-                    UpRight = new Point(From.X + 1, From.Y - 1);
-                    DownLeft = new Point(From.X - 1, From.Y + 1);
-                    DownRight = new Point(From.X + 1, From.Y + 1);
-                    Right = new Point(From.X + 1, From.Y);
-                    Down = new Point(From.X, From.Y + 1);
-                    Up = new Point(From.X, From.Y - 1);
-                    Left = new Point(From.X - 1, From.Y);
+                    UpLeft = new ChessPoint(From.X - 1, From.Y - 1);
+                    UpRight = new ChessPoint(From.X + 1, From.Y - 1);
+                    DownLeft = new ChessPoint(From.X - 1, From.Y + 1);
+                    DownRight = new ChessPoint(From.X + 1, From.Y + 1);
+                    Right = new ChessPoint(From.X + 1, From.Y);
+                    Down = new ChessPoint(From.X, From.Y + 1);
+                    Up = new ChessPoint(From.X, From.Y - 1);
+                    Left = new ChessPoint(From.X - 1, From.Y);
 
                     if (CanPlayerMoveThere(PlayerWhoHasTheMove(), UpLeft))
                         PossibleMoves.Add(UpLeft);
@@ -263,37 +263,37 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Rook:
-                    P = new Point(From.X, From.Y + 1);
+                    P = new ChessPoint(From.X, From.Y + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y++;
                     }
 
-                    P = new Point(From.X, From.Y - 1);
+                    P = new ChessPoint(From.X, From.Y - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y--;
                     }
 
-                    P = new Point(From.X + 1, From.Y);
+                    P = new ChessPoint(From.X + 1, From.Y);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++;
                     }
 
-                    P = new Point(From.X - 1, From.Y);
+                    P = new ChessPoint(From.X - 1, From.Y);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--;
@@ -301,37 +301,37 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Bishop:
-                    P = new Point(From.X + 1, From.Y + 1);
+                    P = new ChessPoint(From.X + 1, From.Y + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y++;
                     }
 
-                    P = new Point(From.X - 1, From.Y - 1);
+                    P = new ChessPoint(From.X - 1, From.Y - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y--;
                     }
 
-                    P = new Point(From.X + 1, From.Y - 1);
+                    P = new ChessPoint(From.X + 1, From.Y - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y--;
                     }
 
-                    P = new Point(From.X - 1, From.Y + 1);
+                    P = new ChessPoint(From.X - 1, From.Y + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y++;
@@ -339,73 +339,73 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Queen:
-                    P = new Point(From.X, From.Y + 1);
+                    P = new ChessPoint(From.X, From.Y + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y++;
                     }
 
-                    P = new Point(From.X, From.Y - 1);
+                    P = new ChessPoint(From.X, From.Y - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y--;
                     }
 
-                    P = new Point(From.X + 1, From.Y);
+                    P = new ChessPoint(From.X + 1, From.Y);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++;
                     }
 
-                    P = new Point(From.X - 1, From.Y);
+                    P = new ChessPoint(From.X - 1, From.Y);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--;
                     }
 
-                    P = new Point(From.X + 1, From.Y + 1);
+                    P = new ChessPoint(From.X + 1, From.Y + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y++;
                     }
 
-                    P = new Point(From.X - 1, From.Y - 1);
+                    P = new ChessPoint(From.X - 1, From.Y - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y--;
                     }
 
-                    P = new Point(From.X + 1, From.Y - 1);
+                    P = new ChessPoint(From.X + 1, From.Y - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y--;
                     }
 
-                    P = new Point(From.X - 1, From.Y + 1);
+                    P = new ChessPoint(From.X - 1, From.Y + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y++;
@@ -415,25 +415,25 @@ namespace TestDiscordBot.Chess
 
             return PossibleMoves.ToArray();
         }
-        public Point[] GetAllPossibleMovesForPiece(int fromX, int fromY)
+        public ChessPoint[] GetAllPossibleMovesForPiece(int fromX, int fromY)
         {
             if (fromX < 0 || fromY < 0 || fromX >= 8 || fromY >= 8 || Pieces[fromX, fromY] == null)
-                return new Point[0];
+                return new ChessPoint[0];
 
-            List<Point> PossibleMoves = new List<Point>();
-            Point UpLeft = new Point();
-            Point UpRight = new Point();
-            Point DownLeft = new Point();
-            Point DownRight = new Point();
-            Point RightUp = new Point();
-            Point RightDown = new Point();
-            Point LeftUp = new Point();
-            Point LeftDown = new Point();
-            Point Right = new Point();
-            Point Down = new Point();
-            Point Up = new Point();
-            Point Left = new Point();
-            Point P = new Point();
+            List<ChessPoint> PossibleMoves = new List<ChessPoint>();
+            ChessPoint UpLeft = new ChessPoint();
+            ChessPoint UpRight = new ChessPoint();
+            ChessPoint DownLeft = new ChessPoint();
+            ChessPoint DownRight = new ChessPoint();
+            ChessPoint RightUp = new ChessPoint();
+            ChessPoint RightDown = new ChessPoint();
+            ChessPoint LeftUp = new ChessPoint();
+            ChessPoint LeftDown = new ChessPoint();
+            ChessPoint Right = new ChessPoint();
+            ChessPoint Down = new ChessPoint();
+            ChessPoint Up = new ChessPoint();
+            ChessPoint Left = new ChessPoint();
+            ChessPoint P = new ChessPoint();
 
             switch (Pieces[fromX, fromY].Type)
             {
@@ -442,21 +442,21 @@ namespace TestDiscordBot.Chess
                     {
                         if (Pieces[fromX, fromY].HasMoved)
                         {
-                            if (IsFieldVacant(new Point(fromX, fromY + 1)))
-                                PossibleMoves.Add(new Point(fromX, fromY + 1));
+                            if (IsFieldVacant(new ChessPoint(fromX, fromY + 1)))
+                                PossibleMoves.Add(new ChessPoint(fromX, fromY + 1));
                         }
                         else
                         {
-                            if (IsFieldVacant(new Point(fromX, fromY + 1)))
+                            if (IsFieldVacant(new ChessPoint(fromX, fromY + 1)))
                             {
-                                PossibleMoves.Add(new Point(fromX, fromY + 1));
-                                if (IsFieldVacant(new Point(fromX, fromY + 2)))
-                                    PossibleMoves.Add(new Point(fromX, fromY + 2));
+                                PossibleMoves.Add(new ChessPoint(fromX, fromY + 1));
+                                if (IsFieldVacant(new ChessPoint(fromX, fromY + 2)))
+                                    PossibleMoves.Add(new ChessPoint(fromX, fromY + 2));
                             }
                         }
 
-                        Left = new Point(fromX - 1, fromY + 1);
-                        Right = new Point(fromX + 1, fromY + 1);
+                        Left = new ChessPoint(fromX - 1, fromY + 1);
+                        Right = new ChessPoint(fromX + 1, fromY + 1);
 
                         if (IsFieldInBounds(Left) && GetChessPieceFromPoint(Left) != null && Pieces[Left.X, Left.Y].Parent == PlayerBottom)
                             PossibleMoves.Add(Left);
@@ -467,21 +467,21 @@ namespace TestDiscordBot.Chess
                     {
                         if (Pieces[fromX, fromY].HasMoved)
                         {
-                            if (IsFieldVacant(new Point(fromX, fromY - 1)))
-                                PossibleMoves.Add(new Point(fromX, fromY - 1));
+                            if (IsFieldVacant(new ChessPoint(fromX, fromY - 1)))
+                                PossibleMoves.Add(new ChessPoint(fromX, fromY - 1));
                         }
                         else
                         {
-                            if (IsFieldVacant(new Point(fromX, fromY - 1)))
+                            if (IsFieldVacant(new ChessPoint(fromX, fromY - 1)))
                             {
-                                PossibleMoves.Add(new Point(fromX, fromY - 1));
-                                if (IsFieldVacant(new Point(fromX, fromY - 2)))
-                                    PossibleMoves.Add(new Point(fromX, fromY - 2));
+                                PossibleMoves.Add(new ChessPoint(fromX, fromY - 1));
+                                if (IsFieldVacant(new ChessPoint(fromX, fromY - 2)))
+                                    PossibleMoves.Add(new ChessPoint(fromX, fromY - 2));
                             }
                         }
 
-                        Left = new Point(fromX - 1, fromY - 1);
-                        Right = new Point(fromX + 1, fromY - 1);
+                        Left = new ChessPoint(fromX - 1, fromY - 1);
+                        Right = new ChessPoint(fromX + 1, fromY - 1);
 
                         if (IsFieldInBounds(Left) && GetChessPieceFromPoint(Left) != null && Pieces[Left.X, Left.Y].Parent == PlayerTop)
                             PossibleMoves.Add(Left);
@@ -491,14 +491,14 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Knight:
-                    UpLeft = new Point(fromX - 1, fromY - 2);
-                    UpRight = new Point(fromX + 1, fromY - 2);
-                    DownLeft = new Point(fromX - 1, fromY + 2);
-                    DownRight = new Point(fromX + 1, fromY + 2);
-                    RightUp = new Point(fromX + 2, fromY - 1);
-                    RightDown = new Point(fromX + 2, fromY + 1);
-                    LeftUp = new Point(fromX - 2, fromY - 1);
-                    LeftDown = new Point(fromX - 2, fromY + 1);
+                    UpLeft = new ChessPoint(fromX - 1, fromY - 2);
+                    UpRight = new ChessPoint(fromX + 1, fromY - 2);
+                    DownLeft = new ChessPoint(fromX - 1, fromY + 2);
+                    DownRight = new ChessPoint(fromX + 1, fromY + 2);
+                    RightUp = new ChessPoint(fromX + 2, fromY - 1);
+                    RightDown = new ChessPoint(fromX + 2, fromY + 1);
+                    LeftUp = new ChessPoint(fromX - 2, fromY - 1);
+                    LeftDown = new ChessPoint(fromX - 2, fromY + 1);
 
                     if (CanPlayerMoveThere(PlayerWhoHasTheMove(), UpLeft))
                         PossibleMoves.Add(UpLeft);
@@ -519,14 +519,14 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.King:
-                    UpLeft = new Point(fromX - 1, fromY - 1);
-                    UpRight = new Point(fromX + 1, fromY - 1);
-                    DownLeft = new Point(fromX - 1, fromY + 1);
-                    DownRight = new Point(fromX + 1, fromY + 1);
-                    Right = new Point(fromX + 1, fromY);
-                    Down = new Point(fromX, fromY + 1);
-                    Up = new Point(fromX, fromY - 1);
-                    Left = new Point(fromX - 1, fromY);
+                    UpLeft = new ChessPoint(fromX - 1, fromY - 1);
+                    UpRight = new ChessPoint(fromX + 1, fromY - 1);
+                    DownLeft = new ChessPoint(fromX - 1, fromY + 1);
+                    DownRight = new ChessPoint(fromX + 1, fromY + 1);
+                    Right = new ChessPoint(fromX + 1, fromY);
+                    Down = new ChessPoint(fromX, fromY + 1);
+                    Up = new ChessPoint(fromX, fromY - 1);
+                    Left = new ChessPoint(fromX - 1, fromY);
 
                     if (CanPlayerMoveThere(PlayerWhoHasTheMove(), UpLeft))
                         PossibleMoves.Add(UpLeft);
@@ -547,37 +547,37 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Rook:
-                    P = new Point(fromX, fromY + 1);
+                    P = new ChessPoint(fromX, fromY + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y++;
                     }
 
-                    P = new Point(fromX, fromY - 1);
+                    P = new ChessPoint(fromX, fromY - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y--;
                     }
 
-                    P = new Point(fromX + 1, fromY);
+                    P = new ChessPoint(fromX + 1, fromY);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++;
                     }
 
-                    P = new Point(fromX - 1, fromY);
+                    P = new ChessPoint(fromX - 1, fromY);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--;
@@ -585,37 +585,37 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Bishop:
-                    P = new Point(fromX + 1, fromY + 1);
+                    P = new ChessPoint(fromX + 1, fromY + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y++;
                     }
 
-                    P = new Point(fromX - 1, fromY - 1);
+                    P = new ChessPoint(fromX - 1, fromY - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y--;
                     }
 
-                    P = new Point(fromX + 1, fromY - 1);
+                    P = new ChessPoint(fromX + 1, fromY - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y--;
                     }
 
-                    P = new Point(fromX - 1, fromY + 1);
+                    P = new ChessPoint(fromX - 1, fromY + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y++;
@@ -623,73 +623,73 @@ namespace TestDiscordBot.Chess
                     break;
 
                 case ChessPieceType.Queen:
-                    P = new Point(fromX, fromY + 1);
+                    P = new ChessPoint(fromX, fromY + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y++;
                     }
 
-                    P = new Point(fromX, fromY - 1);
+                    P = new ChessPoint(fromX, fromY - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.Y--;
                     }
 
-                    P = new Point(fromX + 1, fromY);
+                    P = new ChessPoint(fromX + 1, fromY);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++;
                     }
 
-                    P = new Point(fromX - 1, fromY);
+                    P = new ChessPoint(fromX - 1, fromY);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--;
                     }
 
-                    P = new Point(fromX + 1, fromY + 1);
+                    P = new ChessPoint(fromX + 1, fromY + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y++;
                     }
 
-                    P = new Point(fromX - 1, fromY - 1);
+                    P = new ChessPoint(fromX - 1, fromY - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y--;
                     }
 
-                    P = new Point(fromX + 1, fromY - 1);
+                    P = new ChessPoint(fromX + 1, fromY - 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X++; P.Y--;
                     }
 
-                    P = new Point(fromX - 1, fromY + 1);
+                    P = new ChessPoint(fromX - 1, fromY + 1);
                     while (CanPlayerMoveThere(PlayerWhoHasTheMove(), P))
                     {
-                        PossibleMoves.Add(new Point(P.X, P.Y));
+                        PossibleMoves.Add(new ChessPoint(P.X, P.Y));
                         if (GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == PlayerWhoHasntTheMove())
                             break;
                         P.X--; P.Y++;
@@ -699,15 +699,15 @@ namespace TestDiscordBot.Chess
 
             return PossibleMoves.ToArray();
         }
-        public bool IsFieldVacant(Point P)
+        public bool IsFieldVacant(ChessPoint P)
         {
             return P.X >= 0 && P.Y >= 0 && P.X < 8 && P.Y < 8 && Pieces[P.X, P.Y] == null;
         }
-        public bool IsFieldInBounds(Point P)
+        public bool IsFieldInBounds(ChessPoint P)
         {
             return P.X >= 0 && P.Y >= 0 && P.X < 8 && P.Y < 8;
         }
-        public bool CanPlayerMoveThere(ChessPlayer CurrentPlayer, Point P)
+        public bool CanPlayerMoveThere(ChessPlayer CurrentPlayer, ChessPoint P)
         {
             ChessPlayer OtherPlayer = null;
             if (CurrentPlayer == PlayerBottom)
@@ -720,7 +720,7 @@ namespace TestDiscordBot.Chess
             return IsFieldInBounds(P) && GetChessPieceFromPoint(P) == null ||
                     IsFieldInBounds(P) && GetChessPieceFromPoint(P) != null && GetChessPieceFromPoint(P).Parent == OtherPlayer;
         }
-        public ChessPiece GetChessPieceFromPoint(Point P)
+        public ChessPiece GetChessPieceFromPoint(ChessPoint P)
         {
             return Pieces[P.X, P.Y];
         }
@@ -757,14 +757,14 @@ namespace TestDiscordBot.Chess
                 for (int y = 0; y < Pieces.GetLength(1); y++)
                     Pieces[x, y] = null;
         }
-        public void MovePiece(Point from, Point to)
+        public void MovePiece(ChessPoint from, ChessPoint to)
         {
             if (slow)
                 Thread.Sleep(1000);
 
             ChessPiece FromPiece = GetChessPieceFromPoint(from);
             ChessPlayer MovePlayer = PlayerWhoHasTheMove();
-            List<Point> AllPossibleMoves = new List<Point>(GetAllPossibleMovesForPiece(from));
+            List<ChessPoint> AllPossibleMoves = new List<ChessPoint>(GetAllPossibleMovesForPiece(from));
             if (FromPiece.Parent == MovePlayer && AllPossibleMoves.Contains(to))
             {
                 Turns++;
@@ -806,12 +806,12 @@ namespace TestDiscordBot.Chess
             if (slow)
                 Thread.Sleep(1000);
 
-            Point from = M.From;
-            Point to = M.To;
+            ChessPoint from = M.From;
+            ChessPoint to = M.To;
 
             ChessPiece FromPiece = GetChessPieceFromPoint(from);
             ChessPlayer MovePlayer = PlayerWhoHasTheMove();
-            List<Point> AllPossibleMoves = new List<Point>(GetAllPossibleMovesForPiece(from));
+            List<ChessPoint> AllPossibleMoves = new List<ChessPoint>(GetAllPossibleMovesForPiece(from));
             if (FromPiece.Parent == MovePlayer && AllPossibleMoves.Contains(to))
             {
                 Turns++;
@@ -848,7 +848,7 @@ namespace TestDiscordBot.Chess
             else
                 throw new ArgumentException();
         }
-        void EndGameBecauseOfRecurrence(ChessPlayer FaultyPlayer, Point from)
+        void EndGameBecauseOfRecurrence(ChessPlayer FaultyPlayer, ChessPoint from)
         {
             GameEnded = true;
             OnGameEnd();
@@ -863,7 +863,7 @@ namespace TestDiscordBot.Chess
             else
                 throw new Exception("wat");
         }
-        void EndGameNormally(ChessPlayer Winner, Point from)
+        void EndGameNormally(ChessPlayer Winner, ChessPoint from)
         {
             GameEnded = true;
             OnGameEnd();

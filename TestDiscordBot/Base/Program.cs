@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -105,7 +106,7 @@ namespace TestDiscordBot
             ShowWindow(GetConsoleWindow(), 2);
 #endregion
             
-#region commands
+            #region commands
             while (true)
             {
                 Console.Write("$");
@@ -145,7 +146,7 @@ namespace TestDiscordBot
                 }
                 else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
                 {
-#region set channel code
+                    #region set channel code
                     try
                     {
                         string[] splits = input.Split(' ');
@@ -180,7 +181,7 @@ namespace TestDiscordBot
                 }
                 else if (input.StartsWith("/del "))
                 {
-#region deletion code
+                    #region deletion code
                     try
                     {
                         string[] splits = input.Split(' ');
@@ -237,6 +238,11 @@ namespace TestDiscordBot
                 {
                     Console.WriteLine(config.ToString());
                 }
+                else if (input == "/restart")
+                {
+                    Process.Start(Global.CurrentExecutablePath + "\\TestDiscordBot.exe");
+                    Process.GetCurrentProcess().Kill();
+                }
                 else if (input == "/test")
                 {
                     try
@@ -251,9 +257,11 @@ namespace TestDiscordBot
                     Console.WriteLine("I dont know that command.");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
-
             }
-#endregion
+            #endregion
+
+            foreach (Command c in commands)
+                c.onExit();
 
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
@@ -305,15 +313,14 @@ namespace TestDiscordBot
                     {
                         EmbedBuilder Embed = new EmbedBuilder();
                         Embed.WithColor(0, 128, 255);
-                        for (int i = 0; i < 24 && i < commandsLeft.Count; i++)
+                        for (int i = 0; i < 24 && commandsLeft.Count > 0; i++)
                         {
-                            if (commandsLeft[i].command != "")
+                            if (commandsLeft[0].command != "" && !commandsLeft[0].isHidden)
                             {
-                                string desc = ((commandsLeft[i].desc == null ? "" : commandsLeft[i].desc + " ") + (commandsLeft[i].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                                Embed.AddField(commandsLeft[i].prefix + commandsLeft[i].command, desc == null || desc == "" ? "-" : desc);
+                                string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + " ") + (commandsLeft[0].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
+                                Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command, desc == null || desc == "" ? "-" : desc);
                             }
-                            commandsLeft.RemoveAt(i);
-                            i--;
+                            commandsLeft.RemoveAt(0);
                         }
                         Embed.WithDescription("Made by " + Global.Master.Mention + "\n\nCommands:");
                         Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");

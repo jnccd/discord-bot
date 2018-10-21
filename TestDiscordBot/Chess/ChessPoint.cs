@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot.Chess
 {
-    public class Point
+    public class ChessPoint
     {
         public int X, Y;
-        public static Point Zero
+        public static ChessPoint Zero
         {
             get
             {
-                return new Point(0, 0);
+                return new ChessPoint(0, 0);
             }
         }
 
-        public Point()
+        public ChessPoint()
         {
             X = 0; Y = 0;
         }
-        public Point(int X, int Y)
+        public ChessPoint(int X, int Y)
         {
             this.X = X;
             this.Y = Y;

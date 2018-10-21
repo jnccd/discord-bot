@@ -130,7 +130,7 @@ namespace TestDiscordBot.Commands
 
                 try
                 {
-                    Board.MovePiece(new Point(x1, y1), new Point(x2, y2));
+                    Board.MovePiece(new ChessPoint(x1, y1), new ChessPoint(x2, y2));
                 }
                 catch
                 {

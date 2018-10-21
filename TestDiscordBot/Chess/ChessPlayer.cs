@@ -19,7 +19,7 @@ namespace TestDiscordBot.Chess
             this.Parent = Parent;
         }
 
-        public virtual void MovePiece(Point From, Point To)
+        public virtual void MovePiece(ChessPoint From, ChessPoint To)
         {
             Parent.MovePiece(From, To);
         }
