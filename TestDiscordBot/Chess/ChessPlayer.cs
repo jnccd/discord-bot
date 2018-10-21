@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace TestDiscordBot.Chess
@@ -35,10 +33,6 @@ namespace TestDiscordBot.Chess
 
         }
         public virtual void Update()
-        {
-
-        }
-        public virtual void Draw(SpriteBatch SB)
         {
 
         }
