@@ -27,81 +27,78 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            await Task.Factory.StartNew(() =>
+            while (working) { Thread.Sleep(500); }
+
+            working = true;
+
+            string[] split = commandmessage.Content.Split(' ');
+            if (split.Length == 1)
             {
-                while (working) { Thread.Sleep(500); }
+                EmbedBuilder Embed = new EmbedBuilder();
+                Embed.WithColor(0, 128, 255);
+                Embed.AddField(prefix + command + " print", "Prints the canvas without this annoying help message.");
+                Embed.AddField(prefix + command + " draw + coordinates(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) + ") + color",
+                    "Draws the specified color the the specified place\neg. " + prefix + command + " draw 10,45 Red");
+                Embed.WithDescription("Place Commands:");
+                await Global.SendEmbed(Embed, commandmessage.Channel);
 
-                working = true;
+                await Global.SendFile(filePath, commandmessage.Channel);
+            }
+            else if (split[1] == "print")
+            {
+                await Global.SendFile(filePath, commandmessage.Channel);
+            }
+            else if (split[1] == "draw")
+            {
+                int X, Y;
 
-                string[] split = commandmessage.Content.Split(' ');
-                if (split.Length == 1)
+                if (split.Length != 4)
                 {
-                    EmbedBuilder Embed = new EmbedBuilder();
-                    Embed.WithColor(0, 128, 255);
-                    Embed.AddField(prefix + command + " print", "Prints the canvas without this annoying help message.");
-                    Embed.AddField(prefix + command + " draw + coordinates(0 - " + (placeSize / 10) + ", 0 - " + (placeSize / 10) + ") + color",
-                        "Draws the specified color the the specified place\neg. " + prefix + command + " draw 10,45 Red");
-                    Embed.WithDescription("Place Commands:");
-                    Global.SendEmbed(Embed, commandmessage.Channel);
-
-                    Global.SendFile(filePath, commandmessage.Channel);
-                }
-                else if (split[1] == "print")
-                {
-                    Global.SendFile(filePath, commandmessage.Channel);
-                }
-                else if (split[1] == "draw")
-                {
-                    int X, Y;
-
-                    if (split.Length != 4)
-                    {
-                        Global.SendText("I need 4 arguments to draw!", commandmessage.Channel);
-                        return;
-                    }
-
-                    try
-                    {
-                        string[] temp = split[2].Split(',');
-                        X = Convert.ToInt32(temp[0]);
-                        Y = Convert.ToInt32(temp[1]);
-                    }
-                    catch
-                    {
-                        Global.SendText("I don't understand those coordinates, fam!", commandmessage.Channel);
-                        return;
-                    }
-
-                    if (X >= (placeSize / pixelSize) || Y >= (placeSize / pixelSize))
-                    {
-                        Global.SendText("The picture is only " + (placeSize / pixelSize) + "x" + (placeSize / pixelSize) + " big!\nTry smaller coordinates.", commandmessage.Channel);
-                        return;
-                    }
-
-                    brushColor = System.Drawing.Color.FromName(split[3]);
-
-                    if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
-                    {
-                        Global.SendText("I dont think I know that color :thinking:", commandmessage.Channel);
-                        return;
-                    }
-
-                    using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                        temp = (Bitmap)Bitmap.FromStream(stream);
-
-                    using (Graphics graphics = Graphics.FromImage(temp))
-                    {
-                        graphics.FillRectangle(new SolidBrush(brushColor), new Rectangle(X * pixelSize, Y * pixelSize, pixelSize, pixelSize));
-                    }
-
-                    using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-
-                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+                    await Global.SendText("I need 4 arguments to draw!", commandmessage.Channel);
+                    return;
                 }
 
-                working = false;
-            });
+                try
+                {
+                    string[] temp = split[2].Split(',');
+                    X = Convert.ToInt32(temp[0]);
+                    Y = Convert.ToInt32(temp[1]);
+                }
+                catch
+                {
+                    await Global.SendText("I don't understand those coordinates, fam!", commandmessage.Channel);
+                    return;
+                }
+
+                if (X >= (placeSize / pixelSize) || Y >= (placeSize / pixelSize))
+                {
+                    await Global.SendText("The picture is only " + (placeSize / pixelSize) + "x" + (placeSize / pixelSize) + " big!\nTry smaller coordinates.", commandmessage.Channel);
+                    return;
+                }
+
+                brushColor = System.Drawing.Color.FromName(split[3]);
+
+                if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
+                {
+                    await Global.SendText("I dont think I know that color :thinking:", commandmessage.Channel);
+                    return;
+                }
+
+                using (FileStream stream = new FileStream(filePath, FileMode.Open))
+                    temp = (Bitmap)Bitmap.FromStream(stream);
+
+                using (Graphics graphics = Graphics.FromImage(temp))
+                {
+                    graphics.FillRectangle(new SolidBrush(brushColor), new Rectangle(X * pixelSize, Y * pixelSize, pixelSize, pixelSize));
+                }
+
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                    temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+
+                await Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+            }
+
+            working = false;
         }
     }
 }
