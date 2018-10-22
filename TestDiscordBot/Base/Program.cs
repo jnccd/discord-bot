@@ -26,6 +26,7 @@ namespace TestDiscordBot
         bool gotWorkingToken = false;
         ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
         string[] commandPrefixes;
+        bool closing = false;
         ISocketMessageChannel CurrentChannel;
         DiscordSocketClient client;
         Command[] commands;
@@ -263,9 +264,11 @@ namespace TestDiscordBot
             foreach (Command c in commands)
                 c.onExit();
 
+            closing = true;
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
             await client.LogoutAsync();
+            Environment.Exit(0);
         }
 
         private async Task Client_JoinedGuild(SocketGuild arg)
@@ -278,13 +281,16 @@ namespace TestDiscordBot
         private async Task Client_Disconnected(Exception arg)
         {
             Console.WriteLine("Disconect!");
-            try
+            if (!closing)
             {
-                await client.LogoutAsync();
+                try
+                {
+                    await client.LogoutAsync();
+                }
+                catch { }
+                await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
+                await client.StartAsync();
             }
-            catch { }
-            await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
-            await client.StartAsync();
         }
         private Task Client_Ready()
         {
