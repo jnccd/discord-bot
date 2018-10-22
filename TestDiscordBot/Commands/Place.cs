@@ -24,13 +24,14 @@ namespace TestDiscordBot.Commands
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",
                 (string[] split, ISocketMessageChannel Channel) => { return true; },
                 async (SocketMessage commandmessage, string filePath, string[] split) => { await Global.SendFile(filePath, commandmessage.Channel); }),
-            new PlaceCommand("draw", "Draws the specified color to the specified place\neg. " + prefix + command + " draw 10,45 Red",
+            new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) + 
+            ")\neg. " + prefix + command + " drawPixel 10,45 Red",
                 (string[] split, ISocketMessageChannel Channel) => {
 
                     int X, Y;
                     if (split.Length != 4)
                     {
-                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        Global.SendText("I need 3 arguments to draw!", Channel);
                         return false;
                     }
 
@@ -84,18 +85,237 @@ namespace TestDiscordBot.Commands
 
                     Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
 
+                }),
+            new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
+            ")\neg. " + prefix + command + " drawCircle 100,450 Red 25",
+                (string[] split, ISocketMessageChannel Channel) => {
+
+                    int X, Y, S;
+                    if (split.Length != 5)
+                    {
+                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        return false;
+                    }
+
+                    try
+                    {
+                        string[] temp = split[2].Split(',');
+                        X = Convert.ToInt32(temp[0]);
+                        Y = Convert.ToInt32(temp[1]);
+                    }
+                    catch
+                    {
+                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        return false;
+                    }
+
+                    //if (X >= placeSize || Y >= placeSize)
+                    //{
+                    //    Global.SendText("The picture is only " + placeSize + "x" + placeSize + " big!\nTry smaller coordinates.", Channel);
+                    //    return false;
+                    //}
+
+                    System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
+
+                    if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
+                    {
+                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        return false;
+                    }
+
+                    try
+                    {
+                        S = Convert.ToInt32(split[4]);
+                    }
+                    catch
+                    {
+                        Global.SendText("I don't understand that size, fam!", Channel);
+                        return false;
+                    }
+
+                    if (S > 100)
+                    {
+                        Global.SendText("Thats a little big, don't ya think?", Channel);
+                        return false;
+                    }
+
+                    return true;
+
+                },
+                (SocketMessage commandmessage, string filePath, string[] split) => {
+
+                    string[] temps = split[2].Split(',');
+                    int X = Convert.ToInt32(temps[0]);
+                    int Y = Convert.ToInt32(temps[1]);
+
+                    int S = Convert.ToInt32(split[4]);
+
+                    Bitmap temp;
+                    System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
+                    using (FileStream stream = new FileStream(filePath, FileMode.Open))
+                        temp = (Bitmap)Bitmap.FromStream(stream);
+
+                    using (Graphics graphics = Graphics.FromImage(temp))
+                    {
+                        graphics.FillPie(new SolidBrush(brushColor), new Rectangle(X - S, Y - S, S * 2, S * 2), 0, 360);
+                    }
+
+                    using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+
+                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+
+                }),
+            new PlaceCommand("drawRekt", "Draws a rectangle in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
+            ") and size\neg. " + prefix + command + " drawRekt 100,250 Red 200,100",
+                (string[] split, ISocketMessageChannel Channel) => {
+
+                    int X, Y, W, H;
+                    if (split.Length < 5)
+                    {
+                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        return false;
+                    }
+
+                    try
+                    {
+                        string[] temp = split[2].Split(',');
+                        X = Convert.ToInt32(temp[0]);
+                        Y = Convert.ToInt32(temp[1]);
+                    }
+                    catch
+                    {
+                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        return false;
+                    }
+
+                    try
+                    {
+                        string[] temp = split[4].Split(',');
+                        W = Convert.ToInt32(temp[0]);
+                        H = Convert.ToInt32(temp[1]);
+                    }
+                    catch
+                    {
+                        Global.SendText("I don't understand that size, fam!", Channel);
+                        return false;
+                    }
+
+                    if (W + H > 500)
+                    {
+                        Global.SendText("Thats a little big, don't ya think?", Channel);
+                        return false;
+                    }
+
+                    System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
+
+                    if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
+                    {
+                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        return false;
+                    }
+
+                    return true;
+
+                },
+                (SocketMessage commandmessage, string filePath, string[] split) => {
+
+                    string[] temps = split[2].Split(',');
+                    int X = Convert.ToInt32(temps[0]);
+                    int Y = Convert.ToInt32(temps[1]);
+                    temps = split[4].Split(',');
+                    int W = Convert.ToInt32(temps[0]);
+                    int H = Convert.ToInt32(temps[1]);
+
+                    Bitmap temp;
+                    System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
+                    using (FileStream stream = new FileStream(filePath, FileMode.Open))
+                        temp = (Bitmap)Bitmap.FromStream(stream);
+
+                    using (Graphics graphics = Graphics.FromImage(temp))
+                    {
+                        graphics.FillRectangle(new SolidBrush(brushColor), new Rectangle(X, Y, W, H));
+                    }
+
+                    using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+
+                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+
+                }),
+            new PlaceCommand("drawString", "Draws a string in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
+            ")\neg. " + prefix + command + " drawString 100,250 Red OwO what dis",
+                (string[] split, ISocketMessageChannel Channel) => {
+
+                    int X, Y, S;
+                    if (split.Length < 5)
+                    {
+                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        return false;
+                    }
+
+                    try
+                    {
+                        string[] temp = split[2].Split(',');
+                        X = Convert.ToInt32(temp[0]);
+                        Y = Convert.ToInt32(temp[1]);
+                    }
+                    catch
+                    {
+                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        return false;
+                    }
+
+                    //if (X >= placeSize || Y >= placeSize)
+                    //{
+                    //    Global.SendText("The picture is only " + placeSize + "x" + placeSize + " big!\nTry smaller coordinates.", Channel);
+                    //    return false;
+                    //}
+
+                    System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
+
+                    if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
+                    {
+                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        return false;
+                    }
+
+                    return true;
+
+                },
+                (SocketMessage commandmessage, string filePath, string[] split) => {
+
+                    string[] temps = split[2].Split(',');
+                    int X = Convert.ToInt32(temps[0]);
+                    int Y = Convert.ToInt32(temps[1]);
+                    
+                    Bitmap temp;
+                    System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
+                    using (FileStream stream = new FileStream(filePath, FileMode.Open))
+                        temp = (Bitmap)Bitmap.FromStream(stream);
+
+                    using (Graphics graphics = Graphics.FromImage(temp))
+                    {
+                        graphics.DrawString(string.Join(" ", split.Skip(4).ToArray()), new Font("Comic Sans", 16), new SolidBrush(brushColor), new PointF(X, Y) );
+                    }
+
+                    using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+
+                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+
                 }) };
         }
 
         class PlaceCommand
         {
-            public delegate bool conditionCheck(string[] split, ISocketMessageChannel Channel);
+            public delegate bool ConditionCheck(string[] split, ISocketMessageChannel Channel);
             public delegate void Execution(SocketMessage commandmessage, string filePath, string[] split);
             public string command, desc;
-            public conditionCheck check;
+            public ConditionCheck check;
             public Execution execute;
 
-            public PlaceCommand(string command, string desc, conditionCheck check, Execution execute)
+            public PlaceCommand(string command, string desc, ConditionCheck check, Execution execute)
             {
                 this.command = command;
                 this.desc = desc;
