@@ -22,10 +22,15 @@ namespace TestDiscordBot.Commands
             else
                 Target = commandmessage.Author;
 
-            ushort size = 128;
+            ushort size = 512;
             try
             {
                 size = Convert.ToUInt16(commandmessage.Content.Split(' ')[1]);
+            }
+            catch { }
+            try
+            {
+                size = Convert.ToUInt16(commandmessage.Content.Split(' ')[2]);
             }
             catch { }
 
