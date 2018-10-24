@@ -35,7 +35,6 @@ namespace TestDiscordBot
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
                                select assemblyType).ToArray();
-        delegate Task ThreadedMessageReceivedDelegat(SocketMessage message);
         
         static void Main(string[] args)
             => Global.P.MainAsync().GetAwaiter().GetResult();
@@ -282,18 +281,18 @@ namespace TestDiscordBot
         }
         private async Task Client_Disconnected(Exception arg)
         {
-            Console.WriteLine("Disconect!");
-            if (!closing)
-            {
-                // Restart
-                ProcessStartInfo Info = new ProcessStartInfo();
-                Info.Arguments = "/C ping 127.0.0.1 -n 2 && \"" + Application.ExecutablePath + "\"";
-                Info.WindowStyle = ProcessWindowStyle.Hidden;
-                Info.CreateNoWindow = true;
-                Info.FileName = "cmd.exe";
-                Process.Start(Info);
-                Application.Exit();
-            }
+            //Console.WriteLine("Disconect!");
+            //if (!closing)
+            //{
+            //    // Restart
+            //    ProcessStartInfo Info = new ProcessStartInfo();
+            //    Info.Arguments = "/C ping 127.0.0.1 -n 2 && \"" + Application.ExecutablePath + "\"";
+            //    Info.WindowStyle = ProcessWindowStyle.Hidden;
+            //    Info.CreateNoWindow = true;
+            //    Info.FileName = "cmd.exe";
+            //    Process.Start(Info);
+            //    Application.Exit();
+            //}
         }
         private async Task Client_Ready()
         {
@@ -314,7 +313,7 @@ namespace TestDiscordBot
                 t.Start(message);
             }
         }
-        private void ThreadedMessageReceived(object o)
+        private async void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
 
@@ -337,7 +336,7 @@ namespace TestDiscordBot
                     }
                     Embed.WithDescription("Made by " + Global.Master.Mention + "\n\nCommands:");
                     Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
-                    Global.SendEmbed(Embed, message.Channel);
+                    await Global.SendEmbed(Embed, message.Channel);
                 }
             }
             // Experimental
@@ -347,17 +346,17 @@ namespace TestDiscordBot
                     if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
                         try
                         {
-                            commands[i].execute(message);
+                            await commands[i].execute(message);
 
                             Console.CursorLeft = 0;
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
+                            Console.WriteLine("Send " + commands[i].GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
                             Console.ForegroundColor = ConsoleColor.White;
                             Console.Write("$");
                         }
                         catch (Exception e)
                         {
-                            Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+                            await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
 
                             Console.CursorLeft = 0;
                             Console.ForegroundColor = ConsoleColor.Red;
@@ -373,22 +372,22 @@ namespace TestDiscordBot
                     if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
                     {
                         if (commands[i].isExperimental)
-                            Global.SendText("Experimental commands cant be used here!", message.Channel);
+                            await Global.SendText("Experimental commands cant be used here!", message.Channel);
                         else
                             try
                             {
                                 Global.SaveUser(message.Author.Id);
-                                commands[i].execute(message);
+                                await commands[i].execute(message);
 
                                 Console.CursorLeft = 0;
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
+                                Console.WriteLine("Send " + commands[i].GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
                                 Console.ForegroundColor = ConsoleColor.White;
                                 Console.Write("$");
                             }
                             catch (Exception e)
                             {
-                                Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+                                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
 
                                 Console.CursorLeft = 0;
                                 Console.ForegroundColor = ConsoleColor.Red;
