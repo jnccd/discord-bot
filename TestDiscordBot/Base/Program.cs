@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using TestDiscordBot.Commands;
 using TestDiscordBot.XML;
 
@@ -34,6 +35,7 @@ namespace TestDiscordBot
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
                                select assemblyType).ToArray();
+        delegate Task ThreadedMessageReceivedDelegat(SocketMessage message);
         
         static void Main(string[] args)
             => Global.P.MainAsync().GetAwaiter().GetResult();
@@ -283,115 +285,118 @@ namespace TestDiscordBot
             Console.WriteLine("Disconect!");
             if (!closing)
             {
-                try
-                {
-                    await client.LogoutAsync();
-                }
-                catch { }
-                await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
-                await client.StartAsync();
+                // Restart
+                ProcessStartInfo Info = new ProcessStartInfo();
+                Info.Arguments = "/C ping 127.0.0.1 -n 2 && \"" + Application.ExecutablePath + "\"";
+                Info.WindowStyle = ProcessWindowStyle.Hidden;
+                Info.CreateNoWindow = true;
+                Info.FileName = "cmd.exe";
+                Process.Start(Info);
+                Application.Exit();
             }
         }
-        private Task Client_Ready()
+        private async Task Client_Ready()
         {
             clientReady = true;
-            return Task.FromResult(0);
         }
-        private Task Log(LogMessage msg)
+        private async Task Log(LogMessage msg)
         {
             Console.CursorLeft = 0;
             Console.WriteLine(msg.ToString());
             if (clientReady)
                 Console.Write("$");
-            return Task.FromResult(0);
         }
         private async Task MessageReceived(SocketMessage message)
         {
             if (!message.Author.IsBot && message.Content.StartsWith(commandPrefixes))
             {
-                await Task.Factory.StartNew(async () =>
+                Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
+                t.Start(message);
+            }
+        }
+        private void ThreadedMessageReceived(object o)
+        {
+            SocketMessage message = (SocketMessage)o;
+
+            if (message.Content == Global.prefix + "help")
+            {
+                List<Command> commandsLeft = commands.ToList();
+
+                while (commandsLeft.Count > 0)
                 {
-                    if (message.Content == Global.prefix + "help")
+                    EmbedBuilder Embed = new EmbedBuilder();
+                    Embed.WithColor(0, 128, 255);
+                    for (int i = 0; i < 24 && commandsLeft.Count > 0; i++)
                     {
-                        List<Command> commandsLeft = commands.ToList();
-
-                        while (commandsLeft.Count > 0)
+                        if (commandsLeft[0].command != "" && !commandsLeft[0].isHidden)
                         {
-                            EmbedBuilder Embed = new EmbedBuilder();
-                            Embed.WithColor(0, 128, 255);
-                            for (int i = 0; i < 24 && commandsLeft.Count > 0; i++)
-                            {
-                                if (commandsLeft[0].command != "" && !commandsLeft[0].isHidden)
-                                {
-                                    string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + " ") + (commandsLeft[0].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                                    Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command, desc == null || desc == "" ? "-" : desc);
-                                }
-                                commandsLeft.RemoveAt(0);
-                            }
-                            Embed.WithDescription("Made by " + Global.Master.Mention + "\n\nCommands:");
-                            Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
-                            await Global.SendEmbed(Embed, message.Channel);
+                            string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + " ") + (commandsLeft[0].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
+                            Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command, desc == null || desc == "" ? "-" : desc);
                         }
+                        commandsLeft.RemoveAt(0);
                     }
-                    // Experimental
-                    else if (ExperimentalChannels.Contains(message.Channel.Id))
-                    {
-                        for (int i = 0; i < commands.Length; i++)
-                            if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
-                                try
-                                {
-                                    await commands[i].execute(message);
+                    Embed.WithDescription("Made by " + Global.Master.Mention + "\n\nCommands:");
+                    Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
+                    Global.SendEmbed(Embed, message.Channel);
+                }
+            }
+            // Experimental
+            else if (ExperimentalChannels.Contains(message.Channel.Id))
+            {
+                for (int i = 0; i < commands.Length; i++)
+                    if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
+                        try
+                        {
+                            commands[i].execute(message);
 
-                                    Console.CursorLeft = 0;
-                                    Console.ForegroundColor = ConsoleColor.Green;
-                                    Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
-                                    Console.ForegroundColor = ConsoleColor.White;
-                                    Console.Write("$");
-                                }
-                                catch (Exception e)
-                                {
-                                    await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+                            Console.CursorLeft = 0;
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.Write("$");
+                        }
+                        catch (Exception e)
+                        {
+                            Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
 
-                                    Console.CursorLeft = 0;
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine(e);
-                                    Console.ForegroundColor = ConsoleColor.White;
-                                    Console.Write("$");
-                                }
-                    }
-                    // Default Channels
-                    else
+                            Console.CursorLeft = 0;
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(e);
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.Write("$");
+                        }
+            }
+            // Default Channels
+            else
+            {
+                for (int i = 0; i < commands.Length; i++)
+                    if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
                     {
-                        for (int i = 0; i < commands.Length; i++)
-                            if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
+                        if (commands[i].isExperimental)
+                            Global.SendText("Experimental commands cant be used here!", message.Channel);
+                        else
+                            try
                             {
-                                if (commands[i].isExperimental)
-                                    await Global.SendText("Experimental commands cant be used here!", message.Channel);
-                                else
-                                    try
-                                    {
-                                        Global.SaveUser(message.Author.Id);
-                                        await commands[i].execute(message);
+                                Global.SaveUser(message.Author.Id);
+                                commands[i].execute(message);
 
-                                        Console.CursorLeft = 0;
-                                        Console.ForegroundColor = ConsoleColor.Green;
-                                        Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
-                                        Console.ForegroundColor = ConsoleColor.White;
-                                        Console.Write("$");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+                                Console.CursorLeft = 0;
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Send " + commands[i].GetType().Name + " in " + message.Channel.Name + " for " + message.Author.Username);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("$");
+                            }
+                            catch (Exception e)
+                            {
+                                Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
 
-                                        Console.CursorLeft = 0;
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine(e);
-                                        Console.ForegroundColor = ConsoleColor.White;
-                                        Console.Write("$");
-                                    }
+                                Console.CursorLeft = 0;
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine(e);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.Write("$");
                             }
                     }
-                });
             }
         }
 

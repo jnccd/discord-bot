@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
