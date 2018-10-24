@@ -26,8 +26,7 @@ namespace TestDiscordBot.Commands
                 return;
             }
 
-            string url = string.Format("http://www.google.com/search?q=" + split[1] + "&btnI");
-            url = url.Replace(' ', '+');
+            string url = string.Format("http://www.google.com/search?q=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())) + "&btnI");
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
             req.KeepAlive = false;
             req.AllowAutoRedirect = true;
