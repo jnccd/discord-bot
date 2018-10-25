@@ -22,7 +22,7 @@ namespace TestDiscordBot.Commands
                 if (config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                 {
                     config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
-                    await Global.SendText("Canceled Patch Note subscribtion for this channel!", commandmessage.Channel);
+                    await Global.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
                 }
                 else
                 {
