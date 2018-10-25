@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
             {
                 string html = sr.ReadToEnd();
                 string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
-                string link = "https://github.com" + html.GetEverythingBetween("<a class=\"commit - tease - sha\" href=\"", "\" data-pjax>");
+                string link = "https://github.com/niklasCarstensen/Discord-Bot/commit/" + html.GetEverythingBetween("href=\"/niklasCarstensen/Discord-Bot/commit/", "\">");
 
                 if (message != config.Data.LastCommitMessage)
                 {
