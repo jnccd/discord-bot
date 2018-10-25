@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
     {
         List<TicTacToeGame> Games = new List<TicTacToeGame>();
 
-        public TicTacToe() : base("tictactoe", "Allows you to play TicTacToe against your friends or random people!", false)
+        public TicTacToe() : base("tictactoe", "Play TicTacToe against random people!", false)
         {
 
         }
