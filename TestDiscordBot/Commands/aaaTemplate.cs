@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class aaaTemplate : Command
     {
-        public aaaTemplate() : base("", "", false)
+        public aaaTemplate() : base("", "", true)
         {
 
         }
