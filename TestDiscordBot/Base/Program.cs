@@ -42,6 +42,8 @@ namespace TestDiscordBot
         async Task MainAsync()
         {
             #region startup
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+
             try
             {
                 Console.WriteLine("Build from: " + File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n'));
