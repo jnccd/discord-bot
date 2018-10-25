@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -100,6 +101,7 @@ namespace TestDiscordBot
             await client.SetGameAsync("Type " + Global.prefix + "help");
 #endif
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
+            Task.Factory.StartNew(() => { CheckForPatches(); });
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -252,6 +254,8 @@ namespace TestDiscordBot
                     try
                     {
                         // TODO: Insert Testing Code here
+
+                        CheckForPatches();
                     }
                     catch (Exception e) { Console.WriteLine(e); }
                 }
@@ -352,7 +356,7 @@ namespace TestDiscordBot
 
                             Console.CursorLeft = 0;
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Send " + commands[i].GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
+                            Console.WriteLine("Send " + commands[i].GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
                             Console.ForegroundColor = ConsoleColor.White;
                             Console.Write("$");
                         }
@@ -401,6 +405,46 @@ namespace TestDiscordBot
             }
         }
 
+        async void CheckForPatches()
+        {
+            try
+            {
+                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                string url = "https://github.com/niklasCarstensen/Discord-Bot";
+                WebRequest req = HttpWebRequest.Create(url);
+                req.Timeout = 10000;
+                WebResponse W = req.GetResponse();
+                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                {
+                    string html = sr.ReadToEnd();
+                    string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
+
+                    if (message != config.Data.LastCommitMessage)
+                    {
+                        config.Data.LastCommitMessage = message;
+                        config.Save();
+
+                        foreach(ulong id in config.Data.PatchNoteSubscribedChannels)
+                        {
+                            EmbedBuilder Embed = new EmbedBuilder();
+                            Embed.WithColor(0, 128, 255);
+                            Embed.AddField("Patch Notes:", message);
+                            Embed.AddField("Link: https://github.com/niklasCarstensen/Discord-Bot", "");
+                            await Global.SendEmbed(Embed, (ISocketMessageChannel)getChannelFromID(id));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
+        }
+
         public SocketUser getUserFromId(ulong UserId)
         {
             return client.GetUser(UserId);
@@ -408,6 +452,10 @@ namespace TestDiscordBot
         public SocketChannel getChannelFromID(ulong ChannelID)
         {
             return client.GetChannel(ChannelID);
+        }
+        public SocketGuild getGuildFromChannel(IChannel Channel)
+        {
+            return ((SocketGuildChannel)Channel).Guild;
         }
         public SocketSelfUser getSelf()
         {

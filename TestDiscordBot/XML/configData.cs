@@ -12,13 +12,13 @@ namespace TestDiscordBot.XML
         public string BotToken;
         public List<ulong> ChannelsWrittenOn;
         public List<DiscordUser> UserList;
+        public List<ulong> PatchNoteSubscribedChannels;
+        public string LastCommitMessage;
 
         public configData()
         {
             // TODO: Add initilization logic here
             BotToken = "<INSERT BOT TOKEN HERE>";
-            ChannelsWrittenOn = new List<ulong>();
-            UserList = new List<DiscordUser>();
         }
     }
 }
