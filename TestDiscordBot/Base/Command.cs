@@ -68,12 +68,20 @@ namespace TestDiscordBot
             isHiddenP = isHidden;
             prefixP = Global.prefix;
         }
-        public Command(string command, string desc, string prefix, bool isExperimental)
+        public Command(string prefix, string command, string desc, bool isExperimental)
         {
             descP = desc;
             commandP = command;
             isExperimentalP = isExperimental;
             isHiddenP = false;
+            prefixP = prefix;
+        }
+        public Command(string prefix, string command, string desc, bool isExperimental, bool isHidden)
+        {
+            descP = desc;
+            commandP = command;
+            isExperimentalP = isExperimental;
+            isHiddenP = isHidden;
             prefixP = prefix;
         }
 
@@ -82,6 +90,10 @@ namespace TestDiscordBot
 
         }
 
+        public virtual void onConnected()
+        {
+
+        }
         public virtual void onExit()
         {
 

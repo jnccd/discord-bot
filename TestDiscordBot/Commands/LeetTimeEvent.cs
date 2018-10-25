@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class LeetTimeEvent : Command
     {
-        public LeetTimeEvent() : base("e", "Be the first one to leet on 13:37!", "Leet tim", false)
+        public LeetTimeEvent() : base("Leet tim", "e", "Be the first one to leet on 13:37!", false, true)
         {
 
         }

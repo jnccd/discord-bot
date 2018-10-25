@@ -93,15 +93,22 @@ namespace TestDiscordBot
             commands = commands.OrderBy(x => x.command).ToArray(); // Sort commands in alphabetical order
             
             while (!clientReady) { Thread.Sleep(20); }
-
-            Global.Master = client.GetUser(300699566041202699);
 #if DEBUG
             await client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
 #else
             await client.SetGameAsync("Type " + Global.prefix + "help");
 #endif
+            Global.Master = client.GetUser(300699566041202699);
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
-            Task.Factory.StartNew(() => { CheckForPatches(); });
+            Task.Factory.StartNew(() => {
+                foreach (Command c in commands)
+                {
+                    try
+                    {
+                        c.onConnected();
+                    } catch (Exception e) { Console.WriteLine(e); }
+                }
+            });
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -254,8 +261,6 @@ namespace TestDiscordBot
                     try
                     {
                         // TODO: Insert Testing Code here
-
-                        CheckForPatches();
                     }
                     catch (Exception e) { Console.WriteLine(e); }
                 }
@@ -269,7 +274,13 @@ namespace TestDiscordBot
             #endregion
 
             foreach (Command c in commands)
-                c.onExit();
+            {
+                try
+                {
+                    c.onExit();
+                }
+                catch (Exception e) { Console.WriteLine(e); }
+            }
 
             closing = true;
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
@@ -404,47 +415,7 @@ namespace TestDiscordBot
                     }
             }
         }
-
-        async void CheckForPatches()
-        {
-            try
-            {
-                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-                string url = "https://github.com/niklasCarstensen/Discord-Bot";
-                WebRequest req = HttpWebRequest.Create(url);
-                req.Timeout = 10000;
-                WebResponse W = req.GetResponse();
-                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-                {
-                    string html = sr.ReadToEnd();
-                    string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
-
-                    if (message != config.Data.LastCommitMessage)
-                    {
-                        config.Data.LastCommitMessage = message;
-                        config.Save();
-
-                        foreach(ulong id in config.Data.PatchNoteSubscribedChannels)
-                        {
-                            EmbedBuilder Embed = new EmbedBuilder();
-                            Embed.WithColor(0, 128, 255);
-                            Embed.AddField("Patch Notes:", message);
-                            Embed.AddField("Link: https://github.com/niklasCarstensen/Discord-Bot", "");
-                            await Global.SendEmbed(Embed, (ISocketMessageChannel)getChannelFromID(id));
-                        }
-                    }
-                }
-            } catch (Exception e) {
-
-            }
-        }
-        bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
-        }
-
+        
         public SocketUser getUserFromId(ulong UserId)
         {
             return client.GetUser(UserId);
