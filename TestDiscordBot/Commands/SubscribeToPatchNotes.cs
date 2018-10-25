@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
             {
                 string html = sr.ReadToEnd();
                 string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
-                string link = "https://github.com" + html.GetEverythingBetween("<a class=\"commit - tease - sha\" href=\"", "\"");
+                string link = "https://github.com" + html.GetEverythingBetween("<a class=\"commit - tease - sha\" href=\"", "\" data-pjax>");
 
                 if (message != config.Data.LastCommitMessage)
                 {
@@ -48,7 +48,8 @@ namespace TestDiscordBot.Commands
                             Embed.AddField("Message:", message);
                             Embed.AddField("Link: ", link);
                             Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.getChannelFromID(id));
-                        } catch (Exception e) { Console.WriteLine(e); }
+                        } catch (Exception e) {
+                            Console.WriteLine(e); }
                     }
                 }
             }
