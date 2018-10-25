@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
 {
     public class SubscribeToPatchNotes : Command
     {
-        public SubscribeToPatchNotes() : base("togglePatchNotes", "Add this channel to the list of channels that will be notified when patch notes for this bot get published.", false)
+        public SubscribeToPatchNotes() : base("togglePatchNotes", "Get notified when a new bot version is published.", false)
         {
 
         }
@@ -44,9 +44,9 @@ namespace TestDiscordBot.Commands
                         {
                             EmbedBuilder Embed = new EmbedBuilder();
                             Embed.WithColor(0, 128, 255);
-                            Embed.WithDescription("Patch Notes:");
-                            Embed.AddField("Message:", message);
+                            Embed.AddField("Patch Notes:", message);
                             Embed.AddField("Link: ", link);
+                            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
                             Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.getChannelFromID(id));
                         } catch (Exception e) {
                             Console.WriteLine(e); }

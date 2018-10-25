@@ -105,7 +105,6 @@
     <Compile Include="Commands\Google.cs" />
     <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Profile.cs" />
-    <Compile Include="Commands\SourceCode.cs" />
     <Compile Include="Commands\SubscribeToPatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
     <Compile Include="XML\config.cs" />

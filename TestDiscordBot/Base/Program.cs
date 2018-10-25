@@ -29,6 +29,7 @@ namespace TestDiscordBot
         ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
         string[] commandPrefixes;
         bool closing = false;
+        string buildDate;
         ISocketMessageChannel CurrentChannel;
         DiscordSocketClient client;
         Command[] commands;
@@ -47,9 +48,12 @@ namespace TestDiscordBot
 
             try
             {
-                Console.WriteLine("Build from: " + File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n'));
+                buildDate = File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n');
+                Console.WriteLine("Build from: " + buildDate);
+            } catch {
+                if (buildDate == null)
+                    buildDate = "Error: Couldn't read build date!";
             }
-            catch { }
             client = new DiscordSocketClient();
             client.Log += Log;
             client.JoinedGuild += Client_JoinedGuild;
@@ -347,12 +351,14 @@ namespace TestDiscordBot
                         if (commandsLeft[0].command != "" && !commandsLeft[0].isHidden)
                         {
                             string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + " ") + (commandsLeft[0].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                            Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command, desc == null || desc == "" ? "-" : desc);
+                            Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command, desc == null || desc == "" ? "-" : desc, true);
                         }
                         commandsLeft.RemoveAt(0);
                     }
-                    Embed.WithDescription("Made by " + Global.Master.Mention + "\n\nCommands:");
-                    Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev!");
+                    //Embed.WithTitle("Help Menu");
+                    Embed.WithDescription("I was made by " + Global.Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+                    Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev! Current Build from: " + buildDate);
+                    Embed.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
                     await Global.SendEmbed(Embed, message.Channel);
                 }
             }

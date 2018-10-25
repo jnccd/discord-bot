@@ -21,7 +21,7 @@ namespace TestDiscordBot.Commands
             "https://www.reddit.com/r/pyrocynical/", "https://www.reddit.com/r/SequelMemes/",
             "https://www.reddit.com/r/starterpacks/", "https://www.reddit.com/r/memeframe/" };
 
-        public Meme() : base("meme", "Posts a random meme from a random subreddit, might send some weird ass shit so be advised. Takes Subreddit names as argument if you want specific subreddits.", false)
+        public Meme() : base("meme", "Posts a random meme, takes Subreddit names as argument.", false)
         {
 
         }
