@@ -15,7 +15,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task execute(SocketMessage message)
         {
             // <Insert command code here>
         }

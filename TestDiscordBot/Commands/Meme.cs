@@ -14,7 +14,7 @@ namespace TestDiscordBot.Commands
     {
         string url = "";
         public static string[] Subreddits = new string[] { "https://www.reddit.com/r/anime_irl/", "https://www.reddit.com/r/Animemes/",
-            "https://www.reddit.com/r/hmmm/", "https://www.reddit.com/r/memes/", "https://www.reddit.com/r/PewdiepieSubmissions/",
+            "https://www.reddit.com/r/memes/", "https://www.reddit.com/r/PewdiepieSubmissions/",
             "https://www.reddit.com/r/marvelmemes/", "https://www.reddit.com/r/me_irl/", "https://www.reddit.com/r/OTMemes/",
             "https://www.reddit.com/r/MemeEconomy/", "https://www.reddit.com/r/fakehistoryporn/",
             "https://www.reddit.com/r/Overwatch_Memes/", "https://www.reddit.com/r/PrequelMemes/", "https://www.reddit.com/r/greentext/",
