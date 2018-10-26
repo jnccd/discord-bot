@@ -13,11 +13,47 @@ namespace TestDiscordBot
 {
     public static class Global
     {
-        public static SocketUser Master;
-        public static Random RDM = new Random();
-        public static Program P = new Program();
-        public const string prefix = "!";
-        public static string CurrentExecutablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        static SocketUser MasterP;
+        static Random RDMP = new Random();
+        static Program PP = new Program();
+        static string CurrentExecutablePathP = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public const string prefix = "$";
+
+        public static string CurrentExecutablePath
+        {
+            get
+            {
+                return CurrentExecutablePathP;
+            }
+        }
+        public static Program P
+        {
+            get
+            {
+                return PP;
+            }
+        }
+        public static Random RDM
+        {
+            get
+            {
+                return RDMP;
+            }
+        }
+        public static SocketUser Master
+        {
+            get
+            {
+                return MasterP;
+            }
+            set
+            {
+                if (MasterP == null)
+                    MasterP = value;
+                else
+                    throw new FieldAccessException("The Master may only be set once!");
+            }
+        }
 
         public static async Task SendFile(string path, ISocketMessageChannel Channel)
         {

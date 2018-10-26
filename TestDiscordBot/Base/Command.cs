@@ -85,7 +85,7 @@ namespace TestDiscordBot
             prefixP = prefix;
         }
 
-        public virtual async Task execute(SocketMessage commandmessage)
+        public virtual async Task execute(SocketMessage message)
         {
 
         }
