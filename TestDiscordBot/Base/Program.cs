@@ -365,7 +365,7 @@ namespace TestDiscordBot
             else if (ExperimentalChannels.Contains(message.Channel.Id))
             {
                 for (int i = 0; i < commands.Length; i++)
-                    if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
+                    if (message.Content.ToLower().StartsWith((commands[i].prefix + commands[i].command).ToLower()))
                         try
                         {
                             await commands[i].execute(message);
