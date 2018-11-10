@@ -17,7 +17,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            string[] Files = Directory.GetFiles(@"D:\Eigene Dateien\Medien\Bilder\Reactions\Anime Quote");
+            string[] Files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\Anime Quotes");
             List<string> SendableFiles = new List<string>();
             foreach (string s in Files)
             {
