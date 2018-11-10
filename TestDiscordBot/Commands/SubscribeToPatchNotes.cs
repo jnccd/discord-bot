@@ -33,7 +33,7 @@ namespace TestDiscordBot.Commands
                 string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
                 string link = "https://github.com/niklasCarstensen/Discord-Bot/commit/" + html.GetEverythingBetween("href=\"/niklasCarstensen/Discord-Bot/commit/", "\">");
 
-                if (message != config.Data.LastCommitMessage)
+                if (message != config.Data.LastCommitMessage && message != "")
                 {
                     config.Data.LastCommitMessage = message;
                     config.Save();
@@ -42,10 +42,10 @@ namespace TestDiscordBot.Commands
                     {
                         try
                         {
+                            
                             EmbedBuilder Embed = new EmbedBuilder();
                             Embed.WithColor(0, 128, 255);
-                            Embed.AddField("Patch Notes:", message);
-                            Embed.AddField("Link: ", link);
+                            Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
                             Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.getChannelFromID(id));
                         } catch (Exception e) {
