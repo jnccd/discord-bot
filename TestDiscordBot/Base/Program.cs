@@ -15,7 +15,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using TestDiscordBot.Commands;
 using TestDiscordBot.XML;
 
@@ -355,9 +354,9 @@ namespace TestDiscordBot
                         }
                         commandsLeft.RemoveAt(0);
                     }
-                    //Embed.WithTitle("Help Menu");
+                    
                     Embed.WithDescription("I was made by " + Global.Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
-                    Embed.WithFooter("Commands flagged as \"(EXPERIMENTAL)\" can only be used on channels approved by the dev! Current Build from: " + buildDate);
+                    Embed.WithFooter("Current Build from: " + buildDate);
                     Embed.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
                     await Global.SendEmbed(Embed, message.Channel);
                 }
