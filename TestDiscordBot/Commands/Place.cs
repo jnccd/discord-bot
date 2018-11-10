@@ -324,9 +324,9 @@ namespace TestDiscordBot.Commands
             }
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task execute(SocketMessage message)
         {
-            string[] split = commandmessage.Content.Split(' ');
+            string[] split = message.Content.Split(' ');
             if (split.Length == 1)
             {
                 EmbedBuilder Embed = new EmbedBuilder();
@@ -336,17 +336,17 @@ namespace TestDiscordBot.Commands
                     Embed.AddField(prefix + command + " " + Pcommand.command, Pcommand.desc);
                 }
                 Embed.WithDescription("Place Commands:");
-                await Global.SendEmbed(Embed, commandmessage.Channel);
+                await Global.SendEmbed(Embed, message.Channel);
 
-                await Global.SendFile(filePath, commandmessage.Channel);
+                await Global.SendFile(filePath, message.Channel);
             }
             else
             {
                 foreach (PlaceCommand Pcommand in subCommands)
                 {
-                    if (split[1] == Pcommand.command && Pcommand.check(split, commandmessage.Channel))
+                    if (split[1] == Pcommand.command && Pcommand.check(split, message.Channel))
                     {
-                        Pcommand.execute(commandmessage, filePath, split);
+                        Pcommand.execute(message, filePath, split);
                         break;
                     }
                 }
