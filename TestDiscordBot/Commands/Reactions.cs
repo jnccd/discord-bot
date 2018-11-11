@@ -19,18 +19,24 @@ namespace TestDiscordBot.Commands
                 // TODO: Add new reactions here
                 new Reaction("You sure", "Send this if some people are too sure about themselves.", async (message) => {
                     await Global.SendText("https://cdn.discordapp.com/attachments/473991188974927884/510947142127452172/sure2smol.gif", message.Channel); }),
+                new Reaction("wat", "Send this if wat.", async (message) => {
+                    await Global.SendText("https://cdn.discordapp.com/attachments/473991188974927884/510954862616379403/Screenshot_9223371422766423856_opera.png", message.Channel); }),
+                new Reaction("You cant scare me", "Send this if you cant be scared.", async (message) => {
+                    await Global.SendText("https://youtu.be/ug2aoVZYgaU?t=157", message.Channel); }),
+                new Reaction("Who are you", "Send this if someone wants to know who you are.", async (message) => {
+                    await Global.SendText("https://youtu.be/ug2aoVZYgaU?t=246", message.Channel); }),
                 new Reaction("I dont believe it", "Send this if you dont believe something.", async (message) => {
                     await Global.SendText("https://youtu.be/ug2aoVZYgaU?t=460", message.Channel); }),
                 new Reaction("I didnt say it would be easy", "Send this if something isnt easy.", async (message) => {
                     await Global.SendText("https://youtu.be/ug2aoVZYgaU?t=491", message.Channel); }),
-                new Reaction("You cant scare me", "Send this if you cant be scared.", async (message) => {
-                    await Global.SendText("https://youtu.be/ug2aoVZYgaU?t=157", message.Channel); })
+                new Reaction("we got em R2", "Send this if you got em.", async (message) => {
+                    await Global.SendText("https://youtu.be/GQhKBn42XcU?t=24", message.Channel); })
             };
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task execute(SocketMessage message) 
         {
-            string[] split = message.Content.Split(' ');
+            string[] split = message.Content.Split(' '); 
             if (split.Length == 1)
             {
                 EmbedBuilder Embed = new EmbedBuilder(); 
