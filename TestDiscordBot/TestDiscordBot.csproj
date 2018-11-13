@@ -102,6 +102,7 @@
     <Compile Include="Chess\ChessPoint.cs" />
     <Compile Include="Commands\Chess.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
+    <Compile Include="Commands\GetTimecode.cs" />
     <Compile Include="Commands\Google.cs" />
     <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Profile.cs" />
@@ -113,7 +114,6 @@
     <Compile Include="Commands\AnimeQuote.cs" />
     <Compile Include="Commands\Ball.cs" />
     <Compile Include="Base\Command.cs" />
-    <Compile Include="Commands\LeetTimeEvent.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\ProfilePicture.cs" />
     <Compile Include="Base\Global.cs" />
