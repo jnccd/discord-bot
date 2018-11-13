@@ -20,6 +20,14 @@ using TestDiscordBot.XML;
 
 namespace TestDiscordBot
 {
+    public class IllegalCommandException : Exception
+    {
+        public IllegalCommandException(string message) : base (message)
+        {
+
+        }
+    }
+
     public class Program
     {
         int clearYcoords;
@@ -83,7 +91,11 @@ namespace TestDiscordBot
             
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
+            {
                 commands[i] = (Command)Activator.CreateInstance(commandTypes[i]);
+                if (commands[i].command.Contains(" ") || commands[i].prefix.Contains(" "))
+                    throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" + commands[i].prefix + commands[i].command + "\" in " + commands[i]);
+            }
 
             List<string> prefixes = new List<string>();
             for (int i = 0; i < commands.Length; i++)
@@ -365,7 +377,7 @@ namespace TestDiscordBot
             else if (ExperimentalChannels.Contains(message.Channel.Id))
             {
                 for (int i = 0; i < commands.Length; i++)
-                    if (message.Content.ToLower().StartsWith((commands[i].prefix + commands[i].command).ToLower()))
+                    if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
                         try
                         {
                             await commands[i].execute(message);
