@@ -1163,6 +1163,22 @@
     <Content Include="Resources\Anime Quotes\Unbubvugbvouenannt.JPG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\MarkowSources\Anderes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\MarkowSources\FurryScheiß.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\MarkowSources\HarryPotterFanfictions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\MarkowSources\TheEntireScriptOfThorRagnarok.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\MarkowSources\Wikipedia Artikel.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\MarkowSources\ZufälligeWikipediaSeite.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\Reactions\" />

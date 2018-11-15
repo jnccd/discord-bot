@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -24,8 +25,10 @@ namespace TestDiscordBot.Commands
         public override async void onConnected()
         {
             DateTime start = DateTime.Now;
-
+            
             string input = "";
+
+            // Load from Discord
             foreach (SocketGuild guild in Global.P.getGuilds())
                 if (guild.Id != 473991188974927882)
                     foreach (SocketChannel channel in guild.Channels)
@@ -36,6 +39,20 @@ namespace TestDiscordBot.Commands
                                 input += m.Content + " \n";
                             input = Regex.Replace(input, @"\s+", " ").TrimEnd(' ');
                         }
+
+            // Load from Files
+            string[] files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\MarkowSources\\");
+            foreach (string file in files)
+            {
+                string[] lines = File.ReadAllLines(file);
+                foreach (string line in lines)
+                {
+                    string trimmed = line.Trim(' ').Trim('\t');
+                    if (trimmed != "")
+                        input += trimmed + "\n";
+                }
+            }
+
             t = MarkovHelper.BuildTDict(input, 2);
 
             Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
