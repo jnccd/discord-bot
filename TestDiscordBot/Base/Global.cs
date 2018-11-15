@@ -85,8 +85,10 @@ namespace TestDiscordBot
             if (config.Data.ChannelsWrittenOn == null)
                 config.Data.ChannelsWrittenOn = new List<ulong>();
             if (!config.Data.ChannelsWrittenOn.Contains(Channel.Id))
+            {
                 config.Data.ChannelsWrittenOn.Add(Channel.Id);
-            config.Save();
+                config.Save();
+            }
         }
         public static void SaveUser(ulong UserID)
         {
@@ -128,6 +130,14 @@ namespace TestDiscordBot
                 }
             }
             return d[n, m];
+        }
+
+        public static void ConsoleWriteLine(string text, ConsoleColor Color)
+        {
+            Console.CursorLeft = 0;
+            Console.ForegroundColor = Color;
+            Console.WriteLine(text);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         // Extensions

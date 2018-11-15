@@ -104,11 +104,13 @@
     <Compile Include="Commands\GetScreenshot.cs" />
     <Compile Include="Commands\GetTimecode.cs" />
     <Compile Include="Commands\Google.cs" />
+    <Compile Include="Commands\Markow.cs" />
     <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\Reactions.cs" />
     <Compile Include="Commands\SubscribeToPatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
+    <Compile Include="HelperClasses\MarkovHelper.cs" />
     <Compile Include="XML\config.cs" />
     <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\AnimeQuote.cs" />
@@ -121,7 +123,7 @@
     <Compile Include="XML\configData.cs" />
     <Compile Include="XML\DiscordUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Web\Reddit.cs" />
+    <Compile Include="HelperClasses\RedditHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
