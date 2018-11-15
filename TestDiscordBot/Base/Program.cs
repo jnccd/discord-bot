@@ -115,15 +115,18 @@ namespace TestDiscordBot
 #endif
             Global.Master = client.GetUser(300699566041202699);
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
-            Task.Factory.StartNew(() => {
-                foreach (Command c in commands)
-                {
+#pragma warning disable CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
+            foreach (Command c in commands)
+            {
+                Task.Factory.StartNew(() => {
                     try
                     {
                         c.onConnected();
-                    } catch (Exception e) { Console.WriteLine(e); }
-                }
-            });
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                });
+            }
+#pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -294,7 +297,7 @@ namespace TestDiscordBot
                 {
                     c.onExit();
                 }
-                catch (Exception e) { Console.WriteLine(e); }
+                catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
 
             closing = true;
@@ -449,7 +452,11 @@ namespace TestDiscordBot
         {
             return client.CurrentUser;
         }
-
+        public SocketGuild[] getGuilds()
+        {
+            return client.Guilds.ToArray();
+        }
+        
         // Imports
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();

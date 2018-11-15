@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot
 {
-    public static class Reddit
+    public static class RedditHelper
     {
         public static string GetPostJsonFromSubreddit(string subUrl)
         {

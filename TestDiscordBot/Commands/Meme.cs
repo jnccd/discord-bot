@@ -34,7 +34,7 @@ namespace TestDiscordBot.Commands
             if (commandmessage.Content.Split(' ').Length > 1)
             {
                 url = "https://www.reddit.com/r/" + commandmessage.Content.Split(' ')[1] + "/";
-                if (!Reddit.IsReachable(url))
+                if (!RedditHelper.IsReachable(url))
                 {
                     await Global.SendText("Thats not a valid subreddit!", commandmessage.Channel);
                     return;
@@ -47,8 +47,8 @@ namespace TestDiscordBot.Commands
             {
                 try
                 {
-                    string postJson = Reddit.GetPostJsonFromSubreddit(url);
-                    await Reddit.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author);
+                    string postJson = RedditHelper.GetPostJsonFromSubreddit(url);
+                    await RedditHelper.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author);
                     worked = true;
                 }
                 catch (Exception e)
