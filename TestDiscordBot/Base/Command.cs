@@ -11,7 +11,6 @@ namespace TestDiscordBot
     public class Command
     {
         private string descP;
-        private string prefixP;
         private string commandP;
         private bool isExperimentalP;
         private bool isHiddenP;
@@ -27,7 +26,7 @@ namespace TestDiscordBot
         {
             get
             {
-                return prefixP;
+                return Global.prefix;
             }
         }
         public string command
@@ -58,7 +57,6 @@ namespace TestDiscordBot
             commandP = command;
             isExperimentalP = isExperimental;
             isHiddenP = false;
-            prefixP = Global.prefix;
         }
         public Command(string command, string desc, bool isExperimental, bool isHidden)
         {
@@ -66,23 +64,6 @@ namespace TestDiscordBot
             commandP = command;
             isExperimentalP = isExperimental;
             isHiddenP = isHidden;
-            prefixP = Global.prefix;
-        }
-        public Command(string prefix, string command, string desc, bool isExperimental)
-        {
-            descP = desc;
-            commandP = command;
-            isExperimentalP = isExperimental;
-            isHiddenP = false;
-            prefixP = prefix;
-        }
-        public Command(string prefix, string command, string desc, bool isExperimental, bool isHidden)
-        {
-            descP = desc;
-            commandP = command;
-            isExperimentalP = isExperimental;
-            isHiddenP = isHidden;
-            prefixP = prefix;
         }
 
         public virtual async Task execute(SocketMessage message)
