@@ -1172,9 +1172,6 @@
     <Content Include="Resources\MarkowSources\HarryPotterFanfictions.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\MarkowSources\TheEntireScriptOfThorRagnarok.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\MarkowSources\Wikipedia Artikel.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

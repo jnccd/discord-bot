@@ -138,6 +138,7 @@ namespace TestDiscordBot
             Console.ForegroundColor = Color;
             Console.WriteLine(text);
             Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("$");
         }
 
         // Extensions
