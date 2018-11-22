@@ -34,7 +34,6 @@ namespace TestDiscordBot
         bool clientReady = false;
         bool gotWorkingToken = false;
         ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
-        string[] commandPrefixes;
         bool closing = false;
         string buildDate;
         ISocketMessageChannel CurrentChannel;
@@ -96,14 +95,6 @@ namespace TestDiscordBot
                 if (commands[i].command.Contains(" ") || commands[i].prefix.Contains(" "))
                     throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" + commands[i].prefix + commands[i].command + "\" in " + commands[i]);
             }
-
-            List<string> prefixes = new List<string>();
-            for (int i = 0; i < commands.Length; i++)
-                if (!prefixes.Contains(commands[i].prefix))
-                    prefixes.Add(commands[i].prefix);
-            if (!prefixes.Contains(Global.prefix))
-                prefixes.Add(Global.prefix);
-            commandPrefixes = prefixes.ToArray();
 
             commands = commands.OrderBy(x => x.command).ToArray(); // Sort commands in alphabetical order
             
@@ -342,7 +333,7 @@ namespace TestDiscordBot
         }
         private async Task MessageReceived(SocketMessage message)
         {
-            if (!message.Author.IsBot && message.Content.StartsWith(commandPrefixes))
+            if (!message.Author.IsBot && message.Content.StartsWith(Global.prefix))
             {
                 Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
                 t.Start(message);
