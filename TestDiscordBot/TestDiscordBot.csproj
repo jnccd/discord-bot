@@ -110,6 +110,7 @@
     <Compile Include="Commands\Reactions.cs" />
     <Compile Include="Commands\SubscribeToPatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
+    <Compile Include="Commands\UrbanDict.cs" />
     <Compile Include="HelperClasses\MarkovHelper.cs" />
     <Compile Include="XML\config.cs" />
     <Compile Include="Commands\aaaTemplate.cs" />

@@ -345,8 +345,8 @@ namespace TestDiscordBot
 
             if (message.Content == Global.prefix + "help")
             {
+                #region post Help
                 List<Command> commandsLeft = commands.ToList();
-
                 while (commandsLeft.Count > 0)
                 {
                     EmbedBuilder Embed = new EmbedBuilder();
@@ -366,64 +366,60 @@ namespace TestDiscordBot
                     Embed.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
                     await Global.SendEmbed(Embed, message.Channel);
                 }
+                #endregion
             }
-            // Experimental
-            else if (ExperimentalChannels.Contains(message.Channel.Id))
-            {
-                for (int i = 0; i < commands.Length; i++)
-                    if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
-                        try
-                        {
-                            await commands[i].execute(message);
-
-                            Console.CursorLeft = 0;
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Send " + commands[i].GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write("$");
-                        }
-                        catch (Exception e)
-                        {
-                            await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
-
-                            Console.CursorLeft = 0;
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine(e);
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write("$");
-                        }
-            }
-            // Default Channels
             else
             {
+                // Find command
+                int[] distances = new int[commands.Length];
                 for (int i = 0; i < commands.Length; i++)
-                    if ((commands[i].prefix + commands[i].command).ToLower() == (message.Content.Split(' ')[0]).ToLower())
+                {
+                    distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), (message.Content.Split(' ')[0]).ToLower());
+                    if (distances[i] == 0)
+                        executeCommand(commands[i], message);
+                }
+                int minIndex = 0; int min = int.MaxValue;
+                for (int i = 0; i < commands.Length; i++)
+                    if (distances[i] < min)
                     {
-                        if (commands[i].isExperimental)
-                            await Global.SendText("Experimental commands cant be used here!", message.Channel);
-                        else
-                            try
-                            {
-                                Global.SaveUser(message.Author.Id);
-                                await commands[i].execute(message);
-
-                                Console.CursorLeft = 0;
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Send " + commands[i].GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
-                                Console.ForegroundColor = ConsoleColor.White;
-                                Console.Write("$");
-                            }
-                            catch (Exception e)
-                            {
-                                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
-
-                                Console.CursorLeft = 0;
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine(e);
-                                Console.ForegroundColor = ConsoleColor.White;
-                                Console.Write("$");
-                            }
+                        minIndex = i;
+                        min = distances[i];
                     }
+                if (min < 4)
+                {
+                    await Global.SendText("I don't know that command, but " + commands[minIndex].prefix + commands[minIndex].command + " is pretty close:", message.Channel);
+                    await executeCommand(commands[minIndex], message);
+                }
+            }
+        }
+        private async Task executeCommand(Command command, SocketMessage message)
+        {
+            if (command.isExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
+            {
+                await Global.SendText("Experimental commands cant be used here!", message.Channel);
+                return;
+            }
+
+            try
+            {
+                Global.SaveUser(message.Author.Id);
+                await command.execute(message);
+
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Send " + command.GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
+            }
+            catch (Exception e)
+            {
+                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
             }
         }
         
