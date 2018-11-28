@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class GetTimecode : Command
     {
-        public GetTimecode() : base("getTimestamp", "Gets the exact timestamp of a message", false)
+        public GetTimecode() : base("getTimestamp", "Gets the timestamps of a message", false)
         {
 
         }
