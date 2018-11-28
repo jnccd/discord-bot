@@ -11,7 +11,7 @@ namespace TestDiscordBot.Commands
 {
     public class Google : Command
     {
-        public Google() : base("google", "Google stuff", false)
+        public Google() : base("google", "Search stuff", false)
         {
 
         }
