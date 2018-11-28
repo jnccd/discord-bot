@@ -138,6 +138,8 @@ namespace TestDiscordBot.Commands
                     return;
                 }
             }
+            else
+                await Global.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", commandmessage.Channel);
         }
 
         public string ChessBoardToDiscordString(ChessBoard Board)

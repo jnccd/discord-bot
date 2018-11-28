@@ -57,8 +57,7 @@ namespace TestDiscordBot
 
         public static async Task SendFile(string path, ISocketMessageChannel Channel)
         {
-            await Channel.SendFileAsync(path);
-            SaveChannel(Channel);
+            await SendFile(path, null, Channel);
         }
         public static async Task SendFile(string path, string text, ISocketMessageChannel Channel)
         {

@@ -376,7 +376,10 @@ namespace TestDiscordBot
                 {
                     distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), (message.Content.Split(' ')[0]).ToLower());
                     if (distances[i] == 0)
-                        executeCommand(commands[i], message);
+                    {
+                        await executeCommand(commands[i], message);
+                        return;
+                    }
                 }
                 int minIndex = 0; int min = int.MaxValue;
                 for (int i = 0; i < commands.Length; i++)
@@ -385,7 +388,7 @@ namespace TestDiscordBot
                         minIndex = i;
                         min = distances[i];
                     }
-                if (min < 4)
+                if (min < 5)
                 {
                     await Global.SendText("I don't know that command, but " + commands[minIndex].prefix + commands[minIndex].command + " is pretty close:", message.Channel);
                     await executeCommand(commands[minIndex], message);
@@ -407,7 +410,7 @@ namespace TestDiscordBot
 
                 Console.CursorLeft = 0;
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Send " + command.GetType().Name + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
+                Console.WriteLine("Send " + command.GetType().Name + " on " + DateTime.Now.ToShortTimeString() + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("$");
             }
