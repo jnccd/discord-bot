@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
 {
     public class SubscribeToPatchNotes : Command
     {
-        public SubscribeToPatchNotes() : base("togglePatchNotes", "Get notified when a new bot version is published.", false)
+        public SubscribeToPatchNotes() : base("togglePatchNotes", "Get annoying messages", false)
         {
 
         }
