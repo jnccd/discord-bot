@@ -18,7 +18,7 @@ namespace TestDiscordBot.Commands
         const int pixelSize = 10;
         PlaceCommand[] subCommands;
 
-        public Place() : base("place", "Basically just r/place.", false)
+        public Place() : base("place", "Basically just r/place", false)
         {
             subCommands = new PlaceCommand[] {
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",

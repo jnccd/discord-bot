@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
     {
         List<ChessBoard> Boards = new List<ChessBoard>();
 
-        public Chess() : base("chess", "Challenge someone to a chess duel!", false)
+        public Chess() : base("chess", "Play chess", false)
         {
 
         }

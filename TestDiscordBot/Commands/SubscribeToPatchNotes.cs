@@ -42,14 +42,14 @@ namespace TestDiscordBot.Commands
                     {
                         try
                         {
-                            
                             EmbedBuilder Embed = new EmbedBuilder();
                             Embed.WithColor(0, 128, 255);
                             Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
                             Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.getChannelFromID(id));
                         } catch (Exception e) {
-                            Console.WriteLine(e); }
+                            Console.WriteLine(e);
+                        }
                     }
                 }
             }

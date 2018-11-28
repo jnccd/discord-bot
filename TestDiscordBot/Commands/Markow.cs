@@ -17,7 +17,7 @@ namespace TestDiscordBot.Commands
     {
         TDict t = null; // dataset
 
-        public Markow() : base("markow", "Uses sick markow chain autocompletion to create text.", false)
+        public Markow() : base("markow", "Generates text.", false)
         {
 
         }

@@ -10,7 +10,7 @@ namespace TestDiscordBot.Commands
 {
     public class UrbanDict : Command
     {
-        public UrbanDict() : base("urbanDict", "Search for a word you dont know.", false)
+        public UrbanDict() : base("urbanDict", "Educate yourself.", false)
         {
 
         }
