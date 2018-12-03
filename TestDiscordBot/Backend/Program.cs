@@ -34,7 +34,6 @@ namespace TestDiscordBot
         bool clientReady = false;
         bool gotWorkingToken = false;
         ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
-        bool closing = false;
         string buildDate;
         ISocketMessageChannel CurrentChannel;
         DiscordSocketClient client;
@@ -290,8 +289,7 @@ namespace TestDiscordBot
                 }
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
-
-            closing = true;
+            
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
             await client.LogoutAsync();
@@ -307,18 +305,7 @@ namespace TestDiscordBot
         }
         private async Task Client_Disconnected(Exception arg)
         {
-            //Console.WriteLine("Disconect!");
-            //if (!closing)
-            //{
-            //    // Restart
-            //    ProcessStartInfo Info = new ProcessStartInfo();
-            //    Info.Arguments = "/C ping 127.0.0.1 -n 2 && \"" + Application.ExecutablePath + "\"";
-            //    Info.WindowStyle = ProcessWindowStyle.Hidden;
-            //    Info.CreateNoWindow = true;
-            //    Info.FileName = "cmd.exe";
-            //    Process.Start(Info);
-            //    Application.Exit();
-            //}
+
         }
         private async Task Client_Ready()
         {
@@ -333,16 +320,34 @@ namespace TestDiscordBot
         }
         private async Task MessageReceived(SocketMessage message)
         {
-            if (!message.Author.IsBot && message.Content.StartsWith(Global.prefix))
+            if (!message.Author.IsBot)
             {
-                Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
-                t.Start(message);
+                if (message.Content.StartsWith(Global.prefix))
+                {
+                    Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
+                    t.Start(message);
+                }
+
+                if (char.IsLetter(message.Content[0]))
+                {
+                    Task.Factory.StartNew(() => {
+                        foreach (Command c in commands)
+                        {
+                            try
+                            {
+                                c.onNonCommandMessageRecieved(message.Content);
+                            }
+                            catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                        }
+                    });
+                }
             }
+
         }
         private async void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
-
+            
             if (message.Content == Global.prefix + "help")
             {
                 #region post Help
@@ -371,17 +376,19 @@ namespace TestDiscordBot
             else
             {
                 // Find command
+                Command called = commands.FirstOrDefault(x => (x.prefix + x.command).ToLower() == (message.Content.Split(' ')[0]).ToLower());
+                if (called != null)
+                {
+                    await executeCommand(called, message);
+                    return;
+                }
+
+                // No command found
                 int[] distances = new int[commands.Length];
                 for (int i = 0; i < commands.Length; i++)
-                {
                     distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), (message.Content.Split(' ')[0]).ToLower());
-                    if (distances[i] == 0)
-                    {
-                        await executeCommand(commands[i], message);
-                        return;
-                    }
-                }
-                int minIndex = 0; int min = int.MaxValue;
+                int minIndex = 0;
+                int min = int.MaxValue;
                 for (int i = 0; i < commands.Length; i++)
                     if (distances[i] < min)
                     {
@@ -392,6 +399,7 @@ namespace TestDiscordBot
                 {
                     await Global.SendText("I don't know that command, but " + commands[minIndex].prefix + commands[minIndex].command + " is pretty close:", message.Channel);
                     await executeCommand(commands[minIndex], message);
+                    return;
                 }
             }
         }
@@ -410,7 +418,7 @@ namespace TestDiscordBot
 
                 Console.CursorLeft = 0;
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Send " + command.GetType().Name + " on " + DateTime.Now.ToShortTimeString() + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
+                Console.WriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("$");
             }

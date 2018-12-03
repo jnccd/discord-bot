@@ -118,11 +118,11 @@
     <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\AnimeQuote.cs" />
     <Compile Include="Commands\Ball.cs" />
-    <Compile Include="Base\Command.cs" />
+    <Compile Include="Backend\Command.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\ProfilePicture.cs" />
-    <Compile Include="Base\Global.cs" />
-    <Compile Include="Base\Program.cs" />
+    <Compile Include="Backend\Global.cs" />
+    <Compile Include="Backend\Program.cs" />
     <Compile Include="XML\configData.cs" />
     <Compile Include="XML\DiscordUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -11,7 +11,7 @@ namespace TestDiscordBot.Commands
 {
     public class GooglePic : Command
     {
-        public GooglePic() : base("picture", "Get a picture from a string", true, true)
+        public GooglePic() : base("picture", "Get a picture from a string", false, true)
         {
 
         }
@@ -26,7 +26,7 @@ namespace TestDiscordBot.Commands
                 return;
             }
 
-            string url = string.Format("https://www.google.de/search?tbm=isch&q=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())));
+            string url = string.Format("https://www.google.de/search?hs=238&source=lnms&tbm=isch&sa=X&q=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())));
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
             req.KeepAlive = false;
             WebResponse W = req.GetResponse();
@@ -35,7 +35,7 @@ namespace TestDiscordBot.Commands
             {
                 string html = sr.ReadToEnd();
 
-                picURL = html.GetEverythingBetween("href=\"/imgres?imgurl=", "&amp;");
+                picURL = html.GetEverythingBetween("src=\"", "\" ");
             }
 
             await Global.SendText(picURL, message.Channel);
