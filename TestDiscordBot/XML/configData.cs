@@ -13,6 +13,7 @@ namespace TestDiscordBot.XML
         public List<ulong> ChannelsWrittenOn;
         public List<DiscordUser> UserList;
         public List<ulong> PatchNoteSubscribedChannels;
+        public List<string> loadedMarkovTextFiles;
         public string LastCommitMessage;
 
         public configData()

@@ -20,13 +20,7 @@ using TestDiscordBot.XML;
 
 namespace TestDiscordBot
 {
-    public class IllegalCommandException : Exception
-    {
-        public IllegalCommandException(string message) : base (message)
-        {
-
-        }
-    }
+    public class IllegalCommandException : Exception { public IllegalCommandException(string message) : base (message) { } }
 
     public class Program
     {
@@ -289,7 +283,8 @@ namespace TestDiscordBot
                 }
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
-            
+            config.Save();
+
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
             await client.LogoutAsync();

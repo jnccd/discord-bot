@@ -8,8 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
-using TDict = System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, uint>>;
+using TestDiscordBot.XML;
 
 namespace TestDiscordBot.Commands
 {
@@ -23,8 +22,30 @@ namespace TestDiscordBot.Commands
         public override async void onConnected()
         {
             DateTime start = DateTime.Now;
-            
             string input = "";
+
+            MarkovHelper.LoadDict();
+
+            // Load from text Files
+            if (!MarkovHelper.SaveFileExists())
+                config.Data.loadedMarkovTextFiles.Clear();
+            string[] files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\MarkowSources\\");
+            foreach (string file in files)
+            {
+                if (!config.Data.loadedMarkovTextFiles.Contains(Path.GetFileName(file)))
+                {
+                    string[] lines = File.ReadAllLines(file);
+                    foreach (string line in lines)
+                    {
+                        string trimmed = line.Trim('\n').Trim('\t').Trim(' ');
+                        if (trimmed != "")
+                            input += trimmed + "\n";
+                    }
+                    config.Data.loadedMarkovTextFiles.Add(Path.GetFileName(file));
+                }
+            }
+            MarkovHelper.AddToDict(input);
+            input = "";
 
             // Load from Discord
             foreach (SocketGuild guild in Global.P.getGuilds())
@@ -34,27 +55,12 @@ namespace TestDiscordBot.Commands
                         {
                             IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
                             foreach (IMessage m in messages)
-                                input += m.Content + " \n";
-                            input = Regex.Replace(input, @"\s+", " ").TrimEnd(' ');
+                                if (m.Content.Trim('\n').Trim('\t').Trim(' ') != "")
+                                    input += m.Content + "\n";
                         }
 
             MarkovHelper.AddToDict(input);
             input = "";
-
-            // Load from Files
-            string[] files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\MarkowSources\\");
-            foreach (string file in files)
-            {
-                string[] lines = File.ReadAllLines(file);
-                foreach (string line in lines)
-                {
-                    string trimmed = line.Trim(' ').Trim('\t');
-                    if (trimmed != "")
-                        input += trimmed + "\n";
-                }
-            }
-
-            MarkovHelper.AddToDict(input);
 
             Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
@@ -62,20 +68,23 @@ namespace TestDiscordBot.Commands
         {
             MarkovHelper.AddToDict(message);
         }
+        public override void onExit()
+        {
+            MarkovHelper.SaveDict();
+        }
 
         public override async Task execute(SocketMessage message)
         {
             string[] split = message.Content.Split(' ');
 
-            if (split.Length > 1 && split[1] == "\\learn")
+            try
             {
-                MarkovHelper.AddToDict(split.Skip(2).Aggregate((x, y) => { return x + " " + y; }));
-                await Global.SendText("Successfully added text to database!", message.Channel);
-            }
-            else
-            {
-                string output = MarkovHelper.GetString(split.Length > 1 ? split.Last() : "", 5, 2000);
+                string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 2, 2000);
                 await Global.SendText(output, message.Channel);
+            }
+            catch (NoEmptyElementException e)
+            {
+                await Global.SendText("Markow isn't ready yet!", message.Channel);
             }
         }
     }
