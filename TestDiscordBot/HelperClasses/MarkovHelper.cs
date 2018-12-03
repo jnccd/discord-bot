@@ -1,173 +1,63 @@
-﻿using WDict = System.Collections.Generic.Dictionary<string, uint>;
-using TDict = System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, uint>>;
-
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
 namespace TestDiscordBot
 {
-    // Imported from https://github.com/7lb/Markov
-
     static public class MarkovHelper
     {
-        static public TDict BuildTDict(string s, int size)
+        static Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
+
+        public static void AddToDict(string addition)
         {
-            TDict t = new TDict();
-            string prev = "";
-            foreach (string word in Chunk(s, size) )
+            lock (dict)
             {
-                if (t.ContainsKey(prev))
+                string[] split = new string[] { "" }.Union(addition.Split(' ')).ToArray();
+                for (int i = 0; i < split.Length - 1; i++)
                 {
-                    WDict w = t[prev];
-                    if ( w.ContainsKey(word) )
-                        w[word] += 1;
-                    else
-                        w.Add(word, 1);
-                }
-                else
-                    t.Add( prev, new WDict(){{word, 1}} );
-
-                prev = word;
-            }
-
-            return t;
-        }
-
-        static public string[] Chunk(string s, int size)
-        {
-            string[] ls = s.Split(' ');
-            List<string> chunk = new List<string>();
-
-            for (int i = 0; i < ls.Length - size; ++i)
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.Append( ls.Skip(i).Take(size).Aggregate( (w, k) => w + " " + k) );
-                chunk.Add( sb.ToString() );
-            }
-
-            return chunk.ToArray();
-        }
-
-        static public string BuildString(TDict t, int len, bool exact)
-        {
-            string last;
-            List<string> ucStr = new List<string>();
-            StringBuilder sb = new StringBuilder();
-
-            foreach ( string word in t.Keys.Skip(1) )
-            {
-                if ( char.IsUpper( word.First() ) )
-                    ucStr.Add(word);
-            }
-
-            if (ucStr.Count > 0)
-                sb.Append( ucStr.ElementAt(Global.RDM.Next(0, ucStr.Count) ) );
-
-            last = sb.ToString();
-            sb.Append(" ");
-
-            WDict w = new WDict();
- 
-            for (uint i = 0; i < len; ++i)
-            {
-                if (t.ContainsKey(last))
-                    w = t[last];
-                else
-                    w = t[""];
-
-                last = MarkovHelper.Choose(w);
-                sb.Append( last.Split(' ').Last() ).Append(" ");
-            }
-
-            if (!exact)
-            {
-                while (true)
-                {
-                    if (t.ContainsKey(last))
-                        w = t[last];
-                    else
-                        w = t[""];
-
-                    last = MarkovHelper.Choose(w);
-                    sb.Append(last.Split(' ').Last()).Append(" ");
-
-                    char end = last.TrimEnd(' ').Last();
-                    if (end == '.' || end == '!' || end == '?')
-                        break;
+                    if (split[i + 1] != "" && split[i + 1] != null)
+                    {
+                        List<string> list = null;
+                        if (dict.TryGetValue(split[i], out list))
+                            list.Add(split[i + 1]);
+                        else
+                            dict.Add(split[i], new string[] { split[i + 1] }.ToList());
+                    }
                 }
             }
-
-            return sb.ToString();
         }
-        static public string BuildString(TDict t, int len, bool exact, string start)
+
+        public static string GetString(string start, int minLength, int maxLength)
         {
-            StringBuilder sb = new StringBuilder();
-
-            string last = start;
-
-            WDict w = new WDict();
-
-
-            try {
-                int min = t.Keys.Min(x => Global.LevenshteinDistance(x, start));
-                string s = t.Keys.First(x => Global.LevenshteinDistance(x, start) == min);
-                if (s == null)
-                    throw new System.Exception();
-                w = t[s];
-            } catch {
-                w = t[""];
-            }
-
-            last = MarkovHelper.Choose(w);
-            sb.Append(last.Split(' ').Last()).Append(" ");
-
-
-            for (uint i = 0; i < len; ++i)
+            lock (dict)
             {
-                if (t.ContainsKey(last))
-                    w = t[last];
+                if (start == null)
+                    start = dict.Keys.ElementAt(Global.RDM.Next(dict.Keys.Count));
+                List<string> outputList = new string[] { start }.ToList();
+
+                for (int i = 0; i < minLength; i++)
+                    AddWord(outputList);
+                while (!outputList.Last().EndsWith(".") && !outputList.Last().EndsWith("!") && !outputList.Last().EndsWith("?") && !outputList.Last().EndsWith("\n"))
+                    AddWord(outputList);
+
+                string output = outputList.Aggregate((x, y) => { return x + " " + y; });
+                if (output.Length > maxLength)
+                    output = output.Substring(0, maxLength);
+
+                return output;
+            }
+        }
+        static void AddWord(List<string> output)
+        {
+            List<string> list = null;
+            if (dict.TryGetValue(output.Last(), out list))
+                output.Add(list.ElementAt(Global.RDM.Next(list.Count)));
+            else
+            {
+                if (dict.TryGetValue("", out list))
+                    output.Add(list.ElementAt(Global.RDM.Next(list.Count)));
                 else
-                    w = t[""];
-
-                last = MarkovHelper.Choose(w);
-                sb.Append(last.Split(' ').Last()).Append(" ");
-            }
-
-
-            if (!exact)
-            {
-                while (true)
-                {
-                    if (t.ContainsKey(last))
-                        w = t[last];
-                    else
-                        w = t[""];
-
-                    last = MarkovHelper.Choose(w);
-                    sb.Append(last.Split(' ').Last()).Append(" ");
-
-                    char end = last.TrimEnd(' ').Last();
-                    if (end == '.' || end == '!' || end == '?')
-                        break;
-                }
-            }
-
-            return sb.ToString();
-        }
-
-        static private string Choose(WDict w)
-        {
-            long total = w.Sum(t => t.Value);
-
-            while (true)
-            {
-                int i = Global.RDM.Next(0, w.Count);
-                double c = Global.RDM.NextDouble();
-                KeyValuePair<string, uint> k = w.ElementAt(i);
-
-                if ( c < (double)k.Value / total )
-                    return k.Key;
+                    throw new System.Exception("No \"\" Element!?");
             }
         }
     }

@@ -15,8 +15,6 @@ namespace TestDiscordBot.Commands
 {
     public class Markow : Command
     {
-        TDict t = null; // dataset
-
         public Markow() : base("markow", "Generates text", false)
         {
 
@@ -40,6 +38,9 @@ namespace TestDiscordBot.Commands
                             input = Regex.Replace(input, @"\s+", " ").TrimEnd(' ');
                         }
 
+            MarkovHelper.AddToDict(input);
+            input = "";
+
             // Load from Files
             string[] files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\MarkowSources\\");
             foreach (string file in files)
@@ -53,26 +54,29 @@ namespace TestDiscordBot.Commands
                 }
             }
 
-            t = MarkovHelper.BuildTDict(input, 2);
+            MarkovHelper.AddToDict(input);
 
             Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
+        }
+        public override void onNonCommandMessageRecieved(string message)
+        {
+            MarkovHelper.AddToDict(message);
         }
 
         public override async Task execute(SocketMessage message)
         {
-            if (t == null)
-            {
-                await Global.SendText("This component has't been loaded yet!", message.Channel);
-                return;
-            }
-
-            string output = "";
             string[] split = message.Content.Split(' ');
-            if (split.Length == 1)
-                output = MarkovHelper.BuildString(t, 25, false);
+
+            if (split.Length > 1 && split[1] == "\\learn")
+            {
+                MarkovHelper.AddToDict(split.Skip(2).Aggregate((x, y) => { return x + " " + y; }));
+                await Global.SendText("Successfully added text to database!", message.Channel);
+            }
             else
-                output = MarkovHelper.BuildString(t, 25, false, split.Skip(1).Aggregate((x, y) => x + " " + y));
-            await Global.SendText(output, message.Channel);
+            {
+                string output = MarkovHelper.GetString(split.Length > 1 ? split.Last() : "", 5, 2000);
+                await Global.SendText(output, message.Channel);
+            }
         }
     }
 }
