@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TestDiscordBot.XML;
+using TestDiscordBot.Config;
 
 namespace TestDiscordBot.Commands
 {
@@ -44,8 +44,6 @@ namespace TestDiscordBot.Commands
                     config.Data.loadedMarkovTextFiles.Add(Path.GetFileName(file));
                 }
             }
-            MarkovHelper.AddToDict(input);
-            input = "";
 
             // Load from Discord
             foreach (SocketGuild guild in Global.P.getGuilds())
@@ -55,18 +53,17 @@ namespace TestDiscordBot.Commands
                         {
                             IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
                             foreach (IMessage m in messages)
-                                if (m.Content.Trim('\n').Trim('\t').Trim(' ') != "")
-                                    input += m.Content + "\n";
+                                if (!m.Author.IsBot && m.Content.Trim('\n').Trim('\t').Trim(' ') != "")
+                                    input += m.Content.Trim(' ') + " ";
                         }
 
             MarkovHelper.AddToDict(input);
-            input = "";
 
             Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
-        public override void onNonCommandMessageRecieved(string message)
+        public override void onNonCommandMessageRecieved(SocketMessage message)
         {
-            MarkovHelper.AddToDict(message);
+            MarkovHelper.AddToDict(message.Content);
         }
         public override void onExit()
         {

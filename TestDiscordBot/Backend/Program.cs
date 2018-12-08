@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TestDiscordBot.Commands;
-using TestDiscordBot.XML;
+using TestDiscordBot.Config;
 
 namespace TestDiscordBot
 {
@@ -44,7 +44,7 @@ namespace TestDiscordBot
         {
             #region startup
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-
+            
             try
             {
                 buildDate = File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n');
@@ -267,11 +267,7 @@ namespace TestDiscordBot
                     catch (Exception e) { Console.WriteLine(e); }
                 }
                 else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("I dont know that command.");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
+                    Global.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
             }
             #endregion
 
@@ -323,14 +319,14 @@ namespace TestDiscordBot
                     t.Start(message);
                 }
 
-                if (char.IsLetter(message.Content[0]))
+                if (char.IsLetter(message.Content[0]) || message.Content[0] == '<')
                 {
                     Task.Factory.StartNew(() => {
                         foreach (Command c in commands)
                         {
                             try
                             {
-                                c.onNonCommandMessageRecieved(message.Content);
+                                c.onNonCommandMessageRecieved(message);
                             }
                             catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                         }
@@ -449,7 +445,7 @@ namespace TestDiscordBot
         {
             return client.Guilds.ToArray();
         }
-        
+
         // Imports
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();

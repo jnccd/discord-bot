@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace TestDiscordBot.XML
+namespace TestDiscordBot.Config
 {
     public static class config
     {
-        static string configPath = Global.CurrentExecutablePath + "\\config.xml";
+        static string configPath = Global.CurrentExecutablePath + "\\config.json";
         public static configData Data = new configData();
         static Loader L = new Loader();
         
@@ -24,15 +25,20 @@ namespace TestDiscordBot.XML
         }
         public static void Save()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(configData));
-            using (TextWriter writer = new StreamWriter(configPath))
-                serializer.Serialize(writer, Data);
+            //XmlSerializer serializer = new XmlSerializer(typeof(configData));
+            //using (TextWriter writer = new StreamWriter(configPath))
+            //    serializer.Serialize(writer, Data);
+            File.WriteAllText(configPath, JsonConvert.SerializeObject(Data));
         }
         public static void Load()
         {
-            XmlSerializer deserializer = new XmlSerializer(typeof(configData));
-            using (TextReader reader = new StreamReader(configPath))
-                Data = (configData)deserializer.Deserialize(reader);
+            //XmlSerializer deserializer = new XmlSerializer(typeof(configData));
+            //using (TextReader reader = new StreamReader(configPath))
+            //    Data = (configData)deserializer.Deserialize(reader);
+            if (Exists())
+                Data = JsonConvert.DeserializeObject<configData>(File.ReadAllText(configPath));
+            else
+                Data = new configData();
         }
         public static new string ToString()
         {
@@ -78,10 +84,17 @@ namespace TestDiscordBot.XML
     {
         public Loader()
         {
-            if (config.Exists())
-                config.Load();
-            else
-                config.Data = new configData();
+            try
+            {
+                if (config.Exists())
+                    config.Load();
+                else
+                    config.Data = new configData();
+            }
+            catch (Exception e)
+            {
+                throw new Exception();
+            }
         }
     }
 }

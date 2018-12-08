@@ -71,7 +71,7 @@ namespace TestDiscordBot
 
         }
 
-        public virtual void onNonCommandMessageRecieved(string message)
+        public virtual void onNonCommandMessageRecieved(SocketMessage message)
         {
 
         }

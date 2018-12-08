@@ -13,8 +13,9 @@ namespace TestDiscordBot
 
     public static class MarkovHelper
     {
+        const byte inputLength = 2;
+        static string savePath = Global.CurrentExecutablePath + "\\markow" + inputLength + ".json";
         static Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
-        static string savePath = Global.CurrentExecutablePath + "\\markow.json";
 
         public static bool SaveFileExists()
         {
@@ -34,16 +35,22 @@ namespace TestDiscordBot
         {
             lock (dict)
             {
-                string[] split = new string[] { "" }.Union(addition.Split(' ')).ToArray();
-                for (int i = 0; i < split.Length - 1; i++)
+                List<string> presplit = new List<string>();
+                for (int i = 0; i < inputLength; i++)
+                    presplit.Add("");
+                presplit.AddRange(addition.Split(' '));
+                string[] split = presplit.ToArray();
+
+                for (int i = 0; i < split.Length - inputLength; i++)
                 {
-                    if (split[i + 1] != "" && split[i + 1] != null)
+                    if (split[i + inputLength] != "" && split[i + inputLength] != null)
                     {
                         List<string> list = null;
-                        if (dict.TryGetValue(split[i], out list))
-                            list.Add(split[i + 1]);
+                        string key = split.ToList().GetRange(i, inputLength).Aggregate((x, y) => { return x + " " + y; }).Trim(' ');
+                        if (dict.TryGetValue(key, out list))
+                            list.Add(split[i + inputLength]);
                         else
-                            dict.Add(split[i], new string[] { split[i + 1] }.ToList());
+                            dict.Add(key, new string[] { split[i + inputLength] }.ToList());
                     }
                 }
             }
@@ -59,7 +66,7 @@ namespace TestDiscordBot
 
                 for (int i = 0; i < minLength; i++)
                     AddWord(outputList);
-                while (!outputList.Last().EndsWith(".") && !outputList.Last().EndsWith("!") && !outputList.Last().EndsWith("?") && !outputList.Last().Contains("\n"))
+                while (!outputList.Last().EndsWith(".") && !outputList.Last().EndsWith("!") && !outputList.Last().EndsWith("?") && !outputList.Last().EndsWith("\n"))
                     AddWord(outputList);
 
                 string output = outputList.Aggregate((x, y) => { return x + " " + y; });
@@ -72,7 +79,8 @@ namespace TestDiscordBot
         static void AddWord(List<string> output)
         {
             List<string> list = null;
-            if (dict.TryGetValue(output.Last(), out list))
+            string key = output.Skip(Math.Max(0, output.Count() - inputLength)).Aggregate((x, y) => { return x + " " + y; });
+            if (dict.TryGetValue(key, out list))
                 output.Add(list.ElementAt(Global.RDM.Next(list.Count)));
             else
             {

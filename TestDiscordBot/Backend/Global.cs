@@ -1,13 +1,15 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using NAudio.Wave;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.XML;
+using TestDiscordBot.Config;
 
 namespace TestDiscordBot
 {
@@ -78,7 +80,7 @@ namespace TestDiscordBot
             await Channel.SendMessageAsync("", false, Embed.Build());
             SaveChannel(Channel);
         }
-
+        
         public static void SaveChannel(ISocketMessageChannel Channel)
         {
             if (config.Data.ChannelsWrittenOn == null)
@@ -157,7 +159,7 @@ namespace TestDiscordBot
         public static string GetEverythingBetween(this string str, string left, string right)
         {
             int leftIndex = str.IndexOf(left);
-            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex);
+            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
 
             if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
             {
@@ -182,6 +184,10 @@ namespace TestDiscordBot
                 if (str.StartsWith(s))
                     return true;
             return false;
+        }
+        public static ulong GetServerID(this SocketMessage m)
+        {
+            return P.getGuildFromChannel(m.Channel).Id;
         }
     }
 }
