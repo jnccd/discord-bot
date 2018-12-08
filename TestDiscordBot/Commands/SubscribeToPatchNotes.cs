@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.XML;
+using TestDiscordBot.Config;
 
 namespace TestDiscordBot.Commands
 {

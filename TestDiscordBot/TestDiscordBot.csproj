@@ -82,6 +82,10 @@
       <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NAudio, Version=1.8.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.5\lib\net35\NAudio.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -99,11 +103,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -120,6 +126,7 @@
     <Compile Include="Chess\ChessMove.cs" />
     <Compile Include="Chess\ChessPoint.cs" />
     <Compile Include="Commands\Chess.cs" />
+    <Compile Include="Commands\EmojiUsage.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
     <Compile Include="Commands\GetTimecode.cs" />
     <Compile Include="Commands\Google.cs" />
@@ -133,7 +140,7 @@
     <Compile Include="Commands\TicTacToe.cs" />
     <Compile Include="Commands\UrbanDict.cs" />
     <Compile Include="HelperClasses\MarkovHelper.cs" />
-    <Compile Include="XML\config.cs" />
+    <Compile Include="Config\config.cs" />
     <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\AnimeQuote.cs" />
     <Compile Include="Commands\Ball.cs" />
@@ -142,8 +149,9 @@
     <Compile Include="Commands\ProfilePicture.cs" />
     <Compile Include="Backend\Global.cs" />
     <Compile Include="Backend\Program.cs" />
-    <Compile Include="XML\configData.cs" />
-    <Compile Include="XML\DiscordUser.cs" />
+    <Compile Include="Config\configData.cs" />
+    <Compile Include="Config\DiscordServer.cs" />
+    <Compile Include="Config\DiscordUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperClasses\RedditHelper.cs" />
   </ItemGroup>
@@ -1192,15 +1200,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\MarkowSources\HarryPotterFanfictions.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\MarkowSources\StarWars1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\MarkowSources\StarWars2.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\MarkowSources\StarWars3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

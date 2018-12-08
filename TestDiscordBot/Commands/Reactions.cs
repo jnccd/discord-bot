@@ -32,7 +32,9 @@ namespace TestDiscordBot.Commands
                 new Reaction("we got em R2", "Send this if you got em.", async (message) => {
                     await Global.SendText("https://youtu.be/GQhKBn42XcU?t=24", message.Channel); }),
                 new Reaction("I came in like a wrecking ball", "Send this if you came in like a wrecking ball.", async (message) => {
-                    await Global.SendText("https://youtu.be/My2FRPA3Gf8?t=93", message.Channel); })
+                    await Global.SendText("https://youtu.be/My2FRPA3Gf8?t=93", message.Channel); }),
+                new Reaction("Shitty Mario", "Send this if you shitty.", async (message) => {
+                    await Global.SendText("https://www.youtube.com/watch?v=x74bZjDYUTE", message.Channel); })
             };
         }
 
