@@ -131,6 +131,7 @@
     <Compile Include="Commands\GetTimecode.cs" />
     <Compile Include="Commands\Google.cs" />
     <Compile Include="Commands\GooglePic.cs" />
+    <Compile Include="Commands\Haskell.cs" />
     <Compile Include="Commands\Latex.cs" />
     <Compile Include="Commands\Markow.cs" />
     <Compile Include="Commands\Place.cs" />
@@ -157,6 +158,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="haskell.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="latex.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
