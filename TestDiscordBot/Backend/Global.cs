@@ -66,6 +66,11 @@ namespace TestDiscordBot
             await Channel.SendFileAsync(path, text);
             SaveChannel(Channel);
         }
+        public static async Task SendFile(Stream stream, string fileName, string text, ISocketMessageChannel Channel)
+        {
+            await Channel.SendFileAsync(stream, fileName, text);
+            SaveChannel(Channel);
+        }
         public static async Task SendText(string text, ISocketMessageChannel Channel)
         {
             await Channel.SendMessageAsync(text);
@@ -156,6 +161,13 @@ namespace TestDiscordBot
                 indexes.Add(index);
             }
         }
+        public static bool ContainsOneOf(this string str, string[] tests)
+        {
+            foreach (string s in tests)
+                if (str.Contains(s))
+                    return true;
+            return false;
+        }
         public static string GetEverythingBetween(this string str, string left, string right)
         {
             int leftIndex = str.IndexOf(left);
@@ -188,6 +200,14 @@ namespace TestDiscordBot
         public static ulong GetServerID(this SocketMessage m)
         {
             return P.getGuildFromChannel(m.Channel).Id;
+        }
+        public static string ContainsPictureLink(this string str)
+        {
+            string[] split = str.Split(' ');
+            foreach (string s in split)
+                if (s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".png"))
+                    return s;
+            return null;
         }
     }
 }

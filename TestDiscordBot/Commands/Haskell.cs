@@ -12,7 +12,7 @@ namespace TestDiscordBot.Commands
 {
     public class Haskell : Command
     {
-        public Haskell() : base("ghci", "Compiles Haskell Code", true)
+        public Haskell() : base("ghci", "Compiles Haskell Code", false)
         {
 
         }
@@ -23,14 +23,16 @@ namespace TestDiscordBot.Commands
             {
                 bool exited = false;
 
-                if (message.Content.Contains("IO") || message.Content.Contains("Write") || message.Content.Contains("write") || message.Content.Contains("import") ||
-                message.Content.Contains("open") || message.Content.Contains("File") || message.Content.Contains("handle") || message.Content.Contains("System"))
-                {
-                    Global.SendText("Your code contains commands you don't have permission to use!", message.Channel);
-                    return;
-                }
+                string[] split = message.Content.Split(' ');
+                foreach (string s in split)
+                    if (s != "randomRIO" && s != "(\\nextIOWord" && s != "nextIOWord" && s.ContainsOneOf(new string[] { "IO", "Write", "write", "read", "Read", "import", "open",
+                        "File", "Handle", "handle", "System", "unsafe", "seq", "Profunctor", "Windows" }))
+                    {
+                        Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + s, message.Channel);
+                        return;
+                    }
 
-                File.WriteAllText("input.hs", message.Content.Split(' ').Skip(1).Aggregate((x, y) => { return x + " " + y; }));
+                File.WriteAllText("input.hs", "import Data.List\nimport System.Random\n" + message.Content.Split(' ').Skip(1).Aggregate((x, y) => { return x + " " + y; }));
                 Process compiler = new Process();
                 compiler.StartInfo.FileName = "haskell.bat";
                 compiler.StartInfo.CreateNoWindow = true;
@@ -41,10 +43,32 @@ namespace TestDiscordBot.Commands
                 
                 Task.Factory.StartNew(async () => {
                     compiler.WaitForExit();
-                    if (File.Exists("haskellCompile.txt"))
+                    if (exited)
+                        return;
+                    try
                     {
-                        string output = File.ReadAllText("haskellCompile.txt");
-                        await Global.SendText(output.Split('\n').Skip(1).Aggregate((x, y) => { return x + "\n" + y; }), message.Channel);
+                        if (File.Exists("haskellCompile.txt"))
+                        {
+                            string[] output = File.ReadAllLines("haskellCompile.txt");
+
+                            Debug.WriteLine("Raw Haskell Output: ");
+                            Debug.WriteLine(output.Aggregate((x, y) => x + "\n" + y));
+
+                            if (output.Length <= 2)
+                                await Global.SendText("Your code didn't create any output!", message.Channel);
+                            else
+                            {
+                                string shortenedOutput = output.ToList().GetRange(1, output.Length - 2).Select((x) => (x.Split('>').Last())).
+                                Aggregate((x, y) => { return x + "\n" + y; });
+
+                                if (shortenedOutput.Length < 2000)
+                                    await Global.SendText(shortenedOutput, message.Channel);
+                                else
+                                    await Global.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
+                            }
+                        }
+                    } catch (Exception e) {
+                        Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                     }
                     exited = true;
                 });
@@ -53,6 +77,7 @@ namespace TestDiscordBot.Commands
                     Thread.Sleep(100);
                 if (!exited)
                 {
+                    exited = true;
                     try {
                         compiler.Close();
                     } catch { }

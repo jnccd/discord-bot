@@ -126,6 +126,7 @@
     <Compile Include="Chess\ChessMove.cs" />
     <Compile Include="Chess\ChessPoint.cs" />
     <Compile Include="Commands\Chess.cs" />
+    <Compile Include="Commands\EditLast.cs" />
     <Compile Include="Commands\EmojiUsage.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
     <Compile Include="Commands\GetTimecode.cs" />
