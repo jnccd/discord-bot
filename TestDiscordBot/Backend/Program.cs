@@ -445,11 +445,8 @@ namespace TestDiscordBot
                 Global.SaveUser(message.Author.Id);
                 await command.execute(message);
 
-                Console.CursorLeft = 0;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
+                Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
+                    ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
             }
             catch (Exception e)
             {
@@ -458,11 +455,7 @@ namespace TestDiscordBot
                     await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
                 } catch { }
 
-                Console.CursorLeft = 0;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
+                Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
             }
         }
         

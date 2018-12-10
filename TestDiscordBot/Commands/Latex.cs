@@ -23,26 +23,30 @@ namespace TestDiscordBot.Commands
         {
             lock (this)
             {
-                string latex = message.Content.Split(' ').Skip(1).Aggregate((x, y) => x + " " + y);
+                try
+                {
+                    string latex = message.Content.Split(' ').Skip(1).Aggregate((x, y) => x + " " + y);
 
-                if (!latex.StartsWith("\\documentclass["))
-                    latex = "\\documentclass[preview,border=12pt]{standalone}\n\\usepackage{amsmath}\n\\usepackage{tikz}\n\\begin{document}\n" + latex + "\n\\end{document}";
+                    if (!latex.StartsWith("\\documentclass["))
+                        latex = "\\documentclass[preview,border=12pt]{standalone}\n\\usepackage{amsmath}\n\\usepackage{tikz}\n\\begin{document}\n" + latex + "\n\\end{document}";
 
-                File.WriteAllText("input.tex", latex);
+                    File.WriteAllText("input.tex", latex);
 
-                Process converter = new Process();
-                converter.StartInfo.FileName = "latex.bat";
-                converter.StartInfo.UseShellExecute = false;
-                converter.StartInfo.RedirectStandardInput = true;
-                //converter.StartInfo.CreateNoWindow = true;
-                //converter.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    Process converter = new Process();
+                    converter.StartInfo.FileName = "latex.bat";
+                    converter.StartInfo.UseShellExecute = false;
+                    converter.StartInfo.RedirectStandardInput = true;
+                    //converter.StartInfo.CreateNoWindow = true;
+                    //converter.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-                converter.Start();
-                Thread.Sleep(500);
-                converter.StandardInput.WriteLine("return");
-                converter.WaitForExit();
+                    converter.Start();
+                    Thread.Sleep(500);
+                    converter.StandardInput.WriteLine("return");
+                    converter.WaitForExit();
 
-                Global.SendFile(Global.CurrentExecutablePath + "\\output.png", message.Channel);
+                    Global.SendFile(Global.CurrentExecutablePath + "\\output.png", message.Channel);
+                }
+                catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
         }
     }
