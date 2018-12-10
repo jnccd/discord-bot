@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -28,11 +29,8 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => { return char.ToUpper(x); })), message.Channel);
             }),
-            new EditLastCommand("colorChannelSwap", "edit pic c:", false, async (SocketMessage message, string lastText, string lastPic) => {
-                WebRequest request = WebRequest.Create(lastPic);
-                WebResponse response = request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                Bitmap bmp = new Bitmap(responseStream);
+            new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, string lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
@@ -42,14 +40,10 @@ namespace TestDiscordBot.Commands
                         bmp.SetPixel(x, y, c);
                     }
 
-                bmp.Save("imgedit.png");
-                await Global.SendFile("imgedit.png", message.Channel);
+                await Global.SendBitmap(bmp, message.Channel);
             }),
-            new EditLastCommand("invert", "edit pic c:", false, async (SocketMessage message, string lastText, string lastPic) => {
-                WebRequest request = WebRequest.Create(lastPic);
-                WebResponse response = request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                Bitmap bmp = new Bitmap(responseStream);
+            new EditLastCommand("invert", "Invert the color of each pixel", false, async (SocketMessage message, string lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
@@ -59,10 +53,9 @@ namespace TestDiscordBot.Commands
                         bmp.SetPixel(x, y, c);
                     }
 
-                bmp.Save("imgedit.png");
-                await Global.SendFile("imgedit.png", message.Channel);
+                await Global.SendBitmap(bmp, message.Channel);
             })
-            
+
             };
         }
 

@@ -112,10 +112,17 @@ namespace TestDiscordBot
             }
 #pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
             Console.CursorLeft = 0;
+            Console.WriteLine("Active on the following Servers: ");
+            try
+            {
+                foreach (SocketGuild g in client.Guilds)
+                    Console.WriteLine(g.Name);
+            } catch { }
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine(CurrentChannel);
+            Console.Write(CurrentChannel);
             Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(" on " + getGuildFromChannel(CurrentChannel).Name);
             Console.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
             ShowWindow(GetConsoleWindow(), 2);
@@ -262,9 +269,9 @@ namespace TestDiscordBot
                 {
                     try
                     {
-                        // TODO: Insert Testing Code here
+                        
                     }
-                    catch (Exception e) { Console.WriteLine(e); }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
                     Global.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
@@ -291,8 +298,39 @@ namespace TestDiscordBot
         {
             try
             {
-                await Global.SendText("Yall gay", arg.DefaultChannel);
-            } catch { }
+                bool hasWrite = false, hasRead = false, hasReadHistory = false, hasFiles = false;
+                SocketGuild g = client.GetGuild(479950092938248193);
+                IUser u = g.Users.FirstOrDefault(x => x.Id == getSelf().Id);
+                if (u != null)
+                {
+                    IEnumerable<IRole> roles = (u as IGuildUser).RoleIds.Select(x => (u as IGuildUser).Guild.GetRole(x));
+                    foreach (IRole r in roles)
+                    {
+                        if (r.Permissions.SendMessages)
+                            hasWrite = true;
+                        if (r.Permissions.ReadMessages)
+                            hasRead = true;
+                        if (r.Permissions.ReadMessageHistory)
+                            hasReadHistory = true;
+                        if (r.Permissions.AttachFiles)
+                            hasFiles = true;
+                    }
+                }
+
+                if (!hasWrite)
+                {
+                    IDMChannel c = await g.Owner.GetOrCreateDMChannelAsync();
+                    await c.SendMessageAsync("How can one be on your server and not have the right to write messages!? This is outrageous, its unfair!");
+                    return;
+                }
+
+                if (!hasRead || !hasReadHistory || !hasFiles)
+                {
+                    await g.TextChannels.ElementAt(0).SendMessageAsync("Whoever added me has big gay and didn't give me all the permissions.");
+                    return;
+                }
+            }
+            catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
         }
         private async Task Client_Disconnected(Exception arg)
         {
@@ -415,7 +453,10 @@ namespace TestDiscordBot
             }
             catch (Exception e)
             {
-                await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+                try
+                {
+                    await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
+                } catch { }
 
                 Console.CursorLeft = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
