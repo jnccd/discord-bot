@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +22,7 @@ namespace TestDiscordBot.Commands
             Commands = new EditLastCommand[] {
             
             new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Select((x) => x + "f")).Remove(lastText.Last()), message.Channel);
+                await Global.SendText(string.Join("", lastText.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
             }),
             new EditLastCommand("stupid", "Convert text to stupid", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })), message.Channel);
@@ -54,11 +55,37 @@ namespace TestDiscordBot.Commands
                     }
 
                 await Global.SendBitmap(bmp, message.Channel);
+            }),
+            new EditLastCommand("expand", "Expand the picture", false, async (SocketMessage message, string lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Vector2 target = new Vector2(x, y).RepelFrom(new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, true);
+                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
+                    }
+
+                await Global.SendBitmap(output, message.Channel);
+            }),
+            new EditLastCommand("collapse", "Collapse the picture", false, async (SocketMessage message, string lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Vector2 target = new Vector2(x, y).RepelFrom(new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, false);
+                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
+                    }
+
+                await Global.SendBitmap(output, message.Channel);
             })
 
             };
         }
-
+        
         public override async Task execute(SocketMessage message)
         {
             IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
@@ -67,7 +94,8 @@ namespace TestDiscordBot.Commands
             {
                 if (lastText == null && m.Id != message.Id && !string.IsNullOrWhiteSpace(m.Content))
                     lastText = m.Content;
-                if (lastPic == null && m.Id != message.Id && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Filename.EndsWith(".png") && m.Attachments.ElementAt(0).Size > 0)
+                if (lastPic == null && m.Id != message.Id && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0 && m.Attachments.ElementAt(0).Filename.EndsWith(".png") ||
+                    lastPic == null && m.Id != message.Id && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0 && m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
                     lastPic = m.Attachments.ElementAt(0).Url;
                 if (lastPic == null && m.Id != message.Id && m.Content.ContainsPictureLink() != null)
                     lastPic = m.Content.ContainsPictureLink();
@@ -104,10 +132,8 @@ namespace TestDiscordBot.Commands
                             return;
                         }
 
-                        lock (this)
-                        {
-                            command.execute(message, lastText, lastPic);
-                        }
+                        command.execute(message, lastText, lastPic);
+
                         break;
                     }
                 }

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Xna.Framework;
 using NAudio.Wave;
 using System;
 using System.Collections;
@@ -230,9 +231,47 @@ namespace TestDiscordBot
         {
             string[] split = str.Split(' ');
             foreach (string s in split)
-                if (s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".png"))
+                if (s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".png") ||
+                    s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".jpg"))
                     return s;
             return null;
+        }
+        public static Vector2 RepelFrom(this Vector2 repelled, Vector2 repeller, Bitmap within, bool expand)
+        {
+            Vector2 diff = repelled - repeller;
+            Vector2 move = diff;
+            move.Normalize();
+
+            float transformedLength = (diff / ((within.Width + within.Height) / 7)).LengthSquared();
+            move = transformedLength == 0 ?
+            Vector2.Zero :
+            move * (100 / transformedLength);
+
+            Vector2 target = Vector2.Zero;
+            if (expand)
+                target = repelled - move;
+            else
+                target = repelled + move;
+
+            if (float.IsNaN(target.X) || float.IsInfinity(target.X))
+                target.X = repelled.X;
+            if (float.IsNaN(target.Y) || float.IsInfinity(target.Y))
+                target.Y = repelled.Y;
+            if (target.X < 0)
+                target.X = 0;
+            if (target.X > within.Width - 1)
+                target.X = within.Width - 1;
+            if (target.Y < 0)
+                target.Y = 0;
+            if (target.Y > within.Height - 1)
+                target.Y = within.Height - 1;
+
+            return target;
+        }
+        private static float ComputeGaussian(this float n, float theta)
+        {
+            return (float)((1.0 / Math.Sqrt(2 * Math.PI * theta)) *
+                           Math.Exp(-(n * n) / (2 * theta * theta)));
         }
     }
 }
