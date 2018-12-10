@@ -4,8 +4,10 @@ using NAudio.Wave;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,10 +68,25 @@ namespace TestDiscordBot
             await Channel.SendFileAsync(path, text);
             SaveChannel(Channel);
         }
+        public static async Task SendFile(Stream stream, string fileName, ISocketMessageChannel Channel)
+        {
+            await SendFile(stream, fileName, "", Channel);
+        }
         public static async Task SendFile(Stream stream, string fileName, string text, ISocketMessageChannel Channel)
         {
+            stream.Position = 0;
             await Channel.SendFileAsync(stream, fileName, text);
             SaveChannel(Channel);
+        }
+        public static async Task SendBitmap(Bitmap bmp, ISocketMessageChannel Channel)
+        {
+            await SendBitmap(bmp, "", Channel);
+        }
+        public static async Task SendBitmap(Bitmap bmp, string text, ISocketMessageChannel Channel)
+        {
+            MemoryStream stream = new MemoryStream();
+            bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            await SendFile(stream, "kek.png", text, Channel);
         }
         public static async Task SendText(string text, ISocketMessageChannel Channel)
         {
@@ -100,6 +117,14 @@ namespace TestDiscordBot
         {
             if (!config.Data.UserList.Exists(x => x.UserID == UserID))
                 config.Data.UserList.Add(new DiscordUser(UserID));
+        }
+
+        public static Bitmap GetBitmapFromURL(string url)
+        {
+            WebRequest request = WebRequest.Create(url);
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            return new Bitmap(responseStream);
         }
 
         public static int LevenshteinDistance(string s, string t)
