@@ -45,17 +45,18 @@ namespace TestDiscordBot.Commands
                 }
             }
 
-            // Load from Discord
-            foreach (SocketGuild guild in Global.P.getGuilds())
-                if (guild.Id != 473991188974927882)
-                    foreach (SocketChannel channel in guild.Channels)
-                        if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
-                        {
-                            IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
-                            foreach (IMessage m in messages)
-                                if (!m.Author.IsBot && m.Content.Trim('\n').Trim('\t').Trim(' ') != "")
-                                    input += m.Content.Trim(' ') + " ";
-                        }
+            // Loads the same shit multiple tiems and fucks everything up
+            //// Load from Discord
+            //foreach (SocketGuild guild in Global.P.getGuilds())
+            //    if (guild.Id != 473991188974927882)
+            //        foreach (SocketChannel channel in guild.Channels)
+            //            if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
+            //            {
+            //                IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
+            //                foreach (IMessage m in messages)
+            //                    if (!m.Author.IsBot && m.Content.Trim('\n').Trim('\t').Trim(' ') != "")
+            //                        input += m.Content.Trim(' ') + " ";
+            //            }
 
             MarkovHelper.AddToDict(input);
 
