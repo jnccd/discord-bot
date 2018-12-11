@@ -11,7 +11,7 @@ namespace TestDiscordBot.Commands
 {
     public class EmojiUsage : Command
     {
-        public EmojiUsage() : base("emojiUsage", "Which emojis do people actually use?", false)
+        public EmojiUsage() : base("emojiUsage", "Which emojis are actually used?", false)
         {
 
         }
