@@ -97,6 +97,19 @@ namespace TestDiscordBot.Commands
                     }
 
                 await Global.SendBitmap(output, message.Channel);
+            }),
+            new EditLastCommand("fall", "Fall the picture?", false, async (SocketMessage message, string lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Vector2 target = Transform(new Vector2(x, y), new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, TransformMode.Fall);
+                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
+                    }
+
+                await Global.SendBitmap(output, message.Channel);
             })
 
             };
@@ -131,7 +144,7 @@ namespace TestDiscordBot.Commands
 
                 case TransformMode.Stir:
                     transformedLength = (diff / ((within.Width + within.Height) / 7)).LengthSquared();
-                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 10;
+                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
                     target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X), 
