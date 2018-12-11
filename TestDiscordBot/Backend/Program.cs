@@ -379,7 +379,7 @@ namespace TestDiscordBot
             
             if (message.Content == Global.prefix + "help")
             {
-                #region post Help
+                #region get Help
                 List<Command> commandsLeft = commands.ToList();
                 while (commandsLeft.Count > 0)
                 {
@@ -389,8 +389,9 @@ namespace TestDiscordBot
                     {
                         if (commandsLeft[0].command != "" && !commandsLeft[0].isHidden)
                         {
-                            string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + " ") + (commandsLeft[0].isExperimental ? "(EXPERIMENTAL)" : "")).Trim(' ');
-                            Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command, desc == null || desc == "" ? "-" : desc, true);
+                            string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + "   ")).Trim(' ');
+                            Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command + (commandsLeft[0].isExperimental ? " [EXPERIMENTAL]" : ""), 
+                                desc == null || desc == "" ? "-" : desc, true);
                         }
                         commandsLeft.RemoveAt(0);
                     }
@@ -450,7 +451,7 @@ namespace TestDiscordBot
             }
             catch (Exception e)
             {
-                try
+                try // Try in case I dont have the permissions to write at all
                 {
                     await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
                 } catch { }
