@@ -83,7 +83,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
 
                 }),
             new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
@@ -163,7 +163,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
 
                 }),
             new PlaceCommand("drawRekt", "Draws a rectangle in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
@@ -240,7 +240,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
 
                 }),
             new PlaceCommand("drawString", "Draws a string in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
@@ -302,7 +302,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, "Succsessfully drawn!", commandmessage.Channel);
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
 
                 }) };
         }

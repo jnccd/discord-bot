@@ -110,6 +110,7 @@
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -142,6 +143,7 @@
     <Compile Include="Commands\SubscribeToPatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
     <Compile Include="Commands\UrbanDict.cs" />
+    <Compile Include="Commands\SubscribeToWarframeAlerts.cs" />
     <Compile Include="HelperClasses\MarkovHelper.cs" />
     <Compile Include="Config\config.cs" />
     <Compile Include="Commands\aaaTemplate.cs" />
@@ -157,6 +159,10 @@
     <Compile Include="Config\DiscordUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperClasses\RedditHelper.cs" />
+    <Compile Include="Remotable\Cache.cs" />
+    <Compile Include="Remotable\frmRServer.cs" />
+    <Compile Include="Remotable\IObserver.cs" />
+    <Compile Include="Remotable\MyRemotableObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -125,25 +125,26 @@ namespace TestDiscordBot.Commands
             float rotationAngle = 0;
             double cos = 0;
             double sin = 0;
-            float maxDistance = (center / ((within.Width + within.Height) / 7)).LengthSquared();
+            float div = ((within.Width + within.Height) / 7);
+            float maxDistance = (center / div).LengthSquared();
             switch (mode)
             {
                 case TransformMode.Expand:
-                    transformedLength = (diff / ((within.Width + within.Height) / 7)).LengthSquared();
+                    transformedLength = (diff / div).LengthSquared();
                     target = (transformedLength == 0 || (100 / transformedLength) > diff.Length()) ?
                         center :
                         point - move * (100 / transformedLength);
                     break;
 
                 case TransformMode.Collapse:
-                    transformedLength = (diff / ((within.Width + within.Height) / 7)).LengthSquared();
+                    transformedLength = (diff / div).LengthSquared();
                     target = (transformedLength == 0) ?
                         center :
-                        point + move * (100 / transformedLength);
+                        point + move * (25 / transformedLength);
                     break;
 
                 case TransformMode.Stir:
-                    transformedLength = (diff / ((within.Width + within.Height) / 7)).LengthSquared();
+                    transformedLength = (diff / div).LengthSquared();
                     rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
@@ -152,7 +153,7 @@ namespace TestDiscordBot.Commands
                     break;
 
                 case TransformMode.Fall:
-                    transformedLength = (diff / ((within.Width + within.Height) / 7)).LengthSquared();
+                    transformedLength = (diff / div).LengthSquared();
                     rotationAngle = transformedLength / 3;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);

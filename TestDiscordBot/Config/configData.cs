@@ -14,6 +14,7 @@ namespace TestDiscordBot.Config
         public List<DiscordUser> UserList;
         public List<DiscordServer> ServerList;
         public List<ulong> PatchNoteSubscribedChannels;
+        public List<ulong> WarframeSubscribedChannels;
         public List<string> loadedMarkovTextFiles;
         public string LastCommitMessage;
 
