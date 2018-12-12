@@ -59,35 +59,26 @@ namespace TestDiscordBot
                     throw new FieldAccessException("The Master may only be set once!");
             }
         }
-
-        public static async Task SendFile(string path, ISocketMessageChannel Channel)
-        {
-            await SendFile(path, null, Channel);
-        }
-        public static async Task SendFile(string path, string text, ISocketMessageChannel Channel)
+        
+        public static async Task SendFile(string path, ISocketMessageChannel Channel, string text = "")
         {
             await Channel.SendFileAsync(path, text);
             SaveChannel(Channel);
         }
-        public static async Task SendFile(Stream stream, string fileName, ISocketMessageChannel Channel)
+        public static async Task SendFile(Stream stream, ISocketMessageChannel Channel, string fileName = "", string text = "")
         {
-            await SendFile(stream, fileName, "", Channel);
-        }
-        public static async Task SendFile(Stream stream, string fileName, string text, ISocketMessageChannel Channel)
-        {
+            if (fileName == "")
+                fileName = DateTime.Now.ToBinary().ToString();
+
             stream.Position = 0;
             await Channel.SendFileAsync(stream, fileName, text);
             SaveChannel(Channel);
         }
-        public static async Task SendBitmap(Bitmap bmp, ISocketMessageChannel Channel)
-        {
-            await SendBitmap(bmp, "", Channel);
-        }
-        public static async Task SendBitmap(Bitmap bmp, string text, ISocketMessageChannel Channel)
+        public static async Task SendBitmap(Bitmap bmp, ISocketMessageChannel Channel, string text = "")
         {
             MemoryStream stream = new MemoryStream();
             bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-            await SendFile(stream, "kek.png", text, Channel);
+            await SendFile(stream, Channel, text);
         }
         public static async Task SendText(string text, ISocketMessageChannel Channel)
         {

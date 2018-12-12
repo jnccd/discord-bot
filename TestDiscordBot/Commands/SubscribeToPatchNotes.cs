@@ -48,7 +48,7 @@ namespace TestDiscordBot.Commands
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
                             Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.getChannelFromID(id));
                         } catch (Exception e) {
-                            Console.WriteLine(e);
+                            Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                         }
                     }
                 }

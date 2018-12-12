@@ -45,7 +45,7 @@ namespace TestDiscordBot.Commands
                 }
             }
 
-            // Loads the same shit multiple tiems and fucks everything up
+            // Loads the same shit multiple times and fucks everything up
             //// Load from Discord
             //foreach (SocketGuild guild in Global.P.getGuilds())
             //    if (guild.Id != 473991188974927882)

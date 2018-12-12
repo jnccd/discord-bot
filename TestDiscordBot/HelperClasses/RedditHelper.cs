@@ -94,7 +94,7 @@ namespace TestDiscordBot
                 else
                 {
                     // send post
-                    await Global.SendFile(videofile, ResultTitle, Channel);
+                    await Global.SendFile(videofile, Channel, ResultTitle);
                     await Global.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
                 }
                 
