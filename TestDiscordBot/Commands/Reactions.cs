@@ -36,10 +36,12 @@ namespace TestDiscordBot.Commands
                 new Reaction("Shitty Mario", "Send this if you shitty.", async (message) => {
                     await Global.SendText("https://www.youtube.com/watch?v=x74bZjDYUTE", message.Channel); }),
                 new Reaction("Oh my gaaaa", "Send this if oh my gaaaaa.", async (message) => {
-                    await Global.SendText("https://youtu.be/UnktCDi-BVs?t=9", message.Channel); })
+                    await Global.SendText("https://youtu.be/UnktCDi-BVs?t=9", message.Channel); }),
+                new Reaction("heh", "Send this if heh.", async (message) => {
+                    await Global.SendText("https://pbs.twimg.com/media/DuPdNCOV4AA20F6?format=jpg&name=small", message.Channel); })
             };
         }
-
+        
         public override async Task execute(SocketMessage message) 
         {
             string[] split = message.Content.Split(' '); 

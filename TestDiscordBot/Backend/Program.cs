@@ -99,18 +99,6 @@ namespace TestDiscordBot
 #endif
             Global.Master = client.GetUser(300699566041202699);
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
-#pragma warning disable CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
-            foreach (Command c in commands)
-            {
-                Task.Factory.StartNew(() => {
-                    try
-                    {
-                        c.onConnected();
-                    }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                });
-            }
-#pragma warning restore CS4014 // Da dieser Aufruf nicht abgewartet wird, wird die Ausführung der aktuellen Methode fortgesetzt, bevor der Aufruf abgeschlossen ist
             Console.CursorLeft = 0;
             Console.WriteLine("Active on the following Servers: ");
             try
@@ -126,8 +114,18 @@ namespace TestDiscordBot
             Console.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
             ShowWindow(GetConsoleWindow(), 2);
-#endregion
-            
+            foreach (Command c in commands)
+            {
+                Task.Factory.StartNew(() => {
+                    try
+                    {
+                        c.onConnected();
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                });
+            }
+            #endregion
+
             #region commands
             while (true)
             {

@@ -65,20 +65,20 @@ namespace TestDiscordBot
             await Channel.SendFileAsync(path, text);
             SaveChannel(Channel);
         }
-        public static async Task SendFile(Stream stream, ISocketMessageChannel Channel, string fileName = "", string text = "")
+        public static async Task SendFile(Stream stream, ISocketMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
         {
             if (fileName == "")
                 fileName = DateTime.Now.ToBinary().ToString();
 
             stream.Position = 0;
-            await Channel.SendFileAsync(stream, fileName, text);
+            await Channel.SendFileAsync(stream, fileName + "." + fileEnd, text);
             SaveChannel(Channel);
         }
         public static async Task SendBitmap(Bitmap bmp, ISocketMessageChannel Channel, string text = "")
         {
             MemoryStream stream = new MemoryStream();
             bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-            await SendFile(stream, Channel, text);
+            await SendFile(stream, Channel, "png", "", text);
         }
         public static async Task SendText(string text, ISocketMessageChannel Channel)
         {
@@ -231,6 +231,20 @@ namespace TestDiscordBot
         {
             return (float)((1.0 / Math.Sqrt(2 * Math.PI * theta)) *
                            Math.Exp(-(n * n) / (2 * theta * theta)));
+        }
+        public static double ConvertToDouble(this string s)
+        {
+            return Convert.ToDouble(s.Replace('.', ','));
+        }
+        public static string ToCapital(this string s)
+        {
+            string o = "";
+            for (int i = 0; i < s.Length; i++)
+                if (i == 0)
+                    o += char.ToUpper(s[i]);
+                else
+                    o += char.ToLower(s[i]);
+            return o;
         }
     }
 }

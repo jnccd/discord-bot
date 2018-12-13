@@ -26,6 +26,7 @@ namespace TestDiscordBot.Config
             UserList = new List<DiscordUser>();
             ServerList = new List<DiscordServer>();
             PatchNoteSubscribedChannels = new List<ulong>();
+            WarframeSubscribedChannels = new List<ulong>();
             loadedMarkovTextFiles = new List<string>();
         }
     }

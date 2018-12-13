@@ -59,53 +59,37 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(bmp, message.Channel);
             }),
-            new EditLastCommand("expand", "Expand the picture", false, async (SocketMessage message, string lastText, string lastPic) => {
+            new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" + 
+            "\nThe syntax is: liq [mode] [eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, string lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+                Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
+                float Strength = 1;
+                string[] split = message.Content.Split(' ');
+
+                try
+                {
+                    string cen = split[3];
+                    string[] cent = cen.Split(',');
+                    center.X = (float)Convert.ToDouble(cent[0]) * bmp.Width;
+                    center.Y = (float)Convert.ToDouble(cent[1]) * bmp.Height;
+                } catch { }
+
+                try
+                {
+                    Strength = (float)Convert.ToDouble(split[4]);
+                } catch { }
+
+                TransformMode mode = TransformMode.Expand;
+                try
+                {
+                    Enum.TryParse(split[2].ToCapital(), out mode);
+                } catch { }
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
                     {
-                        Vector2 target = Transform(new Vector2(x, y), new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, TransformMode.Expand);
-                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
-                    }
-
-                await Global.SendBitmap(output, message.Channel);
-            }),
-            new EditLastCommand("collapse", "Collapse the picture", false, async (SocketMessage message, string lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
-                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Vector2 target = Transform(new Vector2(x, y), new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, TransformMode.Collapse);
-                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
-                    }
-
-                await Global.SendBitmap(output, message.Channel);
-            }),
-            new EditLastCommand("stir", "Stir the picture", false, async (SocketMessage message, string lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
-                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Vector2 target = Transform(new Vector2(x, y), new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, TransformMode.Stir);
-                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
-                    }
-
-                await Global.SendBitmap(output, message.Channel);
-            }),
-            new EditLastCommand("fall", "Fall the picture?", false, async (SocketMessage message, string lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
-                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Vector2 target = Transform(new Vector2(x, y), new Vector2(bmp.Width / 2, bmp.Height / 2), bmp, TransformMode.Fall);
+                        Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
                         output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
                     }
 
@@ -114,7 +98,7 @@ namespace TestDiscordBot.Commands
 
             };
         }
-        private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, TransformMode mode)
+        private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
         {
             Vector2 diff = point - center;
             Vector2 move = diff;
@@ -130,14 +114,14 @@ namespace TestDiscordBot.Commands
             switch (mode)
             {
                 case TransformMode.Expand:
-                    transformedLength = (diff / div).LengthSquared();
+                    transformedLength = (diff / div).LengthSquared() * strength;
                     target = (transformedLength == 0 || (100 / transformedLength) > diff.Length()) ?
                         center :
                         point - move * (100 / transformedLength);
                     break;
 
                 case TransformMode.Collapse:
-                    transformedLength = (diff / div).LengthSquared();
+                    transformedLength = (diff / div).LengthSquared() * strength;
                     target = (transformedLength == 0) ?
                         center :
                         point + move * (25 / transformedLength);
@@ -145,7 +129,7 @@ namespace TestDiscordBot.Commands
 
                 case TransformMode.Stir:
                     transformedLength = (diff / div).LengthSquared();
-                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
+                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000 * strength;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
                     target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X), 
@@ -154,7 +138,7 @@ namespace TestDiscordBot.Commands
 
                 case TransformMode.Fall:
                     transformedLength = (diff / div).LengthSquared();
-                    rotationAngle = transformedLength / 3;
+                    rotationAngle = transformedLength / 3 * strength;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
                     target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
