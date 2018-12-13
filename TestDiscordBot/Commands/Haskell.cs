@@ -12,7 +12,7 @@ namespace TestDiscordBot.Commands
 {
     public class Haskell : Command
     {
-        public Haskell() : base("ghci", "Compiles Haskell Code", true)
+        public Haskell() : base("ghci", "Compiles Haskell Code", false)
         {
 
         }

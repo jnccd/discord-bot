@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using RemotableObjects;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace TestDiscordBot.Commands
                 try
                 {
                     foreach (ulong ID in config.Data.WarframeSubscribedChannels)
-                        Global.SendText("Canceled NITAIIIN subscription for this channel!", (ISocketMessageChannel)Global.P.getChannelFromID(ID));
+                        Global.SendText("@everyone \n" + text, (ISocketMessageChannel)Global.P.getChannelFromID(ID));
                 } catch (Exception e) {
                     Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                 }
@@ -28,6 +29,9 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage message)
         {
+            if (config.Data.WarframeSubscribedChannels == null)
+                config.Data.WarframeSubscribedChannels = new List<ulong>();
+
             if (message.Author.Id == Global.P.getGuildFromChannel(message.Channel).OwnerId || message.Author.Id == Global.Master.Id)
             {
                 if (config.Data.WarframeSubscribedChannels.Contains(message.Channel.Id))
