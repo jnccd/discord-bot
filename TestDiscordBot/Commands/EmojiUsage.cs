@@ -18,8 +18,10 @@ namespace TestDiscordBot.Commands
         
         public override void onNonCommandMessageRecieved(SocketMessage message)
         {
-            if (message.Content.Count(x => x == ':') >= 2)
+            int userIndex = config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
+            if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)
             {
+                config.Data.UserList[userIndex].LastEmojiMessage = DateTime.Now;
                 string emoji = message.Content.GetEverythingBetween(":", ":");
 
                 if (emoji.Contains(" ") || emoji.Contains("\n"))
@@ -27,18 +29,23 @@ namespace TestDiscordBot.Commands
 
                 ulong serverID = message.GetServerID();
                 DiscordServer server = config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
-                if (server == null || server.EmojiUsage == null)
+                if (server == null)
                 {
                     server = new DiscordServer(serverID);
                     config.Data.ServerList.Add(server);
                 }
+                if (server.Emoji == null || server.Emoji.Count == 0)
+                    server.Emoji = Global.P.getGuildFromID(server.ServerID).Emotes.Select(x => x.Name).ToList();
                 
-                if (server.EmojiUsage.ContainsKey(emoji))
-                    server.EmojiUsage[emoji]++;
-                else
-                    server.EmojiUsage.Add(emoji, 1);
+                if (server.Emoji.Contains(emoji) || emoji.StartsWith("GW"))
+                {
+                    if (server.EmojiUsage.ContainsKey(emoji))
+                        server.EmojiUsage[emoji]++;
+                    else
+                        server.EmojiUsage.Add(emoji, 1);
 
-                server.EmojiUsage = server.EmojiUsage.OrderByDescending(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+                    server.EmojiUsage = server.EmojiUsage.OrderByDescending(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+                }
             }
         }
 
@@ -54,6 +61,7 @@ namespace TestDiscordBot.Commands
                 {
                     embed.AddField(":" + server.EmojiUsage.Keys.ElementAt(i) + ":", "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!");
                 }
+                embed.WithColor(0, 128, 255);
                 await Global.SendEmbed(embed, message.Channel);
             }
         }

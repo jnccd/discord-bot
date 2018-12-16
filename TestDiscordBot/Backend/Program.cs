@@ -480,6 +480,10 @@ namespace TestDiscordBot
         {
             return client.Guilds.ToArray();
         }
+        public SocketGuild getGuildFromID(ulong GuildID)
+        {
+            return client.GetGuild(GuildID);
+        }
 
         // Imports
         [DllImport("kernel32.dll")]

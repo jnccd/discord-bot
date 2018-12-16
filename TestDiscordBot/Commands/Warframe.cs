@@ -13,14 +13,23 @@ namespace TestDiscordBot.Commands
     public class Warframe : Command
     {
         frmRServer server;
+        string worldState;
+        DateTime lastUpdated;
 
         public Warframe() : base("warframe", "Know when DE drops that NITAIIIN", false)
         {
             server = new frmRServer(new frmRServer.ReceivedMessage((string text) => {
+                string[] split = text.Split('|');
                 try
                 {
-                    foreach (ulong ID in config.Data.WarframeSubscribedChannels)
-                        Global.SendText("@everyone \n" + text, (ISocketMessageChannel)Global.P.getChannelFromID(ID));
+                    if (split[0] != "")
+                        foreach (ulong ID in config.Data.WarframeSubscribedChannels)
+                            Global.SendText("@everyone \n" + split[0], (ISocketMessageChannel)Global.P.getChannelFromID(ID));
+                    if (split.Length > 1)
+                    {
+                        worldState = split[1];
+                        lastUpdated = DateTime.Now;
+                    }
                 } catch (Exception e) {
                     Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                 }
@@ -60,7 +69,7 @@ namespace TestDiscordBot.Commands
             }
             else if (split[1] == "state")
             {
-
+                await Global.SendText(worldState + "\nLast Updated: " + DateTime.Now.Subtract(lastUpdated), message.Channel);
             }
         }
     }

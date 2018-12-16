@@ -12,6 +12,7 @@ namespace TestDiscordBot.Config
         public ulong UserID;
         public int Credits;
         public int TotalCommandsUsed;
+        public DateTime LastEmojiMessage = new DateTime();
 
         public DiscordUser()
         {
