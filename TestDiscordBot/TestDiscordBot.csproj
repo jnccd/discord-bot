@@ -143,7 +143,7 @@
     <Compile Include="Commands\SubscribeToPatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
     <Compile Include="Commands\UrbanDict.cs" />
-    <Compile Include="Commands\SubscribeToWarframeAlerts.cs" />
+    <Compile Include="Commands\Warframe.cs" />
     <Compile Include="HelperClasses\MarkovHelper.cs" />
     <Compile Include="Config\config.cs" />
     <Compile Include="Commands\aaaTemplate.cs" />

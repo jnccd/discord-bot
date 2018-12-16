@@ -355,7 +355,7 @@ namespace TestDiscordBot
                     t.Start(message);
                 }
 
-                if (char.IsLetter(message.Content[0]) || message.Content[0] == '<')
+                if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 {
                     Task.Factory.StartNew(() => {
                         foreach (Command c in commands)
@@ -374,6 +374,8 @@ namespace TestDiscordBot
         private async void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
+
+            config.Data.UserList.First(x => x.UserID == message.Author.Id).TotalCommandsUsed++;
             
             if (message.Content == Global.prefix + "help")
             {

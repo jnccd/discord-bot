@@ -11,16 +11,15 @@ namespace TestDiscordBot.Config
     {
         public ulong UserID;
         public int Credits;
+        public int TotalCommandsUsed;
 
         public DiscordUser()
         {
-            UserID = 0;
-            Credits = 0;
+            
         }
         public DiscordUser(ulong UserID)
         {
             this.UserID = UserID;
-            Credits = 0;
         }
 
         public bool Equals(SocketUser User)

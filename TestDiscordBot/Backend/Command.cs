@@ -50,6 +50,13 @@ namespace TestDiscordBot
                 return isHiddenP;
             }
         }
+        public string prefixAndCommand
+        {
+            get
+            {
+                return prefix + command;
+            }
+        }
 
         public Command(string command, string desc, bool isExperimental)
         {
