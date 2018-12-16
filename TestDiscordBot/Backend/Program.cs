@@ -265,9 +265,13 @@ namespace TestDiscordBot
                 }
                 else if (input == "/test")
                 {
+                    // TODO: Test
                     try
                     {
-                        
+                        EmbedBuilder embed = new EmbedBuilder();
+                        for (int i = 0; i < 100; i++)
+                            embed.AddField("Omega", "LUL" + i);
+                        await Global.SendEmbed(embed, CurrentChannel);
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -374,8 +378,6 @@ namespace TestDiscordBot
         private async void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
-
-            config.Data.UserList.First(x => x.UserID == message.Author.Id).TotalCommandsUsed++;
             
             if (message.Content == Global.prefix + "help")
             {
@@ -410,28 +412,34 @@ namespace TestDiscordBot
                 if (called != null)
                 {
                     await executeCommand(called, message);
-                    return;
                 }
-
-                // No command found
-                int[] distances = new int[commands.Length];
-                for (int i = 0; i < commands.Length; i++)
-                    distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), (message.Content.Split(' ')[0]).ToLower());
-                int minIndex = 0;
-                int min = int.MaxValue;
-                for (int i = 0; i < commands.Length; i++)
-                    if (distances[i] < min)
-                    {
-                        minIndex = i;
-                        min = distances[i];
-                    }
-                if (min < 5)
+                else
                 {
-                    await Global.SendText("I don't know that command, but " + commands[minIndex].prefix + commands[minIndex].command + " is pretty close:", message.Channel);
-                    await executeCommand(commands[minIndex], message);
-                    return;
+                    // No command found
+                    int[] distances = new int[commands.Length];
+                    for (int i = 0; i < commands.Length; i++)
+                        distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), (message.Content.Split(' ')[0]).ToLower());
+                    int minIndex = 0;
+                    int min = int.MaxValue;
+                    for (int i = 0; i < commands.Length; i++)
+                        if (distances[i] < min)
+                        {
+                            minIndex = i;
+                            min = distances[i];
+                        }
+                    if (min < 5)
+                    {
+                        await Global.SendText("I don't know that command, but " + commands[minIndex].prefix + commands[minIndex].command + " is pretty close:", message.Channel);
+                        await executeCommand(commands[minIndex], message);
+                    }
                 }
             }
+
+            DiscordUser user = config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
+            if (user != null)
+                user.TotalCommandsUsed++;
+            else
+                GetHashCode();
         }
         private async Task executeCommand(Command command, SocketMessage message)
         {

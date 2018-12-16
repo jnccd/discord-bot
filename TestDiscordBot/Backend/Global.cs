@@ -82,7 +82,18 @@ namespace TestDiscordBot
         }
         public static async Task SendText(string text, ISocketMessageChannel Channel)
         {
-            await Channel.SendMessageAsync(text);
+            if (text.Length < 2000)
+                await Channel.SendMessageAsync(text);
+            else
+            {
+                while (text.Length > 0)
+                {
+                    int subLength = Math.Min(1999, text.Length);
+                    string sub = text.Substring(0, subLength);
+                    await Channel.SendMessageAsync(sub);
+                    text = text.Remove(0, subLength);
+                }
+            }
             SaveChannel(Channel);
         }
         public static async Task SendText(string text, ulong ChannelID)
@@ -91,7 +102,31 @@ namespace TestDiscordBot
         }
         public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
         {
-            await Channel.SendMessageAsync("", false, Embed.Build());
+            if (Embed.Fields.Count < 25)
+                await Channel.SendMessageAsync("", false, Embed.Build());
+            else
+            {
+                while (Embed.Fields.Count > 0)
+                {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.Color = Embed.Color;
+                    eb.Description = Embed.Description;
+                    eb.Author = Embed.Author;
+                    eb.Footer = Embed.Footer;
+                    eb.ImageUrl = Embed.ImageUrl;
+                    eb.ThumbnailUrl = Embed.ThumbnailUrl;
+                    eb.Timestamp = Embed.Timestamp;
+                    eb.Title = Embed.Title;
+                    eb.Url = Embed.Title;
+                    eb.Url = Embed.Url;
+                    for (int i = 0; i < 25 && Embed.Fields.Count > 0; i++)
+                    {
+                        eb.Fields.Add(Embed.Fields[0]);
+                        Embed.Fields.RemoveAt(0);
+                    }
+                    await Channel.SendMessageAsync("", false, eb.Build());
+                }
+            }
             SaveChannel(Channel);
         }
         
