@@ -25,7 +25,8 @@ namespace TestDiscordBot.Commands
                 await Global.SendText(string.Join("", lastText.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
             }),
             new EditLastCommand("stupid", "Convert text to stupid", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })), message.Channel);
+                await Global.SendText("https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob" + 
+                    string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })), message.Channel);
             }),
             new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => { return char.ToUpper(x); })), message.Channel);
@@ -71,13 +72,13 @@ namespace TestDiscordBot.Commands
                 {
                     string cen = split[3];
                     string[] cent = cen.Split(',');
-                    center.X = (float)Convert.ToDouble(cent[0]) * bmp.Width;
-                    center.Y = (float)Convert.ToDouble(cent[1]) * bmp.Height;
+                    center.X = (float)Global.ConvertToDouble(cent[0]) * bmp.Width;
+                    center.Y = (float)Global.ConvertToDouble(cent[1]) * bmp.Height;
                 } catch { }
 
                 try
                 {
-                    Strength = (float)Convert.ToDouble(split[4]);
+                    Strength = (float)Global.ConvertToDouble(split[4]);
                 } catch { }
 
                 TransformMode mode = TransformMode.Expand;
@@ -128,8 +129,8 @@ namespace TestDiscordBot.Commands
                     break;
 
                 case TransformMode.Stir:
-                    transformedLength = (diff / div).LengthSquared();
-                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000 * strength;
+                    transformedLength = (diff / div).LengthSquared() * strength;
+                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
                     target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X), 
@@ -137,8 +138,8 @@ namespace TestDiscordBot.Commands
                     break;
 
                 case TransformMode.Fall:
-                    transformedLength = (diff / div).LengthSquared();
-                    rotationAngle = transformedLength / 3 * strength;
+                    transformedLength = (diff / div).LengthSquared() * strength;
+                    rotationAngle = transformedLength / 3;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
                     target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),

@@ -15,12 +15,16 @@ namespace TestDiscordBot.Commands
         {
 
         }
-
+        
         public override void onNonCommandMessageRecieved(SocketMessage message)
         {
             if (message.Content.Count(x => x == ':') >= 2)
             {
                 string emoji = message.Content.GetEverythingBetween(":", ":");
+
+                if (emoji.Contains(" ") || emoji.Contains("\n"))
+                    return;
+
                 ulong serverID = message.GetServerID();
                 DiscordServer server = config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
                 if (server == null || server.EmojiUsage == null)
@@ -28,11 +32,13 @@ namespace TestDiscordBot.Commands
                     server = new DiscordServer(serverID);
                     config.Data.ServerList.Add(server);
                 }
-
+                
                 if (server.EmojiUsage.ContainsKey(emoji))
                     server.EmojiUsage[emoji]++;
                 else
                     server.EmojiUsage.Add(emoji, 1);
+
+                server.EmojiUsage = server.EmojiUsage.OrderByDescending(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
             }
         }
 
