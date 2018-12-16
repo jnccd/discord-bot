@@ -9,6 +9,7 @@ namespace TestDiscordBot.Config
     public class DiscordServer
     {
         public ulong ServerID = 0;
+        public List<string> Emoji = new List<string>();
         public Dictionary<string, uint> EmojiUsage = new Dictionary<string, uint>();
 
         public DiscordServer()
