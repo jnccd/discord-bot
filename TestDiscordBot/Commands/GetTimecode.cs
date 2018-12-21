@@ -17,7 +17,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage message)
         {
-            string[] split = message.Content.Split(' ');
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
                 await Global.SendText("I need a messageID!", message.Channel);
             else if (split.Length == 2)

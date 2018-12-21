@@ -408,7 +408,8 @@ namespace TestDiscordBot
             else
             {
                 // Find command
-                Command called = commands.FirstOrDefault(x => (x.prefix + x.command).ToLower() == (message.Content.Split(' ')[0]).ToLower());
+                string[] split = message.Content.Split(new char[] { ' ', '\n' });
+                Command called = commands.FirstOrDefault(x => (x.prefix + x.command).ToLower() == split[0].ToLower());
                 if (called != null)
                 {
                     await executeCommand(called, message);
@@ -418,7 +419,7 @@ namespace TestDiscordBot
                     // No command found
                     int[] distances = new int[commands.Length];
                     for (int i = 0; i < commands.Length; i++)
-                        distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), (message.Content.Split(' ')[0]).ToLower());
+                        distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), split[0].ToLower());
                     int minIndex = 0;
                     int min = int.MaxValue;
                     for (int i = 0; i < commands.Length; i++)

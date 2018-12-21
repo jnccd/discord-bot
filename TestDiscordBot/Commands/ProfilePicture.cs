@@ -25,12 +25,12 @@ namespace TestDiscordBot.Commands
             ushort size = 512;
             try
             {
-                size = Convert.ToUInt16(commandmessage.Content.Split(' ')[1]);
+                size = Convert.ToUInt16(commandmessage.Content.Split(new char[] { ' ', '\n' })[1]);
             }
             catch { }
             try
             {
-                size = Convert.ToUInt16(commandmessage.Content.Split(' ')[2]);
+                size = Convert.ToUInt16(commandmessage.Content.Split(new char[] { ' ', '\n' })[2]);
             }
             catch { }
 

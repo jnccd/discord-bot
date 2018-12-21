@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
     {
         public EmojiUsage() : base("emojiUsage", "Which emojis are actually used?", false)
         {
-
+            // TODO: Update server emojilists at startup
         }
         
         public override void onNonCommandMessageRecieved(SocketMessage message)

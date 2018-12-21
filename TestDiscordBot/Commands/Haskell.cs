@@ -12,7 +12,7 @@ namespace TestDiscordBot.Commands
 {
     public class Haskell : Command
     {
-        public Haskell() : base("ghci", "Compiles Haskell Code", true)
+        public Haskell() : base("ghci", "Compiles Haskell Code", false)
         {
 
         }
@@ -25,16 +25,19 @@ namespace TestDiscordBot.Commands
                 {
                     bool exited = false;
 
-                    string[] split = message.Content.Split(' ');
+                    string[] split = message.Content.Split(new char[] { ' ', '\n' });
                     foreach (string s in split)
-                        if (s != "randomRIO" && s != "(\\nextIOWord" && s != "nextIOWord" && s.ContainsOneOf(new string[] { "IO", "Write", "write", "read", "Read", "import", "open",
-                        "File", "Handle", "handle", "System", "unsafe", "seq", "Profunctor", "Windows" }))
+                        if (s.ContainsOneOf(new string[] { "Write", "write", "read", "Read", "Path", "path", "Directory", "directory", "open", "Open", "import",
+                        "File", "file", "Handle", "handle", "System", "system", "unsafe", "seq", "Profunctor", "Windows", "windows" }) || s.Length > 1 && s[0] == ':' && char.IsLetter(s[1]))
                         {
                             Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + s, message.Channel);
                             return;
                         }
 
-                    File.WriteAllText("input.hs", "import Data.List\nimport System.Random\n" + message.Content.Split(' ').Skip(1).Aggregate((x, y) => { return x + " " + y; }));
+                    string haskellInput = split.Skip(1).Aggregate((x, y) => { return x + " " + y; }).Trim('`');
+                    if (haskellInput.StartsWith("haskell"))
+                        haskellInput.Remove(0, "haskell".Length);
+                    File.WriteAllText("input.hs", haskellInput);
                     Process compiler = new Process();
                     compiler.StartInfo.FileName = "haskell.bat";
                     compiler.StartInfo.CreateNoWindow = true;
@@ -57,12 +60,16 @@ namespace TestDiscordBot.Commands
                                 Debug.WriteLine(output.Aggregate((x, y) => x + "\n" + y));
 
                                 if (output.Length <= 2)
-                                    await Global.SendText("Your code didn't create any output!", message.Channel);
+                                    await Global.SendText("Your code didn't create any output or an error occured!", message.Channel);
                                 else
                                 {
                                     string shortenedOutput = output.ToList().GetRange(1, output.Length - 2).Select((x) => (x.Split('>').Last())).
-                                    Aggregate((x, y) => { return x + "\n" + y; });
+                                    Aggregate((x, y) => { return x + "\n" + y; }).Remove(0, 1);
 
+                                    shortenedOutput = output.Aggregate((x, y) => x + "\n" + y);
+
+                                    shortenedOutput = shortenedOutput.Insert(0, "```");
+                                    shortenedOutput = shortenedOutput.Insert(shortenedOutput.Length, "```");
                                     if (shortenedOutput.Length < 2000)
                                         await Global.SendText(shortenedOutput, message.Channel);
                                     else

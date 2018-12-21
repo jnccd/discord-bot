@@ -25,7 +25,7 @@ namespace TestDiscordBot.Commands
             {
                 try
                 {
-                    string latex = message.Content.Split(' ').Skip(1).Aggregate((x, y) => x + " " + y);
+                    string latex = message.Content.Split(new char[] { ' ', '\n' }).Skip(1).Aggregate((x, y) => x + " " + y);
 
                     if (!latex.StartsWith("\\documentclass["))
                         latex = "\\documentclass[preview,border=12pt]{standalone}\n\\usepackage{amsmath}\n\\usepackage{tikz}\n\\begin{document}\n" + latex + "\n\\end{document}";
