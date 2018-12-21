@@ -26,7 +26,7 @@ namespace TestDiscordBot.Commands
             }),
             new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) + 
-                    "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
+                    "\nhttps://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
             }),
             new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => { return char.ToUpper(x); })), message.Channel);

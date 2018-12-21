@@ -378,7 +378,12 @@ namespace TestDiscordBot
         private async void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
-            
+
+            // Add server
+            ulong serverID = message.GetServerID();
+            if (!config.Data.ServerList.Exists(x => x.ServerID == serverID))
+                config.Data.ServerList.Add(new DiscordServer(serverID));
+
             if (message.Content == Global.prefix + "help")
             {
                 #region get Help
@@ -439,8 +444,6 @@ namespace TestDiscordBot
             DiscordUser user = config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
             if (user != null)
                 user.TotalCommandsUsed++;
-            else
-                GetHashCode();
         }
         private async Task executeCommand(Command command, SocketMessage message)
         {
