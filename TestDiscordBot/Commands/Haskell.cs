@@ -34,7 +34,7 @@ namespace TestDiscordBot.Commands
                             return;
                         }
 
-                    string haskellInput = split.Skip(1).Aggregate((x, y) => { return x + " " + y; }).Trim('`');
+                    string haskellInput = message.Content.Remove(0, 5).Trim('`');
                     if (haskellInput.StartsWith("haskell"))
                         haskellInput.Remove(0, "haskell".Length);
                     File.WriteAllText("input.hs", haskellInput);
@@ -59,22 +59,26 @@ namespace TestDiscordBot.Commands
                                 Debug.WriteLine("Raw Haskell Output: ");
                                 Debug.WriteLine(output.Aggregate((x, y) => x + "\n" + y));
 
-                                if (output.Length <= 2)
+                                string parsedOutput = "";
+
+                                string workOutput = output.Aggregate((x, y) => x + "\n" + y);
+                                while (workOutput.Contains(">"))
+                                {
+                                    string o = workOutput.GetEverythingBetween("> ", "Pre");
+                                    if (!string.IsNullOrWhiteSpace(o))
+                                        parsedOutput += o;
+                                    workOutput = workOutput.Remove(0, workOutput.IndexOf('>') + 1);
+                                }
+
+                                parsedOutput = parsedOutput.Insert(0, "```");
+                                parsedOutput = parsedOutput.Insert(parsedOutput.Length, "```");
+                                
+                                if (parsedOutput.Length >= 2000)
+                                    await Global.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
+                                else if (string.IsNullOrWhiteSpace(parsedOutput.Trim('`')))
                                     await Global.SendText("Your code didn't create any output or an error occured!", message.Channel);
                                 else
-                                {
-                                    string shortenedOutput = output.ToList().GetRange(1, output.Length - 2).Select((x) => (x.Split('>').Last())).
-                                    Aggregate((x, y) => { return x + "\n" + y; }).Remove(0, 1);
-
-                                    shortenedOutput = output.Aggregate((x, y) => x + "\n" + y);
-
-                                    shortenedOutput = shortenedOutput.Insert(0, "```");
-                                    shortenedOutput = shortenedOutput.Insert(shortenedOutput.Length, "```");
-                                    if (shortenedOutput.Length < 2000)
-                                        await Global.SendText(shortenedOutput, message.Channel);
-                                    else
-                                        await Global.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
-                                }
+                                    await Global.SendText(parsedOutput, message.Channel);
                             }
                         }
                         catch (Exception e)
