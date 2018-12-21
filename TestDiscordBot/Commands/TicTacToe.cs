@@ -20,7 +20,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            if (commandmessage.Content.Split(' ').Length < 2 || commandmessage.Content.Split(' ')[1] == "help")
+            if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length < 2 || commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "help")
             {
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
                 Embed.WithDescription("TicTacToe Commands:");
                 await Global.SendEmbed(Embed, commandmessage.Channel);
             }
-            else if (commandmessage.Content.Split(' ')[1] == "newGame")
+            else if (commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "newGame")
             {
                 if (commandmessage.MentionedUsers.Count < 1 || commandmessage.MentionedUsers.Count > 1)
                 {
@@ -70,7 +70,7 @@ namespace TestDiscordBot.Commands
                     }
                 }
             }
-            else if (commandmessage.Content.Split(' ')[1] == "set")
+            else if (commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "set")
             {
                 TicTacToeGame Game = null;
                 try
@@ -85,7 +85,7 @@ namespace TestDiscordBot.Commands
                 }
                 else
                 {
-                    if (commandmessage.Content.Split(' ').Length < 3)
+                    if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length < 3)
                     {
                         await Global.SendText("Where are the coordinates?!", commandmessage.Channel);
                     }
@@ -100,7 +100,7 @@ namespace TestDiscordBot.Commands
                             byte x = 255, y = 255;
                             try
                             {
-                                string coords = commandmessage.Content.Split(' ')[2];
+                                string coords = commandmessage.Content.Split(new char[] { ' ', '\n' })[2];
                                 string[] xy = coords.Split(',');
                                 x = Convert.ToByte(xy[0]);
                                 y = Convert.ToByte(xy[1]);
@@ -155,7 +155,7 @@ namespace TestDiscordBot.Commands
                     }
                 }
             }
-            else if (commandmessage.Content.Split(' ')[1] == "game" || commandmessage.Content.Split(' ')[1] == "Game")
+            else if (commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "game" || commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "Game")
             {
                 TicTacToeGame Game = null;
                 try

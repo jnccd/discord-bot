@@ -38,7 +38,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage message)
         {
-            string[] split = message.Content.Split(' ');
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
             {
                 await Global.SendText("Use \"" + prefixAndCommand + " toggleNotify\" to toggle notifications", message.Channel);
@@ -69,7 +69,7 @@ namespace TestDiscordBot.Commands
             }
             else if (split[1] == "state")
             {
-                await Global.SendText(worldState + "\nLast Updated: " + DateTime.Now.Subtract(lastUpdated), message.Channel);
+                await Global.SendText(worldState + "\nLast Updated: " + lastUpdated, message.Channel);
             }
         }
     }

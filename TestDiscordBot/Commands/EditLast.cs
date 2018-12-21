@@ -24,9 +24,9 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
             }),
-            new EditLastCommand("stupid", "Convert text to stupid", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText("https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob" + 
-                    string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })), message.Channel);
+            new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, string lastText, string lastPic) => {
+                await Global.SendText(string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) + 
+                    "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
             }),
             new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, string lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Select((x) => { return char.ToUpper(x); })), message.Channel);
@@ -66,7 +66,7 @@ namespace TestDiscordBot.Commands
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
                 float Strength = 1;
-                string[] split = message.Content.Split(' ');
+                string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
                 try
                 {
@@ -181,7 +181,7 @@ namespace TestDiscordBot.Commands
                     break;
             }
 
-            string[] split = message.Content.Split(' ');
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
             {
                 EmbedBuilder Embed = new EmbedBuilder();

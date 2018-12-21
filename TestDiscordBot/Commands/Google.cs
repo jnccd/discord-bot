@@ -18,7 +18,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            string[] split = commandmessage.Content.Split(' ');
+            string[] split = commandmessage.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length <= 1)
             {

@@ -73,7 +73,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage message)
         {
-            string[] split = message.Content.Split(' ');
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             try
             {

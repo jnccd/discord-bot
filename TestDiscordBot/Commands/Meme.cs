@@ -31,9 +31,9 @@ namespace TestDiscordBot.Commands
             // Getting a subreddit
             bool worked = false;
 
-            if (commandmessage.Content.Split(' ').Length > 1)
+            if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length > 1)
             {
-                url = "https://www.reddit.com/r/" + commandmessage.Content.Split(' ')[1] + "/";
+                url = "https://www.reddit.com/r/" + commandmessage.Content.Split(new char[] { ' ', '\n' })[1] + "/";
                 if (!RedditHelper.IsReachable(url))
                 {
                     await Global.SendText("Thats not a valid subreddit!", commandmessage.Channel);
