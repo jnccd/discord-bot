@@ -13,9 +13,15 @@ namespace TestDiscordBot.Commands
     {
         public EmojiUsage() : base("emojiUsage", "Which emojis are actually used?", false)
         {
-            // TODO: Update server emojilists at startup
+            
         }
-        
+
+        public override void onConnected()
+        {
+            foreach (DiscordServer server in config.Data.ServerList)
+                server.UpdateEmojis();
+        }
+
         public override void onNonCommandMessageRecieved(SocketMessage message)
         {
             int userIndex = config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
@@ -24,28 +30,15 @@ namespace TestDiscordBot.Commands
                 config.Data.UserList[userIndex].LastEmojiMessage = DateTime.Now;
                 string emoji = message.Content.GetEverythingBetween(":", ":");
 
-                if (emoji.Contains(" ") || emoji.Contains("\n"))
-                    return;
-
                 ulong serverID = message.GetServerID();
                 DiscordServer server = config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
                 if (server == null)
-                {
-                    server = new DiscordServer(serverID);
-                    config.Data.ServerList.Add(server);
-                }
-                if (server.Emoji == null || server.Emoji.Count == 0)
-                    server.Emoji = Global.P.getGuildFromID(server.ServerID).Emotes.Select(x => x.Name).ToList();
-                
-                if (server.Emoji.Contains(emoji) || emoji.StartsWith("GW"))
-                {
-                    if (server.EmojiUsage.ContainsKey(emoji))
-                        server.EmojiUsage[emoji]++;
-                    else
-                        server.EmojiUsage.Add(emoji, 1);
+                    return;
 
-                    server.EmojiUsage = server.EmojiUsage.OrderByDescending(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-                }
+                if (server.EmojiUsage.ContainsKey(emoji))
+                    server.EmojiUsage[emoji]++;
+
+                server.EmojiUsage = server.EmojiUsage.OrderByDescending(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
             }
         }
 
