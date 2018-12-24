@@ -25,14 +25,20 @@ namespace TestDiscordBot.Commands
                 {
                     bool exited = false;
 
-                    string[] split = message.Content.Split(new char[] { ' ', '\n' });
-                    foreach (string s in split)
-                        if (s.ContainsOneOf(new string[] { "Write", "write", "read", "Read", "Path", "path", "Directory", "directory", "open", "Open", "import",
-                        "File", "file", "Handle", "handle", "System", "system", "unsafe", "seq", "Profunctor", "Windows", "windows" }) || s.Length > 1 && s[0] == ':' && char.IsLetter(s[1]))
-                        {
-                            Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + s, message.Channel);
-                            return;
-                        }
+                    string[] lines = message.Content.Split('\n');
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        string[] words = lines[i].Split(' ');
+                        foreach (string word in words)
+                            if (word.ContainsOneOf(new string[] { "Write", "write", "read", "Read", "Path", "path", "Directory", "directory", "open", "Open", "import",
+                                "File", "file", "Handle", "handle", "System", "system", "unsafe", "seq", "Profunctor", "Windows", "windows", "TCP", "Socket", "socket",
+                                "Network.", "Client", "Server", "client", "server", "Process", "process", "Compiler.", "Debug.", "Distribution.", "Foreign.", "GHC.",
+                                "Trace.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
+                            {
+                                Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel);
+                                return;
+                            }
+                    }
 
                     string haskellInput = message.Content.Remove(0, 5).Trim('`');
                     if (haskellInput.StartsWith("haskell"))
@@ -70,7 +76,7 @@ namespace TestDiscordBot.Commands
                                     workOutput = workOutput.Remove(0, workOutput.IndexOf('>') + 1);
                                 }
 
-                                parsedOutput = parsedOutput.Insert(0, "```");
+                                parsedOutput = parsedOutput.Insert(0, "```ruby\n");
                                 parsedOutput = parsedOutput.Insert(parsedOutput.Length, "```");
                                 
                                 if (parsedOutput.Length >= 2000)
