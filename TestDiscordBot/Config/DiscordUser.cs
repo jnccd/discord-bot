@@ -13,6 +13,8 @@ namespace TestDiscordBot.Config
         public int Credits;
         public int TotalCommandsUsed;
         public DateTime LastEmojiMessage = new DateTime();
+        public List<string> WarframeFilters = new List<string>();
+        public ulong WarframeChannelID;
 
         public DiscordUser()
         {

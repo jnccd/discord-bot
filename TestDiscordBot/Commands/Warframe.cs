@@ -16,20 +16,27 @@ namespace TestDiscordBot.Commands
         string worldState;
         DateTime lastUpdated;
 
-        public Warframe() : base("warframe", "Know when DE drops that NITAIIIN", false)
+        public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
-            server = new frmRServer(new frmRServer.ReceivedMessage((string text) => {
-                string[] split = text.Split('|');
+            server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
                 try
                 {
-                    if (split[0] != "")
-                        foreach (ulong ID in config.Data.WarframeSubscribedChannels)
-                            Global.SendText("@everyone \n" + split[0], (ISocketMessageChannel)Global.P.getChannelFromID(ID));
-                    if (split.Length > 1)
-                    {
-                        worldState = split[1];
-                        lastUpdated = DateTime.Now;
-                    }
+                    if (string.IsNullOrWhiteSpace(text))
+                        return;
+
+                    string[] split = text.Split('\n');
+                    foreach (string line in split)
+                        foreach (DiscordUser user in config.Data.UserList)
+                            foreach (string filter in user.WarframeFilters)
+                                if (line.Contains(filter))
+                                {
+                                    //IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();
+                                    //await dm.SendMessageAsync(line);
+
+                                    SocketChannel channel = Global.P.getChannelFromID(user.WarframeChannelID);
+                                    if (channel is ISocketMessageChannel)
+                                        await Global.SendText(Global.P.getUserFromId(user.UserID).Mention + "\n" + line, (ISocketMessageChannel)channel);
+                                }
                 } catch (Exception e) {
                     Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                 }
@@ -39,37 +46,40 @@ namespace TestDiscordBot.Commands
         public override async Task execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
+            DiscordUser user = config.Data.UserList.Find(x => x.UserID == message.Author.Id);
+            user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
             {
-                await Global.SendText("Use \"" + prefixAndCommand + " toggleNotify\" to toggle notifications", message.Channel);
-                await Global.SendText("Use \"" + prefixAndCommand + " state\" to get worldstate information [WIP]", message.Channel);
+                await Global.SendText("Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
+                                      "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
+                                      "Use \"" + prefixAndCommand + " filters\" to view your fitlers.\n" +
+                                      "eg. \"" + prefixAndCommand + " +FILTER\" Nitain\" to get notified for nitain alerts", message.Channel);
             }
-            else if (split[1] == "toggleNotify")
+            else if (split[1].StartsWith("+"))
             {
-                if (config.Data.WarframeSubscribedChannels == null)
-                    config.Data.WarframeSubscribedChannels = new List<ulong>();
-
-                if (message.Author.Id == Global.P.getGuildFromChannel(message.Channel).OwnerId || message.Author.Id == Global.Master.Id)
-                {
-                    if (config.Data.WarframeSubscribedChannels.Contains(message.Channel.Id))
-                    {
-                        config.Data.WarframeSubscribedChannels.Remove(message.Channel.Id);
-                        await Global.SendText("Canceled NITAIIIN subscription for this channel!", message.Channel);
-                    }
-                    else
-                    {
-                        config.Data.WarframeSubscribedChannels.Add(message.Channel.Id);
-                        await Global.SendText("Subscribed to NITAIIIN SPAM!", message.Channel);
-                    }
-                }
+                string filter = split[1].Remove(0, 1);
+                if (user.WarframeFilters.Contains(filter))
+                    await Global.SendText("You already have that filter fam", message.Channel);
                 else
                 {
-                    await Global.SendText("Only the server/bot owner is authorized to use this command!", message.Channel);
+                    user.WarframeFilters.Add(filter);
+                    await Global.SendText("Added filter: " + filter, message.Channel);
                 }
             }
-            else if (split[1] == "state")
+            else if (split[1].StartsWith("-"))
             {
-                await Global.SendText(worldState + "\nLast Updated: " + lastUpdated, message.Channel);
+                string filter = split[1].Remove(0, 1);
+                if (user.WarframeFilters.Contains(filter))
+                {
+                    user.WarframeFilters.Remove(filter);
+                    await Global.SendText("Removed filter: " + filter, message.Channel);
+                }
+                else
+                    await Global.SendText("You don't even have that filter fam", message.Channel);
+            }
+            else if(split[1] == "filters")
+            {
+                await Global.SendText("Your filters: \n" + user.WarframeFilters.Aggregate((x, y) => x + "\n" + y) + (user.WarframeFilters.Count == 0 ? "\nWell that looks pretty emtpy" : ""), message.Channel);
             }
         }
     }
