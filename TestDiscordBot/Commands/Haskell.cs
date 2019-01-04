@@ -30,19 +30,18 @@ namespace TestDiscordBot.Commands
                     {
                         string[] words = lines[i].Split(' ');
                         foreach (string word in words)
-                            if (word.ContainsOneOf(new string[] { "Write", "write", "read", "Read", "Path", "path", "Directory", "directory", "open", "Open", "import",
-                                "File", "file", "Handle", "handle", "System", "system", "unsafe", "seq", "Profunctor", "Windows", "windows", "TCP", "Socket", "socket",
-                                "Network.", "Client", "Server", "client", "server", "Process", "process", "Compiler.", "Debug.", "Distribution.", "Foreign.", "GHC.",
-                                "Trace.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
+                            if (word.ContainsOneOf(new string[] { "write", "read", "append", "File", "Handle", "System.", "unsafe", "Windows",
+                                "windows", "TCP", "Socket", "socket", "Network.", "Process.", "Compiler.", "Debug.", "Distribution.",
+                                "Foreign.", "GHC.", "Trace.", "Type.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
                             {
                                 Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel);
                                 return;
                             }
                     }
 
-                    string haskellInput = message.Content.Remove(0, 5).Trim('`');
+                    string haskellInput = message.Content.Remove(0, 5).Trim(' ').Trim('`');
                     if (haskellInput.StartsWith("haskell"))
-                        haskellInput.Remove(0, "haskell".Length);
+                        haskellInput = haskellInput.Remove(0, "haskell".Length);
                     File.WriteAllText("input.hs", haskellInput);
                     Process compiler = new Process();
                     compiler.StartInfo.FileName = "haskell.bat";

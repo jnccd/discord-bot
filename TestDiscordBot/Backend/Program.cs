@@ -380,9 +380,12 @@ namespace TestDiscordBot
             SocketMessage message = (SocketMessage)o;
 
             // Add server
-            ulong serverID = message.GetServerID();
-            if (!config.Data.ServerList.Exists(x => x.ServerID == serverID))
-                config.Data.ServerList.Add(new DiscordServer(serverID));
+            if (message.Channel is SocketGuildChannel)
+            {
+                ulong serverID = message.GetServerID();
+                if (!config.Data.ServerList.Exists(x => x.ServerID == serverID))
+                    config.Data.ServerList.Add(new DiscordServer(serverID));
+            }
 
             if (message.Content == Global.prefix + "help")
             {
@@ -458,8 +461,12 @@ namespace TestDiscordBot
                 Global.SaveUser(message.Author.Id);
                 await command.execute(message);
 
-                Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
-                    ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
+                if (message.Channel is SocketGuildChannel)
+                    Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
+                        ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
+                else
+                    Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
+                        "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
             }
             catch (Exception e)
             {
