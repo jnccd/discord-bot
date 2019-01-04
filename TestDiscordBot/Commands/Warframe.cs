@@ -76,8 +76,9 @@ namespace TestDiscordBot.Commands
                                       "Btw: you can add and remove multiple filters in one command by seperating them with a ,", message.Channel);
             }
             else if(split[1] == "filters")
-                await Global.SendText("Your filters: \n" +
-                        user.WarframeFilters.Aggregate((x, y) => x + "\n" + y) + (user.WarframeFilters.Count == 0 ? "\nWell that looks pretty emtpy" : ""), message.Channel);
+                await Global.SendText("Your filters: \n" + (user.WarframeFilters.Count == 0 ?
+                    "\n\nWell that looks pretty empty" :
+                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)), message.Channel);
             else
             {
                 string answer = "";
@@ -107,8 +108,9 @@ namespace TestDiscordBot.Commands
                             answer += "You don't even have that filter fam";
                     }
                 }
-                await Global.SendText(answer + "\nYour Filters are now: \n" + 
-                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y) + (user.WarframeFilters.Count == 0 ? "\nWell that looks pretty emtpy" : ""), message.Channel);
+                await Global.SendText(answer + "\nYour Filters are now: \n" + (user.WarframeFilters.Count == 0 ?
+                    "\n\nWell that looks pretty empty" : 
+                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)), message.Channel);
             }
         }
     }
