@@ -21,22 +21,41 @@ namespace TestDiscordBot.Commands
             server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(text))
+                    if (string.IsNullOrWhiteSpace(text) || !text.Contains('ↅ'))
                         return;
 
-                    string[] split = text.Split('\n');
-                    foreach (string line in split)
-                        foreach (DiscordUser user in config.Data.UserList)
-                            foreach (string filter in user.WarframeFilters)
-                                if (line.Contains(filter))
-                                {
-                                    //IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();
-                                    //await dm.SendMessageAsync(line);
+                    string[] encoding = text.Split('ↅ');
+                    if (encoding.Length != 2)
+                        throw new ArgumentException("Wrong encoding");
 
-                                    SocketChannel channel = Global.P.getChannelFromID(user.WarframeChannelID);
-                                    if (channel is ISocketMessageChannel)
-                                        await Global.SendText(Global.P.getUserFromId(user.UserID).Mention + "\n" + line, (ISocketMessageChannel)channel);
-                                }
+                    if (encoding[0] == "Update")
+                    {
+                        string[] split = encoding[1].Split('\n');
+                        foreach (string line in split)
+                            foreach (DiscordUser user in config.Data.UserList)
+                                foreach (string filter in user.WarframeFilters)
+                                    if (line.Contains(filter))
+                                    {
+                                        //IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();
+                                        //await dm.SendMessageAsync(line);
+
+                                        SocketChannel channel = Global.P.getChannelFromID(user.WarframeChannelID);
+                                        if (channel is ISocketMessageChannel)
+                                            await Global.SendText(Global.P.getUserFromId(user.UserID).Mention + "\n" + line, (ISocketMessageChannel)channel);
+                                    }
+                    }
+                    else if (encoding[0] == "Void-Trader")
+                    {
+                        List<ulong> channels = config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
+                        foreach (ulong id in channels)
+                        {
+                            SocketChannel channel = Global.P.getChannelFromID(id);
+                            if (channel is ISocketMessageChannel)
+                                await Global.SendText(config.Data.UserList.Where(x => x.WarframeChannelID == id && x.WarframeFilters.Count != 0)
+                                                                          .Select(x => Global.P.getUserFromId(x.UserID).Mention)
+                                                                          .Aggregate((x, y) => x + " " + y) + " " + encoding[1], (ISocketMessageChannel)channel);
+                        }
+                    }
                 } catch (Exception e) {
                     Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                 }
@@ -53,33 +72,43 @@ namespace TestDiscordBot.Commands
                 await Global.SendText("Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
                                       "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
                                       "Use \"" + prefixAndCommand + " filters\" to view your fitlers.\n" +
-                                      "eg. \"" + prefixAndCommand + " +FILTER\" Nitain\" to get notified for nitain alerts", message.Channel);
-            }
-            else if (split[1].StartsWith("+"))
-            {
-                string filter = split[1].Remove(0, 1);
-                if (user.WarframeFilters.Contains(filter))
-                    await Global.SendText("You already have that filter fam", message.Channel);
-                else
-                {
-                    user.WarframeFilters.Add(filter);
-                    await Global.SendText("Added filter: " + filter, message.Channel);
-                }
-            }
-            else if (split[1].StartsWith("-"))
-            {
-                string filter = split[1].Remove(0, 1);
-                if (user.WarframeFilters.Contains(filter))
-                {
-                    user.WarframeFilters.Remove(filter);
-                    await Global.SendText("Removed filter: " + filter, message.Channel);
-                }
-                else
-                    await Global.SendText("You don't even have that filter fam", message.Channel);
+                                      "eg. \"" + prefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
+                                      "Btw: you can add and remove multiple filters in one command by seperating them with a ,", message.Channel);
             }
             else if(split[1] == "filters")
+                await Global.SendText("Your filters: \n" +
+                        user.WarframeFilters.Aggregate((x, y) => x + "\n" + y) + (user.WarframeFilters.Count == 0 ? "\nWell that looks pretty emtpy" : ""), message.Channel);
+            else
             {
-                await Global.SendText("Your filters: \n" + user.WarframeFilters.Aggregate((x, y) => x + "\n" + y) + (user.WarframeFilters.Count == 0 ? "\nWell that looks pretty emtpy" : ""), message.Channel);
+                string answer = "";
+                string[] filterComs = split.Skip(1).Aggregate((x, y) => x + " " + y).Split(',');
+                foreach (string filterCom in filterComs)
+                {
+                    if (filterCom.StartsWith("+"))
+                    {
+                        string filter = filterCom.Remove(0, 1).Trim(' ');
+                        if (user.WarframeFilters.Contains(filter))
+                            answer += "You already have that filter fam";
+                        else
+                        {
+                            user.WarframeFilters.Add(filter);
+                            answer += "Added filter: " + filter + "\n";
+                        }
+                    }
+                    else if (filterCom.StartsWith("-"))
+                    {
+                        string filter = filterCom.Remove(0, 1).Trim(' ');
+                        if (user.WarframeFilters.Contains(filter))
+                        {
+                            user.WarframeFilters.Remove(filter);
+                            answer += "Removed filter: " + filter + "\n";
+                        }
+                        else
+                            answer += "You don't even have that filter fam";
+                    }
+                }
+                await Global.SendText(answer + "\nYour Filters are now: \n" + 
+                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y) + (user.WarframeFilters.Count == 0 ? "\nWell that looks pretty emtpy" : ""), message.Channel);
             }
         }
     }
