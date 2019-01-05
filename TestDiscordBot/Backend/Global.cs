@@ -220,6 +220,13 @@ namespace TestDiscordBot
                     return true;
             return false;
         }
+        public static bool ContainsAllOf(this string str, string[] tests)
+        {
+            foreach (string s in tests)
+                if (!str.Contains(s))
+                    return false;
+            return true;
+        }
         public static string GetEverythingBetween(this string str, string left, string right)
         {
             int leftIndex = str.IndexOf(left);
