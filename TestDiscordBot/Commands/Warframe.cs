@@ -16,6 +16,13 @@ namespace TestDiscordBot.Commands
         string worldState;
         DateTime lastUpdated;
 
+        public struct notif
+        {
+            public List<ulong> userID;
+            public ulong ChannelID;
+            public string line;
+        }
+
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
             server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
@@ -31,18 +38,25 @@ namespace TestDiscordBot.Commands
                     if (encoding[0] == "Update")
                     {
                         string[] split = encoding[1].Split('\n');
+                        //foreach (string line in split)
+                        //    foreach (DiscordUser user in config.Data.UserList)
+                        //        foreach (string filter in user.WarframeFilters)
+                        //            if (line.Contains(filter))
+                        //            {
+                        //                IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();
+                        //                await dm.SendMessageAsync(line);
+                        //            }
+                        List<notif> notifications = new List<notif>();
                         foreach (string line in split)
                             foreach (DiscordUser user in config.Data.UserList)
                                 foreach (string filter in user.WarframeFilters)
-                                    if (line.Contains(filter))
-                                    {
-                                        //IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();
-                                        //await dm.SendMessageAsync(line);
-
-                                        SocketChannel channel = Global.P.getChannelFromID(user.WarframeChannelID);
-                                        if (channel is ISocketMessageChannel)
-                                            await Global.SendText(Global.P.getUserFromId(user.UserID).Mention + "\n" + line, (ISocketMessageChannel)channel);
-                                    }
+                                    if (line.ContainsAllOf(filter.Split('&')))
+                                        if (notifications.Exists(x => x.ChannelID == user.WarframeChannelID && x.line == line))
+                                            notifications.Find(x => x.ChannelID == user.WarframeChannelID && x.line == line).userID.Add(user.UserID);
+                                        else
+                                            notifications.Add(new notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
+                        foreach (notif n in notifications)
+                            await Global.SendText(n.userID.Select(x => Global.P.getUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + n.line, n.ChannelID);
                     }
                     else if (encoding[0] == "Void-Trader")
                     {
@@ -69,11 +83,15 @@ namespace TestDiscordBot.Commands
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
             {
-                await Global.SendText("Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
+                await Global.SendText("```ruby" + 
+                                      "Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
                                       "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
                                       "Use \"" + prefixAndCommand + " filters\" to view your fitlers.\n" +
                                       "eg. \"" + prefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
-                                      "Btw: you can add and remove multiple filters in one command by seperating them with a ,", message.Channel);
+                                      "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ," + 
+                                      "               You can also add a 'multifilter' by binding two or more filters together with a &" + 
+                                      "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
+                                      "```", message.Channel);
             }
             else if(split[1] == "filters")
                 await Global.SendText("Your filters: \n" + (user.WarframeFilters.Count == 0 ?
