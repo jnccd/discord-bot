@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TestDiscordBot.Config;
 
@@ -28,6 +29,9 @@ namespace TestDiscordBot.Commands
             server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
                 try
                 {
+                    while (!Global.P.isConnected) { Thread.Sleep(200); }
+                    //Global.ConsoleWriteLine("Recieved: " + text, ConsoleColor.Yellow);
+
                     if (string.IsNullOrWhiteSpace(text) || !text.Contains('ↅ'))
                         return;
 
@@ -56,7 +60,7 @@ namespace TestDiscordBot.Commands
                                         else
                                             notifications.Add(new notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
                         foreach (notif n in notifications)
-                            await Global.SendText(n.userID.Select(x => Global.P.getUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + n.line, n.ChannelID);
+                            await Global.SendText(n.userID.Select(x => Global.P.getUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
                     }
                     else if (encoding[0] == "Void-Trader")
                     {
@@ -83,13 +87,13 @@ namespace TestDiscordBot.Commands
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
             {
-                await Global.SendText("```ruby" + 
+                await Global.SendText("```ruby\n" + 
                                       "Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
                                       "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
                                       "Use \"" + prefixAndCommand + " filters\" to view your fitlers.\n" +
                                       "eg. \"" + prefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
-                                      "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ," + 
-                                      "               You can also add a 'multifilter' by binding two or more filters together with a &" + 
+                                      "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" + 
+                                      "               You can also add a 'multifilter' by binding two or more filters together with a &\n" + 
                                       "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
                                       "```", message.Channel);
             }
@@ -99,36 +103,38 @@ namespace TestDiscordBot.Commands
                     user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)), message.Channel);
             else
             {
-                string answer = "";
+                EmbedBuilder embed = new EmbedBuilder();
                 string[] filterComs = split.Skip(1).Aggregate((x, y) => x + " " + y).Split(',');
                 foreach (string filterCom in filterComs)
                 {
-                    if (filterCom.StartsWith("+"))
+                    string filterComTrim = filterCom.Trim(' ');
+                    if (filterComTrim.StartsWith("+"))
                     {
-                        string filter = filterCom.Remove(0, 1).Trim(' ');
+                        string filter = filterComTrim.Remove(0, 1).Trim(' ');
                         if (user.WarframeFilters.Contains(filter))
-                            answer += "You already have that filter fam";
+                            embed.AddField("You already have that filter fam", filter);
                         else
                         {
                             user.WarframeFilters.Add(filter);
-                            answer += "Added filter: " + filter + "\n";
+                            embed.AddField("Added filter: ", filter);
                         }
                     }
-                    else if (filterCom.StartsWith("-"))
+                    else if (filterComTrim.StartsWith("-"))
                     {
-                        string filter = filterCom.Remove(0, 1).Trim(' ');
+                        string filter = filterComTrim.Remove(0, 1).Trim(' ');
                         if (user.WarframeFilters.Contains(filter))
                         {
                             user.WarframeFilters.Remove(filter);
-                            answer += "Removed filter: " + filter + "\n";
+                            embed.AddField("Removed filter: ", filter);
                         }
                         else
-                            answer += "You don't even have that filter fam";
+                            embed.AddField("You don't even have that filter fam", filter);
                     }
                 }
-                await Global.SendText(answer + "\nYour Filters are now: \n" + (user.WarframeFilters.Count == 0 ?
+                embed.AddField("Your Filters are now: ", (user.WarframeFilters.Count == 0 ? 
                     "\n\nWell that looks pretty empty" : 
-                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)), message.Channel);
+                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
+                await Global.SendEmbed(embed, message.Channel);
             }
         }
     }

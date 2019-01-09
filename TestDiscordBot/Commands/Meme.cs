@@ -17,8 +17,8 @@ namespace TestDiscordBot.Commands
             "https://www.reddit.com/r/memes/", "https://www.reddit.com/r/PewdiepieSubmissions/",
             "https://www.reddit.com/r/marvelmemes/", "https://www.reddit.com/r/me_irl/", "https://www.reddit.com/r/OTMemes/",
             "https://www.reddit.com/r/MemeEconomy/", "https://www.reddit.com/r/fakehistoryporn/",
-            "https://www.reddit.com/r/Overwatch_Memes/", "https://www.reddit.com/r/PrequelMemes/", "https://www.reddit.com/r/greentext/",
-            "https://www.reddit.com/r/pyrocynical/", "https://www.reddit.com/r/SequelMemes/",
+            "https://www.reddit.com/r/Overwatch_Memes/", "https://www.reddit.com/r/PrequelMemes/",
+            "https://www.reddit.com/r/SequelMemes/",
             "https://www.reddit.com/r/starterpacks/", "https://www.reddit.com/r/memeframe/" };
 
         public Meme() : base("meme", "Posts a random meme", false)
