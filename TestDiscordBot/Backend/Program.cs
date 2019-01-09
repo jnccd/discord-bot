@@ -266,14 +266,7 @@ namespace TestDiscordBot
                 else if (input == "/test")
                 {
                     // TODO: Test
-                    try
-                    {
-                        EmbedBuilder embed = new EmbedBuilder();
-                        for (int i = 0; i < 100; i++)
-                            embed.AddField("Omega", "LUL" + i);
-                        await Global.SendEmbed(embed, CurrentChannel);
-                    }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    bool shit = "sorry fam one more Fieldron time Solaris\nOwO nitain no not really".ContainsAllOf("Fieldron&Solaris".Split('&'));
                 }
                 else
                     Global.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
@@ -502,6 +495,13 @@ namespace TestDiscordBot
         public SocketGuild getGuildFromID(ulong GuildID)
         {
             return client.GetGuild(GuildID);
+        }
+        public bool isConnected
+        {
+            get
+            {
+                return clientReady;
+            }
         }
 
         // Imports

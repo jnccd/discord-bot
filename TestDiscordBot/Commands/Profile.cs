@@ -20,28 +20,39 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            DiscordUser User = config.Data.UserList.Find(x => x.UserID == commandmessage.Author.Id);
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);
 
-            FieldInfo[] Infos = typeof(DiscordUser).GetFields();
-            foreach (FieldInfo info in Infos)
+            if (config.Data.UserList.Exists(x => x.UserID == commandmessage.Author.Id))
             {
-                if (info.FieldType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(info.FieldType))
+                DiscordUser User = config.Data.UserList.Find(x => x.UserID == commandmessage.Author.Id);
+                FieldInfo[] Infos = typeof(DiscordUser).GetFields();
+                foreach (FieldInfo info in Infos)
                 {
-                    IEnumerable a = (IEnumerable)info.GetValue(User);
-                    IEnumerator e = a.GetEnumerator();
-                    string value = "";
-                    e.Reset();
-                    while (e.MoveNext())
-                        value += e.Current + "\n";
-                    Embed.AddField(info.Name + ":", value);
+                    if (info.FieldType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(info.FieldType))
+                    {
+                        IEnumerable a = (IEnumerable)info.GetValue(User);
+                        string value = "";
+                        try
+                        {
+                            IEnumerator e = a.GetEnumerator();
+                            e.Reset();
+                            while (e.MoveNext())
+                                value += e.Current + "\n";
+                        }
+                        catch { }
+                        Embed.AddField(info.Name + ":", value == "" ? "null" : value);
+                    }
+                    else
+                        Embed.AddField(info.Name + ":", info.GetValue(User));
                 }
-                else
-                    Embed.AddField(info.Name + ":", info.GetValue(User));
+
+                Embed.WithDescription("Profile of " + commandmessage.Author.Mention);
             }
-            
-            Embed.WithDescription("Profile of " + commandmessage.Author.Mention);
+            else
+            {
+                Embed.AddField("Error!", "The bot hasn't made a profile of you yet.");
+            }
             await Global.SendEmbed(Embed, commandmessage.Channel);
         }
     }

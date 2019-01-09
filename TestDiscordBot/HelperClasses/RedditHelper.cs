@@ -62,7 +62,19 @@ namespace TestDiscordBot
             ResultTitle = WebUtility.HtmlDecode(postJson.GetEverythingBetween("\"title\": \"", "\", "));
             ResultTimestamp = postJson.GetEverythingBetween("\"created\": ", ", ");
             ResultPoints = postJson.GetEverythingBetween("\"score\": ", ", ");
-            ResultPicURL = postJson.GetEverythingBetween("\"images\": [{\"source\": {\"url\": \"", "\", ");
+            string temp = postJson.GetEverythingBetween(", \"is_video\": ", "}");
+            try { IsVideo = Convert.ToBoolean(temp); }
+            catch { IsVideo = false; }
+
+            // Getting full res image url from the post site html
+            string postHTML = "";
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
+            req.KeepAlive = false;
+            WebResponse W = req.GetResponse();
+            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                ResultPicURL = sr.ReadToEnd().GetEverythingBetween("\"content\":\"", "\",\"");
+            if (ResultPicURL == "" || !IsReachable(ResultPicURL))
+                ResultPicURL = postJson.GetEverythingBetween("\"images\": [{\"source\": {\"url\": \"", "\", ");
             if (ResultPicURL == "" || !IsReachable(ResultPicURL))
                 ResultPicURL = postJson.GetEverythingBetween("\"variants\": {\"gif\": {\"source\": {\"url\": \"", "\"");
             if (ResultPicURL == "" || !IsReachable(ResultPicURL))
@@ -71,9 +83,6 @@ namespace TestDiscordBot
                 ResultPicURL = postJson.GetEverythingBetween("\"url\": \"", "\",");
             if (ResultPicURL == "" || !IsReachable(ResultPicURL))
                 throw new Exception("Faulty URL: " + ResultURL, new Exception(postJson));
-            string temp = postJson.GetEverythingBetween(", \"is_video\": ", "}");
-            try { IsVideo = Convert.ToBoolean(temp); }
-            catch { IsVideo = false; }
 
             if (IsVideo)
             {

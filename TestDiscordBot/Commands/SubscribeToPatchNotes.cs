@@ -33,7 +33,7 @@ namespace TestDiscordBot.Commands
                 string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
                 string link = "https://github.com/niklasCarstensen/Discord-Bot/commit/" + html.GetEverythingBetween("href=\"/niklasCarstensen/Discord-Bot/commit/", "\">");
 
-                if (message != config.Data.LastCommitMessage && message != "")
+                if (message != config.Data.LastCommitMessage && message != "" && message != "Projektdateien hinzufügen.")
                 {
                     config.Data.LastCommitMessage = message;
                     config.Save();
