@@ -17,7 +17,7 @@ namespace TestDiscordBot
             string postJson;
 
             // Getting a post
-            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(subUrl + ".json?limit=100");
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(subUrl + ".json?limit=25");
             req.KeepAlive = false;
             WebResponse W = req.GetResponse();
             using (StreamReader sr = new StreamReader(W.GetResponseStream()))
