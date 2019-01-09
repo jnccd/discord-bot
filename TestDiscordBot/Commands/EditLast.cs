@@ -116,16 +116,12 @@ namespace TestDiscordBot.Commands
             {
                 case TransformMode.Expand:
                     transformedLength = (diff / div).LengthSquared() * strength;
-                    target = (transformedLength == 0 || (100 / transformedLength) > diff.Length()) ?
-                        center :
-                        point - move * (100 / transformedLength);
+                    target = point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
                     break;
 
                 case TransformMode.Collapse:
                     transformedLength = (diff / div).LengthSquared() * strength;
-                    target = (transformedLength == 0) ?
-                        center :
-                        point + move * (25 / transformedLength);
+                    target = point + diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
                     break;
 
                 case TransformMode.Stir:
@@ -168,17 +164,27 @@ namespace TestDiscordBot.Commands
         {
             IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
             string lastText = null, lastPic = null;
+            ulong ownID = Global.OwnID;
             foreach (IMessage m in messages)
             {
-                if (lastText == null && m.Id != message.Id && !string.IsNullOrWhiteSpace(m.Content))
-                    lastText = m.Content;
-                if (lastPic == null && m.Id != message.Id && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0 && m.Attachments.ElementAt(0).Filename.EndsWith(".png") ||
-                    lastPic == null && m.Id != message.Id && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0 && m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                    lastPic = m.Attachments.ElementAt(0).Url;
-                if (lastPic == null && m.Id != message.Id && m.Content.ContainsPictureLink() != null)
-                    lastPic = m.Content.ContainsPictureLink();
-                if (lastText != null && lastPic != null)
-                    break;
+                if (m.Id != message.Id && m.Author.Id != ownID)
+                {
+                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content))
+                        lastText = m.Content;
+                    if (lastPic == null && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
+                    {
+                        if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
+                            lastPic = m.Attachments.ElementAt(0).Url;
+                        else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
+                            lastPic = m.Attachments.ElementAt(0).Url;
+                    }
+                    string picLink = m.Content.ContainsPictureLink();
+                    if (lastPic == null && picLink != null)
+                        lastPic = picLink;
+
+                    if (lastText != null && lastPic != null)
+                        break;
+                }
             }
 
             string[] split = message.Content.Split(new char[] { ' ', '\n' });

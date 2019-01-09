@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using TestDiscordBot.Config;
@@ -59,6 +60,13 @@ namespace TestDiscordBot
                     throw new FieldAccessException("The Master may only be set once!");
             }
         }
+        public static ulong OwnID
+        {
+            get
+            {
+                return PP.getSelf().Id;
+            }
+        } 
         
         public static async Task SendFile(string path, ISocketMessageChannel Channel, string text = "")
         {
@@ -287,6 +295,37 @@ namespace TestDiscordBot
                 else
                     o += char.ToLower(s[i]);
             return o;
+        }
+    }
+
+    // Approximate Math Functions
+    public class Approximate
+    {
+        public static float Sqrt(float z)
+        {
+            if (z == 0) return 0;
+            FloatIntUnion u;
+            u.tmp = 0;
+            u.f = z;
+            u.tmp -= 1 << 23; /* Subtract 2^m. */
+            u.tmp >>= 1; /* Divide by 2. */
+            u.tmp += 1 << 29; /* Add ((b + 1) / 2) * 2^m. */
+            return u.f;
+        }
+        public static double Exp(double val)
+        {
+            long tmp = (long)(1512775 * val + 1072632447);
+            return BitConverter.Int64BitsToDouble(tmp << 32);
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct FloatIntUnion
+        {
+            [FieldOffset(0)]
+            public float f;
+
+            [FieldOffset(0)]
+            public int tmp;
         }
     }
 }
