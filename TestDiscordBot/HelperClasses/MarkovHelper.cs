@@ -13,7 +13,7 @@ namespace TestDiscordBot
 
     public static class MarkovHelper
     {
-        const byte inputLength = 2;
+        const byte inputLength = 1;
         static string savePath = Global.CurrentExecutablePath + "\\markow" + inputLength + ".json";
         static Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
 
@@ -35,34 +35,64 @@ namespace TestDiscordBot
         {
             lock (dict)
             {
-                List<string> presplit = new List<string>();
-                for (int i = 0; i < inputLength; i++)
-                    presplit.Add("");
-                presplit.AddRange(addition.Split(' '));
-                string[] split = presplit.ToArray();
+                addition = addition.Replace("\n", " \n ").Trim(' ');
 
-                for (int i = 0; i < split.Length - inputLength; i++)
+                List<string> presplit = new List<string>();
+                presplit.AddRange(Enumerable.Repeat("", inputLength));
+                presplit.AddRange(addition.Split(' '));
+
+                Add(presplit.ToArray());
+            }
+        }
+        public static void AddToDict(string preText, string addition)
+        {
+            lock (dict)
+            {
+                addition = addition.Replace("\n", " \n ").Trim(' ');
+                preText = (preText + "\n").Replace("\n", " \n ").Trim(' ');
+
+                string[] preTextSplit = preText.Split(' ');
+
+                List<string> presplit = new List<string>();
+                if (inputLength - preTextSplit.Length > 0)
+                    presplit.AddRange(Enumerable.Repeat("", inputLength - preTextSplit.Length));
+                presplit.AddRange(preTextSplit.Skip(Math.Max(0, preTextSplit.Length - inputLength)));
+                presplit.AddRange(addition.Split(' '));
+
+                Add(presplit.ToArray());
+            }
+        }
+        static void Add(string[] processedText)
+        {
+            List<string> list = null;
+            string[] split = processedText;
+            for (int i = 0; i < split.Length - inputLength; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(split[i + inputLength]) && split[i + inputLength] != split[i + inputLength - 1])
                 {
-                    if (split[i + inputLength] != "" && split[i + inputLength] != null)
-                    {
-                        List<string> list = null;
-                        string key = split.ToList().GetRange(i, inputLength).Aggregate((x, y) => { return x + " " + y; }).Trim(' ');
-                        if (dict.TryGetValue(key, out list))
-                            list.Add(split[i + inputLength]);
-                        else
-                            dict.Add(key, new string[] { split[i + inputLength] }.ToList());
-                    }
+                    string key = split.ToList().GetRange(i, inputLength).Aggregate((x, y) => { return x + " " + y; }).Trim(' ');
+                    if (dict.TryGetValue(key, out list))
+                        list.Add(split[i + inputLength]);
+                    else
+                        dict.Add(key, new string[] { split[i + inputLength] }.ToList());
                 }
             }
+            if (dict.TryGetValue("", out list))
+            {
+                list.Clear();
+                list.Add("\n");
+            }
+            if (dict.TryGetValue("\n", out list))
+                list.RemoveAll(x => x == "" || x == "\n");
         }
 
         public static string GetString(string start, int minLength, int maxLength)
         {
             lock (dict)
             {
-                if (start == null)
+                if (string.IsNullOrWhiteSpace(start))
                     start = dict.Keys.ElementAt(Global.RDM.Next(dict.Keys.Count));
-                List<string> outputList = start.Split(' ').ToList();
+                List<string> outputList = start.Replace("\n", " \n ").Trim(' ').Split(' ').ToList();
 
                 for (int i = 0; i < minLength; i++)
                     AddWord(outputList);
