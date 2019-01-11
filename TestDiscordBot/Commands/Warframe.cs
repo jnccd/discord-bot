@@ -29,7 +29,7 @@ namespace TestDiscordBot.Commands
             server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
                 try
                 {
-                    while (!Global.P.isConnected) { Thread.Sleep(200); }
+                    while (!Global.P.isConnected) { Thread.Sleep(20); }
                     //Global.ConsoleWriteLine("Recieved: " + text, ConsoleColor.Yellow);
 
                     if (string.IsNullOrWhiteSpace(text) || !text.Contains('ↅ'))
@@ -47,7 +47,7 @@ namespace TestDiscordBot.Commands
                         //        foreach (string filter in user.WarframeFilters)
                         //            if (line.Contains(filter))
                         //            {
-                        //                IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();
+                        //                IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();d
                         //                await dm.SendMessageAsync(line);
                         //            }
                         List<notif> notifications = new List<notif>();

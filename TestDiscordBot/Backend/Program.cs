@@ -79,7 +79,6 @@ namespace TestDiscordBot
             
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
-            client.Disconnected += Client_Disconnected;
             
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
@@ -116,7 +115,7 @@ namespace TestDiscordBot
             ShowWindow(GetConsoleWindow(), 2);
             foreach (Command c in commands)
             {
-                Task.Factory.StartNew(() => {
+                await Task.Run(() => {
                     try
                     {
                         c.onConnected();
@@ -326,10 +325,6 @@ namespace TestDiscordBot
                 }
             }
             catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-        }
-        private async Task Client_Disconnected(Exception arg)
-        {
-
         }
         private async Task Client_Ready()
         {

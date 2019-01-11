@@ -14,6 +14,8 @@ namespace TestDiscordBot.Commands
 {
     public class Markow : Command
     {
+        bool loadedDict;
+
         public Markow() : base("markow", "Generates text", false)
         {
 
@@ -26,9 +28,25 @@ namespace TestDiscordBot.Commands
 
             MarkovHelper.LoadDict();
 
-            // Load from text Files
+            // Check for reset
             if (!MarkovHelper.SaveFileExists())
+            {
                 config.Data.loadedMarkovTextFiles.Clear();
+
+                // Load from Discord
+                foreach (SocketGuild guild in Global.P.getGuilds())
+                    if (guild.Id != 473991188974927882)
+                        foreach (SocketChannel channel in guild.Channels)
+                            if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
+                            {
+                                IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
+                                foreach (IMessage m in messages)
+                                    if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Global.prefix) && m.Content[0] != '!')
+                                        input += m.Content + "\n";
+                            }
+            }
+
+            // Load from text Files
             string[] files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\MarkowSources\\");
             foreach (string file in files)
             {
@@ -38,37 +56,30 @@ namespace TestDiscordBot.Commands
                     foreach (string line in lines)
                     {
                         string trimmed = line.Trim('\n').Trim('\t').Trim(' ');
-                        if (trimmed != "")
+                        if (!string.IsNullOrWhiteSpace(trimmed))
                             input += trimmed + "\n";
                     }
                     config.Data.loadedMarkovTextFiles.Add(Path.GetFileName(file));
                 }
             }
-
-            // Loads the same shit multiple times and fucks everything up
-            //// Load from Discord
-            //foreach (SocketGuild guild in Global.P.getGuilds())
-            //    if (guild.Id != 473991188974927882)
-            //        foreach (SocketChannel channel in guild.Channels)
-            //            if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
-            //            {
-            //                IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
-            //                foreach (IMessage m in messages)
-            //                    if (!m.Author.IsBot && m.Content.Trim('\n').Trim('\t').Trim(' ') != "")
-            //                        input += m.Content.Trim(' ') + " ";
-            //            }
-
+            
             MarkovHelper.AddToDict(input);
 
+            loadedDict = true;
             Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
-        public override void onNonCommandMessageRecieved(SocketMessage message)
+        public override async void onNonCommandMessageRecieved(SocketMessage message)
         {
-            MarkovHelper.AddToDict(message.Content);
+            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync(2).Flatten();
+            if (messages.Count() == 2)
+                MarkovHelper.AddToDict(messages.ElementAt(1).Content, message.Content);
+            else
+                MarkovHelper.AddToDict(message.Content);
         }
         public override void onExit()
         {
-            MarkovHelper.SaveDict();
+            if (loadedDict)
+                MarkovHelper.SaveDict();
         }
 
         public override async Task execute(SocketMessage message)
@@ -77,7 +88,7 @@ namespace TestDiscordBot.Commands
 
             try
             {
-                string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 2, 2000);
+                string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 5, 2000);
                 await Global.SendText(output, message.Channel);
             }
             catch (NoEmptyElementException e)
