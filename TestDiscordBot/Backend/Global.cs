@@ -200,11 +200,14 @@ namespace TestDiscordBot
 
         public static void ConsoleWriteLine(string text, ConsoleColor Color)
         {
-            Console.CursorLeft = 0;
-            Console.ForegroundColor = Color;
-            Console.WriteLine(text);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("$");
+            lock (Console.Title)
+            {
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = Color;
+                Console.WriteLine(text);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
+            }
         }
 
         // Extensions
