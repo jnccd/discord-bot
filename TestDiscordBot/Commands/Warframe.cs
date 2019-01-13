@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using TestDiscordBot.Config;
 
 namespace TestDiscordBot.Commands
@@ -65,13 +66,33 @@ namespace TestDiscordBot.Commands
                     else if (encoding[0] == "Void-Trader")
                     {
                         List<ulong> channels = config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
+                        string[] split = encoding[1].Split('\n');
+
+                        EmbedBuilder embed = new EmbedBuilder();
+                        embed.WithDescription(split[0]);
+                        embed.WithFooter(split[split.Length - 1].Split(' ').Take(5).Aggregate((x, y) => x + " " + y));
+                        embed.WithTitle("Baro-senpai is here :weary:");
+                        embed.WithTimestamp(new DateTimeOffset(DateTime.Parse(split[split.Length - 1].Split(' ').Skip(5).Aggregate((x, y) => x + " " + y))));
+                        string[] items = split.Skip(1).Take(split.Length - 2).ToArray();
+                        foreach (string item in items)
+                            if (item.Contains("_"))
+                            {
+                                string[] itemSplit = item.Split('_');
+                                string trimedItemName = itemSplit[0].Trim(' ');
+                                embed.AddField(trimedItemName, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" + 
+                                    HttpUtility.HtmlEncode(trimedItemName).Replace(' ', '+') + ") - " + itemSplit[1].Trim(' ').Replace('+', ' '));
+                            }
+
                         foreach (ulong id in channels)
                         {
                             SocketChannel channel = Global.P.getChannelFromID(id);
                             if (channel is ISocketMessageChannel)
-                                await Global.SendText(config.Data.UserList.Where(x => x.WarframeChannelID == id && x.WarframeFilters.Count != 0)
-                                                                          .Select(x => Global.P.getUserFromId(x.UserID).Mention)
-                                                                          .Aggregate((x, y) => x + " " + y) + " " + encoding[1], (ISocketMessageChannel)channel);
+                            {
+                                //await Global.SendText(config.Data.UserList.Where(x => x.WarframeChannelID == id && x.WarframeFilters.Count != 0)
+                                //                                          .Select(x => Global.P.getUserFromId(x.UserID).Mention)
+                                //                                          .Aggregate((x, y) => x + " " + y) + " " + encoding[1], (ISocketMessageChannel)channel); g
+                                await Global.SendEmbed(embed, (ISocketMessageChannel)channel);
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -98,9 +119,13 @@ namespace TestDiscordBot.Commands
                                       "```", message.Channel);
             }
             else if(split[1] == "filters")
-                await Global.SendText("Your filters: \n" + (user.WarframeFilters.Count == 0 ?
-                    "\n\nWell that looks pretty empty" :
-                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)), message.Channel);
+            {
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.AddField("Your Filters: ", (user.WarframeFilters.Count == 0 ?
+                    "Well that looks pretty empty" :
+                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
+                await Global.SendEmbed(embed, message.Channel);
+            }
             else
             {
                 EmbedBuilder embed = new EmbedBuilder();
