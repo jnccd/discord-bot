@@ -19,6 +19,10 @@ namespace TestDiscordBot.Config
         public static configData Data = new configData();
         static Loader L = new Loader();
         
+        public static string getConfigPath()
+        {
+            return configPath;
+        }
         public static bool Exists()
         {
             return File.Exists(configPath);

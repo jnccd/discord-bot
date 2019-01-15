@@ -27,6 +27,7 @@ namespace TestDiscordBot
         int clearYcoords;
         bool clientReady = false;
         bool gotWorkingToken = false;
+        bool exitedNormally = false;
         ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
         string buildDate;
         ISocketMessageChannel CurrentChannel;
@@ -44,7 +45,10 @@ namespace TestDiscordBot
         {
             #region startup
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-            
+
+            handler = new ConsoleEventDelegate(ConsoleEventCallback);
+            SetConsoleCtrlHandler(handler, true);
+
             try
             {
                 buildDate = File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n');
@@ -294,6 +298,7 @@ namespace TestDiscordBot
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
             config.Save();
+            exitedNormally = true;
 
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
             await client.SetStatusAsync(UserStatus.DoNotDisturb);
@@ -512,7 +517,24 @@ namespace TestDiscordBot
             }
         }
 
+        // Closing Event
+        static bool ConsoleEventCallback(int eventType)
+        {
+            if (eventType == 2 && !Global.P.exitedNormally)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Closing... Files are being saved");
+                File.Copy(config.getConfigPath(), Global.CurrentExecutablePath + "\\config_backup.json", true);
+                config.Save();
+            }
+            return false;
+        }
+        static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected // Pinvoke
+        private delegate bool ConsoleEventDelegate(int eventType);
+        
         // Imports
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
         [DllImport("user32.dll")]
