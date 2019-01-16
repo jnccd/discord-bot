@@ -75,7 +75,7 @@ namespace TestDiscordBot
 
         public virtual async Task execute(SocketMessage message)
         {
-
+            
         }
 
         public virtual void onNonCommandMessageRecieved(SocketMessage message)

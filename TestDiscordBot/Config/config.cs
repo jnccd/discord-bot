@@ -88,17 +88,10 @@ namespace TestDiscordBot.Config
     {
         public Loader()
         {
-            try
-            {
-                if (config.Exists())
-                    config.Load();
-                else
-                    config.Data = new configData();
-            }
-            catch (Exception e)
-            {
-                throw new Exception();
-            }
+            if (config.Exists())
+                config.Load();
+            else
+                config.Data = new configData();
         }
     }
 }
