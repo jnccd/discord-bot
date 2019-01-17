@@ -53,8 +53,6 @@ namespace TestDiscordBot.Commands
 
                     Task.Factory.StartNew(async () => {
                         compiler.WaitForExit();
-                        if (exited)
-                            return;
                         try
                         {
                             if (File.Exists("haskellCompile.txt"))
@@ -77,7 +75,8 @@ namespace TestDiscordBot.Commands
 
                                 parsedOutput = parsedOutput.Insert(0, "```ruby\n");
                                 parsedOutput = parsedOutput.Insert(parsedOutput.Length, "```");
-                                
+
+                                exited = true;
                                 if (parsedOutput.Length >= 2000)
                                     await Global.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
                                 else if (string.IsNullOrWhiteSpace(parsedOutput.Trim('`')))
