@@ -26,14 +26,20 @@ namespace TestDiscordBot.Commands
                 return;
             }
 
+            string hitUrl;
             string url = string.Format("http://www.google.com/search?q=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())) + "&btnI");
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
             req.KeepAlive = false;
             req.AllowAutoRedirect = true;
-            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 OPR/56.0.3051.52";
-            Uri U = req.GetResponse().ResponseUri;
+            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
+            WebResponse W = req.GetResponse();
+            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+            {
+                string html = sr.ReadToEnd();
+                hitUrl = html.GetEverythingBetween("cite class", "/cite>").GetEverythingBetween(">", "<");
+            }
 
-            await Global.SendText(U.AbsoluteUri, commandmessage.Channel);
+            await Global.SendText(hitUrl, commandmessage.Channel);
         }
     }
 }
