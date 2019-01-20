@@ -16,7 +16,6 @@ namespace TestDiscordBot.Commands
     {
         frmRServer server;
         string worldState;
-        DateTime lastUpdated;
 
         public struct notif
         {
@@ -95,6 +94,10 @@ namespace TestDiscordBot.Commands
                             }
                         }
                     }
+                    else if (encoding[0] == "State")
+                    {
+                        worldState = encoding[1];
+                    }
                 } catch (Exception e) {
                     Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                 }
@@ -111,7 +114,8 @@ namespace TestDiscordBot.Commands
                 await Global.SendText("```ruby\n" + 
                                       "Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
                                       "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
-                                      "Use \"" + prefixAndCommand + " filters\" to view your fitlers.\n" +
+                                      "Use \"" + prefixAndCommand + " filters\" to view your filters.\n" +
+                                      "Use \"" + prefixAndCommand + " state\" to view the worldState.\n" +
                                       "eg. \"" + prefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
                                       "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" + 
                                       "               You can also add a 'multifilter' by binding two or more filters together with a &\n" + 
@@ -124,6 +128,12 @@ namespace TestDiscordBot.Commands
                 embed.AddField("Your Filters: ", (user.WarframeFilters.Count == 0 ?
                     "Well that looks pretty empty" :
                     user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
+                await Global.SendEmbed(embed, message.Channel);
+            }
+            else if (split[1] == "state")
+            {
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.AddField("WorldState: ", worldState);
                 await Global.SendEmbed(embed, message.Channel);
             }
             else
