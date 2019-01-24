@@ -133,6 +133,7 @@
     <Compile Include="Commands\EmojiUsage.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
     <Compile Include="Commands\GetTimecode.cs" />
+    <Compile Include="Commands\Gif.cs" />
     <Compile Include="Commands\Google.cs" />
     <Compile Include="Commands\GooglePic.cs" />
     <Compile Include="Commands\Haskell.cs" />
