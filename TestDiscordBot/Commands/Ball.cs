@@ -9,7 +9,7 @@ namespace TestDiscordBot.Commands
 {
     public class Ball : Command
     {
-        string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball", "Uhm... I have no idea", "Possibly" };
+        string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball", "Uhm... I have no idea", "Possibly", "No u" };
 
         public Ball() : base("9ball", "Decides your fate", false)
         {
@@ -18,10 +18,11 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            string m = commandmessage.Content;
+            string m = commandmessage.Content.ToLower();
             if (m.Split(' ').Length >= 4 && m.Contains("?"))
             {
-                if (!m.Contains("Why ") && !m.Contains("What ") && !m.Contains("Who ") && !m.Contains("Warum ") && !m.Contains("Was ") && !m.Contains("Wieso "))
+                if (!m.Contains("why ") && !m.Contains("what ") && !m.Contains("who ") && 
+                    !m.Contains("warum ") && !m.Contains("was ") && !m.Contains("wieso ") && !m.Contains("weshalb "))
                 {
                     long sum = 0;
                     for (int i = 0; i < m.Length; i++)

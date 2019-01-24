@@ -17,7 +17,7 @@ namespace TestDiscordBot.Commands
         frmRServer server;
         string worldState;
 
-        public struct notif
+        public class notif
         {
             public List<ulong> userID;
             public ulong ChannelID;
@@ -55,10 +55,13 @@ namespace TestDiscordBot.Commands
                             foreach (DiscordUser user in config.Data.UserList)
                                 foreach (string filter in user.WarframeFilters)
                                     if (line.ContainsAllOf(filter.Split('&')))
-                                        if (notifications.Exists(x => x.ChannelID == user.WarframeChannelID && x.line == line))
-                                            notifications.Find(x => x.ChannelID == user.WarframeChannelID && x.line == line).userID.Add(user.UserID);
+                                    {
+                                        notif notification = notifications.FirstOrDefault(x => x.ChannelID == user.WarframeChannelID && x.line == line);
+                                        if (notification != null && !notification.userID.Contains(user.UserID))
+                                            notification.userID.Add(user.UserID);
                                         else
                                             notifications.Add(new notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
+                                    }
                         foreach (notif n in notifications)
                             await Global.SendText(n.userID.Select(x => Global.P.getUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
                     }
@@ -111,11 +114,11 @@ namespace TestDiscordBot.Commands
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
             {
-                await Global.SendText("```ruby\n" + 
+                await Global.SendText("```ruby\n" +
+                                      "Use \"" + prefixAndCommand + " state\" to view the worldState.\n" +
                                       "Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
                                       "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
                                       "Use \"" + prefixAndCommand + " filters\" to view your filters.\n" +
-                                      "Use \"" + prefixAndCommand + " state\" to view the worldState.\n" +
                                       "eg. \"" + prefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
                                       "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" + 
                                       "               You can also add a 'multifilter' by binding two or more filters together with a &\n" + 
