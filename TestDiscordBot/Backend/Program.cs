@@ -433,7 +433,10 @@ namespace TestDiscordBot
                     // No command found
                     int[] distances = new int[commands.Length];
                     for (int i = 0; i < commands.Length; i++)
-                        distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), split[0].ToLower());
+                        if (commands[i].command != "" && !commands[i].isHidden)
+                            distances[i] = Global.LevenshteinDistance((commands[i].prefix + commands[i].command).ToLower(), split[0].ToLower());
+                        else
+                            distances[i] = int.MaxValue;
                     int minIndex = 0;
                     int min = int.MaxValue;
                     for (int i = 0; i < commands.Length; i++)
@@ -442,7 +445,7 @@ namespace TestDiscordBot
                             minIndex = i;
                             min = distances[i];
                         }
-                    if (min < 5)
+                    if (min < Math.Min(5, split[0].Length - 1))
                     {
                         await Global.SendText("I don't know that command, but " + commands[minIndex].prefix + commands[minIndex].command + " is pretty close:", message.Channel);
                         await executeCommand(commands[minIndex], message);
