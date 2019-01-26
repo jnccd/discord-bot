@@ -61,22 +61,29 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            if (commandmessage.Author.Id == Global.P.getGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
+            if (commandmessage.Channel is SocketGuildChannel)
             {
-                if (config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
+                if (commandmessage.Author.Id == Global.P.getGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
                 {
-                    config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
-                    await Global.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
+                    if (config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
+                    {
+                        config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
+                        await Global.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
+                    }
+                    else
+                    {
+                        config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
+                        await Global.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
+                    }
                 }
                 else
                 {
-                    config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
-                    await Global.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
+                    await Global.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel);
                 }
             }
             else
             {
-                await Global.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel);
+                await Global.SendText("You can't use this in DMs", commandmessage.Channel);
             }
         }
     }

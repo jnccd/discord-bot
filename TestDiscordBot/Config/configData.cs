@@ -16,8 +16,9 @@ namespace TestDiscordBot.Config
         // TODO: Add your variables here
         public List<ulong> PatchNoteSubscribedChannels;
         public List<ulong> WarframeSubscribedChannels;
-        public List<string> loadedMarkovTextFiles;
+        public List<string> LoadedMarkovTextFiles;
         public string LastCommitMessage;
+        public List<ulong> MessagePreviewServers;
 
         public configData()
         {
@@ -29,7 +30,8 @@ namespace TestDiscordBot.Config
             // TODO: Add initilization logic here
             PatchNoteSubscribedChannels = new List<ulong>();
             WarframeSubscribedChannels = new List<ulong>();
-            loadedMarkovTextFiles = new List<string>();
+            LoadedMarkovTextFiles = new List<string>();
+            MessagePreviewServers = new List<ulong>();
         }
     }
 }
