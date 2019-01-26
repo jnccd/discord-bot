@@ -31,11 +31,17 @@ namespace TestDiscordBot.Commands
                             IMessage m = await message.Channel.GetMessageAsync(Convert.ToUInt64(s.Split('/').Last()));
 
                             EmbedBuilder Embed = new EmbedBuilder();
-                            Embed.WithTitle("Preview for " + s);
+                            Embed.WithTitle("Preview for: " + s);
                             Embed.WithColor(0, 128, 255);
-                            Embed.AddField(m.Author.Username, m.Content);
+                            Embed.AddField(m.Author.Username, string.IsNullOrWhiteSpace(m.Content) ? 
+                                m.Attachments.Select(x => x.Url).Aggregate((x, y) => x + " " + y) : m.Content);
+                            try
+                            {
+                                if (m.Attachments.Count > 0)
+                                    Embed.WithImageUrl(m.Attachments.ElementAt(0).Url);
+                            } catch { }
                             await Global.SendEmbed(Embed, message.Channel);
-                        } catch { }
+                        } catch (Exception e) { }
                     }
             }
         }
@@ -55,7 +61,7 @@ namespace TestDiscordBot.Commands
                     else
                     {
                         config.Data.MessagePreviewServers.Add(guild.Id);
-                        await Global.SendText("This Server will get linked message previews now!", message.Channel);
+                        await Global.SendText("This Server will now get linked message previews!", message.Channel);
                     }
                 }
                 else
