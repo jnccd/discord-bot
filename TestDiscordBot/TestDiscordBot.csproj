@@ -142,6 +142,7 @@
     <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\Reactions.cs" />
+    <Compile Include="Commands\ShowMessageLinks.cs" />
     <Compile Include="Commands\SubscribeToPatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
     <Compile Include="Commands\UrbanDict.cs" />

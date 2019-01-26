@@ -26,10 +26,8 @@ namespace TestDiscordBot.Commands
                 Bitmap bmp = new Bitmap(AllScreenBounds.Width, AllScreenBounds.Height, PixelFormat.Format32bppArgb);
                 Graphics graphics = Graphics.FromImage(bmp);
                 graphics.CopyFromScreen(AllScreenBounds.X, AllScreenBounds.Y, 0, 0, new Size(AllScreenBounds.Width, AllScreenBounds.Height), CopyPixelOperation.SourceCopy);
-
-                bmp.Save(Global.CurrentExecutablePath + "\\screenshot.png");
-
-                await Global.SendFile(Global.CurrentExecutablePath + "\\screenshot.png", message.Channel);
+                
+                await Global.SendBitmap(bmp, message.Channel);
             }
         }
     }
