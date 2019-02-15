@@ -20,21 +20,36 @@ namespace TestDiscordBot.Commands
         public EditLast() : base("editLast", "Edit the last message", false)
         {
             Commands = new EditLastCommand[] {
-            
-            new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
+
+            new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(string.Join("", lastText.Content.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
             }),
-            new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) + 
+            new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
                     "\nhttps://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
             }),
-            new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Select((x) => { return char.ToUpper(x); })), message.Channel);
+            new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), message.Channel);
             }),
-            new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, async (SocketMessage message, string lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Select((x) => { return char.ToUpper(x) + " "; })), message.Channel);
+            new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), message.Channel);
             }),
-            new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, string lastText, string lastPic) => {
+            new EditLastCommand("Spoilerify", "Convert text to a spoiler", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })), message.Channel);
+            }),
+            new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(lastText.Content.Replace("|", ""), message.Channel);
+            }),
+            new EditLastCommand("Crosspost", "Crossposts the message into another channel", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                try
+                {
+                    SocketChannel targetChannel = Global.P.getChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
+                    EmbedBuilder Embed = lastText.toEmbed();
+                    Embed.AddField("Crosspost from: ", $"<#{message.Channel.Id}>");
+                    await Global.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
+                } catch (Exception e) { }
+            }),
+            new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
 
                 for (int x = 0; x < bmp.Width; x++)
@@ -47,7 +62,7 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(bmp, message.Channel);
             }),
-            new EditLastCommand("invert", "Invert the color of each pixel", false, async (SocketMessage message, string lastText, string lastPic) => {
+            new EditLastCommand("invert", "Invert the color of each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
 
                 for (int x = 0; x < bmp.Width; x++)
@@ -60,8 +75,8 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(bmp, message.Channel);
             }),
-            new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" + 
-            "\nThe syntax is: liq [mode] [eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, string lastText, string lastPic) => {
+            new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
+            "\nThe syntax is: liq [mode] [eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
@@ -104,7 +119,7 @@ namespace TestDiscordBot.Commands
             Vector2 diff = point - center;
             Vector2 move = diff;
             move.Normalize();
-            
+
             Vector2 target = Vector2.Zero;
             float transformedLength = 0;
             float rotationAngle = 0;
@@ -129,7 +144,7 @@ namespace TestDiscordBot.Commands
                     rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
-                    target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X), 
+                    target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
                                          (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
                     break;
 
@@ -163,14 +178,15 @@ namespace TestDiscordBot.Commands
         public override async Task execute(SocketMessage message)
         {
             IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
-            string lastText = null, lastPic = null;
+            IMessage lastText = null;
+            string lastPic = null;
             ulong ownID = Global.OwnID;
             foreach (IMessage m in messages)
             {
-                if (m.Id != message.Id && m.Author.Id != ownID)
+                if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Global.prefix))
                 {
-                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content))
-                        lastText = m.Content;
+                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Global.prefix))
+                        lastText = m;
                     if (lastPic == null && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
                     {
                         if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
@@ -203,7 +219,7 @@ namespace TestDiscordBot.Commands
             {
                 foreach (EditLastCommand command in Commands)
                 {
-                    if (split[1] == command.command)
+                    if (split[1].ToLower() == command.command.ToLower())
                     {
                         if (command.textBased && lastText == null)
                         {
@@ -226,7 +242,7 @@ namespace TestDiscordBot.Commands
 
         class EditLastCommand
         {
-            public delegate void Execution(SocketMessage message, string lastText, string lastPic);
+            public delegate void Execution(SocketMessage message, IMessage lastText, string lastPic);
             public bool textBased;
             public string command, desc;
             public Execution execute;
