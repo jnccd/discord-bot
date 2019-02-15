@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Serialization;
 
 namespace TestDiscordBot.Chess
 {
     public class ChessPlayer
     {
-        [XmlIgnore]
         public ChessBoard Parent;
 
         public ulong UserID;

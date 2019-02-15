@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
 {
     public class Profile : Command
     {
-        public Profile() : base("profile", "Prints your bot profile (DSGVO‎-Style)", false)
+        public Profile() : base("profile", "Prints your bot profile (GDPR‎-Style)", false)
         {
 
         }

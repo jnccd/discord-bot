@@ -29,17 +29,8 @@ namespace TestDiscordBot.Commands
                         try
                         {
                             IMessage m = await message.Channel.GetMessageAsync(Convert.ToUInt64(s.Split('/').Last()));
-
-                            EmbedBuilder Embed = new EmbedBuilder();
-                            Embed.WithTitle("Preview for: " + s);
-                            Embed.WithColor(0, 128, 255);
-                            Embed.AddField(m.Author.Username, string.IsNullOrWhiteSpace(m.Content) ? 
-                                m.Attachments.Select(x => x.Url).Aggregate((x, y) => x + " " + y) : m.Content);
-                            try
-                            {
-                                if (m.Attachments.Count > 0)
-                                    Embed.WithImageUrl(m.Attachments.ElementAt(0).Url);
-                            } catch { }
+                            EmbedBuilder Embed = m.toEmbed();
+                            Embed.AddField("Preview for: ", s);
                             await Global.SendEmbed(Embed, message.Channel);
                         } catch (Exception e) { }
                     }

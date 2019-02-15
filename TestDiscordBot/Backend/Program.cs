@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,6 +43,7 @@ namespace TestDiscordBot
         async Task MainAsync()
         {
             #region startup
+            Console.ForegroundColor = ConsoleColor.White;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 
             handler = new ConsoleEventDelegate(ConsoleEventCallback);
@@ -107,8 +107,8 @@ namespace TestDiscordBot
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    Console.WriteLine(g.Name);
-            } catch { }
+                    Console.WriteLine(g.Name + "\t" + g.Id);
+            } catch { Global.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.Write(CurrentChannel);
@@ -268,24 +268,48 @@ namespace TestDiscordBot
                 else if (input == "/restart")
                 {
                     Process.Start(Global.CurrentExecutablePath + "\\TestDiscordBot.exe");
-                    Process.GetCurrentProcess().Kill();
+                    break;
                 }
                 else if (input == "/test")
                 {
                     // TODO: Test
                     try
                     {
-                        EmbedBuilder embed = new EmbedBuilder();
-                        embed.WithDescription("Find my source-code [kek124](https://www.google.de).\n");
-                        embed.AddField("[kek](https://www.google.de)", "[kek2](https://www.google.de)");
-                        embed.WithFooter("[kek4](https://www.google.de)");
-                        embed.WithTitle("[kek5](https://www.google.de)");
-                        await Global.SendEmbed(embed, CurrentChannel);
+                        Global.ConsoleWriteLine(String.Join("\n", getGuildFromID(479950092938248193).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+                else if (input.StartsWith("/roles"))
+                {
+                    string[] split = input.Split(' ');
+                    try
+                    {
+                        Global.ConsoleWriteLine(String.Join("\n", getGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+                else if (input.StartsWith("/channels"))
+                {
+                    string[] split = input.Split(' ');
+                    try
+                    {
+                        Global.ConsoleWriteLine(String.Join("\n", getGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+                else if (input.StartsWith("/read"))
+                {
+                    string[] split = input.Split(' ');
+                    try
+                    {
+                        var messages = await (getChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).Flatten();
+                        Global.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
                     Global.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
+                // /read 479955914837852172
             }
             #endregion
 
@@ -367,7 +391,7 @@ namespace TestDiscordBot
 
                 if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 {
-                    Task.Factory.StartNew(() => {
+                    Task.Run(() => {
                         foreach (Command c in commands)
                         {
                             try

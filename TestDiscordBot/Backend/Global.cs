@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Xna.Framework;
-using NAudio.Wave;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -298,6 +297,24 @@ namespace TestDiscordBot
                 else
                     o += char.ToLower(s[i]);
             return o;
+        }
+        public static EmbedBuilder toEmbed(this IMessage m)
+        {
+            EmbedBuilder Embed = new EmbedBuilder();
+            Embed.WithColor(0, 128, 255);
+            Embed.WithAuthor(m.Author);
+            Embed.WithTitle(string.IsNullOrWhiteSpace(m.Content) ?
+                m.Attachments.Select(x => x.Url).
+                Where(x => !x.EndsWith(".png") && !x.EndsWith(".jpg")).
+                Union(new string[] { "-" }).
+                Aggregate((x, y) => y == "-" ? x : x + " " + y) : m.Content);
+            try
+            {
+                if (m.Attachments.Count > 0)
+                    Embed.WithThumbnailUrl(m.Attachments.ElementAt(0).Url);
+            }
+            catch { }
+            return Embed;
         }
     }
 

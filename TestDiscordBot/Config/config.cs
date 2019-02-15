@@ -8,8 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace TestDiscordBot.Config
 {
@@ -17,8 +15,15 @@ namespace TestDiscordBot.Config
     {
         static string configPath = Global.CurrentExecutablePath + "\\config.json";
         public static configData Data = new configData();
-        static Loader L = new Loader();
         
+        static config()
+        {
+            if (config.Exists())
+                config.Load();
+            else
+                config.Data = new configData();
+        }
+
         public static string getConfigPath()
         {
             return configPath;
@@ -82,16 +87,6 @@ namespace TestDiscordBot.Config
             }
 
             return output;
-        }
-    }
-    public class Loader
-    {
-        public Loader()
-        {
-            if (config.Exists())
-                config.Load();
-            else
-                config.Data = new configData();
         }
     }
 }
