@@ -107,8 +107,9 @@ namespace TestDiscordBot
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    Console.WriteLine(g.Name + "\t" + g.Id);
+                    Global.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
             } catch { Global.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.Write(CurrentChannel);
@@ -275,11 +276,11 @@ namespace TestDiscordBot
                     // TODO: Test
                     try
                     {
-                        Global.ConsoleWriteLine(String.Join("\n", getGuildFromID(479950092938248193).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
-                else if (input.StartsWith("/roles"))
+                else if (input.StartsWith("/roles")) // ServerID
                 {
                     string[] split = input.Split(' ');
                     try
@@ -288,7 +289,28 @@ namespace TestDiscordBot
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
-                else if (input.StartsWith("/channels"))
+                else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
+                {
+                    string[] split = input.Split(' ');
+                    try
+                    {
+                        Global.ConsoleWriteLine(getGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
+                            Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+                else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
+                {
+                    string[] split = input.Split(' ');
+                    try
+                    {
+                        await getGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
+                            AddRoleAsync(getGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
+                        Global.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+                else if (input.StartsWith("/channels")) // ChannelID
                 {
                     string[] split = input.Split(' ');
                     try
@@ -297,7 +319,7 @@ namespace TestDiscordBot
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
-                else if (input.StartsWith("/read"))
+                else if (input.StartsWith("/read")) // ChannelID
                 {
                     string[] split = input.Split(' ');
                     try
@@ -309,7 +331,6 @@ namespace TestDiscordBot
                 }
                 else
                     Global.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
-                // /read 479955914837852172
             }
             #endregion
 
