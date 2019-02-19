@@ -407,13 +407,15 @@ namespace TestDiscordBot
             }
             catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
         }
-        private async Task Client_Ready()
+        private Task Client_Ready()
         {
             clientReady = true;
+            return Task.FromResult(0);
         }
-        private async Task Log(LogMessage msg)
+        private Task Log(LogMessage msg)
         {
             Global.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
+            return Task.FromResult(0);
         }
         private async Task MessageReceived(SocketMessage message)
         {
@@ -570,7 +572,7 @@ namespace TestDiscordBot
             }
             return false;
         }
-        static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected // Pinvoke
+        static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
         private delegate bool ConsoleEventDelegate(int eventType);
         
         // Imports

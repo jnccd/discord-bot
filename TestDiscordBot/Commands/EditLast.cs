@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using XnaGeometry;
 
 namespace TestDiscordBot.Commands
 {
@@ -47,7 +47,7 @@ namespace TestDiscordBot.Commands
                     EmbedBuilder Embed = lastText.toEmbed();
                     Embed.AddField("Crosspost from: ", $"<#{message.Channel.Id}>");
                     await Global.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
-                } catch (Exception e) { }
+                } catch { }
             }),
             new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
@@ -126,21 +126,21 @@ namespace TestDiscordBot.Commands
             double cos = 0;
             double sin = 0;
             float div = ((within.Width + within.Height) / 7);
-            float maxDistance = (center / div).LengthSquared();
+            float maxDistance = (float)(center / div).LengthSquared();
             switch (mode)
             {
                 case TransformMode.Expand:
-                    transformedLength = (diff / div).LengthSquared() * strength;
+                    transformedLength = (float)(diff / div).LengthSquared() * strength;
                     target = point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
                     break;
 
                 case TransformMode.Collapse:
-                    transformedLength = (diff / div).LengthSquared() * strength;
+                    transformedLength = (float)(diff / div).LengthSquared() * strength;
                     target = point + diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
                     break;
 
                 case TransformMode.Stir:
-                    transformedLength = (diff / div).LengthSquared() * strength;
+                    transformedLength = (float)(diff / div).LengthSquared() * strength;
                     rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
@@ -149,7 +149,7 @@ namespace TestDiscordBot.Commands
                     break;
 
                 case TransformMode.Fall:
-                    transformedLength = (diff / div).LengthSquared() * strength;
+                    transformedLength = (float)(diff / div).LengthSquared() * strength;
                     rotationAngle = transformedLength / 3;
                     cos = Math.Cos(rotationAngle);
                     sin = Math.Sin(rotationAngle);
@@ -158,9 +158,9 @@ namespace TestDiscordBot.Commands
                     break;
             }
 
-            if (float.IsNaN(target.X) || float.IsInfinity(target.X))
+            if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
                 target.X = point.X;
-            if (float.IsNaN(target.Y) || float.IsInfinity(target.Y))
+            if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
                 target.Y = point.Y;
             if (target.X < 0)
                 target.X = 0;
