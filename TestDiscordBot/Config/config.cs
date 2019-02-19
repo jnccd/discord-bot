@@ -34,16 +34,10 @@ namespace TestDiscordBot.Config
         }
         public static void Save()
         {
-            //XmlSerializer serializer = new XmlSerializer(typeof(configData));
-            //using (TextWriter writer = new StreamWriter(configPath))
-            //    serializer.Serialize(writer, Data);
             File.WriteAllText(configPath, JsonConvert.SerializeObject(Data));
         }
         public static void Load()
         {
-            //XmlSerializer deserializer = new XmlSerializer(typeof(configData));
-            //using (TextReader reader = new StreamReader(configPath))
-            //    Data = (configData)deserializer.Deserialize(reader);
             if (Exists())
                 Data = JsonConvert.DeserializeObject<configData>(File.ReadAllText(configPath));
             else

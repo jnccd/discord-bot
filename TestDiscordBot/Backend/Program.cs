@@ -36,7 +36,8 @@ namespace TestDiscordBot
                                from assemblyType in domainAssembly.GetTypes()
                                where assemblyType.IsSubclassOf(typeof(Command))
                                select assemblyType).ToArray();
-        
+        EmbedBuilder HelpMenu = new EmbedBuilder();
+
         static void Main(string[] args)
             => Global.P.MainAsync().GetAwaiter().GetResult();
 
@@ -52,7 +53,7 @@ namespace TestDiscordBot
             try
             {
                 buildDate = File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n');
-                Console.WriteLine("Build from: " + buildDate);
+                Global.ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
             } catch {
                 if (buildDate == null)
                     buildDate = "Error: Couldn't read build date!";
@@ -101,9 +102,26 @@ namespace TestDiscordBot
             await client.SetGameAsync("Type " + Global.prefix + "help");
 #endif
             Global.Master = client.GetUser(300699566041202699);
+
+            // Build HelpMenu
+            HelpMenu.WithColor(0, 128, 255);
+            for (int i = 0; i < commands.Length; i++)
+            {
+                if (commands[i].command != "" && !commands[i].isHidden)
+                {
+                    string desc = ((commands[i].desc == null ? "" : commands[i].desc + "   ")).Trim(' ');
+                    HelpMenu.AddField(commands[i].prefix + commands[i].command + (commands[i].isExperimental ? " [EXPERIMENTAL]" : ""),
+                        desc == null || desc == "" ? "-" : desc, true);
+                }
+            }
+            HelpMenu.WithDescription("I was made by " + Global.Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+            HelpMenu.WithFooter("Current Build from: " + buildDate);
+            HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
+
+            // Startup Console Display
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.CursorLeft = 0;
-            Console.WriteLine("Active on the following Servers: ");
+            Global.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
             try
             {
                 foreach (SocketGuild g in client.Guilds)
@@ -395,10 +413,7 @@ namespace TestDiscordBot
         }
         private async Task Log(LogMessage msg)
         {
-            Console.CursorLeft = 0;
-            Console.WriteLine(msg.ToString());
-            if (clientReady)
-                Console.Write("$");
+            Global.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
         }
         private async Task MessageReceived(SocketMessage message)
         {
@@ -412,7 +427,7 @@ namespace TestDiscordBot
 
                 if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 {
-                    Task.Run(() => {
+                    await Task.Run(() => {
                         foreach (Command c in commands)
                         {
                             try
@@ -440,29 +455,7 @@ namespace TestDiscordBot
 
             if (message.Content == Global.prefix + "help")
             {
-                #region get Help
-                List<Command> commandsLeft = commands.ToList();
-                while (commandsLeft.Count > 0)
-                {
-                    EmbedBuilder Embed = new EmbedBuilder();
-                    Embed.WithColor(0, 128, 255);
-                    for (int i = 0; i < 24 && commandsLeft.Count > 0; i++)
-                    {
-                        if (commandsLeft[0].command != "" && !commandsLeft[0].isHidden)
-                        {
-                            string desc = ((commandsLeft[0].desc == null ? "" : commandsLeft[0].desc + "   ")).Trim(' ');
-                            Embed.AddField(commandsLeft[0].prefix + commandsLeft[0].command + (commandsLeft[0].isExperimental ? " [EXPERIMENTAL]" : ""), 
-                                desc == null || desc == "" ? "-" : desc, true);
-                        }
-                        commandsLeft.RemoveAt(0);
-                    }
-                    
-                    Embed.WithDescription("I was made by " + Global.Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
-                    Embed.WithFooter("Current Build from: " + buildDate);
-                    Embed.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
-                    await Global.SendEmbed(Embed, message.Channel);
-                }
-                #endregion
+                await Global.SendEmbed(HelpMenu, message.Channel);
             }
             else
             {
