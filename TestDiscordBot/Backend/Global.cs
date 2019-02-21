@@ -17,52 +17,26 @@ namespace TestDiscordBot
 {
     public static class Global
     {
-        static SocketUser MasterP;
-        static Random RDMP = new Random();
-        static Program PP = new Program();
-        static string CurrentExecutablePathP = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public const string prefix = "$";
-
-        public static string CurrentExecutablePath
-        {
-            get
-            {
-                return CurrentExecutablePathP;
-            }
-        }
-        public static Program P
-        {
-            get
-            {
-                return PP;
-            }
-        }
-        public static Random RDM
-        {
-            get
-            {
-                return RDMP;
-            }
-        }
-        public static SocketUser Master
-        {
-            get
-            {
-                return MasterP;
-            }
+        public static SocketUser Master {
+            get { return Master; }
             set
             {
-                if (MasterP == null)
-                    MasterP = value;
+                if (Master == null)
+                    Master = value;
                 else
                     throw new FieldAccessException("The Master may only be set once!");
             }
         }
+        public static Random RDM { get; private set; } = new Random();
+        public static Program P { get; private set; } = new Program();
+        public static string CurrentExecutablePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public const string prefix = "$";
+        
         public static ulong OwnID
         {
             get
             {
-                return PP.getSelf().Id;
+                return P.GetSelf().Id;
             }
         } 
         
@@ -104,7 +78,7 @@ namespace TestDiscordBot
         }
         public static async Task SendText(string text, ulong ChannelID)
         {
-            await SendText(text, (ISocketMessageChannel)P.getChannelFromID(ChannelID));
+            await SendText(text, (ISocketMessageChannel)P.GetChannelFromID(ChannelID));
         }
         public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
         {
@@ -267,7 +241,7 @@ namespace TestDiscordBot
         }
         public static ulong GetServerID(this SocketMessage m)
         {
-            return P.getGuildFromChannel(m.Channel).Id;
+            return P.GetGuildFromChannel(m.Channel).Id;
         }
         public static string ContainsPictureLink(this string str)
         {
@@ -297,7 +271,7 @@ namespace TestDiscordBot
                     o += char.ToLower(s[i]);
             return o;
         }
-        public static EmbedBuilder toEmbed(this IMessage m)
+        public static EmbedBuilder ToEmbed(this IMessage m)
         {
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);

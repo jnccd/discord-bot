@@ -21,7 +21,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async void onConnected()
+        public override async void OnConnected()
         {
             DateTime start = DateTime.Now;
             string input = "";
@@ -34,7 +34,7 @@ namespace TestDiscordBot.Commands
                 config.Data.LoadedMarkovTextFiles.Clear();
 
                 // Load from Discord
-                foreach (SocketGuild guild in Global.P.getGuilds())
+                foreach (SocketGuild guild in Global.P.GetGuilds())
                     if (guild.Id != 473991188974927882)
                         foreach (SocketChannel channel in guild.Channels)
                             if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
@@ -68,7 +68,7 @@ namespace TestDiscordBot.Commands
             loadedDict = true;
             Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
-        public override async void onNonCommandMessageRecieved(SocketMessage message)
+        public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
             IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync(2).Flatten();
             if (messages.Count() == 2)
@@ -76,7 +76,7 @@ namespace TestDiscordBot.Commands
             else
                 MarkovHelper.AddToDict(message.Content);
         }
-        public override void onExit()
+        public override void OnExit()
         {
             if (loadedDict)
                 MarkovHelper.SaveDict();

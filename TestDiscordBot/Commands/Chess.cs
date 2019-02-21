@@ -26,10 +26,10 @@ namespace TestDiscordBot.Commands
             {
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
-                Embed.AddField(prefix + command + " newGame + a mentioned user", "Creates a new game against the mentioned user");
-                Embed.AddField(prefix + command + " move + 2 coordinates", "Moves a chess piece from the first point to the second\n" +
-                    "eg. " + prefix + command + " move 1,1 3,1");
-                Embed.AddField(prefix + command + " game", "Prints the game you are currently in");
+                Embed.AddField(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+                Embed.AddField(Prefix + CommandLine + " move + 2 coordinates", "Moves a chess piece from the first point to the second\n" +
+                    "eg. " + Prefix + CommandLine + " move 1,1 3,1");
+                Embed.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
                 Embed.WithDescription("Chess Commands:");
                 await Global.SendEmbed(Embed, commandmessage.Channel);
             }
@@ -147,7 +147,7 @@ namespace TestDiscordBot.Commands
             string re = "";
 
             if (Board.PlayerTop.UserID != 0)
-                re += Global.P.getUserFromId(Board.PlayerTop.UserID).Mention + "\n";
+                re += Global.P.GetUserFromId(Board.PlayerTop.UserID).Mention + "\n";
             else
                 re += "Unknown Player\n";
 
@@ -230,7 +230,7 @@ namespace TestDiscordBot.Commands
             re += "\n```";
 
             if (Board.PlayerBottom.UserID != 0)
-                re += Global.P.getUserFromId(Board.PlayerBottom.UserID).Mention;
+                re += Global.P.GetUserFromId(Board.PlayerBottom.UserID).Mention;
             else
                 re += "Unknown Player";
 
