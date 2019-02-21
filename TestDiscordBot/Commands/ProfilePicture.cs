@@ -16,11 +16,11 @@ namespace TestDiscordBot.Commands
 
         public override async Task execute(SocketMessage commandmessage)
         {
-            SocketUser Target;
+            SocketUser target;
             if (commandmessage.MentionedUsers.Count > 0)
-                Target = commandmessage.MentionedUsers.ElementAt(0);
+                target = commandmessage.MentionedUsers.ElementAt(0);
             else
-                Target = commandmessage.Author;
+                target = commandmessage.Author;
 
             ushort size = 512;
             try
@@ -34,7 +34,14 @@ namespace TestDiscordBot.Commands
             }
             catch { }
 
-            await Global.SendText(Target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel);
+            try
+            {
+                await Global.SendText(target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel);
+            }
+            catch
+            {
+                await Global.SendText("That guy doesn't have a profile Picture UwU", commandmessage.Channel);
+            }
         }
     }
 }

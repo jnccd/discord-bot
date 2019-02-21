@@ -10,67 +10,39 @@ namespace TestDiscordBot
 {
     public class Command
     {
-        private string descP;
-        private string commandP;
-        private bool isExperimentalP;
-        private bool isHiddenP;
+        public string Desc { get; private set; }
+        public string CommandLine { get; private set; }
+        public bool IsExperimental { get; private set; }
+        public bool IsHidden { get; private set; }
 
-        public string desc
-        {
-            get
-            {
-                return descP;
-            }
-        }
-        public string prefix
+        public string Prefix
         {
             get
             {
                 return Global.prefix;
             }
         }
-        public string command
+        public string PrefixAndCommand
         {
             get
             {
-                return commandP;
-            }
-        }
-        public bool isExperimental
-        {
-            get
-            {
-                return isExperimentalP;
-            }
-        }
-        public bool isHidden
-        {
-            get
-            {
-                return isHiddenP;
-            }
-        }
-        public string prefixAndCommand
-        {
-            get
-            {
-                return prefix + command;
+                return Prefix + CommandLine;
             }
         }
 
         public Command(string command, string desc, bool isExperimental)
         {
-            descP = desc;
-            commandP = command;
-            isExperimentalP = isExperimental;
-            isHiddenP = false;
+            Desc = desc;
+            CommandLine = command;
+            IsExperimental = isExperimental;
+            IsHidden = false;
         }
         public Command(string command, string desc, bool isExperimental, bool isHidden)
         {
-            descP = desc;
-            commandP = command;
-            isExperimentalP = isExperimental;
-            isHiddenP = isHidden;
+            Desc = desc;
+            CommandLine = command;
+            IsExperimental = isExperimental;
+            IsHidden = isHidden;
         }
 
         public virtual async Task execute(SocketMessage message)
@@ -78,15 +50,15 @@ namespace TestDiscordBot
             
         }
 
-        public virtual void onNonCommandMessageRecieved(SocketMessage message)
+        public virtual void OnNonCommandMessageRecieved(SocketMessage message)
         {
 
         }
-        public virtual void onConnected()
+        public virtual void OnConnected()
         {
 
         }
-        public virtual void onExit()
+        public virtual void OnExit()
         {
 
         }

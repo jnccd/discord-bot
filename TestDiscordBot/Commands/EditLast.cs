@@ -43,8 +43,8 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("Crosspost", "Crossposts the message into another channel", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 try
                 {
-                    SocketChannel targetChannel = Global.P.getChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
-                    EmbedBuilder Embed = lastText.toEmbed();
+                    SocketChannel targetChannel = Global.P.GetChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
+                    EmbedBuilder Embed = lastText.ToEmbed();
                     Embed.AddField("Crosspost from: ", $"<#{message.Channel.Id}>");
                     await Global.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
                 } catch { }
@@ -210,7 +210,7 @@ namespace TestDiscordBot.Commands
                 Embed.WithColor(0, 128, 255);
                 foreach (EditLastCommand ecommand in Commands)
                 {
-                    Embed.AddField(prefix + command + " " + ecommand.command, ecommand.desc);
+                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
                 }
                 Embed.WithDescription("EditLast Commands:");
                 await Global.SendEmbed(Embed, message.Channel);

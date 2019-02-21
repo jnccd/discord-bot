@@ -110,7 +110,7 @@ namespace TestDiscordBot
                 // delete "Sending video post. Please wait..." message
                 IEnumerable<IMessage> messages = await Channel.GetMessagesAsync().Flatten();
                 foreach (IMessage m in messages)
-                    if (m.Author.Id == Global.P.getSelf().Id && m.Content == "Sending video post. Please wait...")
+                    if (m.Author.Id == Global.P.GetSelf().Id && m.Content == "Sending video post. Please wait...")
                     {
                         await m.DeleteAsync();
                         break;

@@ -16,11 +16,11 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async void onNonCommandMessageRecieved(SocketMessage message)
+        public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
             if (message.Content.Contains("https://discordapp.com/channels/") &&
                 message.Channel is SocketGuildChannel && 
-                config.Data.MessagePreviewServers.Contains(Global.P.getGuildFromChannel(message.Channel).Id))
+                config.Data.MessagePreviewServers.Contains(Global.P.GetGuildFromChannel(message.Channel).Id))
             {
                 string[] split = message.Content.Split(new char[] { ' ', '\n' });
                 foreach (string s in split)
@@ -29,7 +29,7 @@ namespace TestDiscordBot.Commands
                         try
                         {
                             IMessage m = await message.Channel.GetMessageAsync(Convert.ToUInt64(s.Split('/').Last()));
-                            EmbedBuilder Embed = m.toEmbed();
+                            EmbedBuilder Embed = m.ToEmbed();
                             Embed.AddField("Preview for: ", s);
                             await Global.SendEmbed(Embed, message.Channel);
                         } catch (Exception e) { }
@@ -41,7 +41,7 @@ namespace TestDiscordBot.Commands
         {
             if (message.Channel is SocketGuildChannel)
             {
-                SocketGuild guild = Global.P.getGuildFromChannel(message.Channel);
+                SocketGuild guild = Global.P.GetGuildFromChannel(message.Channel);
                 if (message.Author.Id == guild.OwnerId || message.Author.Id == Global.Master.Id)
                 {
                     if (config.Data.MessagePreviewServers.Contains(guild.Id))

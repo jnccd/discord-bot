@@ -65,7 +65,7 @@ namespace TestDiscordBot.Config
                         {
                             try
                             {
-                                ISocketMessageChannel Channel = (ISocketMessageChannel)Global.P.getChannelFromID((ulong)e.Current);
+                                ISocketMessageChannel Channel = (ISocketMessageChannel)Global.P.GetChannelFromID((ulong)e.Current);
                                 output += " - Name: " + Channel.Name + " - Server: " + ((SocketGuildChannel)Channel).Guild.Name + "\n";
                             }
                             catch { output += "\n"; }

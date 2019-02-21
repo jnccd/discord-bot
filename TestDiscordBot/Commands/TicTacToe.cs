@@ -24,10 +24,10 @@ namespace TestDiscordBot.Commands
             {
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
-                Embed.AddField(prefix + command + " newGame + a mentioned user", "Creates a new game against the mentioned user");
-                Embed.AddField(prefix + command + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " +
-                    "no spaces allowed eg. " + prefix + command + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
-                Embed.AddField(prefix + command + " game", "Prints the game you are currently in");
+                Embed.AddField(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+                Embed.AddField(Prefix + CommandLine + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " +
+                    "no spaces allowed eg. " + Prefix + CommandLine + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
+                Embed.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
                 Embed.WithDescription("TicTacToe Commands:");
                 await Global.SendEmbed(Embed, commandmessage.Channel);
             }
@@ -51,7 +51,7 @@ namespace TestDiscordBot.Commands
                     {
                         if (commandmessage.MentionedUsers.ElementAt(0).IsBot)
                         {
-                            if (commandmessage.MentionedUsers.ElementAt(0).Id == Global.P.getSelf().Id)
+                            if (commandmessage.MentionedUsers.ElementAt(0).Id == Global.P.GetSelf().Id)
                                 await Global.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel);
                             else
                                 await Global.SendText("You cant play with a bot!", commandmessage.Channel);

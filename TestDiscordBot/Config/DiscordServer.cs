@@ -25,7 +25,7 @@ namespace TestDiscordBot.Config
 
         public void UpdateEmojis()
         {
-            SocketGuild guild = Global.P.getGuildFromID(ServerID);
+            SocketGuild guild = Global.P.GetGuildFromID(ServerID);
             IReadOnlyCollection<GuildEmote> emotes = guild.Emotes;
             for (int i = 0; i < EmojiUsage.Keys.Count; i++)
             {

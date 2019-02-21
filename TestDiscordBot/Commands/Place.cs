@@ -25,7 +25,7 @@ namespace TestDiscordBot.Commands
                 (string[] split, ISocketMessageChannel Channel) => { return true; },
                 async (SocketMessage commandmessage, string filePath, string[] split) => { await Global.SendFile(filePath, commandmessage.Channel); }),
             new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) + 
-            ")\neg. " + prefix + command + " drawPixel 10,45 Red",
+            ")\neg. " + Prefix + CommandLine + " drawPixel 10,45 Red",
                 (string[] split, ISocketMessageChannel Channel) => {
 
                     int X, Y;
@@ -87,7 +87,7 @@ namespace TestDiscordBot.Commands
 
                 }),
             new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
-            ")\neg. " + prefix + command + " drawCircle 100,450 Red 25",
+            ")\neg. " + Prefix + CommandLine + " drawCircle 100,450 Red 25",
                 (string[] split, ISocketMessageChannel Channel) => {
 
                     int X, Y, S;
@@ -167,7 +167,7 @@ namespace TestDiscordBot.Commands
 
                 }),
             new PlaceCommand("drawRekt", "Draws a rectangle in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
-            ") and size\neg. " + prefix + command + " drawRekt 100,250 Red 200,100",
+            ") and size\neg. " + Prefix + CommandLine + " drawRekt 100,250 Red 200,100",
                 (string[] split, ISocketMessageChannel Channel) => {
 
                     int X, Y, W, H;
@@ -244,7 +244,7 @@ namespace TestDiscordBot.Commands
 
                 }),
             new PlaceCommand("drawString", "Draws a string in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
-            ")\neg. " + prefix + command + " drawString 100,250 Red OwO what dis",
+            ")\neg. " + Prefix + CommandLine + " drawString 100,250 Red OwO what dis",
                 (string[] split, ISocketMessageChannel Channel) => {
 
                     int X, Y, S;
@@ -333,7 +333,7 @@ namespace TestDiscordBot.Commands
                 Embed.WithColor(0, 128, 255);
                 foreach (PlaceCommand Pcommand in subCommands)
                 {
-                    Embed.AddField(prefix + command + " " + Pcommand.command, Pcommand.desc);
+                    Embed.AddField(Prefix + CommandLine + " " + Pcommand.command, Pcommand.desc);
                 }
                 Embed.WithDescription("Place Commands:");
                 await Global.SendEmbed(Embed, message.Channel);

@@ -29,7 +29,7 @@ namespace TestDiscordBot.Commands
             server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
                 try
                 {
-                    while (!Global.P.isConnected) { Thread.Sleep(20); }
+                    while (!Global.P.ClientReady) { Thread.Sleep(20); }
                     //Global.ConsoleWriteLine("Recieved: " + text, ConsoleColor.Yellow);
 
                     if (string.IsNullOrWhiteSpace(text) || !text.Contains('ↅ'))
@@ -63,7 +63,7 @@ namespace TestDiscordBot.Commands
                                             notifications.Add(new notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
                                     }
                         foreach (notif n in notifications)
-                            await Global.SendText(n.userID.Select(x => Global.P.getUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
+                            await Global.SendText(n.userID.Select(x => Global.P.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
                     }
                     else if (encoding[0] == "Void-Trader")
                     {
@@ -87,7 +87,7 @@ namespace TestDiscordBot.Commands
 
                         foreach (ulong id in channels)
                         {
-                            SocketChannel channel = Global.P.getChannelFromID(id);
+                            SocketChannel channel = Global.P.GetChannelFromID(id);
                             if (channel is ISocketMessageChannel)
                             {
                                 //await Global.SendText(config.Data.UserList.Where(x => x.WarframeChannelID == id && x.WarframeFilters.Count != 0)
@@ -115,11 +115,11 @@ namespace TestDiscordBot.Commands
             if (split.Length == 1)
             {
                 await Global.SendText("```ruby\n" +
-                                      "Use \"" + prefixAndCommand + " state\" to view the worldState.\n" +
-                                      "Use \"" + prefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
-                                      "Use \"" + prefixAndCommand + " -FILTER\" to remove a filter.\n" +
-                                      "Use \"" + prefixAndCommand + " filters\" to view your filters.\n" +
-                                      "eg. \"" + prefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
+                                      "Use \"" + PrefixAndCommand + " state\" to view the worldState.\n" +
+                                      "Use \"" + PrefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
+                                      "Use \"" + PrefixAndCommand + " -FILTER\" to remove a filter.\n" +
+                                      "Use \"" + PrefixAndCommand + " filters\" to view your filters.\n" +
+                                      "eg. \"" + PrefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
                                       "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" + 
                                       "               You can also add a 'multifilter' by binding two or more filters together with a &\n" + 
                                       "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +

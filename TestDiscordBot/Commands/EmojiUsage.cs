@@ -16,13 +16,13 @@ namespace TestDiscordBot.Commands
             
         }
 
-        public override void onConnected()
+        public override void OnConnected()
         {
             foreach (DiscordServer server in config.Data.ServerList)
                 server.UpdateEmojis();
         }
 
-        public override void onNonCommandMessageRecieved(SocketMessage message)
+        public override void OnNonCommandMessageRecieved(SocketMessage message)
         {
             int userIndex = config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
             if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)

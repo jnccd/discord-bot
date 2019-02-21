@@ -18,7 +18,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override void onConnected()
+        public override void OnConnected()
         {
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -46,7 +46,7 @@ namespace TestDiscordBot.Commands
                             Embed.WithColor(0, 128, 255);
                             Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
-                            Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.getChannelFromID(id));
+                            Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.GetChannelFromID(id));
                         } catch (Exception e) {
                             Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                         }
@@ -63,7 +63,7 @@ namespace TestDiscordBot.Commands
         {
             if (commandmessage.Channel is SocketGuildChannel)
             {
-                if (commandmessage.Author.Id == Global.P.getGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
+                if (commandmessage.Author.Id == Global.P.GetGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
                 {
                     if (config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                     {

@@ -51,7 +51,7 @@ namespace TestDiscordBot.Commands
                 Embed.WithColor(0, 128, 255);
                 foreach (Reaction react in reactions)
                 {
-                    Embed.AddField(prefix + command + " " + react.name, react.desc);
+                    Embed.AddField(Prefix + CommandLine + " " + react.name, react.desc);
                 }
                 Embed.WithDescription("Reactions:");
                 await Global.SendEmbed(Embed, message.Channel);
