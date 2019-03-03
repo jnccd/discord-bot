@@ -65,7 +65,7 @@ namespace TestDiscordBot.Commands
                         embed.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
 
                     if (WarframeHandler.worldState.WS_Invasions.Count != 0)
-                        embed.AddField("Invasions:", WarframeHandler.worldState.WS_Invasions.Where(x => x.IsCompleted).
+                        embed.AddField("Invasions:", WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted).
                             Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
 
                     if (WarframeHandler.worldState.WS_Fissures.Count != 0)
@@ -86,7 +86,6 @@ namespace TestDiscordBot.Commands
                     foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
                     {
                         embed.AddField(mission.Syndicate, "Missions: ");
-                        string jobs = "";
                         for (int i = 0; i < mission.jobs.Count; i++)
                             if (mission.jobs[i].rewardPool != null)
                                 embed.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
@@ -156,6 +155,9 @@ namespace TestDiscordBot.Commands
                     NotifyVoidtrader();
                     SendNotifications(GetNotifications());
                 }
+
+                while (config.Data.WarframeIDList.Count > 250)
+                    config.Data.WarframeIDList.RemoveAt(0);
             }
         }
         bool UpdatedWarframeHandlerSuccessfully()
