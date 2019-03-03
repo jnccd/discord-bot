@@ -228,7 +228,7 @@ namespace TestDiscordBot.Commands
             foreach (string line in textNotifications)
                 foreach (DiscordUser user in config.Data.UserList)
                     foreach (string filter in user.WarframeFilters)
-                        if (line.ContainsAllOf(filter.Split('&')))
+                        if (BooleanContainsAllOf(line, filter))
                         {
                             Notif notification = notifications.FirstOrDefault(x => x.ChannelID == user.WarframeChannelID && x.line == line);
                             if (notification != null && !notification.userID.Contains(user.UserID))
@@ -238,6 +238,21 @@ namespace TestDiscordBot.Commands
                         }
             foreach (Notif n in notifications)
                 await Global.SendText(n.userID.Select(x => Global.P.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
+        }
+        bool BooleanContainsAllOf(string s, string match)
+        {
+            string[] matches = match.Split('&');
+            foreach (string m in matches)
+            {
+                if (m[0] == '!')
+                {
+                    if (s.Contains(m.Remove(0, 1)))
+                        return false;
+                }
+                else if (!s.Contains(m))
+                    return false;
+            }
+            return true;
         }
     }
 }
