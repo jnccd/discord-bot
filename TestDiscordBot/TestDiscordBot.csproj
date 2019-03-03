@@ -138,10 +138,30 @@
     <Compile Include="HelperClasses\xnageometry\Vector3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperClasses\RedditHelper.cs" />
-    <Compile Include="Remotable\Cache.cs" />
-    <Compile Include="Remotable\frmRServer.cs" />
-    <Compile Include="Remotable\IObserver.cs" />
-    <Compile Include="Remotable\MyRemotableObject.cs" />
+    <Compile Include="Warframe\WarframeHandler.cs" />
+    <Compile Include="Warframe\WarframeObjects\Alert.cs" />
+    <Compile Include="Warframe\WarframeObjects\Cetuscycle.cs" />
+    <Compile Include="Warframe\WarframeObjects\ConclaveChallenge.cs" />
+    <Compile Include="Warframe\WarframeObjects\CountedItem.cs" />
+    <Compile Include="Warframe\WarframeObjects\DailyDeal.cs" />
+    <Compile Include="Warframe\WarframeObjects\DarkSector.cs" />
+    <Compile Include="Warframe\WarframeObjects\Earthcycle.cs" />
+    <Compile Include="Warframe\WarframeObjects\Event.cs" />
+    <Compile Include="Warframe\WarframeObjects\Fissure.cs" />
+    <Compile Include="Warframe\WarframeObjects\FlashSale.cs" />
+    <Compile Include="Warframe\WarframeObjects\FortunaCycle.cs" />
+    <Compile Include="Warframe\WarframeObjects\GlobalUpgrade.cs" />
+    <Compile Include="Warframe\WarframeObjects\Invasion.cs" />
+    <Compile Include="Warframe\WarframeObjects\Mission.cs" />
+    <Compile Include="Warframe\WarframeObjects\NewsArticle.cs" />
+    <Compile Include="Warframe\WarframeObjects\PersistentEnemy.cs" />
+    <Compile Include="Warframe\WarframeObjects\Reward.cs" />
+    <Compile Include="Warframe\WarframeObjects\Simaris.cs" />
+    <Compile Include="Warframe\WarframeObjects\Sortie.cs" />
+    <Compile Include="Warframe\WarframeObjects\SyndicateJob.cs" />
+    <Compile Include="Warframe\WarframeObjects\SyndicateMission.cs" />
+    <Compile Include="Warframe\WarframeObjects\VoidTrader.cs" />
+    <Compile Include="Warframe\WarframeObjects\WorldState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -1194,6 +1214,7 @@
     <Content Include="Resources\MarkowSources\HarryPotterFanfictions.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Warframe\WarframeObjects\License.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\Reactions\" />

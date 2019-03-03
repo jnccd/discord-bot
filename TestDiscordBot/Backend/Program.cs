@@ -499,8 +499,6 @@ namespace TestDiscordBot
         }
         private async Task ExecuteCommand(Command command, SocketMessage message)
         {
-            Global.ConsoleWriteLine(message.GetType().FullName, ConsoleColor.Cyan);
-
             if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
             {
                 await Global.SendText("Experimental commands cant be used here!", message.Channel);

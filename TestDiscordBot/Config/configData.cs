@@ -19,6 +19,8 @@ namespace TestDiscordBot.Config
         public List<string> LoadedMarkovTextFiles;
         public string LastCommitMessage;
         public List<ulong> MessagePreviewServers;
+        public bool WarframeVoidTraderArrived;
+        public List<string> WarframeIDList;
 
         public configData()
         {
@@ -32,6 +34,7 @@ namespace TestDiscordBot.Config
             WarframeSubscribedChannels = new List<ulong>();
             LoadedMarkovTextFiles = new List<string>();
             MessagePreviewServers = new List<ulong>();
+            WarframeIDList = new List<string>();
         }
     }
 }
