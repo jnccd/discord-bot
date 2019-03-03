@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using RemotableObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using TestDiscordBot.Config;
+using Warframe_Alerts;
+using WarframeNET;
 
 namespace TestDiscordBot.Commands
 {
     public class Warframe : Command
     {
-        frmRServer server;
-        string worldState;
+        const int updateIntervalMin = 5;
+        private readonly string lockject = "";
 
-        public class notif
+        public class Notif
         {
             public List<ulong> userID;
             public ulong ChannelID;
@@ -26,87 +27,9 @@ namespace TestDiscordBot.Commands
 
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
-            server = new frmRServer(new frmRServer.ReceivedMessage(async (string text) => {
-                try
-                {
-                    while (!Global.P.ClientReady) { Thread.Sleep(20); }
-                    //Global.ConsoleWriteLine("Recieved: " + text, ConsoleColor.Yellow);
-
-                    if (string.IsNullOrWhiteSpace(text) || !text.Contains('ↅ'))
-                        return;
-
-                    string[] encoding = text.Split('ↅ');
-                    if (encoding.Length != 2)
-                        throw new ArgumentException("Wrong encoding");
-
-                    if (encoding[0] == "Update")
-                    {
-                        string[] split = encoding[1].Split('\n');
-                        //foreach (string line in split)
-                        //    foreach (DiscordUser user in config.Data.UserList)
-                        //        foreach (string filter in user.WarframeFilters)
-                        //            if (line.Contains(filter))
-                        //            {
-                        //                IDMChannel dm = await Global.P.getUserFromId(user.UserID).GetOrCreateDMChannelAsync();d
-                        //                await dm.SendMessageAsync(line);
-                        //            }
-                        List<notif> notifications = new List<notif>();
-                        foreach (string line in split)
-                            foreach (DiscordUser user in config.Data.UserList)
-                                foreach (string filter in user.WarframeFilters)
-                                    if (line.ContainsAllOf(filter.Split('&')))
-                                    {
-                                        notif notification = notifications.FirstOrDefault(x => x.ChannelID == user.WarframeChannelID && x.line == line);
-                                        if (notification != null && !notification.userID.Contains(user.UserID))
-                                            notification.userID.Add(user.UserID);
-                                        else
-                                            notifications.Add(new notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
-                                    }
-                        foreach (notif n in notifications)
-                            await Global.SendText(n.userID.Select(x => Global.P.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
-                    }
-                    else if (encoding[0] == "Void-Trader")
-                    {
-                        List<ulong> channels = config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
-                        string[] split = encoding[1].Split('\n');
-
-                        EmbedBuilder embed = new EmbedBuilder();
-                        embed.WithDescription(split[0]);
-                        embed.WithFooter(split[split.Length - 1].Split(' ').Take(5).Aggregate((x, y) => x + " " + y));
-                        embed.WithTitle("Baro-senpai is here :weary:");
-                        embed.WithTimestamp(new DateTimeOffset(DateTime.Parse(split[split.Length - 1].Split(' ').Skip(5).Aggregate((x, y) => x + " " + y))));
-                        string[] items = split.Skip(1).Take(split.Length - 2).ToArray();
-                        foreach (string item in items)
-                            if (item.Contains("_"))
-                            {
-                                string[] itemSplit = item.Split('_');
-                                string trimedItemName = itemSplit[0].Trim(' ');
-                                embed.AddField(trimedItemName, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" + 
-                                    HttpUtility.HtmlEncode(trimedItemName).Replace(' ', '+') + ") - " + itemSplit[1].Trim(' ').Replace('+', ' '));
-                            }
-
-                        foreach (ulong id in channels)
-                        {
-                            SocketChannel channel = Global.P.GetChannelFromID(id);
-                            if (channel is ISocketMessageChannel)
-                            {
-                                //await Global.SendText(config.Data.UserList.Where(x => x.WarframeChannelID == id && x.WarframeFilters.Count != 0)
-                                //                                          .Select(x => Global.P.getUserFromId(x.UserID).Mention)
-                                //                                          .Aggregate((x, y) => x + " " + y) + " " + encoding[1], (ISocketMessageChannel)channel); g
-                                await Global.SendEmbed(embed, (ISocketMessageChannel)channel);
-                            }
-                        }
-                    }
-                    else if (encoding[0] == "State")
-                    {
-                        worldState = encoding[1];
-                    }
-                } catch (Exception e) {
-                    Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
-                }
-            }));
+            Task.Factory.StartNew(RunNotificationLoop);
         }
-
+        
         public override async Task execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
@@ -136,44 +59,161 @@ namespace TestDiscordBot.Commands
             else if (split[1] == "state")
             {
                 EmbedBuilder embed = new EmbedBuilder();
-                embed.AddField("WorldState: ", worldState);
+
+                lock (lockject)
+                {
+                    embed.AddField("Worldstate: ", 
+                        "Cetus: " + WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " + 
+                            (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable() + "\n" +
+                        "Fortuna: " + WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " + 
+                            (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable() + "\n" +
+                        "\nFissures:\n" +
+                            WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
+                            Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
+                            Aggregate((x, y) => x + "\n" + y));
+                }
+
                 await Global.SendEmbed(embed, message.Channel);
             }
             else
             {
                 EmbedBuilder embed = new EmbedBuilder();
-                string[] filterComs = split.Skip(1).Aggregate((x, y) => x + " " + y).Split(',');
-                foreach (string filterCom in filterComs)
+                lock (lockject)
                 {
-                    string filterComTrim = filterCom.Trim(' ');
-                    if (filterComTrim.StartsWith("+"))
+                    string[] filterComs = split.Skip(1).Aggregate((x, y) => x + " " + y).Split(',');
+                    foreach (string filterCom in filterComs)
                     {
-                        string filter = filterComTrim.Remove(0, 1).Trim(' ');
-                        if (user.WarframeFilters.Contains(filter))
-                            embed.AddField("You already have that filter fam", filter);
-                        else
+                        string filterComTrim = filterCom.Trim(' ');
+                        if (filterComTrim.StartsWith("+"))
                         {
-                            user.WarframeFilters.Add(filter);
-                            embed.AddField("Added filter: ", filter);
+                            string filter = filterComTrim.Remove(0, 1).Trim(' ');
+                            if (user.WarframeFilters.Contains(filter))
+                                embed.AddField("You already have that filter fam", filter);
+                            else
+                            {
+                                user.WarframeFilters.Add(filter);
+                                embed.AddField("Added filter: ", filter);
+                            }
+                        }
+                        else if (filterComTrim.StartsWith("-"))
+                        {
+                            string filter = filterComTrim.Remove(0, 1).Trim(' ');
+                            if (user.WarframeFilters.Contains(filter))
+                            {
+                                user.WarframeFilters.Remove(filter);
+                                embed.AddField("Removed filter: ", filter);
+                            }
+                            else
+                                embed.AddField("You don't even have that filter fam", filter);
                         }
                     }
-                    else if (filterComTrim.StartsWith("-"))
-                    {
-                        string filter = filterComTrim.Remove(0, 1).Trim(' ');
-                        if (user.WarframeFilters.Contains(filter))
-                        {
-                            user.WarframeFilters.Remove(filter);
-                            embed.AddField("Removed filter: ", filter);
-                        }
-                        else
-                            embed.AddField("You don't even have that filter fam", filter);
-                    }
+                    embed.AddField("Your Filters are now: ", (user.WarframeFilters.Count == 0 ?
+                        "\n\nWell that looks pretty empty" :
+                        user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
                 }
-                embed.AddField("Your Filters are now: ", (user.WarframeFilters.Count == 0 ? 
-                    "\n\nWell that looks pretty empty" : 
-                    user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
                 await Global.SendEmbed(embed, message.Channel);
             }
+        }
+
+        void RunNotificationLoop()
+        {
+            while (!Global.P.ClientReady) { Thread.Sleep(20); }
+
+            while (true)
+            {
+                NotifyAlerts();
+                Thread.Sleep(updateIntervalMin * 60000);
+            }
+        }
+        void NotifyAlerts()
+        {
+            lock (lockject)
+            {
+                if (UpdatedWarframeHandlerSuccessfully())
+                {
+                    NotifyVoidtrader();
+                    SendNotifications(GetNotifications());
+                }
+            }
+        }
+        bool UpdatedWarframeHandlerSuccessfully()
+        {
+            string status = "";
+            string jsonResponse = WarframeHandler.GetJson(ref status);
+            if (status != "OK") return false;
+            WarframeHandler.GetJsonObjects(jsonResponse);
+            return true;
+        }
+        async void NotifyVoidtrader()
+        {
+            if (!config.Data.WarframeVoidTraderArrived && WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0)
+            {
+                List<ulong> channels = config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
+
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.WithDescription("Void trader arrived at " + WarframeHandler.worldState.WS_VoidTrader.Location + " with: ");
+                embed.WithFooter("He will leave again at " + WarframeHandler.worldState.WS_VoidTrader.EndTime);
+                embed.WithTitle("Baro-senpai is here :weary:");
+                embed.WithTimestamp(new DateTimeOffset(WarframeHandler.worldState.WS_VoidTrader.EndTime));
+                foreach (VoidTraderItem item in WarframeHandler.worldState.WS_VoidTrader.Inventory)
+                    embed.AddField(item.Item, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" +
+                             HttpUtility.HtmlEncode(item.Item).Replace(' ', '+') + ") - " + item.Credits + "c " + item.Ducats + "D");
+
+                foreach (ulong id in channels)
+                {
+                    SocketChannel channel = Global.P.GetChannelFromID(id);
+                    if (channel is ISocketMessageChannel)
+                        await Global.SendEmbed(embed, (ISocketMessageChannel)channel);
+                }
+            }
+            config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
+        }
+        List<string> GetNotifications()
+        {
+            List<string> notifications = new List<string>();
+            
+            foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions)
+                for (int i = 0; i < mission.jobs.Count; i++)
+                    if (mission.jobs[i].rewardPool != null && !config.Data.WarframeIDList.Contains(mission.jobs[i].id))
+                    {
+                        config.Data.WarframeIDList.Add(mission.jobs[i].id);
+                        foreach (string reward in mission.jobs[i].rewardPool)
+                        {
+                            notifications.Add(reward + " currently available from the " + mission.Syndicate + "'s " + (i + 1) + ". bounty until " + mission.EndTime.ToLocalTime().ToLongTimeString());
+                        }
+                    }
+            
+            foreach (Alert a in WarframeHandler.worldState.WS_Alerts)
+                if (!config.Data.WarframeIDList.Contains(a.Id))
+                {
+                    config.Data.WarframeIDList.Add(a.Id);
+                    notifications.Add(a.ToTitle() + " - Expires at " + a.EndTime.ToLocalTime().ToLongTimeString() + ", so in " + (int)(a.EndTime.ToLocalTime() - DateTime.Now).TotalMinutes + " minutes");
+                }
+            foreach (Invasion i in WarframeHandler.worldState.WS_Invasions)
+                if (!config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
+                {
+                    config.Data.WarframeIDList.Add(i.Id);
+                    notifications.Add(i.ToTitle());
+                }
+
+            return notifications;
+        }
+        async void SendNotifications(List<string> textNotifications)
+        {
+            List<Notif> notifications = new List<Notif>();
+            foreach (string line in textNotifications)
+                foreach (DiscordUser user in config.Data.UserList)
+                    foreach (string filter in user.WarframeFilters)
+                        if (line.ContainsAllOf(filter.Split('&')))
+                        {
+                            Notif notification = notifications.FirstOrDefault(x => x.ChannelID == user.WarframeChannelID && x.line == line);
+                            if (notification != null && !notification.userID.Contains(user.UserID))
+                                notification.userID.Add(user.UserID);
+                            else
+                                notifications.Add(new Notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
+                        }
+            foreach (Notif n in notifications)
+                await Global.SendText(n.userID.Select(x => Global.P.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
         }
     }
 }

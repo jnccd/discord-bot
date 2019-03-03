@@ -12,17 +12,19 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using TestDiscordBot.Config;
+using WarframeNET;
 
 namespace TestDiscordBot
 {
     public static class Global
     {
+        private static SocketUser Pmaster;
         public static SocketUser Master {
-            get { return Master; }
+            get { return Pmaster; }
             set
             {
-                if (Master == null)
-                    Master = value;
+                if (Pmaster == null)
+                    Pmaster = value;
                 else
                     throw new FieldAccessException("The Master may only be set once!");
             }
@@ -288,6 +290,29 @@ namespace TestDiscordBot
             }
             catch { }
             return Embed;
+        }
+        public static string ToTitle(this Reward r)
+        {
+            List<string> inputs = new List<string> { (r.Items.Count == 0 ? "" : r.Items.Aggregate((x, y) => x + " " + y)),
+                                                     (r.CountedItems.Count == 0 ? "" : r.CountedItems.Select(x => (x.Count > 1 ? x.Count + " " : "") + x.Type).Aggregate((x, y) => x + " " + y)),
+                                                     (r.Credits == 0 ? "" : r.Credits + "c") };
+            inputs.RemoveAll(x => string.IsNullOrWhiteSpace(x));
+            return inputs.Count == 0 ? "" : inputs.Aggregate((x, y) => (x + " - " + y));
+        }
+        public static string ToTitle(this Alert a)
+        {
+            return a.Mission.Reward.ToTitle() + " - " + a.Mission.Node;
+        }
+        public static string ToTitle(this Invasion inv)
+        {
+            return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description;
+        }
+        public static string ToReadable(this TimeSpan t)
+        {
+            return string.Format("{0}{1}{2}{3}", t.Days > 0 ? t.Days + "d " : "",
+                                                 t.Hours > 0 ? t.Hours + "h " : "",
+                                                 t.Minutes > 0 ? t.Minutes + "m " : "",
+                                                 t.Seconds > 0 ? t.Seconds + "s " : "0s ").Trim(' ');
         }
     }
 
