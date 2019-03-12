@@ -28,6 +28,10 @@ namespace TestDiscordBot.Commands
                 await Global.SendText(string.Join("", lastText.Content.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
                     "\nhttps://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
             }),
+            new EditLastCommand("crab", "Crab the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Global.SendText(":crab: " + lastText.Content + " :crab:" +
+                    "\nhttps://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel);
+            }),
             new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), message.Channel);
             }),

@@ -65,8 +65,13 @@ namespace TestDiscordBot.Commands
                         embed.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
 
                     if (WarframeHandler.worldState.WS_Invasions.Count != 0)
-                        embed.AddField("Invasions:", WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted).
-                            Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
+                    {
+                        string invStr = WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted).
+                            Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y);
+                        if (invStr.Length > 1024)
+                            invStr = invStr.Substring(0, 1024);
+                        embed.AddField("Invasions:", invStr);
+                    }
 
                     if (WarframeHandler.worldState.WS_Fissures.Count != 0)
                         embed.AddField("Fissures:", WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
