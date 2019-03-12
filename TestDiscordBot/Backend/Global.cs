@@ -305,7 +305,7 @@ namespace TestDiscordBot
         }
         public static string ToTitle(this Invasion inv)
         {
-            return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description;
+            return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description + " - " + inv.Completion  + "%";
         }
         public static string ToReadable(this TimeSpan t)
         {

@@ -44,6 +44,7 @@ namespace TestDiscordBot
         async Task MainAsync()
         {
             #region startup
+            ShowWindow(GetConsoleWindow(), 2);
             Console.ForegroundColor = ConsoleColor.White;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 
@@ -135,7 +136,6 @@ namespace TestDiscordBot
             Console.WriteLine(" on " + GetGuildFromChannel(CurrentChannel).Name);
             Console.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
-            ShowWindow(GetConsoleWindow(), 2);
             foreach (Command c in commands)
             {
                 await Task.Run(() => {
@@ -560,9 +560,9 @@ namespace TestDiscordBot
             {
                 Console.WriteLine();
                 Console.WriteLine("Closing... Files are being saved");
-                File.Copy(config.getConfigPath(), Global.CurrentExecutablePath + "\\config_backup.json", true);
                 config.Save();
             }
+            Thread.Sleep(250);
             return false;
         }
         static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
