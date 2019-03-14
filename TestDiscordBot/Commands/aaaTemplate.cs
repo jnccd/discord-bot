@@ -10,14 +10,15 @@ namespace TestDiscordBot.Commands
 {
     public class aaaTemplate : Command
     {
-        public aaaTemplate() : base("", "", true)
+        public aaaTemplate() : base("", "", true, true)
         {
 
         }
 
-        public override async Task execute(SocketMessage message)
+        public override Task Execute(SocketMessage message)
         {
             // <Insert command code here>
+            return Task.FromResult(default(object));
         }
     }
 }

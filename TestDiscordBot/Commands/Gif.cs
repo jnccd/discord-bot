@@ -14,9 +14,9 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage message)
+        public override Task Execute(SocketMessage message)
         {
-            
+            return Task.FromResult(default(object));
         }
     }
 }

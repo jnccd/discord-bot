@@ -45,9 +45,9 @@ namespace TestDiscordBot
             IsHidden = isHidden;
         }
 
-        public virtual async Task execute(SocketMessage message)
+        public virtual Task Execute(SocketMessage message)
         {
-            
+            return Task.FromResult(default(object));
         }
 
         public virtual void OnNonCommandMessageRecieved(SocketMessage message)

@@ -32,12 +32,12 @@ namespace TestDiscordBot.Commands
                             EmbedBuilder Embed = m.ToEmbed();
                             Embed.AddField("Preview for: ", s);
                             await Global.SendEmbed(Embed, message.Channel);
-                        } catch (Exception e) { }
+                        } catch { }
                     }
             }
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             if (message.Channel is SocketGuildChannel)
             {

@@ -16,7 +16,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage commandmessage)
         {
             string m = commandmessage.Content.ToLower();
             if (m.Split(' ').Length >= 4 && m.Contains("?"))

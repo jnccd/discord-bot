@@ -17,7 +17,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             if (message.Author.Id == Global.Master.Id)
             {

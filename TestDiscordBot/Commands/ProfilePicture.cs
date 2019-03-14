@@ -14,7 +14,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage commandmessage)
         {
             SocketUser target;
             if (commandmessage.MentionedUsers.Count > 0)

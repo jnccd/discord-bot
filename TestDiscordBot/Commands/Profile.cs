@@ -18,7 +18,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage commandmessage)
         {
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);

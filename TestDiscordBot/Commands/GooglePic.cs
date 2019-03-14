@@ -16,7 +16,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 

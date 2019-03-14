@@ -16,7 +16,7 @@ namespace TestDiscordBot.Commands
         string filePath = Global.CurrentExecutablePath + "\\place.png";
         const int placeSize = 500;
         const int pixelSize = 10;
-        PlaceCommand[] subCommands;
+        readonly PlaceCommand[] subCommands;
 
         public Place() : base("place", "Basically just r/place", false)
         {
@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
                     int X, Y;
                     if (split.Length != 4)
                     {
-                        Global.SendText("I need 3 arguments to draw!", Channel);
+                        Global.SendText("I need 3 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -43,13 +43,13 @@ namespace TestDiscordBot.Commands
                     }
                     catch
                     {
-                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        Global.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
                     if (X >= (placeSize / pixelSize) || Y >= (placeSize / pixelSize))
                     {
-                        Global.SendText("The picture is only " + (placeSize / pixelSize) + "x" + (placeSize / pixelSize) + " big!\nTry smaller coordinates.", Channel);
+                        Global.SendText("The picture is only " + (placeSize / pixelSize) + "x" + (placeSize / pixelSize) + " big!\nTry smaller coordinates.", Channel).Wait();
                         return false;
                     }
 
@@ -57,7 +57,7 @@ namespace TestDiscordBot.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        Global.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -83,7 +83,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }),
             new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
@@ -93,7 +93,7 @@ namespace TestDiscordBot.Commands
                     int X, Y, S;
                     if (split.Length != 5)
                     {
-                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        Global.SendText("I need 4 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -105,7 +105,7 @@ namespace TestDiscordBot.Commands
                     }
                     catch
                     {
-                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        Global.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
@@ -119,7 +119,7 @@ namespace TestDiscordBot.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        Global.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -129,13 +129,13 @@ namespace TestDiscordBot.Commands
                     }
                     catch
                     {
-                        Global.SendText("I don't understand that size, fam!", Channel);
+                        Global.SendText("I don't understand that size, fam!", Channel).Wait();
                         return false;
                     }
 
                     if (S > 100)
                     {
-                        Global.SendText("Thats a little big, don't ya think?", Channel);
+                        Global.SendText("Thats a little big, don't ya think?", Channel).Wait();
                         return false;
                     }
 
@@ -163,7 +163,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }),
             new PlaceCommand("drawRekt", "Draws a rectangle in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
@@ -173,7 +173,7 @@ namespace TestDiscordBot.Commands
                     int X, Y, W, H;
                     if (split.Length < 5)
                     {
-                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        Global.SendText("I need 4 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -185,7 +185,7 @@ namespace TestDiscordBot.Commands
                     }
                     catch
                     {
-                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        Global.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
@@ -197,13 +197,13 @@ namespace TestDiscordBot.Commands
                     }
                     catch
                     {
-                        Global.SendText("I don't understand that size, fam!", Channel);
+                        Global.SendText("I don't understand that size, fam!", Channel).Wait();
                         return false;
                     }
 
                     if (W + H > 500)
                     {
-                        Global.SendText("Thats a little big, don't ya think?", Channel);
+                        Global.SendText("Thats a little big, don't ya think?", Channel).Wait();
                         return false;
                     }
 
@@ -211,7 +211,7 @@ namespace TestDiscordBot.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        Global.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -240,17 +240,17 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }),
             new PlaceCommand("drawString", "Draws a string in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
             ")\neg. " + Prefix + CommandLine + " drawString 100,250 Red OwO what dis",
                 (string[] split, ISocketMessageChannel Channel) => {
 
-                    int X, Y, S;
+                    int X, Y;
                     if (split.Length < 5)
                     {
-                        Global.SendText("I need 4 arguments to draw!", Channel);
+                        Global.SendText("I need 4 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -262,7 +262,7 @@ namespace TestDiscordBot.Commands
                     }
                     catch
                     {
-                        Global.SendText("I don't understand those coordinates, fam!", Channel);
+                        Global.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
@@ -276,7 +276,7 @@ namespace TestDiscordBot.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Global.SendText("I dont think I know that color :thinking:", Channel);
+                        Global.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -302,7 +302,7 @@ namespace TestDiscordBot.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!");
+                    Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }) };
         }
@@ -324,7 +324,7 @@ namespace TestDiscordBot.Commands
             }
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)

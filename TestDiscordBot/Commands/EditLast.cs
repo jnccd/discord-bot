@@ -179,7 +179,7 @@ namespace TestDiscordBot.Commands
         }
         private enum TransformMode { Expand, Collapse, Stir, Fall }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
             IMessage lastText = null;
