@@ -18,7 +18,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage commandmessage)
         {
             if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length < 2 || commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "help")
             {

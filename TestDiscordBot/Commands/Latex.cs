@@ -19,7 +19,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage message)
+        public override Task Execute(SocketMessage message)
         {
             lock (this)
             {
@@ -44,10 +44,12 @@ namespace TestDiscordBot.Commands
                     converter.StandardInput.WriteLine("return");
                     converter.WaitForExit();
 
-                    Global.SendFile(Global.CurrentExecutablePath + "\\output.png", message.Channel);
+                    Global.SendFile(Global.CurrentExecutablePath + "\\output.png", message.Channel).Wait();
                 }
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
+
+            return Task.FromResult(default(object));
         }
     }
 }

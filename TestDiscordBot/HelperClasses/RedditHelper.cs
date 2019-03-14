@@ -67,7 +67,6 @@ namespace TestDiscordBot
             catch { IsVideo = false; }
 
             // Getting full res image url from the post site html
-            string postHTML = "";
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(ResultURL);
             req.KeepAlive = false;
             WebResponse W = req.GetResponse();
@@ -152,7 +151,7 @@ namespace TestDiscordBot
                     return response.StatusCode == HttpStatusCode.OK;
                 }
             }
-            catch (WebException e)
+            catch (WebException)
             {
                 return false;
             }

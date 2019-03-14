@@ -47,7 +47,7 @@ namespace TestDiscordBot.Commands
                             Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
 #if !DEBUG
-                            Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.GetChannelFromID(id));
+                            Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.GetChannelFromID(id)).Wait();
 #else
                             Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
 #endif
@@ -64,7 +64,7 @@ namespace TestDiscordBot.Commands
             return true;
         }
 
-        public override async Task execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage commandmessage)
         {
             if (commandmessage.Channel is SocketGuildChannel)
             {

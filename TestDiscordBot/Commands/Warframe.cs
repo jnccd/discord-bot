@@ -29,7 +29,7 @@ namespace TestDiscordBot.Commands
         {
             Task.Factory.StartNew(RunNotificationLoop);
         }
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             DiscordUser user = config.Data.UserList.Find(x => x.UserID == message.Author.Id);

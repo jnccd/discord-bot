@@ -42,7 +42,7 @@ namespace TestDiscordBot.Commands
             }
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             DiscordServer server = config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
             if (server == null)

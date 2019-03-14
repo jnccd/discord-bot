@@ -42,10 +42,12 @@ namespace TestDiscordBot
         {
             try
             {
-                Global.P.ExecuteBot();
+                Global.P.ExecuteBot().Wait();
             }
             catch (Exception ex)
             {
+                try { config.Save(); } catch { }
+
                 string strPath = Global.CurrentExecutablePath + @"\Log.txt";
                 if (!File.Exists(strPath))
                 {
@@ -63,7 +65,7 @@ namespace TestDiscordBot
             }
         }
         
-        void ExecuteBot()
+        async Task ExecuteBot()
         {
             #region startup
             ShowWindow(GetConsoleWindow(), 2);
@@ -99,8 +101,8 @@ namespace TestDiscordBot
                         config.Save();
                     }
 
-                    client.LoginAsync(TokenType.Bot, config.Data.BotToken);
-                    client.StartAsync();
+                    await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
+                    await client.StartAsync();
 
                     gotWorkingToken = true;
                 }
@@ -122,9 +124,9 @@ namespace TestDiscordBot
 
             while (!ClientReady) { Thread.Sleep(20); }
 #if DEBUG
-            client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
+            await client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
 #else
-            client.SetGameAsync("Type " + Global.prefix + "help");
+            await client.SetGameAsync("Type " + Global.prefix + "help");
 #endif
             Global.Master = client.GetUser(300699566041202699);
 
@@ -163,7 +165,7 @@ namespace TestDiscordBot
             clearYcoords = Console.CursorTop;
             foreach (Command c in commands)
             {
-                Task.Run(() => {
+                await Task.Run(() => {
                     try
                     {
                         c.OnConnected();
@@ -194,7 +196,7 @@ namespace TestDiscordBot
                     {
                         try
                         {
-                            Global.SendText(input, CurrentChannel);
+                            await Global.SendText(input, CurrentChannel);
                         }
                         catch (Exception e)
                         {
@@ -212,7 +214,7 @@ namespace TestDiscordBot
                     {
                         string[] splits = input.Split(' ');
                         string path = splits.Skip(1).Aggregate((x, y) => x + " " + y);
-                        Global.SendFile(path.Trim('\"'), CurrentChannel);
+                        await Global.SendFile(path.Trim('\"'), CurrentChannel);
                     }
                 }
                 else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
@@ -267,7 +269,7 @@ namespace TestDiscordBot
                             {
                                 try
                                 {
-                                    M.DeleteAsync();
+                                    await M.DeleteAsync();
                                     DeletionComplete = true;
                                 }
                                 catch { }
@@ -290,7 +292,7 @@ namespace TestDiscordBot
                         foreach (IMessage m in messages)
                         {
                             if (m.Author.Id == client.CurrentUser.Id)
-                                m.DeleteAsync();
+                                await m.DeleteAsync();
                         }
                     }
                 }
@@ -347,8 +349,8 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
-                            AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
+                        await GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
+                                AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
                         Global.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -388,9 +390,9 @@ namespace TestDiscordBot
             config.Save();
             exitedNormally = true;
 
-            client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
-            client.SetStatusAsync(UserStatus.DoNotDisturb);
-            client.LogoutAsync();
+            await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
+            await client.SetStatusAsync(UserStatus.DoNotDisturb);
+            await client.LogoutAsync();
             Environment.Exit(0);
         }
 
@@ -533,7 +535,7 @@ namespace TestDiscordBot
             try
             {
                 Global.SaveUser(message.Author.Id);
-                await command.execute(message);
+                await command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
                     Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 

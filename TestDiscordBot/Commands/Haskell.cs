@@ -17,7 +17,7 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task execute(SocketMessage message)
+        public override Task Execute(SocketMessage message)
         {
             lock (this)
             {
@@ -34,8 +34,8 @@ namespace TestDiscordBot.Commands
                                 "windows", "TCP", "Socket", "socket", "Network.", "Process.", "Compiler.", "Debug.", "Distribution.",
                                 "Foreign.", "GHC.", "Trace.", "Type.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
                             {
-                                Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel);
-                                return;
+                                Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel).Wait();
+                                return Task.FromResult(default(object));
                             }
                     }
 
@@ -112,11 +112,13 @@ namespace TestDiscordBot.Commands
                             }
                         }
                         catch { }
-                        Global.SendText("Haskell timeout!", message.Channel);
+                        Global.SendText("Haskell timeout!", message.Channel).Wait();
                     }
                 }
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
+
+            return Task.FromResult(default(object));
         }
     }
 }

@@ -82,7 +82,7 @@ namespace TestDiscordBot.Commands
                 MarkovHelper.SaveDict();
         }
 
-        public override async Task execute(SocketMessage message)
+        public override async Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
@@ -91,7 +91,7 @@ namespace TestDiscordBot.Commands
                 string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 5, 2000);
                 await Global.SendText(output, message.Channel);
             }
-            catch (NoEmptyElementException e)
+            catch (NoEmptyElementException)
             {
                 await Global.SendText("Markow isn't ready yet!", message.Channel);
             }
