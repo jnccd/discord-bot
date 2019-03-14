@@ -11,9 +11,9 @@ using TestDiscordBot.Config;
 
 namespace TestDiscordBot.Commands
 {
-    public class SubscribeToPatchNotes : Command
+    public class PatchNotes : Command
     {
-        public SubscribeToPatchNotes() : base("togglePatchNotes", "Get annoying messages", false)
+        public PatchNotes() : base("togglePatchNotes", "Get annoying messages", false)
         {
 
         }
@@ -46,8 +46,13 @@ namespace TestDiscordBot.Commands
                             Embed.WithColor(0, 128, 255);
                             Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+#if !DEBUG
                             Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.GetChannelFromID(id));
-                        } catch (Exception e) {
+#else
+                            Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
+#endif
+                        }
+                        catch (Exception e) {
                             Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                         }
                     }
