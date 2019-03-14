@@ -39,9 +39,31 @@ namespace TestDiscordBot
         EmbedBuilder HelpMenu = new EmbedBuilder();
 
         static void Main(string[] args)
-            => Global.P.MainAsync().GetAwaiter().GetResult();
-
-        async Task MainAsync()
+        {
+            try
+            {
+                Global.P.ExecuteBot();
+            }
+            catch (Exception ex)
+            {
+                string strPath = Global.CurrentExecutablePath + @"\Log.txt";
+                if (!File.Exists(strPath))
+                {
+                    File.Create(strPath).Dispose();
+                }
+                using (StreamWriter sw = File.AppendText(strPath))
+                {
+                    sw.WriteLine();
+                    sw.WriteLine("==========================Error Logging========================");
+                    sw.WriteLine("============Start=============" + DateTime.Now);
+                    sw.WriteLine("Error Message: " + ex.Message);
+                    sw.WriteLine("Stack Trace: " + ex.StackTrace);
+                    sw.WriteLine("=============End=============");
+                }
+            }
+        }
+        
+        void ExecuteBot()
         {
             #region startup
             ShowWindow(GetConsoleWindow(), 2);
@@ -55,14 +77,16 @@ namespace TestDiscordBot
             {
                 buildDate = File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n');
                 Global.ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
-            } catch {
+            }
+            catch
+            {
                 if (buildDate == null)
                     buildDate = "Error: Couldn't read build date!";
             }
             client = new DiscordSocketClient();
             client.Log += Log;
             client.JoinedGuild += Client_JoinedGuild;
-            
+
             while (!gotWorkingToken)
             {
                 try
@@ -75,17 +99,17 @@ namespace TestDiscordBot
                         config.Save();
                     }
 
-                    await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
-                    await client.StartAsync();
+                    client.LoginAsync(TokenType.Bot, config.Data.BotToken);
+                    client.StartAsync();
 
                     gotWorkingToken = true;
                 }
                 catch { config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
             }
-            
+
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
-            
+
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
             {
@@ -95,12 +119,12 @@ namespace TestDiscordBot
             }
 
             commands = commands.OrderBy(x => x.CommandLine).ToArray(); // Sort commands in alphabetical order
-            
+
             while (!ClientReady) { Thread.Sleep(20); }
 #if DEBUG
-            await client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
+            client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
 #else
-            await client.SetGameAsync("Type " + Global.prefix + "help");
+            client.SetGameAsync("Type " + Global.prefix + "help");
 #endif
             Global.Master = client.GetUser(300699566041202699);
 
@@ -127,7 +151,8 @@ namespace TestDiscordBot
             {
                 foreach (SocketGuild g in client.Guilds)
                     Global.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
-            } catch { Global.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            }
+            catch { Global.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -138,7 +163,7 @@ namespace TestDiscordBot
             clearYcoords = Console.CursorTop;
             foreach (Command c in commands)
             {
-                await Task.Run(() => {
+                Task.Run(() => {
                     try
                     {
                         c.OnConnected();
@@ -169,7 +194,7 @@ namespace TestDiscordBot
                     {
                         try
                         {
-                            await Global.SendText(input, CurrentChannel);
+                            Global.SendText(input, CurrentChannel);
                         }
                         catch (Exception e)
                         {
@@ -187,7 +212,7 @@ namespace TestDiscordBot
                     {
                         string[] splits = input.Split(' ');
                         string path = splits.Skip(1).Aggregate((x, y) => x + " " + y);
-                        await Global.SendFile(path.Trim('\"'), CurrentChannel);
+                        Global.SendFile(path.Trim('\"'), CurrentChannel);
                     }
                 }
                 else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
@@ -223,7 +248,7 @@ namespace TestDiscordBot
                         Console.WriteLine("Couldn't set new channel!");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
-#endregion
+                    #endregion
                 }
                 else if (input.StartsWith("/del "))
                 {
@@ -236,13 +261,13 @@ namespace TestDiscordBot
 
                         for (int i = 0; !DeletionComplete; i++)
                         {
-                            M = await ((ISocketMessageChannel)GetChannelFromID(config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1]));
+                            M = ((ISocketMessageChannel)GetChannelFromID(config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
 
                             if (M != null)
                             {
                                 try
                                 {
-                                    await M.DeleteAsync();
+                                    M.DeleteAsync();
                                     DeletionComplete = true;
                                 }
                                 catch { }
@@ -255,17 +280,17 @@ namespace TestDiscordBot
                         Console.WriteLine(e);
                         Console.ForegroundColor = ConsoleColor.White;
                     }
-#endregion
+                    #endregion
                 }
                 else if (input == "/PANIKDELETE")
                 {
                     foreach (ulong ChannelID in config.Data.ChannelsWrittenOn)
                     {
-                        IEnumerable<IMessage> messages = await ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).Flatten();
+                        IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).Flatten().GetAwaiter().GetResult();
                         foreach (IMessage m in messages)
                         {
                             if (m.Author.Id == client.CurrentUser.Id)
-                                await m.DeleteAsync();
+                                m.DeleteAsync();
                         }
                     }
                 }
@@ -294,7 +319,7 @@ namespace TestDiscordBot
                     // TODO: Test
                     try
                     {
-                        
+
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -322,7 +347,7 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        await GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
+                        GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
                             AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
                         Global.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
@@ -342,7 +367,7 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        var messages = await (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).Flatten();
+                        var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).Flatten().GetAwaiter().GetResult();
                         Global.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -363,9 +388,9 @@ namespace TestDiscordBot
             config.Save();
             exitedNormally = true;
 
-            await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
-            await client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await client.LogoutAsync();
+            client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
+            client.SetStatusAsync(UserStatus.DoNotDisturb);
+            client.LogoutAsync();
             Environment.Exit(0);
         }
 
