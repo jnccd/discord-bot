@@ -224,6 +224,33 @@ namespace TestDiscordBot
                 return "";
             }
         }
+        public static List<string> GetEverythingBetweenAll(this string str, string left, string right)
+        {
+            List<string> re = new List<string>();
+
+            int leftIndex = str.IndexOf(left);
+            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
+
+            if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
+            {
+                return re;
+            }
+
+            while (leftIndex != -1 && rightIndex != -1)
+            {
+                try
+                {
+                    str = str.Remove(0, leftIndex + left.Length);
+                    re.Add(str.Remove(rightIndex - leftIndex - left.Length));
+                }
+                catch { break; }
+
+                leftIndex = str.IndexOf(left);
+                rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
+            }
+
+            return re;
+        }
         public static bool StartsWith(this string str, string[] values)
         {
             foreach (string s in values)
