@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot.Commands
 {
-    public class aaaTemplate : Command
+    public class Template : Command
     {
-        public aaaTemplate() : base("", "", true, true)
+        public Template() : base("", "", true, true)
         {
 
         }

@@ -32,7 +32,7 @@ namespace TestDiscordBot.Commands
         public override async Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
-            DiscordUser user = config.Data.UserList.Find(x => x.UserID == message.Author.Id);
+            DiscordUser user = Config.Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
             {
@@ -143,7 +143,8 @@ namespace TestDiscordBot.Commands
 
         void RunNotificationLoop()
         {
-            while (!Global.P.ClientReady) { Thread.Sleep(20); }
+            Thread.CurrentThread.Name = "Warframe Notification Loop";
+            while (!Program.ClientReady) { Thread.Sleep(20); }
 
             while (true)
             {
@@ -161,8 +162,8 @@ namespace TestDiscordBot.Commands
                     SendNotifications(GetNotifications());
                 }
 
-                while (config.Data.WarframeIDList.Count > 250)
-                    config.Data.WarframeIDList.RemoveAt(0);
+                while (Config.Config.Data.WarframeIDList.Count > 250)
+                    Config.Config.Data.WarframeIDList.RemoveAt(0);
             }
         }
         bool UpdatedWarframeHandlerSuccessfully()
@@ -175,9 +176,9 @@ namespace TestDiscordBot.Commands
         }
         async void NotifyVoidtrader()
         {
-            if (!config.Data.WarframeVoidTraderArrived && WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0)
+            if (!Config.Config.Data.WarframeVoidTraderArrived && WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0)
             {
-                List<ulong> channels = config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
+                List<ulong> channels = Config.Config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
 
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.WithDescription("Void trader arrived at " + WarframeHandler.worldState.WS_VoidTrader.Location + " with: ");
@@ -190,12 +191,12 @@ namespace TestDiscordBot.Commands
 
                 foreach (ulong id in channels)
                 {
-                    SocketChannel channel = Global.P.GetChannelFromID(id);
+                    SocketChannel channel = Program.GetChannelFromID(id);
                     if (channel is ISocketMessageChannel)
                         await Global.SendEmbed(embed, (ISocketMessageChannel)channel);
                 }
             }
-            config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
+            Config.Config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
         }
         List<string> GetNotifications()
         {
@@ -203,9 +204,9 @@ namespace TestDiscordBot.Commands
             
             foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions)
                 for (int i = 0; i < mission.jobs.Count; i++)
-                    if (mission.jobs[i].rewardPool != null && !config.Data.WarframeIDList.Contains(mission.jobs[i].id))
+                    if (mission.jobs[i].rewardPool != null && !Config.Config.Data.WarframeIDList.Contains(mission.jobs[i].id))
                     {
-                        config.Data.WarframeIDList.Add(mission.jobs[i].id);
+                        Config.Config.Data.WarframeIDList.Add(mission.jobs[i].id);
                         foreach (string reward in mission.jobs[i].rewardPool)
                         {
                             notifications.Add(reward + " currently available from the " + mission.Syndicate + "'s " + (i + 1) + ". bounty until " + mission.EndTime.ToLocalTime().ToLongTimeString());
@@ -213,15 +214,15 @@ namespace TestDiscordBot.Commands
                     }
             
             foreach (Alert a in WarframeHandler.worldState.WS_Alerts)
-                if (!config.Data.WarframeIDList.Contains(a.Id))
+                if (!Config.Config.Data.WarframeIDList.Contains(a.Id))
                 {
-                    config.Data.WarframeIDList.Add(a.Id);
+                    Config.Config.Data.WarframeIDList.Add(a.Id);
                     notifications.Add(a.ToTitle() + " - Expires at " + a.EndTime.ToLocalTime().ToLongTimeString() + ", so in " + (int)(a.EndTime.ToLocalTime() - DateTime.Now).TotalMinutes + " minutes");
                 }
             foreach (Invasion i in WarframeHandler.worldState.WS_Invasions)
-                if (!config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
+                if (!Config.Config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
                 {
-                    config.Data.WarframeIDList.Add(i.Id);
+                    Config.Config.Data.WarframeIDList.Add(i.Id);
                     notifications.Add(i.ToTitle());
                 }
 
@@ -231,7 +232,7 @@ namespace TestDiscordBot.Commands
         {
             List<Notif> notifications = new List<Notif>();
             foreach (string line in textNotifications)
-                foreach (DiscordUser user in config.Data.UserList)
+                foreach (DiscordUser user in Config.Config.Data.UserList)
                     foreach (string filter in user.WarframeFilters)
                         if (BooleanContainsAllOf(line, filter))
                         {
@@ -242,7 +243,7 @@ namespace TestDiscordBot.Commands
                                 notifications.Add(new Notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
                         }
             foreach (Notif n in notifications)
-                await Global.SendText(n.userID.Select(x => Global.P.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
+                await Global.SendText(n.userID.Select(x => Program.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
         }
         bool BooleanContainsAllOf(string s, string match)
         {

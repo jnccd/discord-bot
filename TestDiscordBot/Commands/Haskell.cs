@@ -42,9 +42,9 @@ namespace TestDiscordBot.Commands
                     string haskellInput = message.Content.Remove(0, 5).Trim(' ').Trim('`');
                     if (haskellInput.StartsWith("haskell"))
                         haskellInput = haskellInput.Remove(0, "haskell".Length);
-                    File.WriteAllText("input.hs", haskellInput);
+                    File.WriteAllText("Commands\\Haskell\\input.hs", haskellInput);
                     Process compiler = new Process();
-                    compiler.StartInfo.FileName = "haskell.bat";
+                    compiler.StartInfo.FileName = "Commands\\Haskell\\haskell.bat";
                     compiler.StartInfo.CreateNoWindow = true;
                     compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     compiler.Start();
@@ -52,12 +52,13 @@ namespace TestDiscordBot.Commands
                     DateTime start = DateTime.Now;
 
                     Task.Factory.StartNew(async () => {
+                        Thread.CurrentThread.Name = "Haskell Compiler";
                         compiler.WaitForExit();
                         try
                         {
-                            if (File.Exists("haskellCompile.txt"))
+                            if (File.Exists("Commands\\Haskell\\haskellCompile.txt"))
                             {
-                                string[] output = File.ReadAllLines("haskellCompile.txt");
+                                string[] output = File.ReadAllLines("Commands\\Haskell\\haskellCompile.txt");
 
                                 Debug.WriteLine("Raw Haskell Output: ");
                                 Debug.WriteLine(output.Aggregate((x, y) => x + "\n" + y));
@@ -92,7 +93,7 @@ namespace TestDiscordBot.Commands
                         exited = true;
                     });
 
-                    while (!exited && (DateTime.Now - start).TotalSeconds < 3)
+                    while (!exited && (DateTime.Now - start).TotalSeconds < 30)
                         Thread.Sleep(100);
                     if (!exited)
                     {

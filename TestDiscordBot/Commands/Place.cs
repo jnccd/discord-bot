@@ -13,7 +13,7 @@ namespace TestDiscordBot.Commands
 {
     public class Place : Command
     {
-        string filePath = Global.CurrentExecutablePath + "\\place.png";
+        readonly string filePath = "Commands\\Place\\place.png";
         const int placeSize = 500;
         const int pixelSize = 10;
         readonly PlaceCommand[] subCommands;

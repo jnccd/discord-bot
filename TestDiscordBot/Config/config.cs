@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot.Config
 {
-    public static class config
+    public static class Config
     {
-        static string configPath = Global.CurrentExecutablePath + "\\config.json";
-        public static configData Data = new configData();
+        static readonly string configPath = "config.json";
+        public static ConfigData Data = new ConfigData();
         
-        static config()
+        static Config()
         {
-            if (config.Exists())
-                config.Load();
+            if (Config.Exists())
+                Config.Load();
             else
-                config.Data = new configData();
+                Config.Data = new ConfigData();
         }
 
-        public static string getConfigPath()
+        public static string GetConfigPath()
         {
             return configPath;
         }
@@ -39,15 +39,15 @@ namespace TestDiscordBot.Config
         public static void Load()
         {
             if (Exists())
-                Data = JsonConvert.DeserializeObject<configData>(File.ReadAllText(configPath));
+                Data = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(configPath));
             else
-                Data = new configData();
+                Data = new ConfigData();
         }
         public static new string ToString()
         {
             string output = "";
 
-            FieldInfo[] Infos = typeof(configData).GetFields();
+            FieldInfo[] Infos = typeof(ConfigData).GetFields();
             foreach (FieldInfo info in Infos)
             {
                 output += "\n" + info.Name + ": ";
@@ -65,7 +65,7 @@ namespace TestDiscordBot.Config
                         {
                             try
                             {
-                                ISocketMessageChannel Channel = (ISocketMessageChannel)Global.P.GetChannelFromID((ulong)e.Current);
+                                ISocketMessageChannel Channel = (ISocketMessageChannel)Program.GetChannelFromID((ulong)e.Current);
                                 output += " - Name: " + Channel.Name + " - Server: " + ((SocketGuildChannel)Channel).Guild.Name + "\n";
                             }
                             catch { output += "\n"; }

@@ -51,7 +51,7 @@ namespace TestDiscordBot.Commands
                     {
                         if (commandmessage.MentionedUsers.ElementAt(0).IsBot)
                         {
-                            if (commandmessage.MentionedUsers.ElementAt(0).Id == Global.P.GetSelf().Id)
+                            if (commandmessage.MentionedUsers.ElementAt(0).Id == Program.GetSelf().Id)
                                 await Global.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel);
                             else
                                 await Global.SendText("You cant play with a bot!", commandmessage.Channel);

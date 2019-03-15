@@ -147,7 +147,7 @@ namespace TestDiscordBot.Commands
             string re = "";
 
             if (Board.PlayerTop.UserID != 0)
-                re += Global.P.GetUserFromId(Board.PlayerTop.UserID).Mention + "\n";
+                re += Program.GetUserFromId(Board.PlayerTop.UserID).Mention + "\n";
             else
                 re += "Unknown Player\n";
 
@@ -230,7 +230,7 @@ namespace TestDiscordBot.Commands
             re += "\n```";
 
             if (Board.PlayerBottom.UserID != 0)
-                re += Global.P.GetUserFromId(Board.PlayerBottom.UserID).Mention;
+                re += Program.GetUserFromId(Board.PlayerBottom.UserID).Mention;
             else
                 re += "Unknown Player";
 

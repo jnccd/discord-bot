@@ -23,9 +23,9 @@ namespace TestDiscordBot.Commands
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);
 
-            if (config.Data.UserList.Exists(x => x.UserID == commandmessage.Author.Id))
+            if (Config.Config.Data.UserList.Exists(x => x.UserID == commandmessage.Author.Id))
             {
-                DiscordUser User = config.Data.UserList.Find(x => x.UserID == commandmessage.Author.Id);
+                DiscordUser User = Config.Config.Data.UserList.Find(x => x.UserID == commandmessage.Author.Id);
                 FieldInfo[] Infos = typeof(DiscordUser).GetFields();
                 foreach (FieldInfo info in Infos)
                 {
