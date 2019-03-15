@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Config;
 
 namespace TestDiscordBot.Commands
 {
@@ -23,40 +21,50 @@ namespace TestDiscordBot.Commands
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            string url = "https://github.com/niklasCarstensen/Discord-Bot";
+            string url = "https://github.com/niklasCarstensen/Discord-Bot/commits/master";
             WebRequest req = HttpWebRequest.Create(url);
             req.Timeout = 10000;
             WebResponse W = req.GetResponse();
             using (StreamReader sr = new StreamReader(W.GetResponseStream()))
             {
                 string html = sr.ReadToEnd();
-                string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
-                string link = "https://github.com/niklasCarstensen/Discord-Bot/commit/" + html.GetEverythingBetween("href=\"/niklasCarstensen/Discord-Bot/commit/", "\">");
-
-                if (message != Config.Config.Data.LastCommitMessage && message != "" && message != "Projektdateien hinzufügen." && message != "GITIGNORE und GITATTRIBUTES hinzufügen.")
+                List<string> messages = html.GetEverythingBetweenAll("<p class=\"commit-title h5 mb-1 text-gray-dark \">", "</p>");
+                
+                foreach (string xmlMessage in messages)
                 {
-                    Config.Config.Data.LastCommitMessage = message;
-                    Config.Config.Save();
+                    string message = xmlMessage.GetEverythingBetween("aria-label=\"", "\" ");
+                    string link = "https://github.com" + xmlMessage.GetEverythingBetween("href=\"", "\">");
 
-                    foreach (ulong id in Config.Config.Data.PatchNoteSubscribedChannels)
+                    if (message == Config.Config.Data.LastCommitMessage)
+                        break;
+
+                    if (message != "Projektdateien hinzufügen." && message != "GITIGNORE und GITATTRIBUTES hinzufügen.")
                     {
-                        try
+                        foreach (ulong id in Config.Config.Data.PatchNoteSubscribedChannels)
                         {
-                            EmbedBuilder Embed = new EmbedBuilder();
-                            Embed.WithColor(0, 128, 255);
-                            Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
-                            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+                            try
+                            {
+                                EmbedBuilder Embed = new EmbedBuilder();
+                                Embed.WithColor(0, 128, 255);
+                                Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
+                                Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
 #if !DEBUG
-                            Global.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
+                                Global.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                            Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
+                                Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
 #endif
-                        }
-                        catch (Exception e) {
-                            Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                            }
+                            catch (Exception e)
+                            {
+                                Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                            }
                         }
                     }
                 }
+
+                if (messages.Count > 0)
+                    Config.Config.Data.LastCommitMessage = messages.First().GetEverythingBetween("aria-label=\"", "\" ");
+                Config.Config.Save();
             }
         }
         bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
