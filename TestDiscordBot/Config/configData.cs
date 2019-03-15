@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot.Config
 {
-    public class configData
+    public class ConfigData
     {
         public string BotToken;
         public List<ulong> ChannelsWrittenOn;
@@ -22,7 +22,7 @@ namespace TestDiscordBot.Config
         public bool WarframeVoidTraderArrived;
         public List<string> WarframeIDList;
 
-        public configData()
+        public ConfigData()
         {
             BotToken = "<INSERT BOT TOKEN HERE>";
             ChannelsWrittenOn = new List<ulong>();

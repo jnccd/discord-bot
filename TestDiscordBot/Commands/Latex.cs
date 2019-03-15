@@ -14,6 +14,10 @@ namespace TestDiscordBot.Commands
 {
     public class Latex : Command
     {
+        readonly string inputPath = "Commands\\Latex\\input.tex";
+        readonly string batchPath = "Commands\\Latex\\latex.bat";
+        readonly string outputPath = "Commands\\Latex\\output.png";
+
         public Latex() : base("latex", "Renders latex strings", false)
         {
 
@@ -29,22 +33,22 @@ namespace TestDiscordBot.Commands
 
                     if (!latex.StartsWith("\\documentclass["))
                         latex = "\\documentclass[preview,border=12pt]{standalone}\n\\usepackage{amsmath}\n\\usepackage{tikz}\n\\begin{document}\n" + latex + "\n\\end{document}";
-
-                    File.WriteAllText("input.tex", latex);
+                    
+                    if (!File.Exists(inputPath))
+                        File.Create(inputPath).Dispose();
+                    File.WriteAllText(inputPath, latex);
 
                     Process converter = new Process();
-                    converter.StartInfo.FileName = "latex.bat";
+                    converter.StartInfo.FileName = batchPath;
                     converter.StartInfo.UseShellExecute = false;
                     converter.StartInfo.RedirectStandardInput = true;
-                    //converter.StartInfo.CreateNoWindow = true;
-                    //converter.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
                     converter.Start();
                     Thread.Sleep(500);
                     converter.StandardInput.WriteLine("return");
                     converter.WaitForExit();
 
-                    Global.SendFile(Global.CurrentExecutablePath + "\\output.png", message.Channel).Wait();
+                    Global.SendFile(outputPath, message.Channel).Wait();
                 }
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }

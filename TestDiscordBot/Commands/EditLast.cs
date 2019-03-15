@@ -15,7 +15,7 @@ namespace TestDiscordBot.Commands
 {
     public class EditLast : Command
     {
-        EditLastCommand[] Commands;
+        readonly EditLastCommand[] Commands;
 
         public EditLast() : base("editLast", "Edit the last message", false)
         {
@@ -44,10 +44,11 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Global.SendText(lastText.Content.Replace("|", ""), message.Channel);
             }),
-            new EditLastCommand("Crosspost", "Crossposts the message into another channel", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Prefix}editLast Crossost #general", 
+                true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 try
                 {
-                    SocketChannel targetChannel = Global.P.GetChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
+                    SocketChannel targetChannel = Program.GetChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
                     EmbedBuilder Embed = lastText.ToEmbed();
                     Embed.AddField("Crosspost from: ", $"<#{message.Channel.Id}>");
                     await Global.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
@@ -79,8 +80,13 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(bmp, message.Channel);
             }),
+            new EditLastCommand("memify", "Turn the last Picture into a meme [WIP]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+
+                
+            }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
-            "\nThe syntax is: liq [mode] [eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
@@ -184,7 +190,7 @@ namespace TestDiscordBot.Commands
             IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
             IMessage lastText = null;
             string lastPic = null;
-            ulong ownID = Global.OwnID;
+            ulong ownID = Program.OwnID;
             foreach (IMessage m in messages)
             {
                 if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Global.prefix))

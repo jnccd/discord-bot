@@ -33,12 +33,12 @@ namespace TestDiscordBot.Commands
                 string message = html.GetEverythingBetween("<a data-pjax=\"true\" title=\"", "\" class=\"message\"");
                 string link = "https://github.com/niklasCarstensen/Discord-Bot/commit/" + html.GetEverythingBetween("href=\"/niklasCarstensen/Discord-Bot/commit/", "\">");
 
-                if (message != config.Data.LastCommitMessage && message != "" && message != "Projektdateien hinzufügen." && message != "GITIGNORE und GITATTRIBUTES hinzufügen.")
+                if (message != Config.Config.Data.LastCommitMessage && message != "" && message != "Projektdateien hinzufügen." && message != "GITIGNORE und GITATTRIBUTES hinzufügen.")
                 {
-                    config.Data.LastCommitMessage = message;
-                    config.Save();
+                    Config.Config.Data.LastCommitMessage = message;
+                    Config.Config.Save();
 
-                    foreach (ulong id in config.Data.PatchNoteSubscribedChannels)
+                    foreach (ulong id in Config.Config.Data.PatchNoteSubscribedChannels)
                     {
                         try
                         {
@@ -47,7 +47,7 @@ namespace TestDiscordBot.Commands
                             Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
 #if !DEBUG
-                            Global.SendEmbed(Embed, (ISocketMessageChannel)Global.P.GetChannelFromID(id)).Wait();
+                            Global.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
                             Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
 #endif
@@ -68,16 +68,16 @@ namespace TestDiscordBot.Commands
         {
             if (commandmessage.Channel is SocketGuildChannel)
             {
-                if (commandmessage.Author.Id == Global.P.GetGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
+                if (commandmessage.Author.Id == Program.GetGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
                 {
-                    if (config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
+                    if (Config.Config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                     {
-                        config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
+                        Config.Config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
                         await Global.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
                     }
                     else
                     {
-                        config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
+                        Config.Config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
                         await Global.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
                     }
                 }

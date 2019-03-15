@@ -23,32 +23,40 @@ namespace TestDiscordBot
 
     public class Program
     {
-        int clearYcoords;
-        public bool ClientReady { get; private set; }
-        bool gotWorkingToken = false;
-        bool exitedNormally = false;
-        ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
-        string buildDate;
-        ISocketMessageChannel CurrentChannel;
-        DiscordSocketClient client;
-        Command[] commands;
-        Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                               from assemblyType in domainAssembly.GetTypes()
-                               where assemblyType.IsSubclassOf(typeof(Command))
-                               select assemblyType).ToArray();
-        EmbedBuilder HelpMenu = new EmbedBuilder();
+        static int clearYcoords;
+        public static bool ClientReady { get; private set; }
+        static bool gotWorkingToken = false;
+        static bool exitedNormally = false;
+        static ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
+        static string buildDate;
+        static ISocketMessageChannel CurrentChannel;
+        static DiscordSocketClient client;
+        static Command[] commands;
+        static Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                                      from assemblyType in domainAssembly.GetTypes()
+                                      where assemblyType.IsSubclassOf(typeof(Command))
+                                      select assemblyType).ToArray();
+        static EmbedBuilder HelpMenu = new EmbedBuilder();
+
+        public static ulong OwnID
+        {
+            get
+            {
+                return GetSelf().Id;
+            }
+        }
 
         static void Main(string[] args)
         {
             try
             {
-                Global.P.ExecuteBot().Wait();
+                ExecuteBot().Wait();
             }
             catch (Exception ex)
             {
-                try { config.Save(); } catch { }
+                try { Config.Config.Save(); } catch { }
 
-                string strPath = Global.CurrentExecutablePath + @"\Log.txt";
+                string strPath = "Log.txt";
                 if (!File.Exists(strPath))
                 {
                     File.Create(strPath).Dispose();
@@ -64,10 +72,10 @@ namespace TestDiscordBot
                 }
             }
         }
-        
-        async Task ExecuteBot()
+        static async Task ExecuteBot()
         {
             #region startup
+            Thread.CurrentThread.Name = "Main Console Input Reciever";
             ShowWindow(GetConsoleWindow(), 2);
             Console.ForegroundColor = ConsoleColor.White;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
@@ -77,7 +85,7 @@ namespace TestDiscordBot
 
             try
             {
-                buildDate = File.ReadAllText(Global.CurrentExecutablePath + "\\BuildDate.txt").TrimEnd('\n');
+                buildDate = File.ReadAllText("BuildDate.txt").TrimEnd('\n');
                 Global.ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
             }
             catch
@@ -93,20 +101,22 @@ namespace TestDiscordBot
             {
                 try
                 {
-                    if (config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
+                    if (Config.Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
                     {
+                        ShowWindow(GetConsoleWindow(), 4);
                         SystemSounds.Exclamation.Play();
+                        Console.CursorLeft = 0;
                         Console.Write("Give me a Bot Token: ");
-                        config.Data.BotToken = Console.ReadLine();
-                        config.Save();
+                        Config.Config.Data.BotToken = Console.ReadLine();
+                        Config.Config.Save();
                     }
 
-                    await client.LoginAsync(TokenType.Bot, config.Data.BotToken);
+                    await client.LoginAsync(TokenType.Bot, Config.Config.Data.BotToken);
                     await client.StartAsync();
 
                     gotWorkingToken = true;
                 }
-                catch { config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
+                catch { Config.Config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
             }
 
             client.MessageReceived += MessageReceived;
@@ -263,7 +273,7 @@ namespace TestDiscordBot
 
                         for (int i = 0; !DeletionComplete; i++)
                         {
-                            M = ((ISocketMessageChannel)GetChannelFromID(config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
+                            M = ((ISocketMessageChannel)GetChannelFromID(Config.Config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
 
                             if (M != null)
                             {
@@ -286,7 +296,7 @@ namespace TestDiscordBot
                 }
                 else if (input == "/PANIKDELETE")
                 {
-                    foreach (ulong ChannelID in config.Data.ChannelsWrittenOn)
+                    foreach (ulong ChannelID in Config.Config.Data.ChannelsWrittenOn)
                     {
                         IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).Flatten().GetAwaiter().GetResult();
                         foreach (IMessage m in messages)
@@ -309,11 +319,11 @@ namespace TestDiscordBot
                 }
                 else if (input == "/config")
                 {
-                    Console.WriteLine(config.ToString());
+                    Console.WriteLine(Config.Config.ToString());
                 }
                 else if (input == "/restart")
                 {
-                    Process.Start(Global.CurrentExecutablePath + "\\TestDiscordBot.exe");
+                    Process.Start("TestDiscordBot.exe");
                     break;
                 }
                 else if (input == "/test")
@@ -387,7 +397,7 @@ namespace TestDiscordBot
                 }
                 catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
-            config.Save();
+            Config.Config.Save();
             exitedNormally = true;
 
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
@@ -396,7 +406,7 @@ namespace TestDiscordBot
             Environment.Exit(0);
         }
 
-        private async Task Client_JoinedGuild(SocketGuild arg)
+        private static async Task Client_JoinedGuild(SocketGuild arg)
         {
             try
             {
@@ -434,17 +444,17 @@ namespace TestDiscordBot
             }
             catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
         }
-        private Task Client_Ready()
+        private static Task Client_Ready()
         {
             ClientReady = true;
             return Task.FromResult(0);
         }
-        private Task Log(LogMessage msg)
+        private static Task Log(LogMessage msg)
         {
             Global.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
             return Task.FromResult(0);
         }
-        private async Task MessageReceived(SocketMessage message)
+        private static async Task MessageReceived(SocketMessage message)
         {
             if (!message.Author.IsBot)
             {
@@ -470,7 +480,7 @@ namespace TestDiscordBot
             }
 
         }
-        private async void ThreadedMessageReceived(object o)
+        private static async void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
 
@@ -478,8 +488,8 @@ namespace TestDiscordBot
             if (message.Channel is SocketGuildChannel)
             {
                 ulong serverID = message.GetServerID();
-                if (!config.Data.ServerList.Exists(x => x.ServerID == serverID))
-                    config.Data.ServerList.Add(new DiscordServer(serverID));
+                if (!Config.Config.Data.ServerList.Exists(x => x.ServerID == serverID))
+                    Config.Config.Data.ServerList.Add(new DiscordServer(serverID));
             }
 
             if (message.Content == Global.prefix + "help")
@@ -520,11 +530,11 @@ namespace TestDiscordBot
                 }
             }
 
-            DiscordUser user = config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
+            DiscordUser user = Config.Config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
             if (user != null)
                 user.TotalCommandsUsed++;
         }
-        private async Task ExecuteCommand(Command command, SocketMessage message)
+        private static async Task ExecuteCommand(Command command, SocketMessage message)
         {
             if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
             {
@@ -555,27 +565,27 @@ namespace TestDiscordBot
             }
         }
         
-        public SocketUser GetUserFromId(ulong UserId)
+        public static SocketUser GetUserFromId(ulong UserId)
         {
             return client.GetUser(UserId);
         }
-        public SocketChannel GetChannelFromID(ulong ChannelID)
+        public static SocketChannel GetChannelFromID(ulong ChannelID)
         {
             return client.GetChannel(ChannelID);
         }
-        public SocketGuild GetGuildFromChannel(IChannel Channel)
+        public static SocketGuild GetGuildFromChannel(IChannel Channel)
         {
             return ((SocketGuildChannel)Channel).Guild;
         }
-        public SocketSelfUser GetSelf()
+        public static SocketSelfUser GetSelf()
         {
             return client.CurrentUser;
         }
-        public SocketGuild[] GetGuilds()
+        public static SocketGuild[] GetGuilds()
         {
             return client.Guilds.ToArray();
         }
-        public SocketGuild GetGuildFromID(ulong GuildID)
+        public static SocketGuild GetGuildFromID(ulong GuildID)
         {
             return client.GetGuild(GuildID);
         }
@@ -583,11 +593,11 @@ namespace TestDiscordBot
         // Closing Event
         static bool ConsoleEventCallback(int eventType)
         {
-            if (eventType == 2 && !Global.P.exitedNormally)
+            if (eventType == 2 && !exitedNormally)
             {
                 Console.WriteLine();
                 Console.WriteLine("Closing... Files are being saved");
-                config.Save();
+                Config.Config.Save();
             }
             Thread.Sleep(250);
             return false;

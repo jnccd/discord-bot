@@ -19,8 +19,8 @@ namespace TestDiscordBot.Commands
         public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
             if (message.Content.Contains("https://discordapp.com/channels/") &&
-                message.Channel is SocketGuildChannel && 
-                config.Data.MessagePreviewServers.Contains(Global.P.GetGuildFromChannel(message.Channel).Id))
+                message.Channel is SocketGuildChannel &&
+                Config.Config.Data.MessagePreviewServers.Contains(Program.GetGuildFromChannel(message.Channel).Id))
             {
                 string[] split = message.Content.Split(new char[] { ' ', '\n' });
                 foreach (string s in split)
@@ -41,17 +41,17 @@ namespace TestDiscordBot.Commands
         {
             if (message.Channel is SocketGuildChannel)
             {
-                SocketGuild guild = Global.P.GetGuildFromChannel(message.Channel);
+                SocketGuild guild = Program.GetGuildFromChannel(message.Channel);
                 if (message.Author.Id == guild.OwnerId || message.Author.Id == Global.Master.Id)
                 {
-                    if (config.Data.MessagePreviewServers.Contains(guild.Id))
+                    if (Config.Config.Data.MessagePreviewServers.Contains(guild.Id))
                     {
-                        config.Data.MessagePreviewServers.Remove(guild.Id);
+                        Config.Config.Data.MessagePreviewServers.Remove(guild.Id);
                         await Global.SendText("This server wont get linked message previews anymore!", message.Channel);
                     }
                     else
                     {
-                        config.Data.MessagePreviewServers.Add(guild.Id);
+                        Config.Config.Data.MessagePreviewServers.Add(guild.Id);
                         await Global.SendText("This Server will now get linked message previews!", message.Channel);
                     }
                 }

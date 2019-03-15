@@ -18,33 +18,33 @@ namespace TestDiscordBot.Commands
 
         public override void OnConnected()
         {
-            foreach (DiscordServer server in config.Data.ServerList)
+            foreach (DiscordServer server in Config.Config.Data.ServerList)
                 server.UpdateEmojis();
         }
 
         public override void OnNonCommandMessageRecieved(SocketMessage message)
         {
-            int userIndex = config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
-            if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)
+            int userIndex = Config.Config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
+            if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(Config.Config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)
             {
-                config.Data.UserList[userIndex].LastEmojiMessage = DateTime.Now;
+                Config.Config.Data.UserList[userIndex].LastEmojiMessage = DateTime.Now;
                 string emoji = message.Content.GetEverythingBetween(":", ":");
 
                 ulong serverID = message.GetServerID();
-                DiscordServer server = config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
+                DiscordServer server = Config.Config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
                 if (server == null)
                     return;
 
                 if (server.EmojiUsage.ContainsKey(emoji))
                     server.EmojiUsage[emoji]++;
 
-                server.EmojiUsage = server.EmojiUsage.OrderByDescending(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+                server.EmojiUsage = server.EmojiUsage.OrderByDescending((KeyValuePair<string, uint> x) => x.Value).ToDictionary((KeyValuePair<string, uint> pair) => pair.Key, (KeyValuePair<string, uint> pair) => pair.Value);
             }
         }
 
         public override async Task Execute(SocketMessage message)
         {
-            DiscordServer server = config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
+            DiscordServer server = Config.Config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
             if (server == null)
                 await Global.SendText("Impossible maybe the archives are incomplete!\nThis Server is not in my database yet.", message.Channel);
             else

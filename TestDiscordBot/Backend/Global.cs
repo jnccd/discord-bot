@@ -30,17 +30,7 @@ namespace TestDiscordBot
             }
         }
         public static Random RDM { get; private set; } = new Random();
-        public static Program P { get; private set; } = new Program();
-        public static string CurrentExecutablePath { get; private set; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public const string prefix = "$";
-        
-        public static ulong OwnID
-        {
-            get
-            {
-                return P.GetSelf().Id;
-            }
-        } 
         
         public static async Task SendFile(string path, ISocketMessageChannel Channel, string text = "")
         {
@@ -80,7 +70,7 @@ namespace TestDiscordBot
         }
         public static async Task SendText(string text, ulong ChannelID)
         {
-            await SendText(text, (ISocketMessageChannel)P.GetChannelFromID(ChannelID));
+            await SendText(text, (ISocketMessageChannel)Program.GetChannelFromID(ChannelID));
         }
         public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
         {
@@ -114,18 +104,18 @@ namespace TestDiscordBot
         
         public static void SaveChannel(ISocketMessageChannel Channel)
         {
-            if (config.Data.ChannelsWrittenOn == null)
-                config.Data.ChannelsWrittenOn = new List<ulong>();
-            if (!config.Data.ChannelsWrittenOn.Contains(Channel.Id))
+            if (Config.Config.Data.ChannelsWrittenOn == null)
+                Config.Config.Data.ChannelsWrittenOn = new List<ulong>();
+            if (!Config.Config.Data.ChannelsWrittenOn.Contains(Channel.Id))
             {
-                config.Data.ChannelsWrittenOn.Add(Channel.Id);
-                config.Save();
+                Config.Config.Data.ChannelsWrittenOn.Add(Channel.Id);
+                Config.Config.Save();
             }
         }
         public static void SaveUser(ulong UserID)
         {
-            if (!config.Data.UserList.Exists(x => x.UserID == UserID))
-                config.Data.UserList.Add(new DiscordUser(UserID));
+            if (!Config.Config.Data.UserList.Exists(x => x.UserID == UserID))
+                Config.Config.Data.UserList.Add(new DiscordUser(UserID));
         }
 
         public static Bitmap GetBitmapFromURL(string url)
@@ -243,7 +233,7 @@ namespace TestDiscordBot
         }
         public static ulong GetServerID(this SocketMessage m)
         {
-            return P.GetGuildFromChannel(m.Channel).Id;
+            return Program.GetGuildFromChannel(m.Channel).Id;
         }
         public static string ContainsPictureLink(this string str)
         {

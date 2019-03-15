@@ -31,10 +31,10 @@ namespace TestDiscordBot.Commands
             // Check for reset
             if (!MarkovHelper.SaveFileExists())
             {
-                config.Data.LoadedMarkovTextFiles.Clear();
+                Config.Config.Data.LoadedMarkovTextFiles.Clear();
 
                 // Load from Discord
-                foreach (SocketGuild guild in Global.P.GetGuilds())
+                foreach (SocketGuild guild in Program.GetGuilds())
                     if (guild.Id != 473991188974927882)
                         foreach (SocketChannel channel in guild.Channels)
                             if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
@@ -47,10 +47,10 @@ namespace TestDiscordBot.Commands
             }
 
             // Load from text Files
-            string[] files = Directory.GetFiles(Global.CurrentExecutablePath + "\\Resources\\MarkowSources\\");
+            string[] files = Directory.GetFiles("Commands\\MarkowSources\\");
             foreach (string file in files)
             {
-                if (!config.Data.LoadedMarkovTextFiles.Contains(Path.GetFileName(file)))
+                if (!Config.Config.Data.LoadedMarkovTextFiles.Contains(Path.GetFileName(file)))
                 {
                     string[] lines = File.ReadAllLines(file);
                     foreach (string line in lines)
@@ -59,7 +59,7 @@ namespace TestDiscordBot.Commands
                         if (!string.IsNullOrWhiteSpace(trimmed))
                             input += trimmed + "\n";
                     }
-                    config.Data.LoadedMarkovTextFiles.Add(Path.GetFileName(file));
+                    Config.Config.Data.LoadedMarkovTextFiles.Add(Path.GetFileName(file));
                 }
             }
             
