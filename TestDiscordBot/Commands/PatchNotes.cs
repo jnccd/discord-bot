@@ -28,42 +28,39 @@ namespace TestDiscordBot.Commands
             using (StreamReader sr = new StreamReader(W.GetResponseStream()))
             {
                 string html = sr.ReadToEnd();
-                List<string> messages = html.GetEverythingBetweenAll("<p class=\"commit-title h5 mb-1 text-gray-dark \">", "</p>");
-                
-                foreach (string xmlMessage in messages)
-                {
-                    string message = xmlMessage.GetEverythingBetween("aria-label=\"", "\" ");
-                    string link = "https://github.com" + xmlMessage.GetEverythingBetween("href=\"", "\">");
+                List<Tuple<string, string>> messages = html.
+                    GetEverythingBetweenAll("<p class=\"commit-title h5 mb-1 text-gray-dark \">", "</p>").
+                    Select(x => new Tuple<string, string>(x.GetEverythingBetween("aria-label=\"", "\" "), 
+                                                          "https://github.com" + x.GetEverythingBetween("href=\"", "\">"))).ToList();
 
-                    if (message == Config.Config.Data.LastCommitMessage)
+                foreach (Tuple<string, string> tuple in messages)
+                {
+                    if (tuple.Item1 == Config.Config.Data.LastCommitMessage)
                         break;
 
-                    if (message != "Projektdateien hinzufügen." && message != "GITIGNORE und GITATTRIBUTES hinzufügen.")
+                    foreach (ulong id in Config.Config.Data.PatchNoteSubscribedChannels)
                     {
-                        foreach (ulong id in Config.Config.Data.PatchNoteSubscribedChannels)
+                        try
                         {
-                            try
-                            {
-                                EmbedBuilder Embed = new EmbedBuilder();
-                                Embed.WithColor(0, 128, 255);
-                                Embed.AddField("Patch Notes:", message + "\n[Link to the github-commit.](" + link + ")");
-                                Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+                            EmbedBuilder Embed = new EmbedBuilder();
+                            Embed.WithColor(0, 128, 255);
+                            Embed.AddField("Patch Notes:", tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")");
+                            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
 #if !DEBUG
-                                Global.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
+                            Global.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                                Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
+                            Global.ConsoleWriteLine("Patch Notes:" + message + "\n[Link to the github-commit.](" + link + ")", ConsoleColor.Cyan);
 #endif
-                            }
-                            catch (Exception e)
-                            {
-                                Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
-                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                         }
                     }
                 }
 
                 if (messages.Count > 0)
-                    Config.Config.Data.LastCommitMessage = messages.First().GetEverythingBetween("aria-label=\"", "\" ");
+                    Config.Config.Data.LastCommitMessage = messages.First().Item1;
                 Config.Config.Save();
             }
         }
