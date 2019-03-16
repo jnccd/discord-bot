@@ -80,11 +80,11 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(bmp, message.Channel);
             }),
-            new EditLastCommand("memify", "Turn the last Picture into a meme [WIP]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+            //new EditLastCommand("memify", "Turn the last Picture into a meme [WIP]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            //    Bitmap bmp = Global.GetBitmapFromURL(lastPic);
 
-                
-            }),
+
+            //}),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
             "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);

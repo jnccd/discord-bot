@@ -173,7 +173,7 @@ namespace TestDiscordBot
                 Console.Write("$");
             }
         }
-
+        
         // Extensions
         public static List<int> AllIndexesOf(this string str, string value)
         {
@@ -308,28 +308,18 @@ namespace TestDiscordBot
             catch { }
             return Embed;
         }
-        public static string ToTitle(this Reward r)
-        {
-            List<string> inputs = new List<string> { (r.Items.Count == 0 ? "" : r.Items.Aggregate((x, y) => x + " " + y)),
-                                                     (r.CountedItems.Count == 0 ? "" : r.CountedItems.Select(x => (x.Count > 1 ? x.Count + " " : "") + x.Type).Aggregate((x, y) => x + " " + y)),
-                                                     (r.Credits == 0 ? "" : r.Credits + "c") };
-            inputs.RemoveAll(x => string.IsNullOrWhiteSpace(x));
-            return inputs.Count == 0 ? "" : inputs.Aggregate((x, y) => (x + " - " + y));
-        }
-        public static string ToTitle(this Alert a)
-        {
-            return a.Mission.Reward.ToTitle() + " - " + a.Mission.Node;
-        }
-        public static string ToTitle(this Invasion inv)
-        {
-            return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description + " - " + inv.Completion  + "%";
-        }
         public static string ToReadable(this TimeSpan t)
         {
             return string.Format("{0}{1}{2}{3}", t.Days > 0 ? t.Days + "d " : "",
                                                  t.Hours > 0 ? t.Hours + "h " : "",
                                                  t.Minutes > 0 ? t.Minutes + "m " : "",
                                                  t.Seconds > 0 ? t.Seconds + "s " : "0s ").Trim(' ');
+        }
+        public static b Foldr<a, b>(this IEnumerable<a> xs, b y, Func<a, b, b> f)
+        {
+            foreach (a x in xs)
+                y = f(x, y);
+            return y;
         }
     }
 
