@@ -13,6 +13,26 @@ using WarframeNET;
 
 namespace TestDiscordBot.Commands
 {
+    public static class WarframeExtensions
+    {
+        public static string ToTitle(this Reward r)
+        {
+            List<string> inputs = new List<string> { (r.Items.Count == 0 ? "" : r.Items.Aggregate((x, y) => x + " " + y)),
+                                                     (r.CountedItems.Count == 0 ? "" : r.CountedItems.Select(x => (x.Count > 1 ? x.Count + " " : "") + x.Type).Aggregate((x, y) => x + " " + y)),
+                                                     (r.Credits == 0 ? "" : r.Credits + "c") };
+            inputs.RemoveAll(x => string.IsNullOrWhiteSpace(x));
+            return inputs.Count == 0 ? "" : inputs.Aggregate((x, y) => (x + " - " + y));
+        }
+        public static string ToTitle(this Alert a)
+        {
+            return a.Mission.Reward.ToTitle() + " - " + a.Mission.Node;
+        }
+        public static string ToTitle(this Invasion inv)
+        {
+            return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description + " - " + inv.Completion + "%";
+        }
+    }
+
     public class Warframe : Command
     {
         const int updateIntervalMin = 5;
@@ -57,49 +77,7 @@ namespace TestDiscordBot.Commands
             }
             else if (split[1] == "state")
             {
-                EmbedBuilder embed = new EmbedBuilder();
-
-                lock (lockject)
-                {
-                    if (WarframeHandler.worldState.WS_Alerts.Count != 0)
-                        embed.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
-
-                    if (WarframeHandler.worldState.WS_Invasions.Count != 0)
-                    {
-                        string invStr = WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted).
-                            Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y);
-                        if (invStr.Length > 1024)
-                            invStr = invStr.Substring(0, 1024);
-                        embed.AddField("Invasions:", invStr);
-                    }
-
-                    if (WarframeHandler.worldState.WS_Fissures.Count != 0)
-                        embed.AddField("Fissures:", WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
-                            Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
-                            Aggregate((x, y) => x + "\n" + y));
-
-                    if (WarframeHandler.worldState.WS_Sortie.Variants.Count != 0)
-                        embed.AddField("Sortie:", WarframeHandler.worldState.WS_Sortie.Variants.
-                            Select(x => x.MissionType + " on " + x.Node + " with " + x.Modifier + "\n" + x.ModifierDescription).Aggregate((x, y) => x + "\n\n" + y));
-
-                    embed.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
-                        (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
-
-                    embed.AddField("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
-                        (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
-                    
-                    foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
-                    {
-                        embed.AddField(mission.Syndicate, "Missions: ");
-                        for (int i = 0; i < mission.jobs.Count; i++)
-                            if (mission.jobs[i].rewardPool != null)
-                                embed.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
-                                    $"{mission.jobs[i].standingStages.Sum()} Standing until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
-                    }
-                }
-
-                embed.WithColor(0, 128, 255);
-                await Global.SendEmbed(embed, message.Channel);
+                await Global.SendEmbed(GetStateEmbed(), message.Channel);
             }
             else
             {
@@ -141,6 +119,59 @@ namespace TestDiscordBot.Commands
             }
         }
 
+        EmbedBuilder GetStateEmbed()
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+
+            lock (lockject)
+            {
+                if (WarframeHandler.worldState.WS_Alerts.Count != 0)
+                    embed.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
+
+                if (WarframeHandler.worldState.WS_Invasions.Count != 0)
+                {
+                    string invStr = WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted).
+                        Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y);
+                    if (invStr.Length > 1024)
+                        invStr = invStr.Substring(0, 1024);
+                    embed.AddField("Invasions:", invStr);
+                }
+
+                if (WarframeHandler.worldState.WS_Fissures.Count != 0)
+                    embed.AddField("Fissures:", WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
+                        Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
+                        Aggregate((x, y) => x + "\n" + y));
+
+                if (WarframeHandler.worldState.WS_Sortie.Variants.Count != 0)
+                    embed.AddField("Sortie:", WarframeHandler.worldState.WS_Sortie.Variants.
+                        Select(x => x.MissionType + " on " + x.Node + " with " + x.Modifier + "\n" + x.ModifierDescription).Aggregate((x, y) => x + "\n\n" + y));
+
+                if (WarframeHandler.worldState.WS_Events.Count != 0)
+                    embed.AddField("Events:", WarframeHandler.worldState.WS_Events.
+                        Select(x => x.Description + " - Until: " + x.EndTime.ToLongDateString() + " - " + x.Rewards.
+                            Select(y => y.ToTitle()).
+                            Foldr("", (a, b) => a + " " + b)).
+                        Foldr("", (x, y) => x + "\n" + y));
+
+                embed.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
+                    (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
+
+                embed.AddField("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
+                    (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
+
+                foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
+                {
+                    embed.AddField(mission.Syndicate, "Missions: ");
+                    for (int i = 0; i < mission.jobs.Count; i++)
+                        if (mission.jobs[i].rewardPool != null)
+                            embed.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
+                                $"{mission.jobs[i].standingStages.Sum()} Standing until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
+                }
+            }
+
+            embed.WithColor(0, 128, 255);
+            return embed;
+        }
         void RunNotificationLoop()
         {
             Thread.CurrentThread.Name = "Warframe Notification Loop";
