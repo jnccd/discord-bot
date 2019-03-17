@@ -84,7 +84,6 @@ namespace TestDiscordBot.Commands
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
                     Global.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
-
                 }),
             new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
             ")\neg. " + Prefix + CommandLine + " drawCircle 100,450 Red 25",
