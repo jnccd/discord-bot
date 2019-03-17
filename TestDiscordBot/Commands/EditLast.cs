@@ -32,7 +32,7 @@ namespace TestDiscordBot.Commands
                 await Global.SendText(":crab: " + lastText.Content + " :crab:" +
                     "\nhttps://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel);
             }),
-            new EditLastCommand("CAPS", "Convert text to CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("CAPS", "Convert text to CAPS",true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), message.Channel);
             }),
             new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
@@ -79,6 +79,22 @@ namespace TestDiscordBot.Commands
                     }
 
                 await Global.SendBitmap(bmp, message.Channel);
+            }),
+            new EditLastCommand("redRekt", "Finds red rectangles in pictures", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+                
+                Rectangle redRekt = FindRectangle(bmp, System.Drawing.Color.FromArgb(254, 34, 34), 20);
+
+                if (redRekt.Width == 0)
+                    await Global.SendText("No Red rekt!", message.Channel);
+                else
+                {
+                    using (Graphics graphics = Graphics.FromImage(output))
+                    graphics.DrawRectangle(new Pen(System.Drawing.Color.Red), redRekt);
+
+                    await Global.SendBitmap(output, message.Channel);
+                }
             }),
             //new EditLastCommand("memify", "Turn the last Picture into a meme [WIP]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
             //    Bitmap bmp = Global.GetBitmapFromURL(lastPic);
@@ -184,6 +200,30 @@ namespace TestDiscordBot.Commands
             return target;
         }
         private enum TransformMode { Expand, Collapse, Stir, Fall }
+        private Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
+        {
+            for (int x = 1; x < Pic.Width; x++)
+                for (int y = 1; y < Pic.Height; y++)
+                    if (IsSameColor(Pic.GetPixel(x, y), C))
+                    {
+                        int a = x;
+                        while (a < Pic.Width && IsSameColor(Pic.GetPixel(a, y), C))
+                            a++;
+
+                        int b = y;
+                        while (b < Pic.Height && IsSameColor(Pic.GetPixel(x, b), C))
+                            b++;
+
+                        if (a - x > MinSize && b - y > MinSize)
+                            return new Rectangle(x, y, a - x - 1, b - y - 1);
+                    }
+
+            return new Rectangle();
+        }
+        private bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
+        {
+            return Math.Abs(C1.R - C2.R) < 5 && Math.Abs(C1.G - C2.G) < 5 && Math.Abs(C1.B - C2.B) < 5;
+        }
 
         public override async Task Execute(SocketMessage message)
         {
@@ -242,7 +282,7 @@ namespace TestDiscordBot.Commands
                             return;
                         }
 
-                        command.execute(message, lastText, lastPic);
+                        await command.execute(message, lastText, lastPic);
 
                         break;
                     }
@@ -252,12 +292,11 @@ namespace TestDiscordBot.Commands
 
         class EditLastCommand
         {
-            public delegate void Execution(SocketMessage message, IMessage lastText, string lastPic);
             public bool textBased;
             public string command, desc;
-            public Execution execute;
+            public Func<SocketMessage, IMessage, string, Task> execute;
 
-            public EditLastCommand(string command, string desc, bool textBased, Execution execute)
+            public EditLastCommand(string command, string desc, bool textBased, Func<SocketMessage, IMessage, string, Task> execute)
             {
                 this.textBased = textBased;
                 this.command = command;
