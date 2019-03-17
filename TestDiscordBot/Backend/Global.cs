@@ -321,6 +321,16 @@ namespace TestDiscordBot
                 y = f(x, y);
             return y;
         }
+        public static a GetRandomValue<a>(this IEnumerable<a> xs)
+        {
+            a[] arr = xs.ToArray();
+            return arr[RDM.Next(arr.Length)];
+        }
+        public static string TakeLastGroup(this string s, char seperator)
+        {
+            string[] split = s.Split(seperator);
+            return split.Take(split.Length - 1).Reverse().Foldr("", (a, b) => a + seperator + b);
+        }
     }
 
     // Approximate Math Functions

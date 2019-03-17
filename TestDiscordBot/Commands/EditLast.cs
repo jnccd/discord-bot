@@ -44,7 +44,7 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Global.SendText(lastText.Content.Replace("|", ""), message.Channel);
             }),
-            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Prefix}editLast Crossost #general", 
+            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Prefix}editLast Crossost #general",
                 true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 try
                 {
@@ -80,10 +80,11 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(bmp, message.Channel);
             }),
-            new EditLastCommand("redRekt", "Finds red rectangles in pictures", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("Rekt", "Finds colored rectangles in pictures", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-                
+
+                System.Drawing.Color c = System.Drawing.Color.FromName(message.Content.Split(' ')[2]);
                 Rectangle redRekt = FindRectangle(bmp, System.Drawing.Color.FromArgb(254, 34, 34), 20);
 
                 if (redRekt.Width == 0)
@@ -96,13 +97,30 @@ namespace TestDiscordBot.Commands
                     await Global.SendBitmap(output, message.Channel);
                 }
             }),
-            //new EditLastCommand("memify", "Turn the last Picture into a meme [WIP]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-            //    Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+            new EditLastCommand("memify", "Turn the last Picture into a meme", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                string[] files = Directory.GetFiles("Commands\\MemeTemplates");
 
+                string memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
+                string memeName = memeTemplateDesign.TakeLastGroup('-');
+                string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
-            //}),
+                Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                Bitmap overlay;
+                using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
+                     overlay = (Bitmap)Bitmap.FromStream(stream);
+                Bitmap output = new Bitmap(overlay.Width, overlay.Height);
+                using (Graphics graphics = Graphics.FromImage(output))
+                {
+                    graphics.DrawImage(bmp, redRekt);
+                    graphics.DrawImage(overlay, new Point(0, 0));
+                }
+
+                await Global.SendBitmap(output, message.Channel);
+            }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
-            "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]", 
+                false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
