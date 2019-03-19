@@ -31,7 +31,8 @@ namespace TestDiscordBot.Commands
                 List<Tuple<string, string>> messages = html.
                     GetEverythingBetweenAll("<p class=\"commit-title h5 mb-1 text-gray-dark \">", "</p>").
                     Select(x => new Tuple<string, string>(x.GetEverythingBetween("aria-label=\"", "\" "), 
-                                                          "https://github.com" + x.GetEverythingBetween("href=\"", "\">"))).ToList();
+                                                          "https://github.com" + x.GetEverythingBetween("href=\"", "\">"))).
+                    Reverse().ToList();
 
                 foreach (Tuple<string, string> tuple in messages)
                 {
