@@ -101,6 +101,7 @@ namespace TestDiscordBot.Commands
             }),
             new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await memifyLock.WaitAsync();
+                Exception e = null;
                 try
                 {
                     Bitmap bmp = Global.GetBitmapFromURL(lastPic);
@@ -161,9 +162,12 @@ namespace TestDiscordBot.Commands
                     else
                         throw new Exception("uwu");
                 }
+                catch (Exception ex) { e = ex; }
                 finally
                 {
                     memifyLock.Release();
+                    if (e != null)
+                        throw e;
                 }
             }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
