@@ -95,6 +95,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Brainfuck.cs" />
     <Compile Include="Commands\Chess\ChessBoard.cs" />
     <Compile Include="Commands\Chess\ChessPiece.cs" />
     <Compile Include="Commands\Chess\ChessPlayer.cs" />
