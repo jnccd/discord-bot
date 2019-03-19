@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using XnaGeometry;
 
@@ -16,6 +17,7 @@ namespace TestDiscordBot.Commands
     public class EditLast : Command
     {
         readonly EditLastCommand[] Commands;
+        static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
 
         public EditLast() : base("editLast", "Edit the last message", false)
         {
@@ -98,63 +100,71 @@ namespace TestDiscordBot.Commands
                 }
             }),
             new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
-                string[] files = Directory.GetFiles("Commands\\MemeTemplates");
-                string[] split = message.Content.Split(' ');
-
-                string memeTemplateDesign = "";
-                if (split.Length == 3 && split[2] == "-list")
+                await memifyLock.WaitAsync();
+                try
                 {
-                    await Global.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
-                                                                    Where(x => x.EndsWith("design")).
-                                                                    Select(x => new string(x.TakeWhile(y => !char.IsDigit(y)).ToArray())).
-                                                                    Aggregate((x, y) => x + "\n" + y), message.Channel);
-                    return;
-                }
-                else if (split.Length > 2)
-                    memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[2]) && 
-                                                          Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
-                else
-                    memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
+                    Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                    string[] files = Directory.GetFiles("Commands\\MemeTemplates");
+                    string[] split = message.Content.Split(' ');
 
-                if (memeTemplateDesign == "")
-                {
-                    await Global.SendText("I don't have that meme in my registry!", message.Channel);
-                    return;
-                }
-
-                string memeName = memeTemplateDesign.RemoveLastGroup('-').TrimEnd('-');
-                string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
-                string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
-
-                if (File.Exists(memeTemplateOverlay))
-                {
-                    Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
-                    Bitmap overlay;
-                    using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
-                        overlay = (Bitmap)Bitmap.FromStream(stream);
-                    Bitmap output = new Bitmap(overlay.Width, overlay.Height);
-                    using (Graphics graphics = Graphics.FromImage(output))
+                    string memeTemplateDesign = "";
+                    if (split.Length == 3 && split[2] == "-list")
                     {
-                       graphics.DrawImage(bmp, redRekt);
-                       graphics.DrawImage(overlay, new Point(0, 0));
+                        await Global.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                                                                        Where(x => x.EndsWith("design")).
+                                                                        Select(x => new string(x.TakeWhile(y => !char.IsDigit(y)).ToArray())).
+                                                                        Aggregate((x, y) => x + "\n" + y), message.Channel);
+                        return;
+                    }
+                    else if (split.Length > 2)
+                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[2]) &&
+                                                              Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
+                    else
+                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
+
+                    if (memeTemplateDesign == "")
+                    {
+                        await Global.SendText("I don't have that meme in my registry!", message.Channel);
+                        return;
                     }
 
-                    await Global.SendBitmap(output, message.Channel);
-                }
-                else if (File.Exists(memeTemplate))
-                {
-                    Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
-                    Bitmap template;
-                    using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-                        template = (Bitmap)Bitmap.FromStream(stream);
-                    using (Graphics graphics = Graphics.FromImage(template))
-                        graphics.DrawImage(bmp, redRekt);
+                    string memeName = memeTemplateDesign.RemoveLastGroup('-').TrimEnd('-');
+                    string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
+                    string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
-                    await Global.SendBitmap(template, message.Channel);
+                    if (File.Exists(memeTemplateOverlay))
+                    {
+                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        Bitmap overlay;
+                        using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
+                            overlay = (Bitmap)Bitmap.FromStream(stream);
+                        Bitmap output = new Bitmap(overlay.Width, overlay.Height);
+                        using (Graphics graphics = Graphics.FromImage(output))
+                        {
+                           graphics.DrawImage(bmp, redRekt);
+                           graphics.DrawImage(overlay, new Point(0, 0));
+                        }
+
+                        await Global.SendBitmap(output, message.Channel);
+                    }
+                    else if (File.Exists(memeTemplate))
+                    {
+                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        Bitmap template;
+                        using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
+                            template = (Bitmap)Bitmap.FromStream(stream);
+                        using (Graphics graphics = Graphics.FromImage(template))
+                            graphics.DrawImage(bmp, redRekt);
+
+                        await Global.SendBitmap(template, message.Channel);
+                    }
+                    else
+                        throw new Exception("uwu");
                 }
-                else
-                    throw new Exception("uwu");
+                finally
+                {
+                    memifyLock.Release();
+                }
             }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
                 "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]", 
