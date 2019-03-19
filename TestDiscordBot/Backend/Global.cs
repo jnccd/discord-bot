@@ -326,7 +326,7 @@ namespace TestDiscordBot
             a[] arr = xs.ToArray();
             return arr[RDM.Next(arr.Length)];
         }
-        public static string TakeLastGroup(this string s, char seperator)
+        public static string RemoveLastGroup(this string s, char seperator)
         {
             string[] split = s.Split(seperator);
             return split.Take(split.Length - 1).Reverse().Foldr("", (a, b) => a + seperator + b);

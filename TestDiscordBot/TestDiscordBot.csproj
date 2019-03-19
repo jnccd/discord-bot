@@ -180,10 +180,94 @@
     <Content Include="BuildDate.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Commands\MemeTemplates\allah-5902994b388b9-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\allah-5902994b388b9.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\branflakes-57f31c1b5ec6e-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\branflakes-57f31c1b5ec6e.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\fairly-odd-parents-57b5b6dea839f-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\fairly-odd-parents-57b5b6dea839f.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\girl-i-like-you-58d575b3b201b-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\girl-i-like-you-58d575b3b201b.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\how-i-sit-58cfd7de7c0b8-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\how-i-sit-58cfd7de7c0b8.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\humanity-57fd4468a8ffe-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\humanity-57fd4468a8ffe-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\hurtful-dog-57f315c453b31-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\hurtful-dog-57f315c453b31.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\i-had-to-grind-for-this-view-58dc68aec7acc-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\i-had-to-grind-for-this-view-58dc68aec7acc-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\meemay-57b1ddc7ae86a-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\meemay-57b1ddc7ae86a.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Commands\MemeTemplates\pucci-58783971b94f0-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Commands\MemeTemplates\pucci-58783971b94f0-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\some-body-once-told-me-58d2edf2e6554-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\some-body-once-told-me-58d2edf2e6554-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\thank-you-kanye-very-cool-5ae1d0be61b5b-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\thank-you-kanye-very-cool-5ae1d0be61b5b.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\top-10-anime-girls-57f3904c656bf-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\top-10-anime-girls-57f3904c656bf.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\truth-58daa03077c86-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\truth-58daa03077c86.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\uglier-up-close-58f4ba7d85806-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Commands\MemeTemplates\uglier-up-close-58f4ba7d85806-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Commands\xnageometry\License.txt" />
