@@ -331,7 +331,7 @@ namespace TestDiscordBot
                     // TODO: Test
                     try
                     {
-                        Global.ConsoleWriteLine("dash".StartsWith("").ToString(),ConsoleColor.White);
+                        
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
