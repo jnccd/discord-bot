@@ -121,7 +121,13 @@ namespace WarframeNET
         /// </summary>
         [JsonProperty("vallisCycle")]
         public FortunaCycle WS_FortunaCycle { get; set; }
-        
+
+        /// <summary>
+        /// Current Nightwave Data.
+        /// </summary>
+        [JsonProperty("nightwave")]
+        public Nightwave WS_NightWave { get; set; }
+
         internal WorldState() { }
     }
 }
