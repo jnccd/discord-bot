@@ -121,6 +121,8 @@
     <Compile Include="Commands\UrbanDict.cs" />
     <Compile Include="Commands\Warframe.cs" />
     <Compile Include="Commands\Markow\MarkovHelper.cs" />
+    <Compile Include="Commands\Warframe\WarframeObjects\Nightwave.cs" />
+    <Compile Include="Commands\Warframe\WarframeObjects\NightwaveChallenge.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Commands\AAATemplate.cs" />
     <Compile Include="Commands\Ball.cs" />

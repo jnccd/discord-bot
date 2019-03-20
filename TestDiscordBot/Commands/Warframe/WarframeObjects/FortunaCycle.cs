@@ -8,11 +8,11 @@ namespace WarframeNET
 {
     public class FortunaCycle
     {
-        public string Id { get; set; }
-        public DateTime Expiry { get; set; }
-        public bool IsWarm { get; set; }
-        public string TimeLeft { get; set; }
-        public string ShortString { get; set; }
+        public string Id;
+        public DateTime Expiry;
+        public bool IsWarm;
+        public string TimeLeft;
+        public string ShortString;
 
         public string Temerature()
         {

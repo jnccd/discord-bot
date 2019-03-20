@@ -142,15 +142,31 @@ namespace TestDiscordBot.Commands
                         Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
                         Aggregate((x, y) => x + "\n" + y));
 
+                if (WarframeHandler.worldState.WS_VoidTrader.Inventory.Count == 0)
+                    embed.AddField("Baro-Senpai is currently gone", "But don't despair he will come back at " + WarframeHandler.worldState.WS_VoidTrader.StartTime);
+                else
+                    embed.AddField("Baro-Senpai is here!", "He got: " + WarframeHandler.worldState.WS_VoidTrader.Inventory.
+                        Select(item => $"{item.Item} {item.Credits}:moneybag: {item.Ducats}D").
+                        Aggregate((x, y) => x + "\n" + y));
+
+                if (WarframeHandler.worldState.WS_NightWave.ActiveChallenges.Count != 0)
+                {
+                    embed.AddField($"Nightwave Challenges: ", $"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
+                        $"{WarframeHandler.worldState.WS_NightWave.Phase}");
+                    foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
+                        embed.AddField($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
+                }
+
                 if (WarframeHandler.worldState.WS_Sortie.Variants.Count != 0)
                     embed.AddField("Sortie:", WarframeHandler.worldState.WS_Sortie.Variants.
-                        Select(x => x.MissionType + " on " + x.Node + " with " + x.Modifier + "\n" + x.ModifierDescription).Aggregate((x, y) => x + "\n\n" + y));
+                        Select(x => x.MissionType + " on " + x.Node + " with " + x.Modifier + "\n" + x.ModifierDescription).
+                        Aggregate((x, y) => x + "\n\n" + y));
 
                 if (WarframeHandler.worldState.WS_Events.Count != 0)
                     embed.AddField("Events:", WarframeHandler.worldState.WS_Events.
                         Select(x => x.Description + " - Until: " + x.EndTime.ToLongDateString() + " - " + x.Rewards.
                             Select(y => y.ToTitle()).
-                            Foldr("", (a, b) => a + " " + b)).
+                            Foldr("", (a, b) => a + " " + b).Trim(' ').Trim('-')).
                         Foldr("", (x, y) => x + "\n" + y));
 
                 embed.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
@@ -165,7 +181,7 @@ namespace TestDiscordBot.Commands
                     for (int i = 0; i < mission.jobs.Count; i++)
                         if (mission.jobs[i].rewardPool != null)
                             embed.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
-                                $"{mission.jobs[i].standingStages.Sum()} Standing until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
+                                $"{mission.jobs[i].standingStages.Sum()} :arrow_up: until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
                 }
             }
 
