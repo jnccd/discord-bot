@@ -44,8 +44,8 @@ namespace TestDiscordBot
                 string bytes = postJson.Remove(0, index + "\\u".Length);
                 bytes = bytes.Remove(4);
                 string hexChar = BitConverter.ToChar(new byte[] { Convert.ToByte(bytes[0]), Convert.ToByte(bytes[1]), Convert.ToByte(bytes[2]), Convert.ToByte(bytes[3]) }, 0).ToString();
-                postJson.Remove(index, 6);
-                postJson.Insert(index, hexChar);
+                postJson = postJson.Remove(index, 6);
+                postJson = postJson.Insert(index, hexChar);
             }
 
             return postJson;

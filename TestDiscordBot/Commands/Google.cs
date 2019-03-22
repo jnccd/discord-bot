@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,17 +17,17 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage message)
         {
-            string[] split = commandmessage.Content.Split(new char[] { ' ', '\n' });
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
+            EmbedBuilder embed = new EmbedBuilder();
 
             if (split.Length <= 1)
             {
-                await Global.SendText("I need something to search!", commandmessage.Channel);
+                await Global.SendText("I need something to search!", message.Channel);
                 return;
             }
-
-            string hitUrl;
+            
             string url = string.Format("http://www.google.com/search?q=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())) + "&btnI");
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
             req.KeepAlive = false;
@@ -36,10 +37,14 @@ namespace TestDiscordBot.Commands
             using (StreamReader sr = new StreamReader(W.GetResponseStream()))
             {
                 string html = sr.ReadToEnd();
-                hitUrl = html.GetEverythingBetween("cite class", "/cite>").GetEverythingBetween(">", "<");
+                Tuple<string, string>[] hits = html.GetEverythingBetweenAll("<p>&bull;&nbsp;<a href=\"", "/p>").
+                    Select(x => new Tuple<string, string>("https://" + x.GetEverythingBetween("https://", "\" target=\""),
+                                                 WebUtility.HtmlDecode(x.GetEverythingBetween("</a> ", "<")))).ToArray();
+                foreach (Tuple<string, string> hit in hits)
+                    embed.AddField(hit.Item1, hit.Item2);
             }
-
-            await Global.SendText(hitUrl, commandmessage.Channel);
+            
+            await Global.SendEmbed(embed, message.Channel);
         }
     }
 }
