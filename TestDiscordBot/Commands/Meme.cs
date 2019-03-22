@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TestDiscordBot.Commands
@@ -43,6 +44,7 @@ namespace TestDiscordBot.Commands
             else
                 url = Subreddits[Global.RDM.Next(Subreddits.Length)];
 
+            Thread.CurrentThread.Name = "kek";
             while (!worked)
             {
                 try
