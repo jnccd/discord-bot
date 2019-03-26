@@ -37,6 +37,7 @@ namespace TestDiscordBot
                                       where assemblyType.IsSubclassOf(typeof(Command))
                                       select assemblyType).ToArray();
         static EmbedBuilder HelpMenu = new EmbedBuilder();
+        static int Executions = 0;
 
         public static ulong OwnID
         {
@@ -544,6 +545,8 @@ namespace TestDiscordBot
 
             try
             {
+                var typingState = message.Channel.EnterTypingState();
+
                 Global.SaveUser(message.Author.Id);
                 await command.Execute(message);
 
@@ -553,6 +556,8 @@ namespace TestDiscordBot
                 else
                     Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
                         "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
+
+                typingState.Dispose();
             }
             catch (Exception e)
             {
