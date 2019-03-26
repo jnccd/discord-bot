@@ -37,7 +37,7 @@ namespace TestDiscordBot
                                       where assemblyType.IsSubclassOf(typeof(Command))
                                       select assemblyType).ToArray();
         static EmbedBuilder HelpMenu = new EmbedBuilder();
-        static int Executions = 0;
+        static int Exectutions = 0;
 
         public static ulong OwnID
         {
@@ -122,6 +122,7 @@ namespace TestDiscordBot
 
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
+            client.ReactionAdded += Client_ReactionAdded;
 
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
@@ -406,7 +407,6 @@ namespace TestDiscordBot
             await client.LogoutAsync();
             Environment.Exit(0);
         }
-
         private static async Task Client_JoinedGuild(SocketGuild arg)
         {
             try
@@ -439,7 +439,7 @@ namespace TestDiscordBot
 
                 if (!hasRead || !hasReadHistory || !hasFiles)
                 {
-                    await g.TextChannels.ElementAt(0).SendMessageAsync("Whoever added me has big gay and didn't give me all the permissions.");
+                    await g.TextChannels.ElementAt(0).SendMessageAsync("Whoever added me has big gay and didn't give me all the usual permissions.");
                     return;
                 }
             }
@@ -455,7 +455,21 @@ namespace TestDiscordBot
             Global.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
             return Task.FromResult(0);
         }
-        private static async Task MessageReceived(SocketMessage message)
+        private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        {
+            Task.Run(() => {
+                foreach (Command c in commands)
+                {
+                    try
+                    {
+                        c.OnEmojiReaction(arg1, arg2, arg3);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+            });
+            return Task.FromResult(default(object));
+        }
+        private static Task MessageReceived(SocketMessage message)
         {
             if (!message.Author.IsBot)
             {
@@ -467,7 +481,7 @@ namespace TestDiscordBot
 
                 if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 {
-                    await Task.Run(() => {
+                    Task.Run(() => {
                         foreach (Command c in commands)
                         {
                             try
@@ -479,7 +493,7 @@ namespace TestDiscordBot
                     });
                 }
             }
-
+            return Task.FromResult(default(object));
         }
         private static async void ThreadedMessageReceived(object o)
         {
@@ -546,6 +560,8 @@ namespace TestDiscordBot
             try
             {
                 var typingState = message.Channel.EnterTypingState();
+                Exectutions++;
+                UpdateWorkState();
 
                 Global.SaveUser(message.Author.Id);
                 await command.Execute(message);
@@ -558,6 +574,8 @@ namespace TestDiscordBot
                         "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
 
                 typingState.Dispose();
+                Exectutions--;
+                UpdateWorkState();
             }
             catch (Exception e)
             {
@@ -568,6 +586,13 @@ namespace TestDiscordBot
 
                 Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
             }
+        }
+        static void UpdateWorkState()
+        {
+            if (Exectutions > 0)
+                client.SetStatusAsync(UserStatus.DoNotDisturb);
+            else
+                client.SetStatusAsync(UserStatus.Online);
         }
         
         public static SocketUser GetUserFromId(ulong UserId)
