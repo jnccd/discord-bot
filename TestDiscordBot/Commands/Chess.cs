@@ -53,11 +53,11 @@ namespace TestDiscordBot.Commands
                     return;
                 }
 
-                if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
-                {
-                    await Global.SendText("You can't play against yourself!", commandmessage.Channel);
-                    return;
-                }
+                //if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
+                //{
+                //    await Global.SendText("You can't play against yourself!", commandmessage.Channel);
+                //    return;
+                //}
 
                 if (Boards.Exists(x => x.PlayerBottom.UserID == commandmessage.MentionedUsers.ElementAt(0).Id ||
                         x.PlayerTop.UserID == commandmessage.MentionedUsers.ElementAt(0).Id))
@@ -79,7 +79,7 @@ namespace TestDiscordBot.Commands
                 }
 
                 await Global.SendText(ChessBoardToDiscordString(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id || 
-                x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
+                    x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
             }
             else if (split[1] == "move")
             {
@@ -131,6 +131,8 @@ namespace TestDiscordBot.Commands
                 try
                 {
                     Board.MovePiece(new ChessPoint(x1, y1), new ChessPoint(x2, y2));
+                    await Global.SendText(ChessBoardToDiscordString(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id ||
+                        x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
                 }
                 catch
                 {

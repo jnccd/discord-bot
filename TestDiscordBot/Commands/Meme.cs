@@ -60,6 +60,9 @@ namespace TestDiscordBot.Commands
                     Console.WriteLine(e);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("$");
+
+                    if (e.ToString().Contains("(404) Nicht gefunden"))
+                        break;
                 }
             }
         }

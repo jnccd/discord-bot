@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,15 @@ namespace TestDiscordBot
             }
         }
 
+        public EmbedBuilder HelpMenu;
+        public class SubCommand
+        {
+            public SubCommand[] SubCommands;
+            public string Command;
+            public string Desc;
+
+        }
+
         public Command(string command, string desc, bool isExperimental)
         {
             Desc = desc;
@@ -44,7 +54,7 @@ namespace TestDiscordBot
             IsExperimental = isExperimental;
             IsHidden = isHidden;
         }
-
+        
         public virtual Task Execute(SocketMessage message)
         {
             return Task.FromResult(default(object));

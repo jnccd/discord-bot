@@ -765,7 +765,7 @@ namespace TestDiscordBot.Chess
             ChessPiece FromPiece = GetChessPieceFromPoint(from);
             ChessPlayer MovePlayer = PlayerWhoHasTheMove();
             List<ChessPoint> AllPossibleMoves = new List<ChessPoint>(GetAllPossibleMovesForPiece(from));
-            if (FromPiece.Parent == MovePlayer && AllPossibleMoves.Contains(to))
+            if (FromPiece.Parent == MovePlayer && AllPossibleMoves.Exists(x => x.X == to.X && x.Y == to.Y))
             {
                 Turns++;
 
