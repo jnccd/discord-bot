@@ -37,7 +37,6 @@ namespace TestDiscordBot
             public SubCommand[] SubCommands;
             public string Command;
             public string Desc;
-
         }
 
         public Command(string command, string desc, bool isExperimental)
@@ -61,6 +60,10 @@ namespace TestDiscordBot
         }
 
         public virtual void OnNonCommandMessageRecieved(SocketMessage message)
+        {
+
+        }
+        public virtual void OnEmojiReaction(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
 
         }
