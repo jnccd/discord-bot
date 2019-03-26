@@ -80,16 +80,18 @@ namespace TestDiscordBot
             {
                 while (Embed.Fields.Count > 0)
                 {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.Color = Embed.Color;
-                    eb.Description = Embed.Description;
-                    eb.Author = Embed.Author;
-                    eb.Footer = Embed.Footer;
-                    eb.ImageUrl = Embed.ImageUrl;
-                    eb.ThumbnailUrl = Embed.ThumbnailUrl;
-                    eb.Timestamp = Embed.Timestamp;
-                    eb.Title = Embed.Title;
-                    eb.Url = Embed.Title;
+                    EmbedBuilder eb = new EmbedBuilder
+                    {
+                        Color = Embed.Color,
+                        Description = Embed.Description,
+                        Author = Embed.Author,
+                        Footer = Embed.Footer,
+                        ImageUrl = Embed.ImageUrl,
+                        ThumbnailUrl = Embed.ThumbnailUrl,
+                        Timestamp = Embed.Timestamp,
+                        Title = Embed.Title,
+                        Url = Embed.Title
+                    };
                     eb.Url = Embed.Url;
                     for (int i = 0; i < 25 && Embed.Fields.Count > 0; i++)
                     {
