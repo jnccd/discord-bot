@@ -49,6 +49,10 @@ namespace TestDiscordBot.Commands
         {
             
         }
+        public override void OnConnected()
+        {
+            Task.Factory.StartNew(RunNotificationLoop);
+        }
         public override async Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
@@ -118,11 +122,7 @@ namespace TestDiscordBot.Commands
                 await Global.SendEmbed(embed, message.Channel);
             }
         }
-        public override void OnConnected()
-        {
-            Task.Factory.StartNew(RunNotificationLoop);
-        }
-
+        
         EmbedBuilder GetStateEmbed()
         {
             EmbedBuilder embed = new EmbedBuilder();

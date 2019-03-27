@@ -16,13 +16,76 @@ namespace TestDiscordBot.Commands
 {
     public class EditLast : Command
     {
-        readonly EditLastCommand[] Commands;
-        static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
-
         public EditLast() : base("editLast", "Edit the last message", false)
         {
-            Commands = new EditLastCommand[] {
 
+        }
+        public override async Task Execute(SocketMessage message)
+        {
+            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
+            IMessage lastText = null;
+            string lastPic = null;
+            ulong ownID = Program.OwnID;
+            foreach (IMessage m in messages)
+            {
+                if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Global.prefix))
+                {
+                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Global.prefix))
+                        lastText = m;
+                    if (lastPic == null && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
+                    {
+                        if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
+                            lastPic = m.Attachments.ElementAt(0).Url;
+                        else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
+                            lastPic = m.Attachments.ElementAt(0).Url;
+                    }
+                    string picLink = m.Content.ContainsPictureLink();
+                    if (lastPic == null && picLink != null)
+                        lastPic = picLink;
+
+                    if (lastText != null && lastPic != null)
+                        break;
+                }
+            }
+
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
+            if (split.Length == 1)
+            {
+                EmbedBuilder Embed = new EmbedBuilder();
+                Embed.WithColor(0, 128, 255);
+                foreach (EditLastCommand ecommand in Commands)
+                {
+                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
+                }
+                Embed.WithDescription("EditLast Commands:");
+                await Global.SendEmbed(Embed, message.Channel);
+            }
+            else
+            {
+                foreach (EditLastCommand command in Commands)
+                {
+                    if (split[1].ToLower() == command.command.ToLower())
+                    {
+                        if (command.textBased && lastText == null)
+                        {
+                            await Global.SendText("I couldn't find text to edit here :thinking:", message.Channel);
+                            return;
+                        }
+                        if (!command.textBased && lastPic == null)
+                        {
+                            await Global.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
+                            return;
+                        }
+
+                        await command.execute(message, lastText, lastPic);
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        public static EditLastCommand[] Commands = new EditLastCommand[] {
             new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Global.SendText(string.Join("", lastText.Content.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
             }),
@@ -46,7 +109,7 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Global.SendText(lastText.Content.Replace("|", ""), message.Channel);
             }),
-            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Prefix}editLast Crossost #general",
+            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Global.prefix}editLast Crossost #general",
                 true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 try
                 {
@@ -171,7 +234,7 @@ namespace TestDiscordBot.Commands
                 }
             }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
-                "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]", 
+                "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]",
                 false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = Global.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
@@ -207,9 +270,8 @@ namespace TestDiscordBot.Commands
 
                 await Global.SendBitmap(output, message.Channel);
             })
-
-            };
-        }
+        };
+        static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
         private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
         {
             Vector2 diff = point - center;
@@ -270,7 +332,7 @@ namespace TestDiscordBot.Commands
             return target;
         }
         private enum TransformMode { Expand, Collapse, Stir, Fall }
-        private Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
+        private static Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
         {
             for (int x = 1; x < Pic.Width; x++)
                 for (int y = 1; y < Pic.Height; y++)
@@ -290,77 +352,12 @@ namespace TestDiscordBot.Commands
 
             return new Rectangle();
         }
-        private bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
+        private static bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
         {
             return Math.Abs(C1.R - C2.R) < 5 && Math.Abs(C1.G - C2.G) < 5 && Math.Abs(C1.B - C2.B) < 5;
         }
 
-        public override async Task Execute(SocketMessage message)
-        {
-            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
-            IMessage lastText = null;
-            string lastPic = null;
-            ulong ownID = Program.OwnID;
-            foreach (IMessage m in messages)
-            {
-                if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Global.prefix))
-                {
-                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Global.prefix))
-                        lastText = m;
-                    if (lastPic == null && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
-                    {
-                        if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                            lastPic = m.Attachments.ElementAt(0).Url;
-                        else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                            lastPic = m.Attachments.ElementAt(0).Url;
-                    }
-                    string picLink = m.Content.ContainsPictureLink();
-                    if (lastPic == null && picLink != null)
-                        lastPic = picLink;
-
-                    if (lastText != null && lastPic != null)
-                        break;
-                }
-            }
-
-            string[] split = message.Content.Split(new char[] { ' ', '\n' });
-            if (split.Length == 1)
-            {
-                EmbedBuilder Embed = new EmbedBuilder();
-                Embed.WithColor(0, 128, 255);
-                foreach (EditLastCommand ecommand in Commands)
-                {
-                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
-                }
-                Embed.WithDescription("EditLast Commands:");
-                await Global.SendEmbed(Embed, message.Channel);
-            }
-            else
-            {
-                foreach (EditLastCommand command in Commands)
-                {
-                    if (split[1].ToLower() == command.command.ToLower())
-                    {
-                        if (command.textBased && lastText == null)
-                        {
-                            await Global.SendText("I couldn't find text to edit here :thinking:", message.Channel);
-                            return;
-                        }
-                        if (!command.textBased && lastPic == null)
-                        {
-                            await Global.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
-                            return;
-                        }
-
-                        await command.execute(message, lastText, lastPic);
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        class EditLastCommand
+        public class EditLastCommand
         {
             public bool textBased;
             public string command, desc;

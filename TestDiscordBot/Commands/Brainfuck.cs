@@ -102,7 +102,7 @@ namespace TestDiscordBot.Commands
                         break;
                 }
 
-                if (steps > 10000)
+                if (steps > 5000)
                 {
                     await Global.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel);
                     return;

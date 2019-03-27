@@ -95,6 +95,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Backend\SelfmadeMessage.cs" />
     <Compile Include="Commands\Brainfuck.cs" />
     <Compile Include="Commands\Chess\ChessBoard.cs" />
     <Compile Include="Commands\Chess\ChessPiece.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Commands\Chess\ChessPoint.cs" />
     <Compile Include="Commands\Chess.cs" />
     <Compile Include="Commands\EditLast.cs" />
+    <Compile Include="Commands\EditThis.cs" />
     <Compile Include="Commands\EmojiUsage.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
     <Compile Include="Commands\GetTimecode.cs" />
