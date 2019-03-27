@@ -88,7 +88,7 @@ namespace TestDiscordBot.Commands
                         }
                         catch (Exception e)
                         {
-                            Extensions.ConvertToDouble(e.ToString(), ConsoleColor.Red);
+                            e.ToString().ConsoleWriteLine(ConsoleColor.Red);
                         }
                         exited = true;
                     });
@@ -116,7 +116,7 @@ namespace TestDiscordBot.Commands
                         Program.SendText("Haskell timeout!", message.Channel).Wait();
                     }
                 }
-                catch (Exception e) { Extensions.ConvertToDouble(e.ToString(), ConsoleColor.Red); }
+                catch (Exception e) { e.ToString().ConsoleWriteLine(ConsoleColor.Red); }
             }
 
             return Task.FromResult(default(object));
