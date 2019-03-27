@@ -22,10 +22,6 @@ namespace TestDiscordBot.Commands
                                                  t.Minutes > 0 ? t.Minutes + "m " : "",
                                                  t.Seconds > 0 ? t.Seconds + "s " : "0s ").Trim(' ');
         }
-    }
-
-    public static class WarframeExtensions
-    {
         public static string ToTitle(this Reward r)
         {
             List<string> inputs = new List<string> { (r.Items.Count == 0 ? "" : r.Items.Aggregate((x, y) => x + " " + y)),
