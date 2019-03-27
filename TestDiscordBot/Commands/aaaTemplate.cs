@@ -18,8 +18,7 @@ namespace TestDiscordBot.Commands
         public override Task Execute(SocketMessage message)
         {
             // <Insert command code here>
-
-            return Task.FromResult(default(object));
+            throw new NotImplementedException();
         }
     }
 }
