@@ -47,7 +47,7 @@ namespace TestDiscordBot.Commands
 
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
-            Task.Factory.StartNew(RunNotificationLoop);
+            
         }
         public override async Task Execute(SocketMessage message)
         {
@@ -117,6 +117,10 @@ namespace TestDiscordBot.Commands
                 }
                 await Global.SendEmbed(embed, message.Channel);
             }
+        }
+        public override void OnConnected()
+        {
+            Task.Factory.StartNew(RunNotificationLoop);
         }
 
         EmbedBuilder GetStateEmbed()
@@ -191,7 +195,6 @@ namespace TestDiscordBot.Commands
         void RunNotificationLoop()
         {
             Thread.CurrentThread.Name = "Warframe Notification Loop";
-            while (!Program.ClientReady) { Thread.Sleep(20); }
 
             while (true)
             {

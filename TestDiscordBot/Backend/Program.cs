@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.WebSocket;
 using System;
 using System.Collections;
@@ -38,6 +39,10 @@ namespace TestDiscordBot
                                       select assemblyType).ToArray();
         static EmbedBuilder HelpMenu = new EmbedBuilder();
         static int Exectutions = 0;
+        static List<Tuple<RestUserMessage, Exception>> CachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
+        static readonly string ErrorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!";
+        static readonly Emoji ErrorEmoji = new Emoji("🤔");
+        static readonly string lockject = "";
 
         public static ulong OwnID
         {
@@ -123,6 +128,7 @@ namespace TestDiscordBot
             client.MessageReceived += MessageReceived;
             client.Ready += Client_Ready;
             client.ReactionAdded += Client_ReactionAdded;
+            client.ReactionRemoved += Client_ReactionRemoved;
 
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
@@ -457,12 +463,50 @@ namespace TestDiscordBot
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
+            Task.Run(async () => {
+                Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                if (error != null)
+                {
+                    var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
+                    reacts.TryGetValue(ErrorEmoji, out var react);
+                    if (react.ReactionCount > 1)
+                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage + "\n\n```" + error.Item2 + "```");
+                    else
+                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage);
+                }
+            });
             Task.Run(() => {
                 foreach (Command c in commands)
                 {
                     try
                     {
-                        c.OnEmojiReaction(arg1, arg2, arg3);
+                        c.OnEmojiReactionAdded(arg1, arg2, arg3);
+                    }
+                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+            });
+            return Task.FromResult(default(object));
+        }
+        private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        {
+            Task.Run(async () => {
+                Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                if (error != null)
+                {
+                    var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
+                    reacts.TryGetValue(ErrorEmoji, out var react);
+                    if (react.ReactionCount > 1)
+                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage + "\n\n```" + error.Item2 + "```");
+                    else
+                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage);
+                }
+            });
+            Task.Run(() => {
+                foreach (Command c in commands)
+                {
+                    try
+                    {
+                        c.OnEmojiReactionRemoved(arg1, arg2, arg3);
                     }
                     catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -551,17 +595,23 @@ namespace TestDiscordBot
         }
         private static async Task ExecuteCommand(Command command, SocketMessage message)
         {
+            if (command.GetType() == typeof(Template) && !ExperimentalChannels.Contains(message.Channel.Id))
+                return;
             if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
             {
                 await Global.SendText("Experimental commands cant be used here!", message.Channel);
                 return;
             }
 
+            IDisposable typingState = null;
             try
             {
-                var typingState = message.Channel.EnterTypingState();
-                Exectutions++;
-                UpdateWorkState();
+                typingState = message.Channel.EnterTypingState();
+                lock (lockject)
+                {
+                    Exectutions++;
+                    UpdateWorkState();
+                }
 
                 Global.SaveUser(message.Author.Id);
                 await command.Execute(message);
@@ -572,19 +622,28 @@ namespace TestDiscordBot
                 else
                     Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
                         "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
-
-                typingState.Dispose();
-                Exectutions--;
-                UpdateWorkState();
             }
             catch (Exception e)
             {
                 try // Try in case I dont have the permissions to write at all
                 {
-                    await Global.SendText("Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!", message.Channel);
-                } catch { }
+                    RestUserMessage m = await message.Channel.SendMessageAsync(ErrorMessage);
 
+                    await m.AddReactionAsync(ErrorEmoji);
+                    CachedErrorMessages.Add(new Tuple<RestUserMessage, Exception>(m, e));
+                }
+                catch { }
+                
                 Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+            }
+            finally
+            {
+                typingState.Dispose();
+                lock (lockject)
+                {
+                    Exectutions--;
+                    UpdateWorkState();
+                }
             }
         }
         static void UpdateWorkState()
