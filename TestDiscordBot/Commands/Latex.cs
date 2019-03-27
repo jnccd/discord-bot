@@ -57,7 +57,7 @@ namespace TestDiscordBot.Commands
                     }
                 }
 
-                Global.SendBitmap(output, message.Channel).Wait();
+                Program.SendBitmap(output, message.Channel).Wait();
                 output.Dispose();
             }
 

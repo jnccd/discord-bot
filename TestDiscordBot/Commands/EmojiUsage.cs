@@ -46,7 +46,7 @@ namespace TestDiscordBot.Commands
         {
             DiscordServer server = Config.Config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
             if (server == null)
-                await Global.SendText("Impossible maybe the archives are incomplete!\nThis Server is not in my database yet.", message.Channel);
+                await Program.SendText("Impossible maybe the archives are incomplete!\nThis Server is not in my database yet.", message.Channel);
             else
             {
                 EmbedBuilder embed = new EmbedBuilder();
@@ -55,7 +55,7 @@ namespace TestDiscordBot.Commands
                     embed.AddField(":" + server.EmojiUsage.Keys.ElementAt(i) + ":", "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!");
                 }
                 embed.WithColor(0, 128, 255);
-                await Global.SendEmbed(embed, message.Channel);
+                await Program.SendEmbed(embed, message.Channel);
             }
         }
     }

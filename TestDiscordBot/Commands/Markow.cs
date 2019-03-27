@@ -41,7 +41,7 @@ namespace TestDiscordBot.Commands
                             {
                                 IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
                                 foreach (IMessage m in messages)
-                                    if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Global.prefix) && m.Content[0] != '!')
+                                    if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.prefix) && m.Content[0] != '!')
                                         input += m.Content + "\n";
                             }
             }
@@ -66,7 +66,7 @@ namespace TestDiscordBot.Commands
             MarkovHelper.AddToDict(input);
 
             loadedDict = true;
-            Global.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
+            Program.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
         public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
@@ -89,11 +89,11 @@ namespace TestDiscordBot.Commands
             try
             {
                 string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 5, 2000);
-                await Global.SendText(output, message.Channel);
+                await Program.SendText(output, message.Channel);
             }
             catch (NoEmptyElementException)
             {
-                await Global.SendText("Markow isn't ready yet!", message.Channel);
+                await Program.SendText("Markow isn't ready yet!", message.Channel);
             }
         }
     }

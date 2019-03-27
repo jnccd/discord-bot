@@ -36,11 +36,11 @@ namespace TestDiscordBot.Commands
 
             try
             {
-                await Global.SendText(target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel);
+                await Program.SendText(target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel);
             }
             catch
             {
-                await Global.SendText("That guy doesn't have a profile Picture UwU", commandmessage.Channel);
+                await Program.SendText("That guy doesn't have a profile Picture UwU", commandmessage.Channel);
             }
         }
     }

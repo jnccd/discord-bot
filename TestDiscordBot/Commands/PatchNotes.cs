@@ -47,14 +47,14 @@ namespace TestDiscordBot.Commands
                             Embed.AddField("Patch Notes:", tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")");
                             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
 #if !DEBUG
-                            Global.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
+                            Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                            Global.ConsoleWriteLine("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")", ConsoleColor.Cyan);
+                            Program.ConsoleWriteLine("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")", ConsoleColor.Cyan);
 #endif
                         }
                         catch (Exception e)
                         {
-                            Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                            Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                         }
                     }
                 }
@@ -73,27 +73,27 @@ namespace TestDiscordBot.Commands
         {
             if (commandmessage.Channel is SocketGuildChannel)
             {
-                if (commandmessage.Author.Id == Program.GetGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Global.Master.Id)
+                if (commandmessage.Author.Id == Program.GetGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Program.Master.Id)
                 {
                     if (Config.Config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                     {
                         Config.Config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
-                        await Global.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
+                        await Program.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
                     }
                     else
                     {
                         Config.Config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
-                        await Global.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
+                        await Program.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
                     }
                 }
                 else
                 {
-                    await Global.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel);
+                    await Program.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel);
                 }
             }
             else
             {
-                await Global.SendText("You can't use this in DMs", commandmessage.Channel);
+                await Program.SendText("You can't use this in DMs", commandmessage.Channel);
             }
         }
     }

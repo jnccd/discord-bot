@@ -70,7 +70,7 @@ namespace TestDiscordBot.Commands
                                 pc++;
                                 if (pc >= message.Content.Length)
                                 {
-                                    await Global.SendText("Check the [] Brackets!", message.Channel);
+                                    await Program.SendText("Check the [] Brackets!", message.Channel);
                                     return;
                                 }
                                 if (message.Content[pc] == '[')
@@ -90,7 +90,7 @@ namespace TestDiscordBot.Commands
                                 pc--;
                                 if (pc < 0)
                                 {
-                                    await Global.SendText("Check the [] Brackets!", message.Channel);
+                                    await Program.SendText("Check the [] Brackets!", message.Channel);
                                     return;
                                 }
                                 if (message.Content[pc] == ']')
@@ -104,7 +104,7 @@ namespace TestDiscordBot.Commands
 
                 if (steps > 5000)
                 {
-                    await Global.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel);
+                    await Program.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel);
                     return;
                 }
 
@@ -112,7 +112,7 @@ namespace TestDiscordBot.Commands
                 steps++;
             }
 
-            await Global.SendText($"```ruby\n {output}```", message.Channel);
+            await Program.SendText($"```ruby\n {output}```", message.Channel);
         }
     }
 }

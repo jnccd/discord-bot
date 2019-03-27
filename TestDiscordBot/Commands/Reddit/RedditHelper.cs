@@ -27,9 +27,9 @@ namespace TestDiscordBot
                 List<int> Posts = html.AllIndexesOf("{\"kind\": \"t3\",");
                 string cuthtml = "";
                 if (Posts.Count >= 100)
-                    cuthtml = html.Remove(0, Posts[Posts.Count - Global.RDM.Next(99) - 1]);
+                    cuthtml = html.Remove(0, Posts[Posts.Count - Program.RDM.Next(99) - 1]);
                 else
-                    cuthtml = html.Remove(0, Posts[Global.RDM.Next(Posts.Count)]);
+                    cuthtml = html.Remove(0, Posts[Program.RDM.Next(Posts.Count)]);
                 List<int> index = cuthtml.AllIndexesOf("{\"kind\": \"t3\",");
                 if (index.Count > 1)
                     postJson = cuthtml.Remove(index[1]);
@@ -85,7 +85,7 @@ namespace TestDiscordBot
 
             if (IsVideo)
             {
-                await Global.SendText("Sending video post. Please wait...", Channel);
+                await Program.SendText("Sending video post. Please wait...", Channel);
 
                 // downlaod video
                 string videofile = "Downloads\\Video.mp4";
@@ -97,13 +97,13 @@ namespace TestDiscordBot
 
                 if (new FileInfo(videofile).Length > 8 * 1024 * 1024)
                 {
-                    await Global.SendText("That video is too big for discords puny 8MB limit!", Channel);
+                    await Program.SendText("That video is too big for discords puny 8MB limit!", Channel);
                 }
                 else
                 {
                     // send post
-                    await Global.SendFile(videofile, Channel, ResultTitle);
-                    await Global.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
+                    await Program.SendFile(videofile, Channel, ResultTitle);
+                    await Program.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
                 }
                 
                 // delete "Sending video post. Please wait..." message
@@ -134,7 +134,7 @@ namespace TestDiscordBot
                 }
                 Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point on " : " fake internet points on ") + subUrl.Remove(0, "https://www.reddit.com".Length));
 
-                await Global.SendEmbed(Embed, Channel);
+                await Program.SendEmbed(Embed, Channel);
             }
         }
 

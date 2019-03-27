@@ -21,12 +21,12 @@ namespace TestDiscordBot.Commands
 
             if (split.Length <= 1)
             {
-                await Global.SendText("I need something to search!", message.Channel);
+                await Program.SendText("I need something to search!", message.Channel);
                 return;
             }
 
             string url = string.Format("https://www.urbandictionary.com/define.php?term=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())));
-            await Global.SendText(url, message.Channel);
+            await Program.SendText(url, message.Channel);
         }
     }
 }

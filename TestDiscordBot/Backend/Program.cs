@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -22,35 +23,210 @@ namespace TestDiscordBot
 {
     public class IllegalCommandException : Exception { public IllegalCommandException(string message) : base (message) { } }
 
+    public static partial class Extensions
+    {
+        // String
+        public static List<int> AllIndexesOf(this string str, string value)
+        {
+            if (String.IsNullOrEmpty(value))
+                throw new ArgumentException("the string to find may not be empty", "value");
+            List<int> indexes = new List<int>();
+            for (int index = 0; ; index += value.Length)
+            {
+                index = str.IndexOf(value, index);
+                if (index == -1)
+                    return indexes;
+                indexes.Add(index);
+            }
+        }
+        public static bool ContainsOneOf(this string str, string[] tests)
+        {
+            foreach (string s in tests)
+                if (str.Contains(s))
+                    return true;
+            return false;
+        }
+        public static bool ContainsAllOf(this string str, string[] tests)
+        {
+            foreach (string s in tests)
+                if (!str.Contains(s))
+                    return false;
+            return true;
+        }
+        public static string GetEverythingBetween(this string str, string left, string right)
+        {
+            int leftIndex = str.IndexOf(left);
+            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
+
+            if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
+            {
+                //throw new Exception("String doesnt contain left or right borders!");
+                return "";
+            }
+
+            try
+            {
+                string re = str.Remove(0, leftIndex + left.Length);
+                re = re.Remove(rightIndex - leftIndex - left.Length);
+                return re;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+        public static List<string> GetEverythingBetweenAll(this string str, string left, string right)
+        {
+            List<string> re = new List<string>();
+
+            int leftIndex = str.IndexOf(left);
+            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
+
+            if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
+            {
+                return re;
+            }
+
+            while (leftIndex != -1 && rightIndex != -1)
+            {
+                try
+                {
+                    str = str.Remove(0, leftIndex + left.Length);
+                    re.Add(str.Remove(rightIndex - leftIndex - left.Length));
+                }
+                catch { break; }
+
+                leftIndex = str.IndexOf(left);
+                rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
+            }
+
+            return re;
+        }
+        public static bool StartsWith(this string str, string[] values)
+        {
+            foreach (string s in values)
+                if (str.StartsWith(s))
+                    return true;
+            return false;
+        }
+        public static string ContainsPictureLink(this string str)
+        {
+            string[] split = str.Split(' ');
+            foreach (string s in split)
+                if (s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".png") ||
+                    s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".jpg"))
+                    return s;
+            return null;
+        }
+        public static double ConvertToDouble(this string s)
+        {
+            return Convert.ToDouble(s.Replace('.', ','));
+        }
+        public static string ToCapital(this string s)
+        {
+            string o = "";
+            for (int i = 0; i < s.Length; i++)
+                if (i == 0)
+                    o += char.ToUpper(s[i]);
+                else
+                    o += char.ToLower(s[i]);
+            return o;
+        }
+
+        // Discord
+        public static EmbedBuilder ToEmbed(this IMessage m)
+        {
+            EmbedBuilder Embed = new EmbedBuilder();
+            Embed.WithColor(0, 128, 255);
+            Embed.WithAuthor(m.Author);
+            Embed.WithTitle(string.IsNullOrWhiteSpace(m.Content) ?
+                m.Attachments.Select(x => x.Url).
+                Where(x => !x.EndsWith(".png") && !x.EndsWith(".jpg")).
+                Union(new string[] { "-" }).
+                Aggregate((x, y) => y == "-" ? x : x + " " + y) : m.Content);
+            try
+            {
+                if (m.Attachments.Count > 0)
+                    Embed.WithThumbnailUrl(m.Attachments.ElementAt(0).Url);
+            }
+            catch { }
+            return Embed;
+        }
+        public static ulong GetServerID(this SocketMessage m)
+        {
+            return Program.GetGuildFromChannel(m.Channel).Id;
+        }
+        
+        // Linq extensions
+        public static b Foldr<a, b>(this IEnumerable<a> xs, b y, Func<a, b, b> f)
+        {
+            foreach (a x in xs)
+                y = f(x, y);
+            return y;
+        }
+        public static b Foldr<a, b>(this IEnumerable<a> xs, Func<a, b, b> f)
+        {
+            return xs.Foldr(default(b), f);
+        }
+        public static a GetRandomValue<a>(this IEnumerable<a> xs)
+        {
+            a[] arr = xs.ToArray();
+            return arr[Program.RDM.Next(arr.Length)];
+        }
+        public static string RemoveLastGroup(this string s, char seperator)
+        {
+            string[] split = s.Split(seperator);
+            return split.Take(split.Length - 1).Reverse().Foldr("", (a, b) => a + seperator + b);
+        }
+    }
+
     public class Program
     {
+        // Console / Execution
         static int clearYcoords;
+        static bool exitedNormally = false;
+        static string buildDate;
+        static int Exectutions = 0;
+        public static Random RDM { get; private set; } = new Random();
+
+        // Client 
+        static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
         static bool gotWorkingToken = false;
-        static bool exitedNormally = false;
-        static ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
-        static string buildDate;
-        static ISocketMessageChannel CurrentChannel;
-        static DiscordSocketClient client;
+
+        // Commands
+        public const string prefix = "$";
         static Command[] commands;
+        static EmbedBuilder HelpMenu = new EmbedBuilder();
         static Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                       from assemblyType in domainAssembly.GetTypes()
                                       where assemblyType.IsSubclassOf(typeof(Command))
                                       select assemblyType).ToArray();
-        static EmbedBuilder HelpMenu = new EmbedBuilder();
-        static int Exectutions = 0;
-        static List<Tuple<RestUserMessage, Exception>> CachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
-        static readonly string ErrorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!";
-        static readonly Emoji ErrorEmoji = new Emoji("🤔");
-        static readonly string lockject = "";
 
-        public static ulong OwnID
+        // Discord
+        private static SocketUser Pmaster;
+        public static SocketUser Master
         {
-            get
+            get { return Pmaster; }
+            set
             {
-                return GetSelf().Id;
+                if (Pmaster == null)
+                    Pmaster = value;
+                else
+                    throw new FieldAccessException("The Master may only be set once!");
             }
         }
+        static ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
+        static ISocketMessageChannel CurrentChannel;
+        static List<Tuple<RestUserMessage, Exception>> CachedErrorMessages = 
+            new List<Tuple<RestUserMessage, Exception>>();
+        static readonly string ErrorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
+            "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
+        static readonly Emoji ErrorEmoji = new Emoji("🤔");
+        
+        static readonly string lockject = "";
+
+        // ------------------------------------------------------------------------------------------------------------
 
         static void Main(string[] args)
         {
@@ -92,7 +268,7 @@ namespace TestDiscordBot
             try
             {
                 buildDate = File.ReadAllText("BuildDate.txt").TrimEnd('\n');
-                Global.ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
+                Program.ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
             }
             catch
             {
@@ -142,11 +318,11 @@ namespace TestDiscordBot
 
             while (!ClientReady) { Thread.Sleep(20); }
 #if DEBUG
-            await client.SetGameAsync("[DEBUG-MODE] Type " + Global.prefix + "help");
+            await client.SetGameAsync("[DEBUG-MODE] Type " + Program.prefix + "help");
 #else
-            await client.SetGameAsync("Type " + Global.prefix + "help");
+            await client.SetGameAsync("Type " + prefix + "help");
 #endif
-            Global.Master = client.GetUser(300699566041202699);
+            Master = client.GetUser(300699566041202699);
 
             // Build HelpMenu
             HelpMenu.WithColor(0, 128, 255);
@@ -159,20 +335,20 @@ namespace TestDiscordBot
                         desc == null || desc == "" ? "-" : desc, true);
                 }
             }
-            HelpMenu.WithDescription("I was made by " + Global.Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+            HelpMenu.WithDescription("I was made by " + Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
             HelpMenu.WithFooter("Current Build from: " + buildDate);
             HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
 
             // Startup Console Display
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.CursorLeft = 0;
-            Global.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
+            Program.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    Global.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
+                    Program.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
             }
-            catch { Global.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            catch { Program.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -188,7 +364,7 @@ namespace TestDiscordBot
                     {
                         c.OnConnected();
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             }
             #endregion
@@ -214,7 +390,7 @@ namespace TestDiscordBot
                     {
                         try
                         {
-                            await Global.SendText(input, CurrentChannel);
+                            await Program.SendText(input, CurrentChannel);
                         }
                         catch (Exception e)
                         {
@@ -232,7 +408,7 @@ namespace TestDiscordBot
                     {
                         string[] splits = input.Split(' ');
                         string path = splits.Skip(1).Aggregate((x, y) => x + " " + y);
-                        await Global.SendFile(path.Trim('\"'), CurrentChannel);
+                        await Program.SendFile(path.Trim('\"'), CurrentChannel);
                     }
                 }
                 else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
@@ -341,26 +517,26 @@ namespace TestDiscordBot
                     {
                         
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/roles")) // ServerID
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Global.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
+                        Program.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Global.ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
+                        Program.ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
                             Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
                 {
@@ -369,18 +545,18 @@ namespace TestDiscordBot
                     {
                         await GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
                                 AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
-                        Global.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
+                        Program.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/channels")) // ChannelID
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Global.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        Program.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/read")) // ChannelID
                 {
@@ -388,12 +564,12 @@ namespace TestDiscordBot
                     try
                     {
                         var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).Flatten().GetAwaiter().GetResult();
-                        Global.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                        Program.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
-                    Global.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
+                    Program.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
             }
             #endregion
 
@@ -403,7 +579,7 @@ namespace TestDiscordBot
                 {
                     c.OnExit();
                 }
-                catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
             Config.Config.Save();
             exitedNormally = true;
@@ -449,7 +625,7 @@ namespace TestDiscordBot
                     return;
                 }
             }
-            catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+            catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
         }
         private static Task Client_Ready()
         {
@@ -458,7 +634,7 @@ namespace TestDiscordBot
         }
         private static Task Log(LogMessage msg)
         {
-            Global.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
+            Program.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
             return Task.FromResult(0);
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
@@ -482,7 +658,7 @@ namespace TestDiscordBot
                     {
                         c.OnEmojiReactionAdded(arg1, arg2, arg3);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
             });
             return Task.FromResult(default(object));
@@ -508,7 +684,7 @@ namespace TestDiscordBot
                     {
                         c.OnEmojiReactionRemoved(arg1, arg2, arg3);
                     }
-                    catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
             });
             return Task.FromResult(default(object));
@@ -517,7 +693,7 @@ namespace TestDiscordBot
         {
             if (!message.Author.IsBot)
             {
-                if (message.Content.StartsWith(Global.prefix))
+                if (message.Content.StartsWith(Program.prefix))
                 {
                     Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
                     t.Start(message);
@@ -532,7 +708,7 @@ namespace TestDiscordBot
                             {
                                 c.OnNonCommandMessageRecieved(message);
                             }
-                            catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                            catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                         }
                     });
                 }
@@ -551,9 +727,9 @@ namespace TestDiscordBot
                     Config.Config.Data.ServerList.Add(new DiscordServer(serverID));
             }
 
-            if (message.Content == Global.prefix + "help")
+            if (message.Content == Program.prefix + "help")
             {
-                await Global.SendEmbed(HelpMenu, message.Channel);
+                await Program.SendEmbed(HelpMenu, message.Channel);
             }
             else
             {
@@ -570,7 +746,7 @@ namespace TestDiscordBot
                     int[] distances = new int[commands.Length];
                     for (int i = 0; i < commands.Length; i++)
                         if (commands[i].CommandLine != "" && !commands[i].IsHidden)
-                            distances[i] = Global.LevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
+                            distances[i] = Program.LevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
                         else
                             distances[i] = int.MaxValue;
                     int minIndex = 0;
@@ -583,7 +759,7 @@ namespace TestDiscordBot
                         }
                     if (min < Math.Min(5, split[0].Length - 1))
                     {
-                        await Global.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel);
+                        await Program.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel);
                         await ExecuteCommand(commands[minIndex], message);
                     }
                 }
@@ -599,7 +775,7 @@ namespace TestDiscordBot
                 return;
             if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
             {
-                await Global.SendText("Experimental commands cant be used here!", message.Channel);
+                await Program.SendText("Experimental commands cant be used here!", message.Channel);
                 return;
             }
 
@@ -613,14 +789,14 @@ namespace TestDiscordBot
                     UpdateWorkState();
                 }
 
-                Global.SaveUser(message.Author.Id);
+                Program.SaveUser(message.Author.Id);
                 await command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
+                    Program.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
                         ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
                 else
-                    Global.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
+                    Program.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
                         "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
             }
             catch (Exception e)
@@ -634,7 +810,7 @@ namespace TestDiscordBot
                 }
                 catch { }
                 
-                Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
             }
             finally
             {
@@ -654,6 +830,7 @@ namespace TestDiscordBot
                 client.SetStatusAsync(UserStatus.Online);
         }
         
+        // Client Getters
         public static SocketUser GetUserFromId(ulong UserId)
         {
             return client.GetUser(UserId);
@@ -677,6 +854,158 @@ namespace TestDiscordBot
         public static SocketGuild GetGuildFromID(ulong GuildID)
         {
             return client.GetGuild(GuildID);
+        }
+        public static ulong OwnID
+        {
+            get
+            {
+                return GetSelf().Id;
+            }
+        }
+
+        // Send Wrappers
+        public static async Task SendFile(string path, ISocketMessageChannel Channel, string text = "")
+        {
+            await Channel.SendFileAsync(path, text);
+            SaveChannel(Channel);
+        }
+        public static async Task SendFile(Stream stream, ISocketMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
+        {
+            if (fileName == "")
+                fileName = DateTime.Now.ToBinary().ToString();
+
+            stream.Position = 0;
+            await Channel.SendFileAsync(stream, fileName + "." + fileEnd, text);
+            SaveChannel(Channel);
+        }
+        public static async Task SendBitmap(Bitmap bmp, ISocketMessageChannel Channel, string text = "")
+        {
+            MemoryStream stream = new MemoryStream();
+            bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            await SendFile(stream, Channel, "png", "", text);
+        }
+        public static async Task SendText(string text, ISocketMessageChannel Channel)
+        {
+            if (text.Length < 2000)
+                await Channel.SendMessageAsync(text);
+            else
+            {
+                while (text.Length > 0)
+                {
+                    int subLength = Math.Min(1999, text.Length);
+                    string sub = text.Substring(0, subLength);
+                    await Channel.SendMessageAsync(sub);
+                    text = text.Remove(0, subLength);
+                }
+            }
+            SaveChannel(Channel);
+        }
+        public static async Task SendText(string text, ulong ChannelID)
+        {
+            await SendText(text, (ISocketMessageChannel)Program.GetChannelFromID(ChannelID));
+        }
+        public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
+        {
+            if (Embed.Fields.Count < 25)
+                await Channel.SendMessageAsync("", false, Embed.Build());
+            else
+            {
+                while (Embed.Fields.Count > 0)
+                {
+                    EmbedBuilder eb = new EmbedBuilder
+                    {
+                        Color = Embed.Color,
+                        Description = Embed.Description,
+                        Author = Embed.Author,
+                        Footer = Embed.Footer,
+                        ImageUrl = Embed.ImageUrl,
+                        ThumbnailUrl = Embed.ThumbnailUrl,
+                        Timestamp = Embed.Timestamp,
+                        Title = Embed.Title,
+                        Url = Embed.Title
+                    };
+                    eb.Url = Embed.Url;
+                    for (int i = 0; i < 25 && Embed.Fields.Count > 0; i++)
+                    {
+                        eb.Fields.Add(Embed.Fields[0]);
+                        Embed.Fields.RemoveAt(0);
+                    }
+                    await Channel.SendMessageAsync("", false, eb.Build());
+                }
+            }
+            SaveChannel(Channel);
+        }
+
+        // Save
+        public static void SaveChannel(ISocketMessageChannel Channel)
+        {
+            if (Config.Config.Data.ChannelsWrittenOn == null)
+                Config.Config.Data.ChannelsWrittenOn = new List<ulong>();
+            if (!Config.Config.Data.ChannelsWrittenOn.Contains(Channel.Id))
+            {
+                Config.Config.Data.ChannelsWrittenOn.Add(Channel.Id);
+                Config.Config.Save();
+            }
+        }
+        public static void SaveUser(ulong UserID)
+        {
+            if (!Config.Config.Data.UserList.Exists(x => x.UserID == UserID))
+                Config.Config.Data.UserList.Add(new DiscordUser(UserID));
+        }
+
+        // Utility
+        public static Bitmap GetBitmapFromURL(string url)
+        {
+            WebRequest request = WebRequest.Create(url);
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            return new Bitmap(responseStream);
+        }
+        public static int LevenshteinDistance(string s, string t)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                if (string.IsNullOrEmpty(t))
+                    return 0;
+                return t.Length;
+            }
+
+            if (string.IsNullOrEmpty(t))
+            {
+                return s.Length;
+            }
+
+            int n = s.Length;
+            int m = t.Length;
+            int[,] d = new int[n + 1, m + 1];
+
+            // initialize the top and right of the table to 0, 1, 2, ...
+            for (int i = 0; i <= n; d[i, 0] = i++) ;
+            for (int j = 1; j <= m; d[0, j] = j++) ;
+
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= m; j++)
+                {
+                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+                    int min1 = d[i - 1, j] + 1;
+                    int min2 = d[i, j - 1] + 1;
+                    int min3 = d[i - 1, j - 1] + cost;
+                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
+                }
+            }
+            return d[n, m];
+        }
+        public static void ConsoleWriteLine(string text, ConsoleColor Color)
+        {
+            lock (Console.Title)
+            {
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = Color;
+                Console.WriteLine(text);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
+            }
         }
 
         // Closing Event

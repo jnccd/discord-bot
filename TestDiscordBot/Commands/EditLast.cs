@@ -14,6 +14,11 @@ using XnaGeometry;
 
 namespace TestDiscordBot.Commands
 {
+    public static partial class Extensions
+    {
+
+    }
+
     public class EditLast : Command
     {
         public EditLast() : base("editLast", "Edit the last message", false)
@@ -28,9 +33,9 @@ namespace TestDiscordBot.Commands
             ulong ownID = Program.OwnID;
             foreach (IMessage m in messages)
             {
-                if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Global.prefix))
+                if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Program.prefix))
                 {
-                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Global.prefix))
+                    if (lastText == null && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.prefix))
                         lastText = m;
                     if (lastPic == null && m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
                     {
@@ -58,7 +63,7 @@ namespace TestDiscordBot.Commands
                     Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
                 }
                 Embed.WithDescription("EditLast Commands:");
-                await Global.SendEmbed(Embed, message.Channel);
+                await Program.SendEmbed(Embed, message.Channel);
             }
             else
             {
@@ -68,12 +73,12 @@ namespace TestDiscordBot.Commands
                     {
                         if (command.textBased && lastText == null)
                         {
-                            await Global.SendText("I couldn't find text to edit here :thinking:", message.Channel);
+                            await Program.SendText("I couldn't find text to edit here :thinking:", message.Channel);
                             return;
                         }
                         if (!command.textBased && lastPic == null)
                         {
-                            await Global.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
+                            await Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
                             return;
                         }
 
@@ -87,40 +92,40 @@ namespace TestDiscordBot.Commands
 
         public static EditLastCommand[] Commands = new EditLastCommand[] {
             new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Content.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
+                await Program.SendText(string.Join("", lastText.Content.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
             }),
             new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return (Global.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
+                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
                     "\nhttps://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
             }),
             new EditLastCommand("crab", "Crab the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(":crab: " + lastText.Content + " :crab:" +
+                await Program.SendText(":crab: " + lastText.Content + " :crab:" +
                     "\nhttps://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel);
             }),
             new EditLastCommand("CAPS", "Convert text to CAPS",true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), message.Channel);
+                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), message.Channel);
             }),
             new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), message.Channel);
+                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), message.Channel);
             }),
             new EditLastCommand("Spoilerify", "Convert text to a spoiler", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })), message.Channel);
+                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })), message.Channel);
             }),
             new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Global.SendText(lastText.Content.Replace("|", ""), message.Channel);
+                await Program.SendText(lastText.Content.Replace("|", ""), message.Channel);
             }),
-            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Global.prefix}editLast Crossost #general",
+            new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Program.prefix}editLast Crossost #general",
                 true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 try
                 {
                     SocketChannel targetChannel = Program.GetChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
                     EmbedBuilder Embed = lastText.ToEmbed();
                     Embed.AddField("Crosspost from: ", $"<#{message.Channel.Id}>");
-                    await Global.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
+                    await Program.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
                 } catch { }
             }),
             new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
@@ -130,10 +135,10 @@ namespace TestDiscordBot.Commands
                         bmp.SetPixel(x, y, c);
                     }
 
-                await Global.SendBitmap(bmp, message.Channel);
+                await Program.SendBitmap(bmp, message.Channel);
             }),
             new EditLastCommand("invert", "Invert the color of each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
@@ -143,23 +148,23 @@ namespace TestDiscordBot.Commands
                         bmp.SetPixel(x, y, c);
                     }
 
-                await Global.SendBitmap(bmp, message.Channel);
+                await Program.SendBitmap(bmp, message.Channel);
             }),
             new EditLastCommand("Rekt", "Finds colored rectangles in pictures", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
                 System.Drawing.Color c = System.Drawing.Color.FromName(message.Content.Split(' ')[2]);
                 Rectangle redRekt = FindRectangle(bmp, System.Drawing.Color.FromArgb(254, 34, 34), 20);
 
                 if (redRekt.Width == 0)
-                    await Global.SendText("No Red rekt!", message.Channel);
+                    await Program.SendText("No Red rekt!", message.Channel);
                 else
                 {
                     using (Graphics graphics = Graphics.FromImage(output))
                     graphics.DrawRectangle(new Pen(System.Drawing.Color.Red), redRekt);
 
-                    await Global.SendBitmap(output, message.Channel);
+                    await Program.SendBitmap(output, message.Channel);
                 }
             }),
             new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
@@ -167,14 +172,14 @@ namespace TestDiscordBot.Commands
                 Exception e = null;
                 try
                 {
-                    Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                    Bitmap bmp = Program.GetBitmapFromURL(lastPic);
                     string[] files = Directory.GetFiles("Commands\\MemeTemplates");
                     string[] split = message.Content.Split(' ');
 
                     string memeTemplateDesign = "";
                     if (split.Length == 3 && split[2] == "-list")
                     {
-                        await Global.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                        await Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
                                                                         Where(x => x.EndsWith("design")).
                                                                         Select(x => new string(x.TakeWhile(y => !char.IsDigit(y)).ToArray())).
                                                                         Aggregate((x, y) => x + "\n" + y), message.Channel);
@@ -188,7 +193,7 @@ namespace TestDiscordBot.Commands
 
                     if (memeTemplateDesign == "")
                     {
-                        await Global.SendText("I don't have that meme in my registry!", message.Channel);
+                        await Program.SendText("I don't have that meme in my registry!", message.Channel);
                         return;
                     }
 
@@ -209,7 +214,7 @@ namespace TestDiscordBot.Commands
                            graphics.DrawImage(overlay, new Point(0, 0));
                         }
 
-                        await Global.SendBitmap(output, message.Channel);
+                        await Program.SendBitmap(output, message.Channel);
                     }
                     else if (File.Exists(memeTemplate))
                     {
@@ -220,7 +225,7 @@ namespace TestDiscordBot.Commands
                         using (Graphics graphics = Graphics.FromImage(template))
                             graphics.DrawImage(bmp, redRekt);
 
-                        await Global.SendBitmap(template, message.Channel);
+                        await Program.SendBitmap(template, message.Channel);
                     }
                     else
                         throw new Exception("uwu");
@@ -236,7 +241,7 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
                 "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]",
                 false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Global.GetBitmapFromURL(lastPic);
+                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
                 float Strength = 1;
@@ -246,13 +251,13 @@ namespace TestDiscordBot.Commands
                 {
                     string cen = split[3];
                     string[] cent = cen.Split(',');
-                    center.X = (float)Global.ConvertToDouble(cent[0]) * bmp.Width;
-                    center.Y = (float)Global.ConvertToDouble(cent[1]) * bmp.Height;
+                    center.X = (float)cent[0].ConvertToDouble() * bmp.Width;
+                    center.Y = (float)cent[1].ConvertToDouble() * bmp.Height;
                 } catch { }
 
                 try
                 {
-                    Strength = (float)Global.ConvertToDouble(split[4]);
+                    Strength = (float)split[4].ConvertToDouble();
                 } catch { }
 
                 TransformMode mode = TransformMode.Expand;
@@ -268,7 +273,7 @@ namespace TestDiscordBot.Commands
                         output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
                     }
 
-                await Global.SendBitmap(output, message.Channel);
+                await Program.SendBitmap(output, message.Channel);
             })
         };
         static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);

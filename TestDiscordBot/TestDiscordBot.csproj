@@ -131,7 +131,6 @@
     <Compile Include="Backend\Command.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\ProfilePicture.cs" />
-    <Compile Include="Backend\Global.cs" />
     <Compile Include="Backend\Program.cs" />
     <Compile Include="Config\ConfigData.cs" />
     <Compile Include="Config\DiscordServer.cs" />

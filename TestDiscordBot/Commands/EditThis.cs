@@ -30,7 +30,7 @@ namespace TestDiscordBot.Commands
                     Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
                 }
                 Embed.WithDescription("EditLast Commands:");
-                await Global.SendEmbed(Embed, message.Channel);
+                await Program.SendEmbed(Embed, message.Channel);
             }
             else
             {
@@ -53,12 +53,12 @@ namespace TestDiscordBot.Commands
 
                         if (command.textBased && string.IsNullOrWhiteSpace(inText))
                         {
-                            await Global.SendText("I couldn't find text to edit here :thinking:", message.Channel);
+                            await Program.SendText("I couldn't find text to edit here :thinking:", message.Channel);
                             return;
                         }
                         if (!command.textBased && inPic == null)
                         {
-                            await Global.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
+                            await Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
                             return;
                         }
 

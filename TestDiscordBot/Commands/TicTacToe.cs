@@ -29,42 +29,42 @@ namespace TestDiscordBot.Commands
                     "no spaces allowed eg. " + Prefix + CommandLine + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
                 Embed.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
                 Embed.WithDescription("TicTacToe Commands:");
-                await Global.SendEmbed(Embed, commandmessage.Channel);
+                await Program.SendEmbed(Embed, commandmessage.Channel);
             }
             else if (commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "newGame")
             {
                 if (commandmessage.MentionedUsers.Count < 1 || commandmessage.MentionedUsers.Count > 1)
                 {
-                    await Global.SendText("You need exactly one player to play against!", commandmessage.Channel);
+                    await Program.SendText("You need exactly one player to play against!", commandmessage.Channel);
                 }
                 else
                 {
                     if (Games.Exists(x => x.Player1 == commandmessage.MentionedUsers.ElementAt(0)) || Games.Exists(x => x.Player2 == commandmessage.MentionedUsers.ElementAt(0)))
                     {
-                        await Global.SendText(commandmessage.MentionedUsers.ElementAt(0).Mention + " is already in a game.", commandmessage.Channel);
+                        await Program.SendText(commandmessage.MentionedUsers.ElementAt(0).Mention + " is already in a game.", commandmessage.Channel);
                     }
                     else if (Games.Exists(x => x.Player1 == commandmessage.Author) || Games.Exists(x => x.Player2 == commandmessage.Author))
                     {
-                        await Global.SendText("You are already in a game.", commandmessage.Channel);
+                        await Program.SendText("You are already in a game.", commandmessage.Channel);
                     }
                     else
                     {
                         if (commandmessage.MentionedUsers.ElementAt(0).IsBot)
                         {
                             if (commandmessage.MentionedUsers.ElementAt(0).Id == Program.GetSelf().Id)
-                                await Global.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel);
+                                await Program.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel);
                             else
-                                await Global.SendText("You cant play with a bot!", commandmessage.Channel);
+                                await Program.SendText("You cant play with a bot!", commandmessage.Channel);
                         }
                         else
                         {
                             if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
-                                await Global.SendText("You can't play against yourself!", commandmessage.Channel);
+                                await Program.SendText("You can't play against yourself!", commandmessage.Channel);
                             else
                             {
                                 Games.Add(new TicTacToeGame(commandmessage.MentionedUsers.ElementAt(0), commandmessage.Author));
-                                await Global.SendText("Created new game against " + commandmessage.MentionedUsers.ElementAt(0) + " successfully!", commandmessage.Channel);
-                                await Global.SendText(Games.Last().ToString(), commandmessage.Channel);
+                                await Program.SendText("Created new game against " + commandmessage.MentionedUsers.ElementAt(0) + " successfully!", commandmessage.Channel);
+                                await Program.SendText(Games.Last().ToString(), commandmessage.Channel);
                             }
                         }
                     }
@@ -81,19 +81,19 @@ namespace TestDiscordBot.Commands
 
                 if (Game == null)
                 {
-                    await Global.SendText("You are not in a game!", commandmessage.Channel);
+                    await Program.SendText("You are not in a game!", commandmessage.Channel);
                 }
                 else
                 {
                     if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length < 3)
                     {
-                        await Global.SendText("Where are the coordinates?!", commandmessage.Channel);
+                        await Program.SendText("Where are the coordinates?!", commandmessage.Channel);
                     }
                     else
                     {
                         if (commandmessage.Author == Game.Player1 && !Game.Player1sTurn || commandmessage.Author == Game.Player2 && Game.Player1sTurn)
                         {
-                            await Global.SendText("Its not your turn!", commandmessage.Channel);
+                            await Program.SendText("Its not your turn!", commandmessage.Channel);
                         }
                         else
                         {
@@ -107,7 +107,7 @@ namespace TestDiscordBot.Commands
 
                                 if (x == 0 || y == 0)
                                 {
-                                    await Global.SendText("You cant put your symbol there!\nRemember Coordinates start at 1, not 0.", commandmessage.Channel);
+                                    await Program.SendText("You cant put your symbol there!\nRemember Coordinates start at 1, not 0.", commandmessage.Channel);
                                     return;
                                 }
 
@@ -116,7 +116,7 @@ namespace TestDiscordBot.Commands
                             }
                             catch
                             {
-                                await Global.SendText("The coordinates Mason what do they mean?!", commandmessage.Channel);
+                                await Program.SendText("The coordinates Mason what do they mean?!", commandmessage.Channel);
                             }
 
                             if (Game.Field[x, y] == 0 && x < 3 && y < 3)
@@ -127,29 +127,29 @@ namespace TestDiscordBot.Commands
                                 else
                                     Game.Field[x, y] = 2;
 
-                                await Global.SendText(Game.ToString(), commandmessage.Channel);
+                                await Program.SendText(Game.ToString(), commandmessage.Channel);
 
                                 if (Game.Draw())
                                 {
-                                    await Global.SendText("Draw between " + Game.Player1.Mention + " and " + Game.Player2.Mention + "!", commandmessage.Channel);
+                                    await Program.SendText("Draw between " + Game.Player1.Mention + " and " + Game.Player2.Mention + "!", commandmessage.Channel);
                                     Games.Remove(Game);
                                 }
 
                                 SocketUser Won = Game.PlayerWon();
                                 if (Won == Game.Player1)
                                 {
-                                    await Global.SendText("The meatbag called " + Game.Player1.Mention + " won!", commandmessage.Channel);
+                                    await Program.SendText("The meatbag called " + Game.Player1.Mention + " won!", commandmessage.Channel);
                                     Games.Remove(Game);
                                 }
                                 else if (Won == Game.Player2)
                                 {
-                                    await Global.SendText("The meatbag called " + Game.Player2.Mention + " won!", commandmessage.Channel);
+                                    await Program.SendText("The meatbag called " + Game.Player2.Mention + " won!", commandmessage.Channel);
                                     Games.Remove(Game);
                                 }
                             }
                             else
                             {
-                                await Global.SendText("You cant put your symbol there!", commandmessage.Channel);
+                                await Program.SendText("You cant put your symbol there!", commandmessage.Channel);
                             }
                         }
                     }
@@ -165,9 +165,9 @@ namespace TestDiscordBot.Commands
                 catch { }
 
                 if (Game == null)
-                    await Global.SendText("You are in no game!", commandmessage.Channel);
+                    await Program.SendText("You are in no game!", commandmessage.Channel);
                 else
-                    await Global.SendText(Game.ToString(), commandmessage.Channel);
+                    await Program.SendText(Game.ToString(), commandmessage.Channel);
             }
         }
     }

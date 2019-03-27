@@ -89,7 +89,7 @@ namespace TestDiscordBot
             lock (dict)
             {
                 if (string.IsNullOrWhiteSpace(start))
-                    start = dict.Keys.ElementAt(Global.RDM.Next(dict.Keys.Count));
+                    start = dict.Keys.ElementAt(Program.RDM.Next(dict.Keys.Count));
                 List<string> outputList = start.Replace("\n", " \n ").Trim(' ').Split(' ').ToList();
 
                 for (int i = 0; i < minLength; i++)
@@ -109,11 +109,11 @@ namespace TestDiscordBot
             List<string> list = null;
             string key = output.Skip(Math.Max(0, output.Count() - inputLength)).Aggregate((x, y) => { return x + " " + y; });
             if (dict.TryGetValue(key, out list))
-                output.Add(list.ElementAt(Global.RDM.Next(list.Count)));
+                output.Add(list.ElementAt(Program.RDM.Next(list.Count)));
             else
             {
                 if (dict.TryGetValue("", out list))
-                    output.Add(list.ElementAt(Global.RDM.Next(list.Count)));
+                    output.Add(list.ElementAt(Program.RDM.Next(list.Count)));
                 else
                     throw new NoEmptyElementException("No \"\" Element!?");
             }

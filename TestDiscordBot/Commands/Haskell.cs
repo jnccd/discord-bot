@@ -34,7 +34,7 @@ namespace TestDiscordBot.Commands
                                 "windows", "TCP", "Socket", "socket", "Network.", "Process.", "Compiler.", "Debug.", "Distribution.",
                                 "Foreign.", "GHC.", "Trace.", "Type.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
                             {
-                                Global.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel).Wait();
+                                Program.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel).Wait();
                                 return Task.FromResult(default(object));
                             }
                     }
@@ -79,16 +79,16 @@ namespace TestDiscordBot.Commands
 
                                 exited = true;
                                 if (parsedOutput.Length >= 2000)
-                                    await Global.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
+                                    await Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
                                 else if (string.IsNullOrWhiteSpace(parsedOutput.Trim('`')))
-                                    await Global.SendText("Your code didn't create any output or an error occured!", message.Channel);
+                                    await Program.SendText("Your code didn't create any output or an error occured!", message.Channel);
                                 else
-                                    await Global.SendText(parsedOutput, message.Channel);
+                                    await Program.SendText(parsedOutput, message.Channel);
                             }
                         }
                         catch (Exception e)
                         {
-                            Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                            Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
                         }
                         exited = true;
                     });
@@ -113,10 +113,10 @@ namespace TestDiscordBot.Commands
                             }
                         }
                         catch { }
-                        Global.SendText("Haskell timeout!", message.Channel).Wait();
+                        Program.SendText("Haskell timeout!", message.Channel).Wait();
                     }
                 }
-                catch (Exception e) { Global.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
 
             return Task.FromResult(default(object));
