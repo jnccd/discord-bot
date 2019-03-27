@@ -24,7 +24,7 @@ namespace TestDiscordBot.Commands
 
             if (split.Length <= 1)
             {
-                await Global.SendText("I need something to search!", message.Channel);
+                await Program.SendText("I need something to search!", message.Channel);
                 return;
             }
             
@@ -44,7 +44,7 @@ namespace TestDiscordBot.Commands
                     embed.AddField(hit.Item1, hit.Item2);
             }
             
-            await Global.SendEmbed(embed, message.Channel);
+            await Program.SendEmbed(embed, message.Channel);
         }
     }
 }

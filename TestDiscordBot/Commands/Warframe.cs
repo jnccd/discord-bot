@@ -13,6 +13,17 @@ using WarframeNET;
 
 namespace TestDiscordBot.Commands
 {
+    public static partial class Extensions
+    {
+        public static string ToReadable(this TimeSpan t)
+        {
+            return string.Format("{0}{1}{2}{3}", t.Days > 0 ? t.Days + "d " : "",
+                                                 t.Hours > 0 ? t.Hours + "h " : "",
+                                                 t.Minutes > 0 ? t.Minutes + "m " : "",
+                                                 t.Seconds > 0 ? t.Seconds + "s " : "0s ").Trim(' ');
+        }
+    }
+
     public static class WarframeExtensions
     {
         public static string ToTitle(this Reward r)
@@ -60,7 +71,7 @@ namespace TestDiscordBot.Commands
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
             {
-                await Global.SendText("```ruby\n" +
+                await Program.SendText("```ruby\n" +
                                       "Use \"" + PrefixAndCommand + " state\" to view the worldState.\n" +
                                       "Use \"" + PrefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
                                       "Use \"" + PrefixAndCommand + " -FILTER\" to remove a filter.\n" +
@@ -77,11 +88,11 @@ namespace TestDiscordBot.Commands
                 embed.AddField("Your Filters: ", (user.WarframeFilters.Count == 0 ?
                     "Well that looks pretty empty" :
                     user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
-                await Global.SendEmbed(embed, message.Channel);
+                await Program.SendEmbed(embed, message.Channel);
             }
             else if (split[1] == "state")
             {
-                await Global.SendEmbed(GetStateEmbed(), message.Channel);
+                await Program.SendEmbed(GetStateEmbed(), message.Channel);
             }
             else
             {
@@ -119,7 +130,7 @@ namespace TestDiscordBot.Commands
                         "\n\nWell that looks pretty empty" :
                         user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
                 }
-                await Global.SendEmbed(embed, message.Channel);
+                await Program.SendEmbed(embed, message.Channel);
             }
         }
         
@@ -243,7 +254,7 @@ namespace TestDiscordBot.Commands
                 {
                     SocketChannel channel = Program.GetChannelFromID(id);
                     if (channel is ISocketMessageChannel)
-                        await Global.SendEmbed(embed, (ISocketMessageChannel)channel);
+                        await Program.SendEmbed(embed, (ISocketMessageChannel)channel);
                 }
             }
             Config.Config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
@@ -293,7 +304,7 @@ namespace TestDiscordBot.Commands
                                 notifications.Add(new Notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
                         }
             foreach (Notif n in notifications)
-                await Global.SendText(n.userID.Select(x => Program.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
+                await Program.SendText(n.userID.Select(x => Program.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
         }
         bool BooleanContainsAllOf(string s, string match)
         {

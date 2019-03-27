@@ -20,7 +20,7 @@ namespace TestDiscordBot
         {
             get
             {
-                return Global.prefix;
+                return Program.prefix;
             }
         }
         public string PrefixAndCommand

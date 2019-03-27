@@ -53,7 +53,7 @@ namespace TestDiscordBot.Commands
             {
                 Embed.AddField("Error!", "The bot hasn't made a profile of you yet.");
             }
-            await Global.SendEmbed(Embed, commandmessage.Channel);
+            await Program.SendEmbed(Embed, commandmessage.Channel);
         }
     }
 }

@@ -224,7 +224,7 @@ namespace TestDiscordBot.Chess
                         bestMove = Moves[i];
                 }
                 if (bestMove.rating == 0)
-                    bestMove = Moves.OrderBy(x => Global.RDM.Next(int.MaxValue)).OrderByDescending(x => x.rating).First();
+                    bestMove = Moves.OrderBy(x => Program.RDM.Next(int.MaxValue)).OrderByDescending(x => x.rating).First();
                 return bestMove;
             }
             else
@@ -246,7 +246,7 @@ namespace TestDiscordBot.Chess
                         bestMove = Moves[i];
                 }
                 if (bestMove.rating == 0)
-                    bestMove = Moves.OrderBy(x => Global.RDM.Next(int.MaxValue)).OrderByDescending(x => -x.rating).First();
+                    bestMove = Moves.OrderBy(x => Program.RDM.Next(int.MaxValue)).OrderByDescending(x => -x.rating).First();
                 return bestMove;
             }
         }
@@ -258,7 +258,7 @@ namespace TestDiscordBot.Chess
             {
                 Debug.WriteLine("I dunnu wat im doin!");
                 ChessMove[] moves = GetAllMoves(Parent, this);
-                minimax = moves[Global.RDM.Next(moves.Length)];
+                minimax = moves[Program.RDM.Next(moves.Length)];
             }
             Parent.MovePiece(minimax);
         }

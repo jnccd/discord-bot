@@ -29,16 +29,16 @@ namespace TestDiscordBot.Commands
                         sum += m.ToCharArray()[i] << i;
 
                     int answerIndex = Math.Abs((int)(sum % answers.Length));
-                    await Global.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel);
+                    await Program.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel);
                 }
                 else
                 {
-                    await Global.SendText("I can only answer yes no questions!", commandmessage.Channel);
+                    await Program.SendText("I can only answer yes no questions!", commandmessage.Channel);
                 }
             }
             else
             {
-                await Global.SendText("Thats not a question!", commandmessage.Channel);
+                await Program.SendText("Thats not a question!", commandmessage.Channel);
             }
         }
     }

@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
                             IMessage m = await message.Channel.GetMessageAsync(Convert.ToUInt64(s.Split('/').Last()));
                             EmbedBuilder Embed = m.ToEmbed();
                             Embed.AddField("Preview for: ", s);
-                            await Global.SendEmbed(Embed, message.Channel);
+                            await Program.SendEmbed(Embed, message.Channel);
                         } catch { }
                     }
             }
@@ -42,22 +42,22 @@ namespace TestDiscordBot.Commands
             if (message.Channel is SocketGuildChannel)
             {
                 SocketGuild guild = Program.GetGuildFromChannel(message.Channel);
-                if (message.Author.Id == guild.OwnerId || message.Author.Id == Global.Master.Id)
+                if (message.Author.Id == guild.OwnerId || message.Author.Id == Program.Master.Id)
                 {
                     if (Config.Config.Data.MessagePreviewServers.Contains(guild.Id))
                     {
                         Config.Config.Data.MessagePreviewServers.Remove(guild.Id);
-                        await Global.SendText("This server wont get linked message previews anymore!", message.Channel);
+                        await Program.SendText("This server wont get linked message previews anymore!", message.Channel);
                     }
                     else
                     {
                         Config.Config.Data.MessagePreviewServers.Add(guild.Id);
-                        await Global.SendText("This Server will now get linked message previews!", message.Channel);
+                        await Program.SendText("This Server will now get linked message previews!", message.Channel);
                     }
                 }
                 else
                 {
-                    await Global.SendText("Only the server/bot owner is authorized to use this command!", message.Channel);
+                    await Program.SendText("Only the server/bot owner is authorized to use this command!", message.Channel);
                 }
             }
         }

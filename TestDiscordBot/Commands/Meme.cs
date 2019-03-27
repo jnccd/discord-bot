@@ -37,12 +37,12 @@ namespace TestDiscordBot.Commands
                 url = "https://www.reddit.com/r/" + commandmessage.Content.Split(new char[] { ' ', '\n' })[1] + "/";
                 if (!RedditHelper.IsReachable(url))
                 {
-                    await Global.SendText("Thats not a valid subreddit!", commandmessage.Channel);
+                    await Program.SendText("Thats not a valid subreddit!", commandmessage.Channel);
                     return;
                 }
             }
             else
-                url = Subreddits[Global.RDM.Next(Subreddits.Length)];
+                url = Subreddits[Program.RDM.Next(Subreddits.Length)];
 
             Thread.CurrentThread.Name = "kek";
             while (!worked)
