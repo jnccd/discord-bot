@@ -132,6 +132,59 @@ namespace TestDiscordBot
                     o += char.ToLower(s[i]);
             return o;
         }
+        public static Bitmap GetBitmapFromURL(this string url)
+        {
+            WebRequest request = WebRequest.Create(url);
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            return new Bitmap(responseStream);
+        }
+        public static int LevenshteinDistance(this string s, string t)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                if (string.IsNullOrEmpty(t))
+                    return 0;
+                return t.Length;
+            }
+
+            if (string.IsNullOrEmpty(t))
+            {
+                return s.Length;
+            }
+
+            int n = s.Length;
+            int m = t.Length;
+            int[,] d = new int[n + 1, m + 1];
+
+            // initialize the top and right of the table to 0, 1, 2, ...
+            for (int i = 0; i <= n; d[i, 0] = i++) ;
+            for (int j = 1; j <= m; d[0, j] = j++) ;
+
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= m; j++)
+                {
+                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+                    int min1 = d[i - 1, j] + 1;
+                    int min2 = d[i, j - 1] + 1;
+                    int min3 = d[i - 1, j - 1] + cost;
+                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
+                }
+            }
+            return d[n, m];
+        }
+        public static void ConsoleWriteLine(this string text, ConsoleColor Color)
+        {
+            lock (Console.Title)
+            {
+                Console.CursorLeft = 0;
+                Console.ForegroundColor = Color;
+                Console.WriteLine(text);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
+            }
+        }
 
         // Discord
         public static EmbedBuilder ToEmbed(this IMessage m)
@@ -157,7 +210,7 @@ namespace TestDiscordBot
             return Program.GetGuildFromChannel(m.Channel).Id;
         }
         
-        // Linq extensions
+        // Linq Extensions
         public static b Foldr<a, b>(this IEnumerable<a> xs, b y, Func<a, b, b> f)
         {
             foreach (a x in xs)
@@ -186,7 +239,7 @@ namespace TestDiscordBot
         static int clearYcoords;
         static bool exitedNormally = false;
         static string buildDate;
-        static int Exectutions = 0;
+        static int ConcurrentCommandExecutions = 0;
         public static Random RDM { get; private set; } = new Random();
 
         // Client 
@@ -276,7 +329,7 @@ namespace TestDiscordBot
                     buildDate = "Error: Couldn't read build date!";
             }
             client = new DiscordSocketClient();
-            client.Log += Log;
+            client.Log += Client_Log;
             client.JoinedGuild += Client_JoinedGuild;
 
             while (!gotWorkingToken)
@@ -589,6 +642,8 @@ namespace TestDiscordBot
             await client.LogoutAsync();
             Environment.Exit(0);
         }
+
+        // Events
         private static async Task Client_JoinedGuild(SocketGuild arg)
         {
             try
@@ -632,7 +687,7 @@ namespace TestDiscordBot
             ClientReady = true;
             return Task.FromResult(0);
         }
-        private static Task Log(LogMessage msg)
+        private static Task Client_Log(LogMessage msg)
         {
             Program.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
             return Task.FromResult(0);
@@ -785,7 +840,7 @@ namespace TestDiscordBot
                 typingState = message.Channel.EnterTypingState();
                 lock (lockject)
                 {
-                    Exectutions++;
+                    ConcurrentCommandExecutions++;
                     UpdateWorkState();
                 }
 
@@ -817,14 +872,14 @@ namespace TestDiscordBot
                 typingState.Dispose();
                 lock (lockject)
                 {
-                    Exectutions--;
+                    ConcurrentCommandExecutions--;
                     UpdateWorkState();
                 }
             }
         }
         static void UpdateWorkState()
         {
-            if (Exectutions > 0)
+            if (ConcurrentCommandExecutions > 0)
                 client.SetStatusAsync(UserStatus.DoNotDisturb);
             else
                 client.SetStatusAsync(UserStatus.Online);
@@ -952,62 +1007,7 @@ namespace TestDiscordBot
             if (!Config.Config.Data.UserList.Exists(x => x.UserID == UserID))
                 Config.Config.Data.UserList.Add(new DiscordUser(UserID));
         }
-
-        // Utility
-        public static Bitmap GetBitmapFromURL(string url)
-        {
-            WebRequest request = WebRequest.Create(url);
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
-            return new Bitmap(responseStream);
-        }
-        public static int LevenshteinDistance(string s, string t)
-        {
-            if (string.IsNullOrEmpty(s))
-            {
-                if (string.IsNullOrEmpty(t))
-                    return 0;
-                return t.Length;
-            }
-
-            if (string.IsNullOrEmpty(t))
-            {
-                return s.Length;
-            }
-
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
-
-            // initialize the top and right of the table to 0, 1, 2, ...
-            for (int i = 0; i <= n; d[i, 0] = i++) ;
-            for (int j = 1; j <= m; d[0, j] = j++) ;
-
-            for (int i = 1; i <= n; i++)
-            {
-                for (int j = 1; j <= m; j++)
-                {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-                    int min1 = d[i - 1, j] + 1;
-                    int min2 = d[i, j - 1] + 1;
-                    int min3 = d[i - 1, j - 1] + cost;
-                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
-                }
-            }
-            return d[n, m];
-        }
-        public static void ConsoleWriteLine(string text, ConsoleColor Color)
-        {
-            lock (Console.Title)
-            {
-                Console.CursorLeft = 0;
-                Console.ForegroundColor = Color;
-                Console.WriteLine(text);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
-            }
-        }
-
+        
         // Closing Event
         static bool ConsoleEventCallback(int eventType)
         {
