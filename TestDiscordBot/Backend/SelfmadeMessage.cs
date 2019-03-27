@@ -25,6 +25,19 @@ namespace TestDiscordBot.Backend
         public IUser Author;
         public DateTimeOffset CreatedAt;
         public ulong Id;
+        public MessageType Type;
+        public MessageSource Source;
+        public bool IsTTS;
+        public bool IsPinned;
+
+        public List<IAttachment> Attachments;
+        public List<IEmbed> Embeds;
+        public List<ITag> Tags;
+        public List<ulong> MentionedChannelIds;
+        public List<ulong> MentionedRoleIds;
+        public List<ulong> MentionedUserIds;
+
+        public Func<RequestOptions, Task> DeleteFunc = (RequestOptions options) => { throw new NotImplementedException(); };
 
         public SelfmadeMessage(IMessage m)
         {
@@ -35,6 +48,19 @@ namespace TestDiscordBot.Backend
             Author = m.Author;
             CreatedAt = m.CreatedAt;
             Id = m.Id;
+            Type = m.Type;
+            Source = m.Source;
+            IsTTS = m.IsTTS;
+            IsPinned = m.IsPinned;
+
+            Attachments = m.Attachments.ToList();
+            Embeds = m.Embeds.ToList();
+            Tags = m.Tags.ToList();
+            MentionedChannelIds = m.MentionedChannelIds.ToList();
+            MentionedRoleIds = m.MentionedRoleIds.ToList();
+            MentionedUserIds = m.MentionedUserIds.ToList();
+
+            DeleteFunc = m.DeleteAsync;
         }
         
         string IMessage.Content => Content;
@@ -44,22 +70,21 @@ namespace TestDiscordBot.Backend
         IUser IMessage.Author => Author;
         DateTimeOffset ISnowflakeEntity.CreatedAt => CreatedAt;
         ulong IEntity<ulong>.Id => Id;
+        MessageType IMessage.Type => Type;
+        MessageSource IMessage.Source => Source;
+        bool IMessage.IsTTS => IsTTS;
+        bool IMessage.IsPinned => IsPinned;
 
-        public MessageType Type => throw new NotImplementedException();
-        public MessageSource Source => throw new NotImplementedException();
-        public bool IsTTS => throw new NotImplementedException();
-        public bool IsPinned => throw new NotImplementedException();
-        
-        public IReadOnlyCollection<IAttachment> Attachments => throw new NotImplementedException();
-        public IReadOnlyCollection<IEmbed> Embeds => throw new NotImplementedException();
-        public IReadOnlyCollection<ITag> Tags => throw new NotImplementedException();
-        public IReadOnlyCollection<ulong> MentionedChannelIds => throw new NotImplementedException();
-        public IReadOnlyCollection<ulong> MentionedRoleIds => throw new NotImplementedException();
-        public IReadOnlyCollection<ulong> MentionedUserIds => throw new NotImplementedException();
+        IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
+        IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+        IReadOnlyCollection<ITag> IMessage.Tags => Tags;
+        IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannelIds;
+        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds;
+        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds;
         
         public Task DeleteAsync(RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            return DeleteFunc(options);
         }
     }
 }
