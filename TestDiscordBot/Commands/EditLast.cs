@@ -125,7 +125,7 @@ namespace TestDiscordBot.Commands
                 } catch { }
             }),
             new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
+                Bitmap bmp = lastPic.GetBitmapFromURL();
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
@@ -138,7 +138,7 @@ namespace TestDiscordBot.Commands
                 await Program.SendBitmap(bmp, message.Channel);
             }),
             new EditLastCommand("invert", "Invert the color of each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
+                Bitmap bmp = lastPic.GetBitmapFromURL();
 
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
@@ -151,7 +151,7 @@ namespace TestDiscordBot.Commands
                 await Program.SendBitmap(bmp, message.Channel);
             }),
             new EditLastCommand("Rekt", "Finds colored rectangles in pictures", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
+                Bitmap bmp = lastPic.GetBitmapFromURL();
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
                 System.Drawing.Color c = System.Drawing.Color.FromName(message.Content.Split(' ')[2]);
@@ -172,7 +172,7 @@ namespace TestDiscordBot.Commands
                 Exception e = null;
                 try
                 {
-                    Bitmap bmp = Program.GetBitmapFromURL(lastPic);
+                    Bitmap bmp = lastPic.GetBitmapFromURL();
                     string[] files = Directory.GetFiles("Commands\\MemeTemplates");
                     string[] split = message.Content.Split(' ');
 
@@ -241,7 +241,7 @@ namespace TestDiscordBot.Commands
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
                 "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]",
                 false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                Bitmap bmp = Program.GetBitmapFromURL(lastPic);
+                Bitmap bmp = lastPic.GetBitmapFromURL();
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
                 float Strength = 1;

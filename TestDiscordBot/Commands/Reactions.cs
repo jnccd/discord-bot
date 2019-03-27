@@ -62,7 +62,7 @@ namespace TestDiscordBot.Commands
                 int[] scores = new int[reactions.Length];
                 for (int i = 0; i < reactions.Length; i++)
                 {
-                    scores[i] = Program.LevenshteinDistance(command, reactions[i].name.ToLower());
+                    scores[i] = Extensions.LevenshteinDistance(command, reactions[i].name.ToLower());
                 }
                 int index = Array.IndexOf(scores, scores.Min());
                 reactions[index].execute(message);
