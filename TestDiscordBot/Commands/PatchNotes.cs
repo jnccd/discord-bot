@@ -54,7 +54,7 @@ namespace TestDiscordBot.Commands
                         }
                         catch (Exception e)
                         {
-                            Extensions.ConvertToDouble(e.ToString(), ConsoleColor.Red);
+                            e.ToString().ConsoleWriteLine(ConsoleColor.Red);
                         }
                     }
                 }
