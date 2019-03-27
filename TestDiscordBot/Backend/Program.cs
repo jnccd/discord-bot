@@ -321,7 +321,7 @@ namespace TestDiscordBot
             try
             {
                 buildDate = File.ReadAllText("BuildDate.txt").TrimEnd('\n');
-                Program.ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
+                ("Build from: " + buildDate).ConsoleWriteLine(ConsoleColor.Magenta);
             }
             catch
             {
@@ -395,13 +395,13 @@ namespace TestDiscordBot
             // Startup Console Display
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.CursorLeft = 0;
-            Program.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
+            Extensions.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    Program.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
+                    Extensions.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
             }
-            catch { Program.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            catch { Extensions.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             Console.CursorLeft = 0;
             Console.Write("Default channel is: ");
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -417,7 +417,7 @@ namespace TestDiscordBot
                     {
                         c.OnConnected();
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             }
             #endregion
@@ -570,26 +570,26 @@ namespace TestDiscordBot
                     {
                         
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/roles")) // ServerID
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Program.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
+                        Extensions.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Program.ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
+                        Extensions.ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
                             Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
                 {
@@ -598,18 +598,18 @@ namespace TestDiscordBot
                     {
                         await GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
                                 AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
-                        Program.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
+                        Extensions.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/channels")) // ChannelID
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Program.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        Extensions.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/read")) // ChannelID
                 {
@@ -617,12 +617,12 @@ namespace TestDiscordBot
                     try
                     {
                         var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).Flatten().GetAwaiter().GetResult();
-                        Program.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                        Extensions.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
-                    Program.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
+                    Extensions.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
             }
             #endregion
 
@@ -632,7 +632,7 @@ namespace TestDiscordBot
                 {
                     c.OnExit();
                 }
-                catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
             Config.Config.Save();
             exitedNormally = true;
@@ -680,7 +680,7 @@ namespace TestDiscordBot
                     return;
                 }
             }
-            catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+            catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
         }
         private static Task Client_Ready()
         {
@@ -689,7 +689,7 @@ namespace TestDiscordBot
         }
         private static Task Client_Log(LogMessage msg)
         {
-            Program.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
+            Extensions.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
             return Task.FromResult(0);
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
@@ -713,7 +713,7 @@ namespace TestDiscordBot
                     {
                         c.OnEmojiReactionAdded(arg1, arg2, arg3);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
             });
             return Task.FromResult(default(object));
@@ -739,7 +739,7 @@ namespace TestDiscordBot
                     {
                         c.OnEmojiReactionRemoved(arg1, arg2, arg3);
                     }
-                    catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
             });
             return Task.FromResult(default(object));
@@ -763,7 +763,7 @@ namespace TestDiscordBot
                             {
                                 c.OnNonCommandMessageRecieved(message);
                             }
-                            catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                            catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                         }
                     });
                 }
@@ -801,7 +801,7 @@ namespace TestDiscordBot
                     int[] distances = new int[commands.Length];
                     for (int i = 0; i < commands.Length; i++)
                         if (commands[i].CommandLine != "" && !commands[i].IsHidden)
-                            distances[i] = Program.LevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
+                            distances[i] = Extensions.LevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
                         else
                             distances[i] = int.MaxValue;
                     int minIndex = 0;
@@ -848,10 +848,10 @@ namespace TestDiscordBot
                 await command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    Program.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
+                    Extensions.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
                         ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
                 else
-                    Program.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
+                    Extensions.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
                         "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
             }
             catch (Exception e)
@@ -865,7 +865,7 @@ namespace TestDiscordBot
                 }
                 catch { }
                 
-                Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
             }
             finally
             {

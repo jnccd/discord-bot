@@ -66,7 +66,7 @@ namespace TestDiscordBot.Commands
             MarkovHelper.AddToDict(input);
 
             loadedDict = true;
-            Program.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
+            Extensions.ConvertToDouble("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
         public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
