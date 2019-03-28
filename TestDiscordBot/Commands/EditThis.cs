@@ -29,7 +29,7 @@ namespace TestDiscordBot.Commands
                 {
                     Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
                 }
-                Embed.WithDescription("EditLast Commands:");
+                Embed.WithDescription("EditThis Commands:");
                 await Program.SendEmbed(Embed, message.Channel);
             }
             else
@@ -48,7 +48,7 @@ namespace TestDiscordBot.Commands
                                 inPic = message.Attachments.ElementAt(0).Url;
                         }
                         string picLink = message.Content.ContainsPictureLink();
-                        if (inPic == null && picLink != null)
+                        if (string.IsNullOrWhiteSpace(inPic) && picLink != null)
                             inPic = picLink;
 
                         if (command.textBased && string.IsNullOrWhiteSpace(inText))

@@ -45,7 +45,7 @@ namespace TestDiscordBot.Commands
                             lastPic = m.Attachments.ElementAt(0).Url;
                     }
                     string picLink = m.Content.ContainsPictureLink();
-                    if (lastPic == null && picLink != null)
+                    if (string.IsNullOrWhiteSpace(lastPic) && picLink != null)
                         lastPic = picLink;
 
                     if (lastText != null && lastPic != null)
@@ -154,11 +154,17 @@ namespace TestDiscordBot.Commands
                 Bitmap bmp = lastPic.GetBitmapFromURL();
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
+                if (message.Content.Split(' ').Length < 2)
+                {
+                    await Program.SendText("This command requires a color as an additional argument!", message.Channel);
+                    return;
+                }
+
                 System.Drawing.Color c = System.Drawing.Color.FromName(message.Content.Split(' ')[2]);
                 Rectangle redRekt = FindRectangle(bmp, System.Drawing.Color.FromArgb(254, 34, 34), 20);
 
                 if (redRekt.Width == 0)
-                    await Program.SendText("No Red rekt!", message.Channel);
+                    await Program.SendText("No rekt!", message.Channel);
                 else
                 {
                     using (Graphics graphics = Graphics.FromImage(output))
@@ -167,7 +173,8 @@ namespace TestDiscordBot.Commands
                     await Program.SendBitmap(output, message.Channel);
                 }
             }),
-            new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list", 
+                false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await memifyLock.WaitAsync();
                 Exception e = null;
                 try
@@ -239,7 +246,8 @@ namespace TestDiscordBot.Commands
                 }
             }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
-                "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation strength]",
+                "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation " +
+                "strength]",
                 false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = lastPic.GetBitmapFromURL();
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
