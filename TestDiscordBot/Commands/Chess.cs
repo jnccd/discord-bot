@@ -121,6 +121,12 @@ namespace TestDiscordBot.Commands
                 {
                     Board.MovePiece(new ChessPoint(x1, y1), new ChessPoint(x2, y2));
                     SendBoard(message);
+
+                    if (Board.GameEnded)
+                    {
+                        await Program.SendText($"Player {(Board.Winner == Board.PlayerWhite ? "White" : "Black")} won!", message.Channel);
+                        Boards.Remove(Board);
+                    }
                 }
                 catch
                 {
@@ -136,8 +142,8 @@ namespace TestDiscordBot.Commands
         {
             ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id || 
             x.PlayerTop.UserID == message.Author.Id);
-            Program.SendBitmap(ChessBoardToPicture(Board), message.Channel, $"<@{Board.PlayerTop.UserID}>(Top) " +
-                $"vs. <@{Board.PlayerBottom.UserID}>(Bottom)\nCurrently its the {(Board.PlayerWhoHasTheMove() == Board.PlayerTop ? "Top" : "Bottom")} " +
+            Program.SendBitmap(ChessBoardToPicture(Board), message.Channel, $"<@{Board.PlayerWhite.UserID}>(White) " +
+                $"vs. <@{Board.PlayerBlack.UserID}>(Black)\nCurrently its the {(Board.PlayerWhoHasTheMove() == Board.PlayerWhite ? "White" : "Black")} " +
                 $"players turn").Wait();
         }
         public string ChessPieceToCharacter(ChessPiece Piece, ChessBoard Board)
