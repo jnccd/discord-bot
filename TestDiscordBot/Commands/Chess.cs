@@ -67,9 +67,7 @@ namespace TestDiscordBot.Commands
                 SendBoard(message);
             }
             else if (split[1] == "game")
-            {
                 SendBoard(message);
-            }
             else if (split[1] == "move")
             {
                 int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
