@@ -19,9 +19,9 @@ namespace TestDiscordBot.Commands
 
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override async Task Execute(SocketMessage message)
         {
-            string[] split = commandmessage.Content.Split(new char[] { ' ', '\n' });
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length < 2 || split[1] == "help")
             {
@@ -32,76 +32,64 @@ namespace TestDiscordBot.Commands
                     "eg. " + Prefix + CommandLine + " move 1,1 3,1");
                 Embed.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
                 Embed.WithDescription("Chess Commands:");
-                await Program.SendEmbed(Embed, commandmessage.Channel);
+                await Program.SendEmbed(Embed, message.Channel);
             }
             else if (split[1] == "newGame")
             {
-                if (Boards.Exists(x => x.PlayerBottom.UserID == commandmessage.Author.Id || x.PlayerTop.UserID == commandmessage.Author.Id))
+                if (Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
-                    await Program.SendText("You are already in a game!", commandmessage.Channel);
+                    await Program.SendText("You are already in a game!", message.Channel);
                     return;
                 }
 
-                if (commandmessage.MentionedUsers.Count != 1)
+                if (message.MentionedUsers.Count != 1)
                 {
-                    await Program.SendText("You need exactly one User to play against!", commandmessage.Channel);
+                    await Program.SendText("You need exactly one User to play against!", message.Channel);
                     return;
                 }
 
-                if (commandmessage.MentionedUsers.ElementAt(0).IsBot || commandmessage.Author.IsBot)
+                if (message.MentionedUsers.ElementAt(0).IsBot || message.Author.IsBot)
                 {
-                    await Program.SendText("You can't play against Bots!", commandmessage.Channel);
+                    await Program.SendText("You can't play against Bots!", message.Channel);
+                    return;
+                }
+                
+                if (Boards.Exists(x => x.PlayerBottom.UserID == message.MentionedUsers.ElementAt(0).Id ||
+                        x.PlayerTop.UserID == message.MentionedUsers.ElementAt(0).Id))
+                {
+                    await Program.SendText(message.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel);
                     return;
                 }
 
-                //if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
-                //{
-                //    await Program.SendText("You can't play against yourself!", commandmessage.Channel);
-                //    return;
-                //}
-
-                if (Boards.Exists(x => x.PlayerBottom.UserID == commandmessage.MentionedUsers.ElementAt(0).Id ||
-                        x.PlayerTop.UserID == commandmessage.MentionedUsers.ElementAt(0).Id))
-                {
-                    await Program.SendText(commandmessage.MentionedUsers.ElementAt(0).Mention + " is already in a game!", commandmessage.Channel);
-                    return;
-                }
-
-                Boards.Add(new ChessBoard(new ChessPlayerDiscord(commandmessage.Author.Id),
-                           new ChessPlayerDiscord(commandmessage.MentionedUsers.ElementAt(0).Id)));
-                await Program.SendText("Created new chess game!", commandmessage.Channel);
+                Boards.Add(new ChessBoard(new ChessPlayerDiscord(message.Author.Id),
+                           new ChessPlayerDiscord(message.MentionedUsers.ElementAt(0).Id)));
+                await Program.SendText("Created new chess game!", message.Channel);
+                SendBoard(message);
             }
             else if (split[1] == "game")
             {
-                if (!Boards.Exists(x => x.PlayerBottom.UserID == commandmessage.Author.Id || x.PlayerTop.UserID == commandmessage.Author.Id))
-                {
-                    await Program.SendText("You are not in a game!", commandmessage.Channel);
-                    return;
-                }
-
-                await Program.SendBitmap(ChessBoardToPicture(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id || 
-                    x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
+                SendBoard(message);
             }
             else if (split[1] == "move")
             {
                 int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-                if (!Boards.Exists(x => x.PlayerBottom.UserID == commandmessage.Author.Id || x.PlayerTop.UserID == commandmessage.Author.Id))
+                if (!Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
-                    await Program.SendText("You are not in a game!", commandmessage.Channel);
+                    await Program.SendText("You are not in a game!", message.Channel);
                     return;
                 }
 
-                ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id || x.PlayerTop.UserID == commandmessage.Author.Id);
+                ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id);
 
                 if (split.Length != 4)
                 {
-                    await Program.SendText("I need exactly 2 coordinates", commandmessage.Channel);
+                    await Program.SendText("I need exactly 2 coordinates", message.Channel);
                     return;
                 }
 
-                if (Board.PlayerWhoHasTheMove().UserID != commandmessage.Author.Id)
+                if (Board.PlayerWhoHasTheMove().UserID != message.Author.Id)
                 {
-                    await Program.SendText("Its not your turn", commandmessage.Channel);
+                    await Program.SendText("Its not your turn", message.Channel);
                     return;
                 }
 
@@ -113,7 +101,7 @@ namespace TestDiscordBot.Commands
                 }
                 catch
                 {
-                    await Program.SendText("I dont understand the first set of your coordinates!", commandmessage.Channel);
+                    await Program.SendText("I dont understand the first set of your coordinates!", message.Channel);
                     return;
                 }
 
@@ -125,26 +113,33 @@ namespace TestDiscordBot.Commands
                 }
                 catch
                 {
-                    await Program.SendText("I dont understand the second set of your coordinates!", commandmessage.Channel);
+                    await Program.SendText("I dont understand the second set of your coordinates!", message.Channel);
                     return;
                 }
 
                 try
                 {
                     Board.MovePiece(new ChessPoint(x1, y1), new ChessPoint(x2, y2));
-                    await Program.SendBitmap(ChessBoardToPicture(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id ||
-                        x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
+                    SendBoard(message);
                 }
                 catch
                 {
-                    await Program.SendText("Oi thats not a legal move!", commandmessage.Channel);
+                    await Program.SendText("Oi thats not a legal move!", message.Channel);
                     return;
                 }
             }
             else
-                await Program.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", commandmessage.Channel);
+                await Program.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", message.Channel);
         }
 
+        public void SendBoard(SocketMessage message)
+        {
+            ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id || 
+            x.PlayerTop.UserID == message.Author.Id);
+            Program.SendBitmap(ChessBoardToPicture(Board), message.Channel, $"<@{Board.PlayerTop.UserID}>(Top) " +
+                $"vs. <@{Board.PlayerBottom.UserID}>(Bottom)\nCurrently its the {(Board.PlayerWhoHasTheMove() == Board.PlayerTop ? "Top" : "Bottom")} " +
+                $"players turn").Wait();
+        }
         public string ChessPieceToCharacter(ChessPiece Piece, ChessBoard Board)
         {
             if (Piece == null)
