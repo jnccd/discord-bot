@@ -234,17 +234,24 @@ namespace TestDiscordBot.Commands
         }
         public Bitmap ChessBoardToPicture(ChessBoard Board)
         {
-            Bitmap picture = new Bitmap(800, 800);
+            int FieldOffset = 25;
+            int FieldSize = 100;
+            Bitmap picture = new Bitmap(8 * FieldSize + FieldOffset, 8 * FieldSize + FieldOffset);
             using (Graphics g = Graphics.FromImage(picture))
             {
-                g.FillRectangle(Brushes.White, new Rectangle(0, 0, 800, 800));
+                g.FillRectangle(Brushes.White, new Rectangle(0, 0, picture.Width, picture.Height));
                 for (int x = 0; x < 8; x++)
                     for (int y = 0; y < 8; y++)
                     {
-                        RectangleF FieldRect = new Rectangle(100 * x, 100 * y, 100, 100);
+                        RectangleF FieldRect = new Rectangle(FieldSize * x + FieldOffset, FieldSize * y + FieldOffset, FieldSize, FieldSize);
                         if ((x + y) % 2 == 0)
                             g.FillRectangle(Brushes.Beige, FieldRect);
-                        g.DrawString(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new Font("Arial", 65), Brushes.Black, FieldRect);
+                        g.DrawString(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new Font("Arial", (int)(FieldSize / 1.6f)), Brushes.Black, FieldRect);
+
+                        if (y == 0)
+                            g.DrawString(x.ToString(), new Font("Arial", (int)(FieldOffset / 1.6f)), Brushes.Black, FieldSize * x + FieldOffset, 0);
+                        if (x == 0)
+                            g.DrawString(y.ToString(), new Font("Arial", (int)(FieldOffset / 1.6f)), Brushes.Black, 0, FieldSize * y + FieldOffset);
                     }
             }
             return picture;
