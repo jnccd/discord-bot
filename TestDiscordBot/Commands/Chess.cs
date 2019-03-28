@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,7 +79,7 @@ namespace TestDiscordBot.Commands
                     return;
                 }
 
-                await Program.SendText(ChessBoardToDiscordString(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id || 
+                await Program.SendBitmap(ChessBoardToPicture(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id || 
                     x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
             }
             else if (split[1] == "move")
@@ -131,7 +132,7 @@ namespace TestDiscordBot.Commands
                 try
                 {
                     Board.MovePiece(new ChessPoint(x1, y1), new ChessPoint(x2, y2));
-                    await Program.SendText(ChessBoardToDiscordString(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id ||
+                    await Program.SendBitmap(ChessBoardToPicture(Boards.Find(x => x.PlayerBottom.UserID == commandmessage.Author.Id ||
                         x.PlayerTop.UserID == commandmessage.Author.Id)), commandmessage.Channel);
                 }
                 catch
@@ -144,6 +145,58 @@ namespace TestDiscordBot.Commands
                 await Program.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", commandmessage.Channel);
         }
 
+        public string ChessPieceToCharacter(ChessPiece Piece, ChessBoard Board)
+        {
+            if (Piece == null)
+                return "";
+            if (Piece.Parent == Board.PlayerBlack)
+            {
+                switch (Piece.Type)
+                {
+                    case ChessPieceType.Bishop:
+                        return "♝";
+
+                    case ChessPieceType.King:
+                        return "♚";
+
+                    case ChessPieceType.Knight:
+                        return "♞";
+
+                    case ChessPieceType.Pawn:
+                        return "♟";
+
+                    case ChessPieceType.Queen:
+                        return "♛";
+
+                    case ChessPieceType.Rook:
+                        return "♜";
+                }
+            }
+            else
+            {
+                switch (Piece.Type)
+                {
+                    case ChessPieceType.Bishop:
+                        return "♗";
+
+                    case ChessPieceType.King:
+                        return "♔";
+
+                    case ChessPieceType.Knight:
+                        return "♘";
+
+                    case ChessPieceType.Pawn:
+                        return "♙";
+
+                    case ChessPieceType.Queen:
+                        return "♕";
+
+                    case ChessPieceType.Rook:
+                        return "♖";
+                }
+            }
+            return "";
+        }
         public string ChessBoardToDiscordString(ChessBoard Board)
         {
             string re = "";
@@ -163,66 +216,7 @@ namespace TestDiscordBot.Commands
                     if (Piece == null)
                         re += "║   ";
                     else
-                    {
-                        if (Piece.Parent == Board.PlayerBlack)
-                        {
-                            switch (Piece.Type)
-                            {
-                                case ChessPieceType.Bishop:
-                                    re += "║ ♝ ";
-                                    break;
-
-                                case ChessPieceType.King:
-                                    re += "║ ♚ ";
-                                    break;
-
-                                case ChessPieceType.Knight:
-                                    re += "║ ♞ ";
-                                    break;
-
-                                case ChessPieceType.Pawn:
-                                    re += "║ ♟ ";
-                                    break;
-
-                                case ChessPieceType.Queen:
-                                    re += "║ ♛ ";
-                                    break;
-
-                                case ChessPieceType.Rook:
-                                    re += "║ ♜ ";
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            switch (Piece.Type)
-                            {
-                                case ChessPieceType.Bishop:
-                                    re += "║ ♗ ";
-                                    break;
-
-                                case ChessPieceType.King:
-                                    re += "║ ♔ ";
-                                    break;
-
-                                case ChessPieceType.Knight:
-                                    re += "║ ♘ ";
-                                    break;
-
-                                case ChessPieceType.Pawn:
-                                    re += "║ ♙ ";
-                                    break;
-
-                                case ChessPieceType.Queen:
-                                    re += "║ ♕ ";
-                                    break;
-
-                                case ChessPieceType.Rook:
-                                    re += "║ ♖ ";
-                                    break;
-                            }
-                        }
-                    }
+                        re += $"║ {ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board)} ";
                 }
                 if (y != 8 - 1)
                     re += "║\n╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣\n";
@@ -237,6 +231,23 @@ namespace TestDiscordBot.Commands
                 re += "Unknown Player";
 
             return re;
+        }
+        public Bitmap ChessBoardToPicture(ChessBoard Board)
+        {
+            Bitmap picture = new Bitmap(800, 800);
+            using (Graphics g = Graphics.FromImage(picture))
+            {
+                g.FillRectangle(Brushes.White, new Rectangle(0, 0, 800, 800));
+                for (int x = 0; x < 8; x++)
+                    for (int y = 0; y < 8; y++)
+                    {
+                        RectangleF FieldRect = new Rectangle(100 * x, 100 * y, 100, 100);
+                        if ((x + y) % 2 == 0)
+                            g.FillRectangle(Brushes.Beige, FieldRect);
+                        g.DrawString(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new Font("Arial", 65), Brushes.Black, FieldRect);
+                    }
+            }
+            return picture;
         }
     }
 }

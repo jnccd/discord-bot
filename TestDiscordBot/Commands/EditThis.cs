@@ -27,7 +27,7 @@ namespace TestDiscordBot.Commands
                 Embed.WithColor(0, 128, 255);
                 foreach (EditLastCommand ecommand in EditLast.Commands)
                 {
-                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
+                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc.Replace("editLast", "editThis"));
                 }
                 Embed.WithDescription("EditThis Commands:");
                 await Program.SendEmbed(Embed, message.Channel);
