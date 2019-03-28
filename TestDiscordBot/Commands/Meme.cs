@@ -13,7 +13,6 @@ namespace TestDiscordBot.Commands
 {
     public class Meme : Command
     {
-        string url = "";
         public static string[] Subreddits = new string[] { "https://www.reddit.com/r/anime_irl/", "https://www.reddit.com/r/Animemes/",
             "https://www.reddit.com/r/memes/", "https://www.reddit.com/r/PewdiepieSubmissions/",
             "https://www.reddit.com/r/marvelmemes/", "https://www.reddit.com/r/me_irl/", "https://www.reddit.com/r/OTMemes/",
@@ -31,6 +30,7 @@ namespace TestDiscordBot.Commands
         {
             // Getting a subreddit
             bool worked = false;
+            string url = "";
 
             if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length > 1)
             {
@@ -50,7 +50,7 @@ namespace TestDiscordBot.Commands
                 try
                 {
                     string postJson = RedditHelper.GetPostJsonFromSubreddit(url);
-                    await RedditHelper.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author);
+                    RedditHelper.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author).Wait();
                     worked = true;
                 }
                 catch (Exception e)
