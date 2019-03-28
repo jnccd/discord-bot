@@ -168,7 +168,10 @@ namespace TestDiscordBot.Commands
                 else
                 {
                     using (Graphics graphics = Graphics.FromImage(output))
-                    graphics.DrawRectangle(new Pen(System.Drawing.Color.Red), redRekt);
+                    {
+                        graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, bmp.Width, bmp.Height));
+                        graphics.DrawRectangle(Pens.Red, redRekt);
+                    }
 
                     await Program.SendBitmap(output, message.Channel);
                 }
