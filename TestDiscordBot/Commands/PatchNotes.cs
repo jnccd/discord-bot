@@ -49,7 +49,7 @@ namespace TestDiscordBot.Commands
 #if !DEBUG
                             Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                            Extensions.ConvertToDouble("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")", ConsoleColor.Cyan);
+                            ("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")").ConsoleWriteLine(ConsoleColor.Cyan);
 #endif
                         }
                         catch (Exception e)
