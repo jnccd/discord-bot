@@ -254,7 +254,7 @@ namespace TestDiscordBot.Commands
                 "additional arguments are -f for the font, -s for the font size and of course -m for the meme", true,
                     (SocketMessage message, IMessage lastText, string lastPic) => {
                         string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
-                        List<string> split = lastText.Content.Split(' ').ToList();
+                        List<string> split = message.Content.Split(' ').ToList();
                         split.RemoveRange(0, 2);
 
                         if (split.Contains("-list"))
@@ -311,7 +311,7 @@ namespace TestDiscordBot.Commands
                                 design = (Bitmap)Bitmap.FromStream(stream);
                             Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
                             using (Graphics graphics = Graphics.FromImage(template))
-                                graphics.DrawString(split.Aggregate((x, y) => x + " " + y), new Font(font, fontSize), Brushes.Black, redRekt);
+                                graphics.DrawString(lastText.Content, new Font(font, fontSize), Brushes.Black, redRekt);
 
                             Program.SendBitmap(template, message.Channel).Wait();
                         }
