@@ -62,7 +62,7 @@ namespace TestDiscordBot.Commands
                             return;
                         }
 
-                        await command.execute(message, new SelfmadeMessage(message).EditContent(inText), inPic);
+                        await command.execute(message, new SelfmadeMessage(message), inPic);
 
                         break;
                     }

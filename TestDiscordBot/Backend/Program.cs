@@ -213,6 +213,7 @@ namespace TestDiscordBot
         // Linq Extensions
         public static b Foldr<a, b>(this IEnumerable<a> xs, b y, Func<a, b, b> f)
         {
+            xs.Reverse();
             foreach (a x in xs)
                 y = f(x, y);
             return y;
@@ -229,7 +230,7 @@ namespace TestDiscordBot
         public static string RemoveLastGroup(this string s, char seperator)
         {
             string[] split = s.Split(seperator);
-            return split.Take(split.Length - 1).Reverse().Foldr("", (a, b) => a + seperator + b);
+            return split.Take(split.Length - 1).Foldr("", (a, b) => a + seperator + b);
         }
     }
 

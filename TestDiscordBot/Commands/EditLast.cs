@@ -176,7 +176,7 @@ namespace TestDiscordBot.Commands
                     await Program.SendBitmap(output, message.Channel);
                 }
             }),
-            new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list", 
+            new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list",
                 false, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await memifyLock.WaitAsync();
                 Exception e = null;
@@ -191,7 +191,7 @@ namespace TestDiscordBot.Commands
                     {
                         await Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
                                                                         Where(x => x.EndsWith("design")).
-                                                                        Select(x => new string(x.TakeWhile(y => !char.IsDigit(y)).ToArray())).
+                                                                        Select(x => new string(x.TakeWhile(y => !char.IsDigit(y)).ToArray()).Trim('-')).
                                                                         Aggregate((x, y) => x + "\n" + y), message.Channel);
                         return;
                     }
@@ -229,6 +229,8 @@ namespace TestDiscordBot.Commands
                     else if (File.Exists(memeTemplate))
                     {
                         Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        if (redRekt.Width == 0)
+                            redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(255, 0, 0), 20);
                         Bitmap template;
                         using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
                             template = (Bitmap)Bitmap.FromStream(stream);
@@ -248,6 +250,76 @@ namespace TestDiscordBot.Commands
                         throw e;
                 }
             }),
+            new EditLastCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
+                "additional arguments are -f for the font, -s for the font size and of course -m for the meme", true,
+                    (SocketMessage message, IMessage lastText, string lastPic) => {
+                        string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
+                        List<string> split = lastText.Content.Split(' ').ToList();
+                        split.RemoveRange(0, 2);
+
+                        if (split.Contains("-list"))
+                        {
+                            Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                                                                       Where(x => x.EndsWith("-design")).
+                                                                       Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
+                                                                       Aggregate((x, y) => x + "\n" + y), message.Channel).Wait();
+                            return Task.FromResult(default(object));
+                        }
+
+                        string font = "Arial";
+                        int fontSize = 16;
+                        int index = split.FindIndex(x => x == "-f");
+                        if (index != -1)
+                        {
+                            font = split[index + 1];
+                            split.RemoveRange(index, 2);
+                        }
+                        index = split.FindIndex(x => x == "-s");
+                        if (index != -1)
+                        {
+                            fontSize = Convert.ToInt32(split[index + 1]);
+                            split.RemoveRange(index, 2);
+                        }
+                        index = split.FindIndex(x => x == "-m");
+                        string memeTemplate = "";
+                        string memeDesign = "";
+                        if (index != -1)
+                        {
+                            memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[index + 1]) && 
+                                Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
+                            memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
+                            split.RemoveRange(index, 2);
+                        }
+                        else
+                        {
+                            memeDesign = files.Where(x => x.Contains("-design")).GetRandomValue();
+                            memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
+                        }
+
+                        if (string.IsNullOrWhiteSpace(memeTemplate))
+                        {
+                            Program.SendText("I don't have that meme in my registry!", message.Channel).Wait();
+                            return Task.FromResult(default(object));
+                        }
+
+                        if (File.Exists(memeTemplate))
+                        {
+                            Bitmap template, design;
+                            using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
+                                template = (Bitmap)Bitmap.FromStream(stream);
+                            using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
+                                design = (Bitmap)Bitmap.FromStream(stream);
+                            Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                            using (Graphics graphics = Graphics.FromImage(template))
+                                graphics.DrawString(split.Aggregate((x, y) => x + " " + y), new Font(font, fontSize), Brushes.Black, redRekt);
+
+                            Program.SendBitmap(template, message.Channel).Wait();
+                        }
+                        else
+                            throw new Exception("uwu");
+
+                        return Task.FromResult(default(object));
+                    }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
                 "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation " +
                 "strength]",
@@ -288,6 +360,7 @@ namespace TestDiscordBot.Commands
             })
         };
         static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
+        static SemaphoreSlim memifyTextLock = new SemaphoreSlim(1, 1);
         private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
         {
             Vector2 diff = point - center;
