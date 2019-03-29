@@ -74,6 +74,7 @@ namespace TestDiscordBot.Commands
                         break;
                     }
                 }
+                await Program.SendText("That subcommand doesn't exist :thinking:", message.Channel);
             }
         }
     }
