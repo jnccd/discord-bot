@@ -20,8 +20,8 @@ namespace TestDiscordBot.Commands
 
         public override async Task Execute(SocketMessage message)
         {
-            string[] split = message.Content.Split(new char[] { ' ', '\n' });
-            if (split.Length == 1)
+            List<string> split = message.Content.Split(new char[] { ' ', '\n' }).ToList();
+            if (split.Count == 1)
             {
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
@@ -38,6 +38,13 @@ namespace TestDiscordBot.Commands
                 {
                     if (split[1].ToLower() == command.command.ToLower())
                     {
+                        // Remove Arguments from LastText Input
+                        for (int i = 0; i < split.Count; i++)
+                            if (split[i].StartsWith("-"))
+                            {
+                                split.RemoveRange(i, 2);
+                                i--;
+                            }
                         string inText = split.Skip(2).Foldr("", (x, y) => y + " " + x);
                         string inPic = "";
                         if (message.Attachments.Count > 0 && message.Attachments.ElementAt(0).Size > 0)
@@ -62,7 +69,7 @@ namespace TestDiscordBot.Commands
                             return;
                         }
 
-                        await command.execute(message, new SelfmadeMessage(message), inPic);
+                        await command.execute(message, new SelfmadeMessage(message).EditContent(inText), inPic);
 
                         break;
                     }
