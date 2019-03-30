@@ -109,7 +109,6 @@
     <Compile Include="Commands\EditThis.cs" />
     <Compile Include="Commands\EmojiUsage.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
-    <Compile Include="Commands\GetTimecode.cs" />
     <Compile Include="Commands\Google.cs" />
     <Compile Include="Commands\Haskell.cs" />
     <Compile Include="Commands\Latex.cs" />
