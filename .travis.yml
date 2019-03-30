@@ -1,2 +1,11 @@
 ﻿language: csharp
 solution: TestDiscordBot.sln
+jobs:
+  include:
+    - stage: build
+      name: "Windows build"
+      os: windows
+    - name: "Linux build"
+      os: linux
+    - name: "Mac n Chesse build"
+      os: osx
