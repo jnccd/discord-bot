@@ -126,14 +126,14 @@
     <Compile Include="Commands\Markow\MarkovHelper.cs" />
     <Compile Include="Commands\Warframe\WarframeObjects\Nightwave.cs" />
     <Compile Include="Commands\Warframe\WarframeObjects\NightwaveChallenge.cs" />
-    <Compile Include="Config\Config.cs" />
-    <Compile Include="Commands\AAATemplate.cs" />
+    <Compile Include="Config\config.cs" />
+    <Compile Include="Commands\aaaTemplate.cs" />
     <Compile Include="Commands\Ball.cs" />
     <Compile Include="Backend\Command.cs" />
     <Compile Include="Commands\Meme.cs" />
     <Compile Include="Commands\ProfilePicture.cs" />
     <Compile Include="Backend\Program.cs" />
-    <Compile Include="Config\ConfigData.cs" />
+    <Compile Include="Config\configData.cs" />
     <Compile Include="Config\DiscordServer.cs" />
     <Compile Include="Config\DiscordUser.cs" />
     <Compile Include="Commands\xnageometry\MathHelper.cs" />
