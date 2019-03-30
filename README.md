@@ -1,6 +1,6 @@
 # Discord-Bot
 
-[![Build Status](https://travis-ci.org/niklasCarstensen/Discord-Bot.svg?branch=master.png)](https://travis-ci.org/niklasCarstensen/Discord-Bot.svg?branch=master)
+[![Build Status](https://travis-ci.org/niklasCarstensen/Discord-Bot.svg?branch=master.png)](https://travis-ci.org/niklasCarstensen/Discord-Bot)
 
 This is an easily modifyable Bot that is meant to run on multiple Servers.
 
