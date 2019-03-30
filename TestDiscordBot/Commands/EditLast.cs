@@ -84,7 +84,7 @@ namespace TestDiscordBot.Commands
 
                         await command.execute(message, lastText, lastPic);
 
-                        break;
+                        return;
                     }
                 }
                 await Program.SendText("That subcommand doesn't exist :thinking:", message.Channel);
