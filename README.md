@@ -1,5 +1,7 @@
 # Discord-Bot
 
+[![Build Status](https://travis-ci.org/niklasCarstensen/Discord-Bot.svg?branch=master.png)](https://travis-ci.org/niklasCarstensen/Discord-Bot.svg?branch=master)
+
 This is an easily modifyable Bot that is meant to run on multiple Servers.
 
 His Program.cs will automaticly register all Command-Childs in his assembly so feel free to add your own Commands.
