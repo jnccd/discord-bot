@@ -168,7 +168,6 @@
     <Compile Include="Commands\Warframe\WarframeObjects\WorldState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".travis.yml" />
     <None Include="App.config" />
     <None Include="Commands\Haskell\haskell.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
