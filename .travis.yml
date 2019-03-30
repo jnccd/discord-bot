@@ -5,6 +5,9 @@ jobs:
     - stage: build
       name: "Windows build"
       mono: none
+      dotnet: latest
+      script:
+       - dotnet restore
       os: windows
     - name: "Linux build"
       os: linux
