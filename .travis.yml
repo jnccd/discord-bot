@@ -5,7 +5,7 @@ jobs:
     - stage: build
       name: "Windows build"
       mono: none
-      dotnet: latest
+      dotnet: 2.1.502
       script:
        - dotnet restore
       os: windows
