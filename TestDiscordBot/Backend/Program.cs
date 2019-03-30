@@ -920,50 +920,53 @@ namespace TestDiscordBot
         }
 
         // Send Wrappers
-        public static async Task SendFile(string path, ISocketMessageChannel Channel, string text = "")
+        public static async Task<RestUserMessage> SendFile(string path, ISocketMessageChannel Channel, string text = "")
         {
-            await Channel.SendFileAsync(path, text);
             SaveChannel(Channel);
+            return await Channel.SendFileAsync(path, text);
         }
-        public static async Task SendFile(Stream stream, ISocketMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
+        public static async Task<RestUserMessage> SendFile(Stream stream, ISocketMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
         {
+            SaveChannel(Channel);
             if (fileName == "")
                 fileName = DateTime.Now.ToBinary().ToString();
-
             stream.Position = 0;
-            await Channel.SendFileAsync(stream, fileName + "." + fileEnd, text);
-            SaveChannel(Channel);
+            return await Channel.SendFileAsync(stream, fileName + "." + fileEnd, text);
         }
-        public static async Task SendBitmap(Bitmap bmp, ISocketMessageChannel Channel, string text = "")
+        public static async Task<RestUserMessage> SendBitmap(Bitmap bmp, ISocketMessageChannel Channel, string text = "")
         {
+            SaveChannel(Channel);
             MemoryStream stream = new MemoryStream();
             bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-            await SendFile(stream, Channel, "png", "", text);
+            return await SendFile(stream, Channel, "png", "", text);
         }
-        public static async Task SendText(string text, ISocketMessageChannel Channel)
+        public static async Task<List<RestUserMessage>> SendText(string text, ISocketMessageChannel Channel)
         {
+            List<RestUserMessage> sendMessages = new List<RestUserMessage>();
+            SaveChannel(Channel);
             if (text.Length < 2000)
-                await Channel.SendMessageAsync(text);
+                sendMessages.Add(await Channel.SendMessageAsync(text));
             else
             {
                 while (text.Length > 0)
                 {
                     int subLength = Math.Min(1999, text.Length);
                     string sub = text.Substring(0, subLength);
-                    await Channel.SendMessageAsync(sub);
+                    sendMessages.Add(await Channel.SendMessageAsync(sub));
                     text = text.Remove(0, subLength);
                 }
             }
-            SaveChannel(Channel);
+            return sendMessages;
         }
-        public static async Task SendText(string text, ulong ChannelID)
+        public static async Task<List<RestUserMessage>> SendText(string text, ulong ChannelID)
         {
-            await SendText(text, (ISocketMessageChannel)Program.GetChannelFromID(ChannelID));
+            return await SendText(text, (ISocketMessageChannel)Program.GetChannelFromID(ChannelID));
         }
-        public static async Task SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
+        public static async Task<List<RestUserMessage>> SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
         {
+            List<RestUserMessage> sendMessages = new List<RestUserMessage>();
             if (Embed.Fields.Count < 25)
-                await Channel.SendMessageAsync("", false, Embed.Build());
+                sendMessages.Add(await Channel.SendMessageAsync("", false, Embed.Build()));
             else
             {
                 while (Embed.Fields.Count > 0)
@@ -986,10 +989,11 @@ namespace TestDiscordBot
                         eb.Fields.Add(Embed.Fields[0]);
                         Embed.Fields.RemoveAt(0);
                     }
-                    await Channel.SendMessageAsync("", false, eb.Build());
+                    sendMessages.Add(await Channel.SendMessageAsync("", false, eb.Build()));
                 }
             }
             SaveChannel(Channel);
+            return sendMessages;
         }
 
         // Save

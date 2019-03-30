@@ -117,6 +117,7 @@
     <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\Reactions.cs" />
+    <Compile Include="Commands\ReactionTest.cs" />
     <Compile Include="Commands\ShowMessageLinks.cs" />
     <Compile Include="Commands\PatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
