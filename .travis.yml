@@ -4,6 +4,7 @@ jobs:
   include:
     - stage: build
       name: "Windows build"
+      mono: none
       os: windows
     - name: "Linux build"
       os: linux
