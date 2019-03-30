@@ -252,7 +252,7 @@ namespace TestDiscordBot.Commands
                 }
             }),
             new EditLastCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
-                "additional arguments are -f for the font, -s for the font size and of course -m for the meme", true,
+                "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", true,
                     (SocketMessage message, IMessage lastText, string lastPic) => {
                         string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
                         List<string> split = message.Content.Split(' ').ToList();
@@ -268,17 +268,17 @@ namespace TestDiscordBot.Commands
                         }
 
                         string font = "Arial";
-                        int fontSize = 16;
+                        float fontSize = 1;
                         int index = split.FindIndex(x => x == "-f");
                         if (index != -1)
                         {
                             font = split[index + 1];
                             split.RemoveRange(index, 2);
                         }
-                        index = split.FindIndex(x => x == "-s");
+                        index = split.FindIndex(x => x == "-r");
                         if (index != -1)
                         {
-                            fontSize = Convert.ToInt32(split[index + 1]);
+                            fontSize = (float)split[index + 1].ConvertToDouble();
                             split.RemoveRange(index, 2);
                         }
                         index = split.FindIndex(x => x == "-m");
@@ -311,6 +311,7 @@ namespace TestDiscordBot.Commands
                             using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
                                 design = (Bitmap)Bitmap.FromStream(stream);
                             Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                            fontSize = redRekt.Height / 5f / fontSize;
                             using (Graphics graphics = Graphics.FromImage(template))
                                 graphics.DrawString(lastText.Content, new Font(font, fontSize), Brushes.Black, redRekt);
 
@@ -361,7 +362,6 @@ namespace TestDiscordBot.Commands
             })
         };
         static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
-        static SemaphoreSlim memifyTextLock = new SemaphoreSlim(1, 1);
         private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
         {
             Vector2 diff = point - center;
