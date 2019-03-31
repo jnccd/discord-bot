@@ -707,16 +707,17 @@ namespace TestDiscordBot
                         await error.Item1.ModifyAsync(m => m.Content = ErrorMessage);
                 }
             });
-            Task.Run(() => {
+            if (arg3.UserId != OwnID)
                 foreach (Command c in commands)
-                {
-                    try
-                    {
-                        c.OnEmojiReactionAdded(arg1, arg2, arg3);
-                    }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-            });
+                    Task.Run(() => {
+                        try
+                        {
+                            c.OnEmojiReactionAdded(arg1, arg2, arg3);
+                            c.OnEmojiReactionUpdated(arg1, arg2, arg3);
+                        }
+                        catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    });
+
             return Task.FromResult(default(object));
         }
         private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
@@ -733,16 +734,17 @@ namespace TestDiscordBot
                         await error.Item1.ModifyAsync(m => m.Content = ErrorMessage);
                 }
             });
-            Task.Run(() => {
+            if (arg3.UserId != OwnID)
                 foreach (Command c in commands)
-                {
-                    try
-                    {
-                        c.OnEmojiReactionRemoved(arg1, arg2, arg3);
-                    }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-            });
+                    Task.Run(() => {
+                        try
+                        {
+                            c.OnEmojiReactionRemoved(arg1, arg2, arg3);
+                            c.OnEmojiReactionUpdated(arg1, arg2, arg3);
+                        }
+                        catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    });
+
             return Task.FromResult(default(object));
         }
         private static Task MessageReceived(SocketMessage message)

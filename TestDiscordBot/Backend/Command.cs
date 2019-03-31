@@ -71,6 +71,10 @@ namespace TestDiscordBot
         {
 
         }
+        public virtual void OnEmojiReactionUpdated(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        {
+
+        }
         public virtual void OnConnected()
         {
 
