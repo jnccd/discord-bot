@@ -70,8 +70,8 @@ namespace TestDiscordBot.Commands
         {
             lock (this)
             {
-                RestUserMessage m = Program.SendText(TextRenderImage(5, 5), message.Channel).Result.First();
-                messages.Add(new ReactionMessage() { Message = m, x = 5, y = 5 });
+                RestUserMessage m = Program.SendText(TextRenderImage(0, 0), message.Channel).Result.First();
+                messages.Add(new ReactionMessage() { Message = m, x = 0, y = 0 });
                 m.AddReactionAsync(left).Wait();
                 m.AddReactionAsync(up).Wait();
                 m.AddReactionAsync(down).Wait();
