@@ -60,6 +60,12 @@ namespace TestDiscordBot.Commands
                 }
         }
 
+        public override void OnExit()
+        {
+            foreach (ReactionMessage m in messages)
+                m.Message.DeleteAsync().Wait();
+        }
+
         public override Task Execute(SocketMessage message)
         {
             lock (this)
