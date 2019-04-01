@@ -1025,6 +1025,18 @@ namespace TestDiscordBot
                 Console.WriteLine();
                 Console.WriteLine("Closing... Files are being saved");
                 Config.Config.Save();
+                Console.WriteLine("Closing... Command Exit events are being executed");
+                foreach (Command c in commands)
+                {
+                    try
+                    {
+                        c.OnExit();
+                    }
+                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                }
+                Console.WriteLine("Closing... Remove Error Emojis");
+                foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
+                    err.Item1.RemoveAllReactionsAsync().Wait();
             }
             Thread.Sleep(250);
             return false;
