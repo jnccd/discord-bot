@@ -41,10 +41,7 @@ namespace TestDiscordBot.Commands
                         // Remove Arguments from LastText Input
                         for (int i = 0; i < split.Count; i++)
                             if (split[i].StartsWith("-"))
-                            {
-                                split.RemoveRange(i, 2);
-                                i--;
-                            }
+                                try { split.RemoveRange(i, 2); i--; } catch { }
                         string inText = split.Skip(2).Foldr("", (x, y) => y + " " + x);
                         string inPic = "";
                         if (message.Attachments.Count > 0 && message.Attachments.ElementAt(0).Size > 0)
