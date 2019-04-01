@@ -280,7 +280,7 @@
     <Content Include="Commands\MemeTemplates\when-youre-home-alone-5974f258024c3.jpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Commands\MemeTextTemplates\i-diagnose-you-with-design.jpg">
+    <Content Include="Commands\MemeTextTemplates\i-diagnose-you-with-design.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Commands\MemeTextTemplates\i-diagnose-you-with.jpg">
