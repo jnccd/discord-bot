@@ -16,7 +16,13 @@ namespace TestDiscordBot.Commands
 
         public Chess() : base("chess", "Play chess", false)
         {
-
+            HelpMenu = new EmbedBuilder();
+            HelpMenu.WithColor(0, 128, 255);
+            HelpMenu.AddField(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+            HelpMenu.AddField(Prefix + CommandLine + " move + 2 coordinates", "Moves a chess piece from the first point to the second\n" +
+                "eg. " + Prefix + CommandLine + " move 1,1 3,1");
+            HelpMenu.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
+            HelpMenu.WithDescription("Chess Commands:");
         }
 
         public override async Task Execute(SocketMessage message)
@@ -24,16 +30,7 @@ namespace TestDiscordBot.Commands
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length < 2 || split[1] == "help")
-            {
-                EmbedBuilder Embed = new EmbedBuilder();
-                Embed.WithColor(0, 128, 255);
-                Embed.AddField(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
-                Embed.AddField(Prefix + CommandLine + " move + 2 coordinates", "Moves a chess piece from the first point to the second\n" +
-                    "eg. " + Prefix + CommandLine + " move 1,1 3,1");
-                Embed.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
-                Embed.WithDescription("Chess Commands:");
-                await Program.SendEmbed(Embed, message.Channel);
-            }
+                await Program.SendEmbed(HelpMenu, message.Channel);
             else if (split[1] == "newGame")
             {
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))

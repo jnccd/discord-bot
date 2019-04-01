@@ -209,7 +209,22 @@ namespace TestDiscordBot
         {
             return Program.GetGuildFromChannel(m.Channel).Id;
         }
-        
+
+        // Drawing
+        public static Bitmap CropImage(this Bitmap source, Rectangle section)
+        {
+            // An empty bitmap which will hold the cropped image
+            Bitmap bmp = new Bitmap(section.Width, section.Height);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+
+                // Draw the given area (section) of the source image
+                // at location 0,0 on the empty bitmap (bmp)
+                g.DrawImage(source, 0, 0, section, GraphicsUnit.Pixel);
+
+            return bmp;
+        }
+
         // Linq Extensions
         public static b Foldr<a, b>(this IEnumerable<a> xs, b y, Func<a, b, b> f)
         {
@@ -286,7 +301,7 @@ namespace TestDiscordBot
         {
             try
             {
-                ExecuteBot().Wait();
+                ExecuteBot();
             }
             catch (Exception ex)
             {
@@ -308,10 +323,10 @@ namespace TestDiscordBot
                 }
             }
         }
-        static async Task ExecuteBot()
+        static void ExecuteBot()
         {
             #region startup
-            Thread.CurrentThread.Name = "Main Console Input Reciever";
+            Thread.CurrentThread.Name = "Main";
             ShowWindow(GetConsoleWindow(), 2);
             Console.ForegroundColor = ConsoleColor.White;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
@@ -347,8 +362,8 @@ namespace TestDiscordBot
                         Config.Config.Save();
                     }
 
-                    await client.LoginAsync(TokenType.Bot, Config.Config.Data.BotToken);
-                    await client.StartAsync();
+                    client.LoginAsync(TokenType.Bot, Config.Config.Data.BotToken).Wait();
+                    client.StartAsync().Wait();
 
                     gotWorkingToken = true;
                 }
@@ -372,21 +387,25 @@ namespace TestDiscordBot
 
             while (!ClientReady) { Thread.Sleep(20); }
 #if DEBUG
-            await client.SetGameAsync("[DEBUG-MODE] Type " + Program.prefix + "help");
+            client.SetGameAsync("[DEBUG-MODE] Type " + Program.prefix + "help").Wait();
 #else
-            await client.SetGameAsync("Type " + prefix + "help");
+            client.SetGameAsync("Type " + prefix + "help").Wait();
 #endif
             Master = client.GetUser(300699566041202699);
 
             // Build HelpMenu
             HelpMenu.WithColor(0, 128, 255);
+            HelpMenu.AddField($"{prefix}help", $"Prints the HelpMenu for a Command" + 
+                (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ? 
+                $", eg. {prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") + 
+                "\nCommands with a HelpMenu are marked with a (h)", true);
             for (int i = 0; i < commands.Length; i++)
             {
                 if (commands[i].CommandLine != "" && !commands[i].IsHidden)
                 {
                     string desc = ((commands[i].Desc == null ? "" : commands[i].Desc + "   ")).Trim(' ');
                     HelpMenu.AddField(commands[i].Prefix + commands[i].CommandLine + (commands[i].IsExperimental ? " [EXPERIMENTAL]" : ""),
-                        desc == null || desc == "" ? "-" : desc, true);
+                        (string.IsNullOrWhiteSpace(desc) ? "-" : desc) + (commands[i].HelpMenu == null ? "" : " (h)"), true);
                 }
             }
             HelpMenu.WithDescription("I was made by " + Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
@@ -413,7 +432,7 @@ namespace TestDiscordBot
             clearYcoords = Console.CursorTop;
             foreach (Command c in commands)
             {
-                await Task.Run(() => {
+                Task.Run(() => {
                     try
                     {
                         c.OnConnected();
@@ -444,7 +463,7 @@ namespace TestDiscordBot
                     {
                         try
                         {
-                            await Program.SendText(input, CurrentChannel);
+                            SendText(input, CurrentChannel).Wait();
                         }
                         catch (Exception e)
                         {
@@ -462,7 +481,7 @@ namespace TestDiscordBot
                     {
                         string[] splits = input.Split(' ');
                         string path = splits.Skip(1).Aggregate((x, y) => x + " " + y);
-                        await Program.SendFile(path.Trim('\"'), CurrentChannel);
+                        SendFile(path.Trim('\"'), CurrentChannel).Wait();
                     }
                 }
                 else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
@@ -517,7 +536,7 @@ namespace TestDiscordBot
                             {
                                 try
                                 {
-                                    await M.DeleteAsync();
+                                    M.DeleteAsync().Wait();
                                     DeletionComplete = true;
                                 }
                                 catch { }
@@ -540,7 +559,7 @@ namespace TestDiscordBot
                         foreach (IMessage m in messages)
                         {
                             if (m.Author.Id == client.CurrentUser.Id)
-                                await m.DeleteAsync();
+                                m.DeleteAsync().Wait();
                         }
                     }
                 }
@@ -597,8 +616,8 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        await GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
-                                AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3]));
+                        GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
+                            AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3])).Wait();
                         Extensions.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -630,9 +649,9 @@ namespace TestDiscordBot
             BeforeClose();
             exitedNormally = true;
 
-            await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
-            await client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await client.LogoutAsync();
+            client.SetGameAsync("Im actually closed but discord doesnt seem to notice...").Wait();
+            client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
+            client.LogoutAsync().Wait();
             Environment.Exit(0);
         }
         static void BeforeClose()
@@ -797,9 +816,15 @@ namespace TestDiscordBot
                     Config.Config.Data.ServerList.Add(new DiscordServer(serverID));
             }
 
-            if (message.Content == Program.prefix + "help")
+            if (message.Content.StartsWith(prefix + "help"))
             {
-                await Program.SendEmbed(HelpMenu, message.Channel);
+                string[] split = message.Content.Split(' ');
+                if (split.Length < 2)
+                    await SendEmbed(HelpMenu, message.Channel);
+                else
+                    foreach (Command c in commands)
+                        if (c.CommandLine == split[1])
+                            await SendEmbed(c.HelpMenu, message.Channel);
             }
             else
             {
