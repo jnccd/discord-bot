@@ -288,6 +288,11 @@ namespace TestDiscordBot.Commands
                         {
                             memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[index + 1]) && 
                                 Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
+                            if (memeDesign == null)
+                            {
+                                Program.SendText("Error, couldn't find that meme design!", message.Channel).Wait();
+                                return Task.FromResult(default(object));
+                            }
                             memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
                             split.RemoveRange(index, 2);
                         }
@@ -311,6 +316,11 @@ namespace TestDiscordBot.Commands
                             using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
                                 design = (Bitmap)Bitmap.FromStream(stream);
                             Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                            if (redRekt.Width == 0)
+                            {
+                                Program.SendText("Error, couldn't find a rectangle to write in!", message.Channel).Wait();
+                                return Task.FromResult(default(object));
+                            }
                             fontSize = redRekt.Height / 5f / fontSize;
                             using (Graphics graphics = Graphics.FromImage(template))
                                 graphics.DrawString(lastText.Content, new Font(font, fontSize), Brushes.Black, redRekt);

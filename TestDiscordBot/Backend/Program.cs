@@ -626,7 +626,20 @@ namespace TestDiscordBot
                     Extensions.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
             }
             #endregion
+            
+            BeforeClose();
+            exitedNormally = true;
 
+            await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
+            await client.SetStatusAsync(UserStatus.DoNotDisturb);
+            await client.LogoutAsync();
+            Environment.Exit(0);
+        }
+        static void BeforeClose()
+        {
+            ConsoleWriteLine("Closing... Files are being saved");
+            Config.Config.Save();
+            ConsoleWriteLine("Closing... Command Exit events are being executed");
             foreach (Command c in commands)
             {
                 try
@@ -635,15 +648,9 @@ namespace TestDiscordBot
                 }
                 catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
-            Config.Config.Save();
+            ConsoleWriteLine("Closing... Remove Error Emojis");
             foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
-                await err.Item1.RemoveAllReactionsAsync();
-            exitedNormally = true;
-
-            await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
-            await client.SetStatusAsync(UserStatus.DoNotDisturb);
-            await client.LogoutAsync();
-            Environment.Exit(0);
+                err.Item1.RemoveAllReactionsAsync().Wait();
         }
 
         // Events
@@ -1023,27 +1030,24 @@ namespace TestDiscordBot
             if (eventType == 2 && !exitedNormally)
             {
                 Console.WriteLine();
-                Console.WriteLine("Closing... Files are being saved");
-                Config.Config.Save();
-                Console.WriteLine("Closing... Command Exit events are being executed");
-                foreach (Command c in commands)
-                {
-                    try
-                    {
-                        c.OnExit();
-                    }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-                Console.WriteLine("Closing... Remove Error Emojis");
-                foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
-                    err.Item1.RemoveAllReactionsAsync().Wait();
+                BeforeClose();
             }
             Thread.Sleep(250);
             return false;
         }
         static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
         private delegate bool ConsoleEventDelegate(int eventType);
-        
+
+        // ???
+        static void ConsoleWriteLine(string text, ConsoleColor Color)
+        {
+            text.ConsoleWriteLine(Color);
+        }
+        static void ConsoleWriteLine(string text)
+        {
+            text.ConsoleWriteLine(ConsoleColor.White);
+        }
+
         // Imports
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);
