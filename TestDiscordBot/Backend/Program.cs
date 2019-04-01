@@ -650,7 +650,10 @@ namespace TestDiscordBot
             }
             ConsoleWriteLine("Closing... Remove Error Emojis");
             foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
+            {
                 err.Item1.RemoveAllReactionsAsync().Wait();
+                err.Item1.ModifyAsync(m => m.Content = ErrorMessage).Wait();
+            }
         }
 
         // Events
