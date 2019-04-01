@@ -636,6 +636,8 @@ namespace TestDiscordBot
                 catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
             Config.Config.Save();
+            foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
+                await err.Item1.RemoveAllReactionsAsync();
             exitedNormally = true;
 
             await client.SetGameAsync("Im actually closed but discord doesnt seem to notice...");
