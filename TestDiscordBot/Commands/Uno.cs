@@ -356,6 +356,13 @@ namespace TestDiscordBot.Commands
                     t = ToUnoType(Convert.ToInt32(split[2][0]));
                 game.PutCardOnTopOfStack(t, c, message.Author.Id, message.Channel);
                 game.Send(message.Channel);
+
+                Tuple<SocketUser, List<UnoCard>> winner = game.Players.FirstOrDefault(x => x.Item2.Count == 0);
+                if (winner != null)
+                {
+                    Program.SendText($"`{winner.Item1.Username}` won! :trophy: :tada: ", message.Channel).Wait();
+                    UnoGames.Remove(game);
+                }
             }
             else
                 Program.SendEmbed(HelpMenu, message.Channel).Wait();
