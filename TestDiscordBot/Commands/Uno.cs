@@ -68,6 +68,12 @@ namespace TestDiscordBot.Commands
 
             public void PutCardOnTopOfStack(UnoCardType t, UnoColor c, ulong PlayerID, ISocketMessageChannel channel)
             {
+                if (PlayerID != TurnPlayerID())
+                {
+                    Program.SendText("It's not your turn :thinking:", channel).Wait();
+                    return;
+                }
+
                 if (!HasColor(t))
                     c = UnoColor.none;
                 UnoCard newCard = UnoCards.FirstOrDefault(x => x.Color == c && x.Type == t);
@@ -77,7 +83,9 @@ namespace TestDiscordBot.Commands
                 if (newCard != null)
                     if (CanPutCardOnTopOfStack(newCard))
                     {
-                        Players.Find(x => x.Item1.Id == PlayerID).Item2.Remove(newCard);
+                        Tuple<SocketUser, List<UnoCard>> player = Players.Find(x => x.Item1.Id == PlayerID);
+                        player.Item2.Remove(newCard);
+                        SendDeck(player);
                         DrawCardOnStack(newCard);
                         TopStackCard = newCard;
                         CurColor = c;
@@ -136,6 +144,7 @@ namespace TestDiscordBot.Commands
                 if (player != null)
                     for (int i = 0; i < count; i++)
                         player.Item2.Add(UnoCards.GetRandomValue());
+                SendDeck(player);
             }
             public static Bitmap RenderDeck(List<UnoCard> cards)
             {
@@ -149,14 +158,20 @@ namespace TestDiscordBot.Commands
                         g.DrawImageUnscaled(cards[i].Picture, new Point((cards[0].Picture.Width + padding) * i, 0));
                 return re;
             }
+            public ulong TurnPlayerID()
+            {
+                return Players[curPlayerIndex].Item1.Id;
+            }
 
             public void Send(ISocketMessageChannel Channel)
             {
                 Program.SendBitmap(curStack, Channel, $"Players in this game: " +
                     $"{Players.Select(x => $"`{x.Item1.Username}`[{x.Item2.Count}]").Aggregate((x, y) => x + " " + y)}\n" +
                     $"It's `{Players[curPlayerIndex].Item1.Username}'s` turn and the current color is `{CurColor.ToString()}`").Wait();
-                foreach (Tuple<SocketUser, List<UnoCard>> player in Players)
-                    Program.SendBitmap(RenderDeck(player.Item2), player.Item1.GetOrCreateDMChannelAsync().Result).Wait();
+            }
+            public void SendDeck(Tuple<SocketUser, List<UnoCard>> player)
+            {
+                Program.SendBitmap(RenderDeck(player.Item2), player.Item1.GetOrCreateDMChannelAsync().Result).Wait();
             }
         }
         class UnoCard
