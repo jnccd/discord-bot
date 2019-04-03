@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,52 +9,208 @@ using System.Threading.Tasks;
 
 namespace TestDiscordBot.Commands
 {
+    public static partial class Extensions
+    {
+        public static Point RotatePointAroundPoint(this Point P, Point RotationOrigin, double angle)
+        {
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+            return new Point((int)(cos * (P.X - RotationOrigin.X) - sin * (P.Y - RotationOrigin.Y) + RotationOrigin.X),
+                             (int)(sin * (P.X - RotationOrigin.X) + cos * (P.Y - RotationOrigin.Y) + RotationOrigin.Y));
+        }
+    }
+
     public class Uno : Command
     {
         public Uno() : base("uno", "Play uno with other humanoids", false, true)
         {
-            // TODO: Build HelpMenu
+            HelpMenu = new EmbedBuilder();
+            HelpMenu.WithColor(0, 128, 255);
+            HelpMenu.WithDescription("Uno Commands:");
+            HelpMenu.AddField(PrefixAndCommand + " new + mentioned users", "Creates a new game with the mentioned users");
+            HelpMenu.AddField(PrefixAndCommand + " move + a card", "Puts the card on the stack\n" +
+                $"eg. {PrefixAndCommand} move One Green\n" +
+                $"eg. {PrefixAndCommand} move Plus4 Red" +
+                $"The latter will move a Plus4 and change the stacks color to Red, Plus4/ChangeColor cards don't have a color though");
+            HelpMenu.AddField(PrefixAndCommand + " draw", "Draw a new card");
+            HelpMenu.AddField(PrefixAndCommand + " print", "Prints the stack of the game you are currently in");
+            HelpMenu.AddField("Valid Cards are: ", UnoCards.Select(x => x.Type + (x.Color == UnoColor.None ? "" : " " + x.Color.ToString())).Aggregate((x, y) => x + ", " + y));
         }
 
         class UnoGame
         {
-            List<ulong> Players = new List<ulong>();
+            public List<Tuple<SocketUser, List<UnoCard>>> Players = new List<Tuple<SocketUser, List<UnoCard>>>();
             Bitmap curStack = new Bitmap(1000, 1000);
             UnoCard TopStackCard = null;
             bool ReversedTurns = false;
             int curPlayerIndex = 0;
+            UnoColor CurColor;
 
-            public UnoGame(List<ulong> Players)
+            public UnoGame(List<SocketUser> Players)
             {
-                this.Players = Players;
-                if (Players.Count < 2)
-                    throw new ArgumentOutOfRangeException("Too few players!");
+                this.Players = Players.Select(x => new Tuple<SocketUser, List<UnoCard>>(x, GetStartingDeck())).ToList();
+            }
+            private static List<UnoCard> GetStartingDeck()
+            {
+                List<UnoCard> cards = new List<UnoCard>(7);
+                for (int i = 0; i < 7; i++)
+                    cards.Add(UnoCards.GetRandomValue());
+                return cards;
+            }
+
+            public bool CanPutCardOnTopOfStack(UnoCard newCard)
+            {
+                return newCard.Color == UnoColor.None ||
+                       TopStackCard == null ||
+                       CurColor == newCard.Color ||
+                       TopStackCard.Type == newCard.Type;
+            }
+
+            public void PutCardOnTopOfStack(UnoCardType t, UnoColor c, ISocketMessageChannel channel)
+            {
+                if (!HasColor(t))
+                    c = UnoColor.None;
+                UnoCard newCard = UnoCards.FirstOrDefault(x => x.Color == c && x.Type == t);
+
+                if (newCard != null)
+                    if (CanPutCardOnTopOfStack(newCard))
+                    {
+                        DrawCardOnStack(newCard);
+                        TopStackCard = newCard;
+                        CurColor = c;
+                        if (newCard.Type == UnoCardType.Reverse)
+                            ReversedTurns = !ReversedTurns;
+                        NextPlayer();
+                        if (newCard.Type == UnoCardType.Skip)
+                            NextPlayer();
+                        if (newCard.Type == UnoCardType.Plus2)
+                            DrawCards(2, Players[curPlayerIndex]);
+                        if (newCard.Type == UnoCardType.Plus4)
+                            DrawCards(4, Players[curPlayerIndex]);
+                    }
+                    else
+                        Program.SendText("You can't put that card on top of the stack :thinking:", channel).Wait();
+                else
+                    Program.SendText("Oi that card doesn't exist!", channel).Wait();
+            }
+            private void DrawCardOnStack(UnoCard newCard)
+            {
+                Point topLeft = new Point(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(100) - 50,
+                                              curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(100) - 50);
+                Point topRight = new Point(topLeft.X + newCard.Picture.Width, topLeft.Y);
+                Point botLeft = new Point(topLeft.X, topLeft.Y + newCard.Picture.Height);
+
+                Point Origin = new Point(500, 500);
+                double rotationAngle = Program.RDM.NextDouble() * 1.5 - 0.75;
+                topLeft.RotatePointAroundPoint(Origin, rotationAngle);
+                topRight.RotatePointAroundPoint(Origin, rotationAngle);
+                botLeft.RotatePointAroundPoint(Origin, rotationAngle);
+
+                using (Graphics g = Graphics.FromImage(curStack))
+                    g.DrawImage(newCard.Picture, new Point[] { topLeft, topRight, botLeft });
+            }
+            private void NextPlayer()
+            {
+                if (!ReversedTurns)
+                {
+                    curPlayerIndex++;
+                    if (curPlayerIndex >= Players.Count)
+                        curPlayerIndex = 0;
+                }
+                else
+                {
+                    curPlayerIndex--;
+                    if (curPlayerIndex < 0)
+                        curPlayerIndex = Players.Count - 1;
+                }
+            }
+            public void DrawCards(int count, ulong playerID)
+            {
+                DrawCards(count, Players.First(y => y.Item1.Id == playerID));
+            }
+            public void DrawCards(int count, Tuple<SocketUser, List<UnoCard>> player)
+            {
+                if (player != null)
+                    for (int i = 0; i < count; i++)
+                        player.Item2.Add(UnoCards.GetRandomValue());
+            }
+            public static Bitmap RenderDeck(List<UnoCard> cards)
+            {
+                if (cards.Count == 0)
+                    return new Bitmap(1, 1);
+
+                int padding = 15;
+                Bitmap re = new Bitmap(cards[0].Picture.Width * cards.Count + padding * (cards.Count - 1), cards[0].Picture.Height);
+                using (Graphics g = Graphics.FromImage(re))
+                    for (int i = 0; i < cards.Count; i++)
+                        g.DrawImageUnscaled(cards[i].Picture, new Point((cards[0].Picture.Width + padding) * i, 0));
+                return re;
+            }
+
+            public void Send(ISocketMessageChannel Channel)
+            {
+                Program.SendBitmap(curStack, Channel, $"Players in this game: " +
+                    $"{Players.Select(x => $"`{x.Item1.Username}`[{x.Item2.Count}]").Aggregate((x, y) => x + " " + y)}\n" +
+                    $"It's `{Players[curPlayerIndex].Item1.Username}'s` turn and the current color is `{CurColor.ToString()}`").Wait();
+                foreach (Tuple<SocketUser, List<UnoCard>> player in Players)
+                    Program.SendBitmap(RenderDeck(player.Item2), player.Item1.GetOrCreateDMChannelAsync().Result).Wait();
             }
         }
         class UnoCard
         {
-            UnoColor Color;
-            UnoCardType Type;
+            public UnoColor Color;
+            public UnoCardType Type;
+            public Bitmap Picture;
 
             public UnoCard(UnoColor Color, UnoCardType Type)
             {
                 this.Color = Color;
                 this.Type = Type;
+                this.Picture = GetPicture(Color, Type);
             }
         }
         enum UnoColor { Red, Yellow, Blue, Green, None }
         enum UnoCardType { One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Skip, Reverse, Plus2, Plus4, ChangeColor }
 
-        readonly List<UnoCard> UnoCards = GetUnoCards();
+        readonly static Bitmap CardsTexture = (Bitmap)Bitmap.FromFile("Commands\\Uno\\UNO-Front.png");
+        readonly static List<UnoCard> UnoCards = GetUnoCards();
         List<UnoGame> UnoGames = new List<UnoGame>();
 
         static bool HasColor(UnoCardType t)
         {
-            if (t == UnoCardType.ChangeColor ||
-                t == UnoCardType.Plus4)
-                return false;
+            return t != UnoCardType.ChangeColor && t != UnoCardType.Plus4;
+        }
+        static bool IsNumber(UnoCardType t)
+        {
+            return t != UnoCardType.ChangeColor && t != UnoCardType.Plus4 && t != UnoCardType.Skip && t != UnoCardType.Reverse && t != UnoCardType.Plus2;
+        }
+        static int ToNumber(UnoCardType t)
+        {
+            if (IsNumber(t))
+            {
+                if (t == UnoCardType.One)
+                    return 1;
+                else if (t == UnoCardType.Two)
+                    return 2;
+                else if (t == UnoCardType.Three)
+                    return 3;
+                else if (t == UnoCardType.Four)
+                    return 4;
+                else if (t == UnoCardType.Five)
+                    return 5;
+                else if (t == UnoCardType.Six)
+                    return 6;
+                else if (t == UnoCardType.Seven)
+                    return 7;
+                else if (t == UnoCardType.Eight)
+                    return 8;
+                else if (t == UnoCardType.Nine)
+                    return 9;
+                else
+                    return -1;
+            }
             else
-                return true;
+                return -1;
         }
         private static List<UnoCard> GetUnoCards()
         {
@@ -70,20 +227,105 @@ namespace TestDiscordBot.Commands
                     cards.Add(new UnoCard(UnoColor.None, t));
             return cards;
         }
+        private static Bitmap GetPicture(UnoColor c, UnoCardType t)
+        {
+            float cardWidth = 4096 / 10f;
+            float cardHeight = 4096 / 7f;
+            int CutOutWidth = (int)cardWidth + 29;
+            int CutOutHeight = (int)cardHeight + 40;
+            if (IsNumber(t))
+            {
+                int X = (int)(cardWidth * (ToNumber(t) - 1));
+                int YNumber = c == UnoColor.Red ? 0 : (c == UnoColor.Yellow ? 1 : (c == UnoColor.Blue ? 2 : (c == UnoColor.Green ? 3 : -1)));
+                int Y = (int)(cardHeight * YNumber);
+                return CardsTexture.CropImage(new Rectangle(X, Y, CutOutWidth, CutOutHeight));
+            }
+            else
+            {
+                if (t == UnoCardType.ChangeColor)
+                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(0 * cardHeight), CutOutWidth, CutOutHeight));
+                else if (t == UnoCardType.Plus4)
+                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(2 * cardHeight), CutOutWidth, CutOutHeight));
+                else if (t == UnoCardType.Skip)
+                {
+                    int XNumber = c == UnoColor.Red ? 0 : (c == UnoColor.Yellow ? 1 : (c == UnoColor.Blue ? 2 : (c == UnoColor.Green ? 3 : -1)));
+                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                }
+                else if (t == UnoCardType.Plus2)
+                {
+                    int XNumber = 4 + (c == UnoColor.Red ? 0 : (c == UnoColor.Yellow ? 1 : (c == UnoColor.Blue ? 2 : (c == UnoColor.Green ? 3 : -1))));
+                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                }
+                else if (t == UnoCardType.Reverse)
+                {
+                    if (c == UnoColor.Red)
+                        return CardsTexture.CropImage(new Rectangle((int)(8 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                    else if (c == UnoColor.Yellow)
+                        return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                    else if (c == UnoColor.Blue)
+                        return CardsTexture.CropImage(new Rectangle((int)(0 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight));
+                    else if (c == UnoColor.Green)
+                        return CardsTexture.CropImage(new Rectangle((int)(1 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight));
+                }
+            }
+            return null;
+        }
         
         public override Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(' ');
             if (split.Contains("new"))
-                UnoGames.Add(new UnoGame(message.MentionedUsers.Select(x =>
-                {
-                    if (x.IsBot)
-                        throw new Exception("Bots cant play Uno!");
-                    return x.Id;
-                }).ToList()));
-            else if (split.Length > 2)
             {
+                UnoGame newGame = new UnoGame(message.MentionedUsers.Union(new SocketUser[] { message.Author }).ToList());
+                if (newGame.Players.Count < 2)
+                {
+                    Program.SendText("You need more players to play Uno!", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
+                if (newGame.Players.Exists(x => x.Item1.IsBot))
+                {
+                    Program.SendText("Bots can't play Uno!", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
+                UnoGames.Add(newGame);
+                newGame.Send(message.Channel);
+            }
+            else if (split.Contains("print_cards")) // Size = {Width = 434 Height = 621}
+                foreach (UnoCard c in UnoCards)
+                    Program.SendBitmap(c.Picture, message.Channel, c.Type.ToString() + " " + c.Color.ToString()).Wait();
+            else if (split.Contains("print"))
+            {
+                UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
+                if (game != null)
+                    game.Send(message.Channel);
+                else
+                    Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
+            }
+            else if (split.Length >= 2 && split[1] == "draw")
+            {
+                var game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
+                if (game != null)
+                    game.DrawCards(1, message.Author.Id);
+                {
+                    Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
+            }
+            else if (split.Length >= 4 && split[1] == "move")
+            {
+                UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
+                if (game == null)
+                {
+                    Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
 
+                UnoCardType t = UnoCardType.One;
+                UnoColor c = UnoColor.None;
+                Enum.TryParse(split[2], out t);
+                Enum.TryParse(split[3], out c);
+                game.PutCardOnTopOfStack(t, c, message.Channel);
+                game.Send(message.Channel);
             }
             else
                 Program.SendEmbed(HelpMenu, message.Channel).Wait();

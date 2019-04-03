@@ -959,12 +959,12 @@ namespace TestDiscordBot
         }
 
         // Send Wrappers
-        public static async Task<RestUserMessage> SendFile(string path, ISocketMessageChannel Channel, string text = "")
+        public static async Task<IUserMessage> SendFile(string path, IMessageChannel Channel, string text = "")
         {
             SaveChannel(Channel);
             return await Channel.SendFileAsync(path, text);
         }
-        public static async Task<RestUserMessage> SendFile(Stream stream, ISocketMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
+        public static async Task<IUserMessage> SendFile(Stream stream, IMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
         {
             SaveChannel(Channel);
             if (fileName == "")
@@ -972,16 +972,16 @@ namespace TestDiscordBot
             stream.Position = 0;
             return await Channel.SendFileAsync(stream, fileName + "." + fileEnd, text);
         }
-        public static async Task<RestUserMessage> SendBitmap(Bitmap bmp, ISocketMessageChannel Channel, string text = "")
+        public static async Task<IUserMessage> SendBitmap(Bitmap bmp, IMessageChannel Channel, string text = "")
         {
             SaveChannel(Channel);
             MemoryStream stream = new MemoryStream();
             bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
             return await SendFile(stream, Channel, "png", "", text);
         }
-        public static async Task<List<RestUserMessage>> SendText(string text, ISocketMessageChannel Channel)
+        public static async Task<List<IUserMessage>> SendText(string text, IMessageChannel Channel)
         {
-            List<RestUserMessage> sendMessages = new List<RestUserMessage>();
+            List<IUserMessage> sendMessages = new List<IUserMessage>();
             SaveChannel(Channel);
             if (text.Length < 2000)
                 sendMessages.Add(await Channel.SendMessageAsync(text));
@@ -997,13 +997,13 @@ namespace TestDiscordBot
             }
             return sendMessages;
         }
-        public static async Task<List<RestUserMessage>> SendText(string text, ulong ChannelID)
+        public static async Task<List<IUserMessage>> SendText(string text, ulong ChannelID)
         {
             return await SendText(text, (ISocketMessageChannel)Program.GetChannelFromID(ChannelID));
         }
-        public static async Task<List<RestUserMessage>> SendEmbed(EmbedBuilder Embed, ISocketMessageChannel Channel)
+        public static async Task<List<IUserMessage>> SendEmbed(EmbedBuilder Embed, IMessageChannel Channel)
         {
-            List<RestUserMessage> sendMessages = new List<RestUserMessage>();
+            List<IUserMessage> sendMessages = new List<IUserMessage>();
             if (Embed.Fields.Count < 25)
                 sendMessages.Add(await Channel.SendMessageAsync("", false, Embed.Build()));
             else
@@ -1036,7 +1036,7 @@ namespace TestDiscordBot
         }
 
         // Save
-        public static void SaveChannel(ISocketMessageChannel Channel)
+        public static void SaveChannel(IChannel Channel)
         {
             if (Config.Config.Data.ChannelsWrittenOn == null)
                 Config.Config.Data.ChannelsWrittenOn = new List<ulong>();
