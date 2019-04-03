@@ -326,10 +326,15 @@ namespace TestDiscordBot.Commands
                     Program.SendText("Bots can't play Uno!", message.Channel).Wait();
                     return Task.FromResult(default(object));
                 }
+                if (UnoGames.Exists(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id)))
+                {
+                    Program.SendText("You are already in a uno game!", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
                 UnoGames.Add(newGame);
                 newGame.Send(message.Channel);
             }
-            else if (split.Contains("print_cards")) // Size = {Width = 434 Height = 621}
+            else if (split.Contains("print_cards") && message.Author.Id == Program.Master.Id) // Size = {Width = 434 Height = 621}
                 foreach (UnoCard c in UnoCards)
                     Program.SendBitmap(c.Picture, message.Channel, c.Type.ToString() + " " + c.Color.ToString()).Wait();
             else if (split.Contains("print"))
