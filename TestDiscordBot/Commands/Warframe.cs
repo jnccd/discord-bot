@@ -54,7 +54,17 @@ namespace TestDiscordBot.Commands
 
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
-            
+            HelpMenu = new EmbedBuilder();
+            HelpMenu.WithDescription("```ruby\n" +
+                                      "Use \"" + PrefixAndCommand + " state\" to view the worldState.\n" +
+                                      "Use \"" + PrefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
+                                      "Use \"" + PrefixAndCommand + " -FILTER\" to remove a filter.\n" +
+                                      "Use \"" + PrefixAndCommand + " filters\" to view your filters.\n" +
+                                      "eg. \"" + PrefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" +
+                                      "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" +
+                                      "               You can also add a 'multifilter' by binding two or more filters together with a &\n" +
+                                      "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
+                                      "```");
         }
         public override void OnConnected()
         {
@@ -66,18 +76,7 @@ namespace TestDiscordBot.Commands
             DiscordUser user = Config.Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
-            {
-                await Program.SendText("```ruby\n" +
-                                      "Use \"" + PrefixAndCommand + " state\" to view the worldState.\n" +
-                                      "Use \"" + PrefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
-                                      "Use \"" + PrefixAndCommand + " -FILTER\" to remove a filter.\n" +
-                                      "Use \"" + PrefixAndCommand + " filters\" to view your filters.\n" +
-                                      "eg. \"" + PrefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" + 
-                                      "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" + 
-                                      "               You can also add a 'multifilter' by binding two or more filters together with a &\n" + 
-                                      "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
-                                      "```", message.Channel);
-            }
+                Program.SendEmbed(HelpMenu, message.Channel).Wait();
             else if(split[1] == "filters")
             {
                 EmbedBuilder embed = new EmbedBuilder();
