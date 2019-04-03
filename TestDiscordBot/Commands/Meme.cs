@@ -23,7 +23,10 @@ namespace TestDiscordBot.Commands
 
         public Meme() : base("meme", "Posts a random meme", false)
         {
-
+            HelpMenu = new EmbedBuilder();
+            HelpMenu.WithColor(0, 128, 255);
+            HelpMenu.WithDescription("This command will retrieve a meme from a number of subreddits, you can also specify " +
+                "a subreddit yourself by adding it as an argument, eg. `$meme me_irl`");
         }
 
         public override async Task Execute(SocketMessage commandmessage)
