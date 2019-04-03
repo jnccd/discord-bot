@@ -73,12 +73,8 @@ namespace TestDiscordBot.Commands
                     Program.SendText("It's not your turn :thinking:", channel).Wait();
                     return;
                 }
-
-                if (!HasColor(t))
-                    c = UnoColor.none;
-                UnoCard newCard = UnoCards.FirstOrDefault(x => x.Color == c && x.Type == t);
-                if (HasColor(t) && c == UnoColor.none)
-                    newCard = null;
+                
+                UnoCard newCard = UnoCards.FirstOrDefault(x => (HasColor(t) ? x.Color == c : x.Color == UnoColor.none) && x.Type == t);
 
                 if (newCard != null)
                     if (CanPutCardOnTopOfStack(newCard))
