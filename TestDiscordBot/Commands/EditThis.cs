@@ -15,23 +15,18 @@ namespace TestDiscordBot.Commands
     {
         public EditThis() : base("editThis", "Edit your message", false)
         {
-
+            EmbedBuilder HelpMenu = new EmbedBuilder();
+            HelpMenu.WithColor(0, 128, 255);
+            HelpMenu.WithDescription("EditThis Commands:");
+            foreach (EditLastCommand ecommand in EditLast.Commands)
+                HelpMenu.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc.Replace("editLast", "editThis"));
         }
 
         public override async Task Execute(SocketMessage message)
         {
             List<string> split = message.Content.Split(new char[] { ' ', '\n' }).ToList();
             if (split.Count == 1)
-            {
-                EmbedBuilder Embed = new EmbedBuilder();
-                Embed.WithColor(0, 128, 255);
-                foreach (EditLastCommand ecommand in EditLast.Commands)
-                {
-                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc.Replace("editLast", "editThis"));
-                }
-                Embed.WithDescription("EditThis Commands:");
-                await Program.SendEmbed(Embed, message.Channel);
-            }
+                await Program.SendEmbed(HelpMenu, message.Channel);
             else
             {
                 foreach (EditLastCommand command in EditLast.Commands)
