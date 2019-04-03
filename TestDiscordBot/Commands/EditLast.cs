@@ -23,7 +23,11 @@ namespace TestDiscordBot.Commands
     {
         public EditLast() : base("editLast", "Edit the last message", false)
         {
-
+            EmbedBuilder HelpMenu = new EmbedBuilder();
+            HelpMenu.WithColor(0, 128, 255);
+            HelpMenu.WithDescription("EditLast Commands:");
+            foreach (EditLastCommand ecommand in Commands)
+                HelpMenu.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
         }
         public override async Task Execute(SocketMessage message)
         {
@@ -33,7 +37,7 @@ namespace TestDiscordBot.Commands
             ulong ownID = Program.OwnID;
             foreach (IMessage m in messages)
             {
-                if (m.Id != message.Id/* && m.Author.Id != ownID*/ && !m.Content.StartsWith(Program.prefix))
+                if (m.Id != message.Id && !m.Content.StartsWith(Program.prefix))
                 {
                     if (lastText == null && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.prefix))
                         lastText = m;
@@ -55,16 +59,7 @@ namespace TestDiscordBot.Commands
 
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
-            {
-                EmbedBuilder Embed = new EmbedBuilder();
-                Embed.WithColor(0, 128, 255);
-                foreach (EditLastCommand ecommand in Commands)
-                {
-                    Embed.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
-                }
-                Embed.WithDescription("EditLast Commands:");
-                await Program.SendEmbed(Embed, message.Channel);
-            }
+                await Program.SendEmbed(HelpMenu, message.Channel);
             else
             {
                 foreach (EditLastCommand command in Commands)
