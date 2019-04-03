@@ -98,8 +98,8 @@ namespace TestDiscordBot.Commands
             }
             private void DrawCardOnStack(UnoCard newCard)
             {
-                Point topLeft = new Point(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(300) - 150,
-                                              curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(300) - 150);
+                Point topLeft = new Point(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(200) - 100,
+                                              curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(200) - 100);
                 Point topRight = new Point(topLeft.X + newCard.Picture.Width, topLeft.Y);
                 Point botLeft = new Point(topLeft.X, topLeft.Y + newCard.Picture.Height);
 

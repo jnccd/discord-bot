@@ -804,7 +804,7 @@ namespace TestDiscordBot
             }
             return Task.FromResult(default(object));
         }
-        private static async void ThreadedMessageReceived(object o)
+        private static void ThreadedMessageReceived(object o)
         {
             SocketMessage message = (SocketMessage)o;
 
@@ -820,11 +820,17 @@ namespace TestDiscordBot
             {
                 string[] split = message.Content.Split(' ');
                 if (split.Length < 2)
-                    await SendEmbed(HelpMenu, message.Channel);
+                    SendEmbed(HelpMenu, message.Channel).Wait();
                 else
+                {
                     foreach (Command c in commands)
                         if (c.CommandLine == split[1])
-                            await SendEmbed(c.HelpMenu, message.Channel);
+                        {
+                            SendEmbed(c.HelpMenu, message.Channel).Wait();
+                            return;
+                        }
+                    SendText("That command doesn't implement a HelpMenu", message.Channel).Wait();
+                }
             }
             else
             {
@@ -833,7 +839,7 @@ namespace TestDiscordBot
                 Command called = commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == split[0].ToLower());
                 if (called != null)
                 {
-                    await ExecuteCommand(called, message);
+                    ExecuteCommand(called, message).Wait();
                 }
                 else
                 {
@@ -854,8 +860,8 @@ namespace TestDiscordBot
                         }
                     if (min < Math.Min(5, split[0].Length - 1))
                     {
-                        await Program.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel);
-                        await ExecuteCommand(commands[minIndex], message);
+                        SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel).Wait();
+                        ExecuteCommand(commands[minIndex], message).Wait();
                     }
                 }
             }
