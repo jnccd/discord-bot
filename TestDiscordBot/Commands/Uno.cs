@@ -29,12 +29,12 @@ namespace TestDiscordBot.Commands
             HelpMenu.WithDescription("Uno Commands:");
             HelpMenu.AddField(PrefixAndCommand + " new + mentioned users", "Creates a new game with the mentioned users");
             HelpMenu.AddField(PrefixAndCommand + " move + a card", "Puts the card on the stack\n" +
-                $"eg. {PrefixAndCommand} move One Green\n" +
-                $"eg. {PrefixAndCommand} move Plus4 Red" +
+                $"eg. {PrefixAndCommand} move 1 green\n" +
+                $"eg. {PrefixAndCommand} move plus4 rEd" +
                 $"The latter will move a Plus4 and change the stacks color to Red, Plus4/ChangeColor cards don't have a color though");
             HelpMenu.AddField(PrefixAndCommand + " draw", "Draw a new card");
             HelpMenu.AddField(PrefixAndCommand + " print", "Prints the stack of the game you are currently in");
-            HelpMenu.AddField("Valid Cards are: ", UnoCards.Select(x => x.Type + (x.Color == UnoColor.None ? "" : " " + x.Color.ToString())).Aggregate((x, y) => x + ", " + y));
+            HelpMenu.AddField("Valid Cards are: ", UnoCards.Select(x => x.Type + (x.Color == UnoColor.none ? "" : " " + x.Color.ToString())).Aggregate((x, y) => x + ", " + y));
         }
 
         class UnoGame
@@ -60,32 +60,35 @@ namespace TestDiscordBot.Commands
 
             public bool CanPutCardOnTopOfStack(UnoCard newCard)
             {
-                return newCard.Color == UnoColor.None ||
+                return newCard.Color == UnoColor.none ||
                        TopStackCard == null ||
                        CurColor == newCard.Color ||
                        TopStackCard.Type == newCard.Type;
             }
 
-            public void PutCardOnTopOfStack(UnoCardType t, UnoColor c, ISocketMessageChannel channel)
+            public void PutCardOnTopOfStack(UnoCardType t, UnoColor c, ulong PlayerID, ISocketMessageChannel channel)
             {
                 if (!HasColor(t))
-                    c = UnoColor.None;
+                    c = UnoColor.none;
                 UnoCard newCard = UnoCards.FirstOrDefault(x => x.Color == c && x.Type == t);
+                if (HasColor(t) && c == UnoColor.none)
+                    newCard = null;
 
                 if (newCard != null)
                     if (CanPutCardOnTopOfStack(newCard))
                     {
+                        Players.Find(x => x.Item1.Id == PlayerID).Item2.Remove(newCard);
                         DrawCardOnStack(newCard);
                         TopStackCard = newCard;
                         CurColor = c;
-                        if (newCard.Type == UnoCardType.Reverse)
+                        if (newCard.Type == UnoCardType.reverse)
                             ReversedTurns = !ReversedTurns;
                         NextPlayer();
-                        if (newCard.Type == UnoCardType.Skip)
+                        if (newCard.Type == UnoCardType.skip)
                             NextPlayer();
-                        if (newCard.Type == UnoCardType.Plus2)
+                        if (newCard.Type == UnoCardType.plus2)
                             DrawCards(2, Players[curPlayerIndex]);
-                        if (newCard.Type == UnoCardType.Plus4)
+                        if (newCard.Type == UnoCardType.plus4)
                             DrawCards(4, Players[curPlayerIndex]);
                     }
                     else
@@ -95,16 +98,16 @@ namespace TestDiscordBot.Commands
             }
             private void DrawCardOnStack(UnoCard newCard)
             {
-                Point topLeft = new Point(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(100) - 50,
-                                              curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(100) - 50);
+                Point topLeft = new Point(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(300) - 150,
+                                              curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(300) - 150);
                 Point topRight = new Point(topLeft.X + newCard.Picture.Width, topLeft.Y);
                 Point botLeft = new Point(topLeft.X, topLeft.Y + newCard.Picture.Height);
 
                 Point Origin = new Point(500, 500);
-                double rotationAngle = Program.RDM.NextDouble() * 1.5 - 0.75;
-                topLeft.RotatePointAroundPoint(Origin, rotationAngle);
-                topRight.RotatePointAroundPoint(Origin, rotationAngle);
-                botLeft.RotatePointAroundPoint(Origin, rotationAngle);
+                double rotationAngle = Program.RDM.NextDouble() * 2 - 1;
+                topLeft = topLeft.RotatePointAroundPoint(Origin, rotationAngle);
+                topRight = topRight.RotatePointAroundPoint(Origin, rotationAngle);
+                botLeft = botLeft.RotatePointAroundPoint(Origin, rotationAngle);
 
                 using (Graphics g = Graphics.FromImage(curStack))
                     g.DrawImage(newCard.Picture, new Point[] { topLeft, topRight, botLeft });
@@ -169,8 +172,8 @@ namespace TestDiscordBot.Commands
                 this.Picture = GetPicture(Color, Type);
             }
         }
-        enum UnoColor { Red, Yellow, Blue, Green, None }
-        enum UnoCardType { One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Skip, Reverse, Plus2, Plus4, ChangeColor }
+        enum UnoColor { red, yellow, blue, green, none }
+        enum UnoCardType { one, two, three, four, five, six, seven, eight, nine, skip, reverse, plus2, plus4, changecolor }
 
         readonly static Bitmap CardsTexture = (Bitmap)Bitmap.FromFile("Commands\\Uno\\UNO-Front.png");
         readonly static List<UnoCard> UnoCards = GetUnoCards();
@@ -178,33 +181,33 @@ namespace TestDiscordBot.Commands
 
         static bool HasColor(UnoCardType t)
         {
-            return t != UnoCardType.ChangeColor && t != UnoCardType.Plus4;
+            return t != UnoCardType.changecolor && t != UnoCardType.plus4;
         }
         static bool IsNumber(UnoCardType t)
         {
-            return t != UnoCardType.ChangeColor && t != UnoCardType.Plus4 && t != UnoCardType.Skip && t != UnoCardType.Reverse && t != UnoCardType.Plus2;
+            return t != UnoCardType.changecolor && t != UnoCardType.plus4 && t != UnoCardType.skip && t != UnoCardType.reverse && t != UnoCardType.plus2;
         }
         static int ToNumber(UnoCardType t)
         {
             if (IsNumber(t))
             {
-                if (t == UnoCardType.One)
+                if (t == UnoCardType.one)
                     return 1;
-                else if (t == UnoCardType.Two)
+                else if (t == UnoCardType.two)
                     return 2;
-                else if (t == UnoCardType.Three)
+                else if (t == UnoCardType.three)
                     return 3;
-                else if (t == UnoCardType.Four)
+                else if (t == UnoCardType.four)
                     return 4;
-                else if (t == UnoCardType.Five)
+                else if (t == UnoCardType.five)
                     return 5;
-                else if (t == UnoCardType.Six)
+                else if (t == UnoCardType.six)
                     return 6;
-                else if (t == UnoCardType.Seven)
+                else if (t == UnoCardType.seven)
                     return 7;
-                else if (t == UnoCardType.Eight)
+                else if (t == UnoCardType.eight)
                     return 8;
-                else if (t == UnoCardType.Nine)
+                else if (t == UnoCardType.nine)
                     return 9;
                 else
                     return -1;
@@ -212,19 +215,44 @@ namespace TestDiscordBot.Commands
             else
                 return -1;
         }
+        static UnoCardType ToUnoType(int i)
+        {
+            switch (i)
+            {
+                case 1:
+                    return UnoCardType.one;
+                case 2:
+                    return UnoCardType.two;
+                case 3:
+                    return UnoCardType.three;
+                case 4:
+                    return UnoCardType.four;
+                case 5:
+                    return UnoCardType.five;
+                case 6:
+                    return UnoCardType.six;
+                case 7:
+                    return UnoCardType.seven;
+                case 8:
+                    return UnoCardType.eight;
+                case 9:
+                    return UnoCardType.nine;
+            }
+            return new UnoCardType();
+        }
         private static List<UnoCard> GetUnoCards()
         {
             List<UnoCard> cards = new List<UnoCard>();
             foreach (UnoCardType t in Enum.GetValues(typeof(UnoCardType)))
                 if (HasColor(t))
                 {
-                    cards.Add(new UnoCard(UnoColor.Red, t));
-                    cards.Add(new UnoCard(UnoColor.Yellow, t));
-                    cards.Add(new UnoCard(UnoColor.Blue, t));
-                    cards.Add(new UnoCard(UnoColor.Green, t));
+                    cards.Add(new UnoCard(UnoColor.red, t));
+                    cards.Add(new UnoCard(UnoColor.yellow, t));
+                    cards.Add(new UnoCard(UnoColor.blue, t));
+                    cards.Add(new UnoCard(UnoColor.green, t));
                 }
                 else
-                    cards.Add(new UnoCard(UnoColor.None, t));
+                    cards.Add(new UnoCard(UnoColor.none, t));
             return cards;
         }
         private static Bitmap GetPicture(UnoColor c, UnoCardType t)
@@ -236,35 +264,35 @@ namespace TestDiscordBot.Commands
             if (IsNumber(t))
             {
                 int X = (int)(cardWidth * (ToNumber(t) - 1));
-                int YNumber = c == UnoColor.Red ? 0 : (c == UnoColor.Yellow ? 1 : (c == UnoColor.Blue ? 2 : (c == UnoColor.Green ? 3 : -1)));
+                int YNumber = c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1)));
                 int Y = (int)(cardHeight * YNumber);
                 return CardsTexture.CropImage(new Rectangle(X, Y, CutOutWidth, CutOutHeight));
             }
             else
             {
-                if (t == UnoCardType.ChangeColor)
+                if (t == UnoCardType.changecolor)
                     return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(0 * cardHeight), CutOutWidth, CutOutHeight));
-                else if (t == UnoCardType.Plus4)
+                else if (t == UnoCardType.plus4)
                     return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(2 * cardHeight), CutOutWidth, CutOutHeight));
-                else if (t == UnoCardType.Skip)
+                else if (t == UnoCardType.skip)
                 {
-                    int XNumber = c == UnoColor.Red ? 0 : (c == UnoColor.Yellow ? 1 : (c == UnoColor.Blue ? 2 : (c == UnoColor.Green ? 3 : -1)));
+                    int XNumber = c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1)));
                     return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
                 }
-                else if (t == UnoCardType.Plus2)
+                else if (t == UnoCardType.plus2)
                 {
-                    int XNumber = 4 + (c == UnoColor.Red ? 0 : (c == UnoColor.Yellow ? 1 : (c == UnoColor.Blue ? 2 : (c == UnoColor.Green ? 3 : -1))));
+                    int XNumber = 4 + (c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1))));
                     return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
                 }
-                else if (t == UnoCardType.Reverse)
+                else if (t == UnoCardType.reverse)
                 {
-                    if (c == UnoColor.Red)
+                    if (c == UnoColor.red)
                         return CardsTexture.CropImage(new Rectangle((int)(8 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
-                    else if (c == UnoColor.Yellow)
+                    else if (c == UnoColor.yellow)
                         return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
-                    else if (c == UnoColor.Blue)
+                    else if (c == UnoColor.blue)
                         return CardsTexture.CropImage(new Rectangle((int)(0 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight));
-                    else if (c == UnoColor.Green)
+                    else if (c == UnoColor.green)
                         return CardsTexture.CropImage(new Rectangle((int)(1 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight));
                 }
             }
@@ -319,12 +347,14 @@ namespace TestDiscordBot.Commands
                     Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
                     return Task.FromResult(default(object));
                 }
-
-                UnoCardType t = UnoCardType.One;
-                UnoColor c = UnoColor.None;
-                Enum.TryParse(split[2], out t);
-                Enum.TryParse(split[3], out c);
-                game.PutCardOnTopOfStack(t, c, message.Channel);
+                
+                UnoCardType t = UnoCardType.one;
+                UnoColor c = UnoColor.none;
+                Enum.TryParse(split[2].ToLower(), out t);
+                Enum.TryParse(split[3].ToLower(), out c);
+                if (split[2].Length > 0 && char.IsDigit(split[2][0]))
+                    t = ToUnoType(Convert.ToInt32(split[2][0]));
+                game.PutCardOnTopOfStack(t, c, message.Author.Id, message.Channel);
                 game.Send(message.Channel);
             }
             else
