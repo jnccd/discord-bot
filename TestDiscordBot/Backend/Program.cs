@@ -556,7 +556,7 @@ namespace TestDiscordBot
                 {
                     foreach (ulong ChannelID in Config.Config.Data.ChannelsWrittenOn)
                     {
-                        IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).Flatten().GetAwaiter().GetResult();
+                        IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
                         foreach (IMessage m in messages)
                         {
                             if (m.Author.Id == client.CurrentUser.Id)
@@ -637,7 +637,7 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).Flatten().GetAwaiter().GetResult();
+                        var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
                         Extensions.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -691,7 +691,7 @@ namespace TestDiscordBot
                     {
                         if (r.Permissions.SendMessages)
                             hasWrite = true;
-                        if (r.Permissions.ReadMessages)
+                        if (r.Permissions.ViewChannel)
                             hasRead = true;
                         if (r.Permissions.ReadMessageHistory)
                             hasReadHistory = true;

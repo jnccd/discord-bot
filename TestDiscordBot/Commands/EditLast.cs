@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
         }
         public override async Task Execute(SocketMessage message)
         {
-            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().Flatten();
+            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().FlattenAsync();
             IMessage lastText = null;
             string lastPic = null;
             ulong ownID = Program.OwnID;

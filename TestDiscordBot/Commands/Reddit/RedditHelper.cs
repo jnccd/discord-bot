@@ -107,7 +107,7 @@ namespace TestDiscordBot
                 }
                 
                 // delete "Sending video post. Please wait..." message
-                IEnumerable<IMessage> messages = await Channel.GetMessagesAsync().Flatten();
+                IEnumerable<IMessage> messages = await Channel.GetMessagesAsync().FlattenAsync();
                 foreach (IMessage m in messages)
                     if (m.Author.Id == Program.GetSelf().Id && m.Content == "Sending video post. Please wait...")
                     {
