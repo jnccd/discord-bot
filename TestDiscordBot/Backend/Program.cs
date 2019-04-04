@@ -226,16 +226,15 @@ namespace TestDiscordBot
         }
 
         // Linq Extensions
-        public static b Foldr<a, b>(this IEnumerable<a> xs, b y, Func<a, b, b> f)
+        public static b Foldl<a, b>(this IEnumerable<a> xs, b y, Func<b, a, b> f)
         {
-            xs.Reverse();
             foreach (a x in xs)
-                y = f(x, y);
+                y = f(y, x);
             return y;
         }
-        public static b Foldr<a, b>(this IEnumerable<a> xs, Func<a, b, b> f)
+        public static b Foldl<a, b>(this IEnumerable<a> xs, Func<b, a, b> f)
         {
-            return xs.Foldr(default(b), f);
+            return xs.Foldl(default(b), f);
         }
         public static a GetRandomValue<a>(this IEnumerable<a> xs)
         {
@@ -245,7 +244,7 @@ namespace TestDiscordBot
         public static string RemoveLastGroup(this string s, char seperator)
         {
             string[] split = s.Split(seperator);
-            return split.Take(split.Length - 1).Foldr("", (a, b) => a + seperator + b);
+            return split.Take(split.Length - 1).Foldl("", (a, b) => a + seperator + b).Remove(0, 1);
         }
     }
 
@@ -292,7 +291,7 @@ namespace TestDiscordBot
         static readonly string ErrorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
         static readonly Emoji ErrorEmoji = new Emoji("🤔");
-        
+
         static readonly string lockject = "";
 
         // ------------------------------------------------------------------------------------------------------------
@@ -603,8 +602,7 @@ namespace TestDiscordBot
                     {
                         EmbedBuilder e = new EmbedBuilder();
                         e.WithDescription("kek");
-                        e.ThumbnailUrl = ("https://travis-ci.org/niklasCarstensen/Discord-Bot.svg");
-                        e.WithImageUrl("https://travis-ci.org/niklasCarstensen/Discord-Bot.svg");
+                        e.WithTitle("Kek waddup l o l wuw".Split(' ').Foldl("", (x, y) => x + " " + y));
                         SendEmbed(e, CurrentChannel).Wait();
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -1015,11 +1013,11 @@ namespace TestDiscordBot
         {
             return await SendText(text, (ISocketMessageChannel)Program.GetChannelFromID(ChannelID));
         }
-        public static async Task<List<IUserMessage>> SendEmbed(EmbedBuilder Embed, IMessageChannel Channel)
+        public static async Task<List<IUserMessage>> SendEmbed(EmbedBuilder Embed, IMessageChannel Channel, string text = "")
         {
             List<IUserMessage> sendMessages = new List<IUserMessage>();
             if (Embed.Fields.Count < 25)
-                sendMessages.Add(await Channel.SendMessageAsync("", false, Embed.Build()));
+                sendMessages.Add(await Channel.SendMessageAsync(text, false, Embed.Build()));
             else
             {
                 while (Embed.Fields.Count > 0)
@@ -1042,7 +1040,7 @@ namespace TestDiscordBot
                         eb.Fields.Add(Embed.Fields[0]);
                         Embed.Fields.RemoveAt(0);
                     }
-                    sendMessages.Add(await Channel.SendMessageAsync("", false, eb.Build()));
+                    sendMessages.Add(await Channel.SendMessageAsync(text, false, eb.Build()));
                 }
             }
             SaveChannel(Channel);
@@ -1088,6 +1086,16 @@ namespace TestDiscordBot
         static void ConsoleWriteLine(string text)
         {
             text.ConsoleWriteLine(ConsoleColor.White);
+        }
+        public static EmbedBuilder CreateEmbedBuilder(string TitleText = "", string DescText = "", string ImgURL = "", IUser Author = null, string ThumbnailURL = "")
+        {
+            EmbedBuilder e = new EmbedBuilder();
+            e.WithDescription(DescText);
+            e.WithImageUrl(ImgURL);
+            e.WithTitle(TitleText);
+            e.WithAuthor(Author);
+            e.WithThumbnailUrl(ThumbnailURL);
+            return e;
         }
 
         // Imports

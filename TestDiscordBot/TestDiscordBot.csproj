@@ -309,9 +309,6 @@
     <PackageReference Include="Google.Apis">
       <Version>1.38.2</Version>
     </PackageReference>
-    <PackageReference Include="HtmlAgilityPack">
-      <Version>1.11.1</Version>
-    </PackageReference>
     <PackageReference Include="NAudio">
       <Version>1.8.5</Version>
     </PackageReference>

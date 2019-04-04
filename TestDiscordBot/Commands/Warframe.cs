@@ -176,8 +176,8 @@ namespace TestDiscordBot.Commands
                     embed.AddField("Events:", WarframeHandler.worldState.WS_Events.
                         Select(x => x.Description + " - Until: " + x.EndTime.ToLongDateString() + " - " + x.Rewards.
                             Select(y => y.ToTitle()).
-                            Foldr("", (a, b) => a + " " + b).Trim(' ').Trim('-')).
-                        Foldr("", (x, y) => x + "\n" + y));
+                            Foldl("", (a, b) => a + " " + b).Trim(' ').Trim('-')).
+                        Foldl("", (x, y) => x + "\n" + y));
 
                 embed.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
                     (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());

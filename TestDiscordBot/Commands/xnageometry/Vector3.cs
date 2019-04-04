@@ -595,7 +595,7 @@ namespace XnaGeometry
         public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
         {
 			// This has not been tested
-			// TODO:  This could probably be unrolled so will look into it later
+			// TODO: This could probably be unrolled so will look into it later
 			Matrix matrix = quat.ToMatrix();
 			Transform(ref vec, ref matrix, out result);
         }
