@@ -22,7 +22,7 @@ namespace TestDiscordBot.Commands
 
     public class Uno : Command
     {
-        public Uno() : base("uno", "Play uno with other humanoids", false, true)
+        public Uno() : base("uno", "Play uno with other humanoids", false)
         {
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
