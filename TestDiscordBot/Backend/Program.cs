@@ -325,7 +325,19 @@ namespace TestDiscordBot
         }
         static void ExecuteBot()
         {
-            #region startup
+            StartUp();
+            HandleConsoleCommandsLoop();
+            
+            BeforeClose();
+            exitedNormally = true;
+
+            client.SetGameAsync("Im actually closed but discord doesnt seem to notice...").Wait();
+            client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
+            client.LogoutAsync().Wait();
+            Environment.Exit(0);
+        }
+        static void StartUp()
+        {
             Thread.CurrentThread.Name = "Main";
             ShowWindow(GetConsoleWindow(), 2);
             Console.ForegroundColor = ConsoleColor.White;
@@ -395,16 +407,16 @@ namespace TestDiscordBot
 
             // Build HelpMenu
             HelpMenu.WithColor(0, 128, 255);
-            HelpMenu.AddField($"{prefix}help", $"Prints the HelpMenu for a Command" + 
-                (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ? 
-                $", eg. {prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") + 
+            HelpMenu.AddField($"{prefix}help", $"Prints the HelpMenu for a Command" +
+                (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ?
+                $", eg. {prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") +
                 "\nCommands with a HelpMenu are marked with a (h)", true);
             for (int i = 0; i < commands.Length; i++)
             {
                 if (commands[i].CommandLine != "" && !commands[i].IsHidden)
                 {
                     string desc = ((commands[i].Desc == null ? "" : commands[i].Desc + "   ")).Trim(' ');
-                    HelpMenu.AddField(commands[i].Prefix + commands[i].CommandLine + 
+                    HelpMenu.AddField(commands[i].Prefix + commands[i].CommandLine +
                         (commands[i].IsExperimental ? " [EXPERIMENTAL]" : "") + (commands[i].HelpMenu == null ? "" : " (h)"),
                         string.IsNullOrWhiteSpace(desc) ? "-" : desc, true);
                 }
@@ -441,9 +453,9 @@ namespace TestDiscordBot
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             }
-            #endregion
-
-            #region commands
+        }
+        static void HandleConsoleCommandsLoop()
+        {
             while (true)
             {
                 lock (Console.Title)
@@ -589,7 +601,11 @@ namespace TestDiscordBot
                     // TODO: Test
                     try
                     {
-                        
+                        EmbedBuilder e = new EmbedBuilder();
+                        e.WithDescription("kek");
+                        e.ThumbnailUrl = ("https://travis-ci.org/niklasCarstensen/Discord-Bot.svg");
+                        e.WithImageUrl("https://travis-ci.org/niklasCarstensen/Discord-Bot.svg");
+                        SendEmbed(e, CurrentChannel).Wait();
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -645,15 +661,6 @@ namespace TestDiscordBot
                 else
                     Extensions.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
             }
-            #endregion
-            
-            BeforeClose();
-            exitedNormally = true;
-
-            client.SetGameAsync("Im actually closed but discord doesnt seem to notice...").Wait();
-            client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
-            client.LogoutAsync().Wait();
-            Environment.Exit(0);
         }
         static void BeforeClose()
         {
