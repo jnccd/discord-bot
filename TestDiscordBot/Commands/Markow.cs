@@ -39,7 +39,7 @@ namespace TestDiscordBot.Commands
                         foreach (SocketChannel channel in guild.Channels)
                             if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
                             {
-                                IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().Flatten();
+                                IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().FlattenAsync();
                                 foreach (IMessage m in messages)
                                     if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.prefix) && m.Content[0] != '!')
                                         input += m.Content + "\n";
@@ -70,7 +70,7 @@ namespace TestDiscordBot.Commands
         }
         public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
-            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync(2).Flatten();
+            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync(2).FlattenAsync();
             if (messages.Count() == 2)
                 MarkovHelper.AddToDict(messages.ElementAt(1).Content, message.Content);
             else

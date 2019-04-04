@@ -29,6 +29,8 @@ namespace TestDiscordBot.Backend
         public MessageSource Source;
         public bool IsTTS;
         public bool IsPinned;
+        public MessageActivity Activity;
+        public MessageApplication Application;
 
         public List<IAttachment> Attachments;
         public List<IEmbed> Embeds;
@@ -74,6 +76,8 @@ namespace TestDiscordBot.Backend
         MessageSource IMessage.Source => Source;
         bool IMessage.IsTTS => IsTTS;
         bool IMessage.IsPinned => IsPinned;
+        MessageActivity IMessage.Activity => Activity;
+        MessageApplication IMessage.Application => Application;
 
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
