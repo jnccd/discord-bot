@@ -387,9 +387,9 @@ namespace TestDiscordBot
 
             while (!ClientReady) { Thread.Sleep(20); }
 #if DEBUG
-            client.SetGameAsync("[DEBUG-MODE] Type " + Program.prefix + "help").Wait();
+            client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
 #else
-            client.SetGameAsync("Type " + prefix + "help").Wait();
+            client.SetGameAsync($"{prefix}help", "", ActivityType.Listening).Wait();
 #endif
             Master = client.GetUser(300699566041202699);
 
