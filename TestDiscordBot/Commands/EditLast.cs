@@ -88,27 +88,37 @@ namespace TestDiscordBot.Commands
 
         public static EditLastCommand[] Commands = new EditLastCommand[] {
             new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(string.Join("", lastText.Content.Select((x) => x + "f")).TrimEnd('f'), message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("", 
+                    string.Join("", lastText.Content.Select(x => x == lastText.Content.Last() ? x + "f" : x.ToString())), "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
-                    "\nhttps://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("", 
+                    string.Join("", lastText.Content.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })), 
+                    "https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", lastText.Author), message.Channel);
             }),
             new EditLastCommand("crab", "Crab the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(":crab: " + lastText.Content + " :crab:" +
-                    "\nhttps://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("", ":crab: " + lastText.Content + " :crab:", "", lastText.Author), message.Channel);
+                await Program.SendText("https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel);
             }),
             new EditLastCommand("CAPS", "Convert text to CAPS",true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("Spoilerify", "Convert text to a spoiler", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })), message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })), "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendText(lastText.Content.Replace("|", ""), message.Channel);
+                await Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    lastText.Content.Replace("|", ""), "", lastText.Author), message.Channel);
+            }),
+            new EditLastCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                await Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    lastText.Content.Select(x => char.IsLetter(x) ? (char)(x - 'A' + 'Ａ') : x).Foldl("", (x, y) => x + y), "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Program.prefix}editLast Crossost #general",
                 true, async (SocketMessage message, IMessage lastText, string lastPic) => {
@@ -203,7 +213,7 @@ namespace TestDiscordBot.Commands
                         return;
                     }
 
-                    string memeName = memeTemplateDesign.RemoveLastGroup('-').TrimEnd('-');
+                    string memeName = memeTemplateDesign.RemoveLastGroup('-');
                     string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
                     string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
@@ -236,7 +246,7 @@ namespace TestDiscordBot.Commands
                         await Program.SendBitmap(template, message.Channel);
                     }
                     else
-                        throw new Exception("uwu");
+                        Program.SendText("Something went wrong :thinking:", message.Channel).Wait();
                 }
                 catch (Exception ex) { e = ex; }
                 finally
