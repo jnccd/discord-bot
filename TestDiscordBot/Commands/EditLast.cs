@@ -118,7 +118,7 @@ namespace TestDiscordBot.Commands
             }),
             new EditLastCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    lastText.Content.Select(x => char.IsLetter(x) ? (char)(x - 'A' + 'Ａ') : x).Foldl("", (x, y) => x + y), "", lastText.Author), message.Channel);
+                    lastText.Content.Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y).Remove(0, 1), "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Program.prefix}editLast Crossost #general",
                 true, async (SocketMessage message, IMessage lastText, string lastPic) => {
@@ -459,7 +459,7 @@ namespace TestDiscordBot.Commands
         }
         private static bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
         {
-            return Math.Abs(C1.R - C2.R) < 5 && Math.Abs(C1.G - C2.G) < 5 && Math.Abs(C1.B - C2.B) < 5;
+            return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
         }
 
         public class EditLastCommand

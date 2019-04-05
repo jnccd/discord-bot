@@ -791,6 +791,7 @@ namespace TestDiscordBot
                 if (message.Content.StartsWith(Program.prefix))
                 {
                     Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
+                    t.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
                     t.Start(message);
                 }
 
