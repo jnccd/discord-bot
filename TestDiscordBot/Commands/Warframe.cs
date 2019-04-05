@@ -38,6 +38,10 @@ namespace TestDiscordBot.Commands
         {
             return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description + " - " + inv.Completion + "%";
         }
+        public static string ToTitle(this Fissure f)
+        {
+            return $"{f.Tier} {f.MissionType} on {f.Node} until {f.EndTime.ToLongTimeString()}";
+        }
     }
 
     public class Warframe : Command
@@ -87,7 +91,8 @@ namespace TestDiscordBot.Commands
             }
             else if (split[1] == "state")
             {
-                await Program.SendEmbed(GetStateEmbed(), message.Channel);
+                foreach(EmbedBuilder e in GetStateEmbeds())
+                    await Program.SendEmbed(e, message.Channel);
             }
             else
             {
@@ -129,74 +134,111 @@ namespace TestDiscordBot.Commands
             }
         }
         
-        EmbedBuilder GetStateEmbed()
+        List<EmbedBuilder> GetStateEmbeds()
         {
-            EmbedBuilder embed = new EmbedBuilder();
+            List<EmbedBuilder> re = new List<EmbedBuilder>();
 
             lock (lockject)
             {
                 if (WarframeHandler.worldState.WS_Alerts.Count != 0)
-                    embed.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
-
+                {
+                    EmbedBuilder alerts = new EmbedBuilder();
+                    alerts.WithColor(0, 128, 255);
+                    alerts.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
+                    re.Add(alerts);
+                }
+                
                 if (WarframeHandler.worldState.WS_Invasions.Count != 0)
                 {
-                    string invStr = WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted).
-                        Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y);
-                    if (invStr.Length > 1024)
-                        invStr = invStr.Substring(0, 1024);
-                    embed.AddField("Invasions:", invStr);
+                    EmbedBuilder invasions = new EmbedBuilder();
+                    invasions.WithColor(0, 128, 255);
+                    foreach (Invasion inv in WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted))
+                        invasions.AddField($"{inv.AttackingFaction}({inv.AttackerReward.ToTitle()}) vs. {inv.DefendingFaction}({inv.DefenderReward.ToTitle()})",
+                            $"{inv.Node} - {inv.Description} - {inv.Completion}%");
+                    re.Add(invasions);
                 }
-
+                
                 if (WarframeHandler.worldState.WS_Fissures.Count != 0)
-                    embed.AddField("Fissures:", WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
+                {
+                    EmbedBuilder fissures = new EmbedBuilder();
+                    fissures.WithColor(0, 128, 255);
+                    fissures.AddField("Fissures:", WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
                         Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
                         Aggregate((x, y) => x + "\n" + y));
-
+                    re.Add(fissures);
+                }
+                
+                EmbedBuilder voidtrader = new EmbedBuilder();
+                voidtrader.WithColor(0, 128, 255);
                 if (WarframeHandler.worldState.WS_VoidTrader.Inventory.Count == 0)
-                    embed.AddField("Baro-Senpai is currently gone", "But don't despair he will come back at " + WarframeHandler.worldState.WS_VoidTrader.StartTime);
+                    voidtrader.WithTitle("Baro-Senpai is currently gone\nBut don't despair he will come back at " + WarframeHandler.worldState.WS_VoidTrader.StartTime);
                 else
-                    embed.AddField("Baro-Senpai is here!", "He got: " + WarframeHandler.worldState.WS_VoidTrader.Inventory.
-                        Select(item => $"{item.Item} {item.Credits}:moneybag: {item.Ducats}D").
-                        Aggregate((x, y) => x + "\n" + y));
+                {
+                    voidtrader.WithTitle("Baro-senpai is here :weary:\nBut only until" + WarframeHandler.worldState.WS_VoidTrader.EndTime);
+                    foreach (VoidTraderItem item in WarframeHandler.worldState.WS_VoidTrader.Inventory)
+                        voidtrader.AddField(item.Item, $"{item.Credits}:moneybag: {item.Ducats}D");
+                }
+                re.Add(voidtrader);
 
                 if (WarframeHandler.worldState.WS_NightWave.ActiveChallenges.Count != 0)
                 {
-                    embed.AddField($"Nightwave Challenges: ", $"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
+                    EmbedBuilder nightwave = new EmbedBuilder();
+                    nightwave.WithColor(0, 128, 255);
+                    nightwave.AddField($"Nightwave Challenges: ", $"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
                         $"{WarframeHandler.worldState.WS_NightWave.Phase}");
                     foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
-                        embed.AddField($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
+                        nightwave.AddField($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
+                    re.Add(nightwave);
                 }
-
+                
                 if (WarframeHandler.worldState.WS_Sortie.Variants.Count != 0)
-                    embed.AddField("Sortie:", WarframeHandler.worldState.WS_Sortie.Variants.
+                {
+                    EmbedBuilder sortie = new EmbedBuilder();
+                    sortie.WithColor(0, 128, 255);
+                    sortie.AddField("Sortie:", WarframeHandler.worldState.WS_Sortie.Variants.
                         Select(x => x.MissionType + " on " + x.Node + " with " + x.Modifier + "\n" + x.ModifierDescription).
                         Aggregate((x, y) => x + "\n\n" + y));
-
+                    re.Add(sortie);
+                }
+                
                 if (WarframeHandler.worldState.WS_Events.Count != 0)
-                    embed.AddField("Events:", WarframeHandler.worldState.WS_Events.
+                {
+                    EmbedBuilder events = new EmbedBuilder();
+                    events.WithColor(0, 128, 255);
+                    events.AddField("Events:", WarframeHandler.worldState.WS_Events.
                         Select(x => x.Description + " - Until: " + x.EndTime.ToLongDateString() + " - " + x.Rewards.
                             Select(y => y.ToTitle()).
                             Foldl("", (a, b) => a + " " + b).Trim(' ').Trim('-')).
                         Foldl("", (x, y) => x + "\n" + y));
+                    re.Add(events);
+                }
 
-                embed.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
-                    (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
-
-                embed.AddField("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
-                    (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
-
-                foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
                 {
-                    embed.AddField(mission.Syndicate, "Missions: ");
-                    for (int i = 0; i < mission.jobs.Count; i++)
-                        if (mission.jobs[i].rewardPool != null)
-                            embed.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
-                                $"{mission.jobs[i].standingStages.Sum()} :arrow_up: until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
+                    EmbedBuilder cycles = new EmbedBuilder();
+                    cycles.WithColor(0, 128, 255);
+                    cycles.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
+                        (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
+                    cycles.AddField("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
+                        (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
+                    re.Add(cycles);
+                }
+
+                {
+                    EmbedBuilder syndicates = new EmbedBuilder();
+                    syndicates.WithColor(0, 128, 255);
+                    foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
+                    {
+                        syndicates.AddField(mission.Syndicate, "Missions: ");
+                        for (int i = 0; i < mission.jobs.Count; i++)
+                            if (mission.jobs[i].rewardPool != null)
+                                syndicates.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
+                                    $"{mission.jobs[i].standingStages.Sum()} :arrow_up: until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
+                    }
+                    re.Add(syndicates);
                 }
             }
-
-            embed.WithColor(0, 128, 255);
-            return embed;
+            
+            return re;
         }
         void RunNotificationLoop()
         {
@@ -218,7 +260,7 @@ namespace TestDiscordBot.Commands
                     SendNotifications(GetNotifications());
                 }
 
-                while (Config.Config.Data.WarframeIDList.Count > 250)
+                while (Config.Config.Data.WarframeIDList.Count > 400)
                     Config.Config.Data.WarframeIDList.RemoveAt(0);
             }
         }
@@ -230,7 +272,7 @@ namespace TestDiscordBot.Commands
             WarframeHandler.GetJsonObjects(jsonResponse);
             return true;
         }
-        async void NotifyVoidtrader()
+        void NotifyVoidtrader()
         {
             if (!Config.Config.Data.WarframeVoidTraderArrived && WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0)
             {
@@ -245,12 +287,14 @@ namespace TestDiscordBot.Commands
                     embed.AddField(item.Item, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" +
                              HttpUtility.HtmlEncode(item.Item).Replace(' ', '+') + ") - " + item.Credits + "c " + item.Ducats + "D");
 
+#if !DEBUG
                 foreach (ulong id in channels)
                 {
                     SocketChannel channel = Program.GetChannelFromID(id);
                     if (channel is ISocketMessageChannel)
-                        await Program.SendEmbed(embed, (ISocketMessageChannel)channel);
+                        Program.SendEmbed(embed, (ISocketMessageChannel)channel).Wait();
                 }
+#endif
             }
             Config.Config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
         }
@@ -280,6 +324,12 @@ namespace TestDiscordBot.Commands
                 {
                     Config.Config.Data.WarframeIDList.Add(i.Id);
                     notifications.Add(i.ToTitle());
+                }
+            foreach (Fissure f in WarframeHandler.worldState.WS_Fissures)
+                if (!Config.Config.Data.WarframeIDList.Contains(f.Id))
+                {
+                    Config.Config.Data.WarframeIDList.Add(f.Id);
+                    notifications.Add(f.ToTitle());
                 }
 
             return notifications;
