@@ -91,8 +91,17 @@ namespace TestDiscordBot.Commands
             }
             else if (split[1] == "state")
             {
-                foreach(EmbedBuilder e in GetStateEmbeds())
-                    await Program.SendEmbed(e, message.Channel);
+                if (split.Length > 2)
+                {
+                    EmbedBuilder e = GetStateEmbeds().FirstOrDefault(x => x.Title.ToLower().Contains(split[2].ToLower()));
+                    if (e == null)
+                        await Program.SendText($"Could not find \"{split[2]}\"", message.Channel);
+                    else
+                        await Program.SendEmbed(e, message.Channel);
+                }
+                else
+                    foreach (EmbedBuilder e in GetStateEmbeds())
+                        await Program.SendEmbed(e, message.Channel);
             }
             else
             {
@@ -144,7 +153,8 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder alerts = new EmbedBuilder();
                     alerts.WithColor(0, 128, 255);
-                    alerts.AddField("Alerts:", WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
+                    alerts.WithTitle("Alerts:");
+                    alerts.WithDescription(WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
                     re.Add(alerts);
                 }
                 
@@ -152,6 +162,7 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder invasions = new EmbedBuilder();
                     invasions.WithColor(0, 128, 255);
+                    invasions.WithTitle("Invasions:");
                     foreach (Invasion inv in WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted))
                         invasions.AddField($"{inv.AttackingFaction}({inv.AttackerReward.ToTitle()}) vs. {inv.DefendingFaction}({inv.DefenderReward.ToTitle()})",
                             $"{inv.Node} - {inv.Description} - {inv.Completion}%");
@@ -162,7 +173,8 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder fissures = new EmbedBuilder();
                     fissures.WithColor(0, 128, 255);
-                    fissures.AddField("Fissures:", WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
+                    fissures.WithTitle("Fissures:");
+                    fissures.WithDescription(WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
                         Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
                         Aggregate((x, y) => x + "\n" + y));
                     re.Add(fissures);
@@ -184,7 +196,8 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder nightwave = new EmbedBuilder();
                     nightwave.WithColor(0, 128, 255);
-                    nightwave.AddField($"Nightwave Challenges: ", $"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
+                    nightwave.WithTitle($"Nightwave Challenges: ");
+                    nightwave.WithDescription($"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
                         $"{WarframeHandler.worldState.WS_NightWave.Phase}");
                     foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
                         nightwave.AddField($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
@@ -195,7 +208,8 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder sortie = new EmbedBuilder();
                     sortie.WithColor(0, 128, 255);
-                    sortie.AddField("Sortie:", WarframeHandler.worldState.WS_Sortie.Variants.
+                    sortie.WithTitle("Sortie:");
+                    sortie.WithDescription(WarframeHandler.worldState.WS_Sortie.Variants.
                         Select(x => x.MissionType + " on " + x.Node + " with " + x.Modifier + "\n" + x.ModifierDescription).
                         Aggregate((x, y) => x + "\n\n" + y));
                     re.Add(sortie);
@@ -205,7 +219,8 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder events = new EmbedBuilder();
                     events.WithColor(0, 128, 255);
-                    events.AddField("Events:", WarframeHandler.worldState.WS_Events.
+                    events.WithTitle("Events:");
+                    events.WithDescription(WarframeHandler.worldState.WS_Events.
                         Select(x => x.Description + " - Until: " + x.EndTime.ToLongDateString() + " - " + x.Rewards.
                             Select(y => y.ToTitle()).
                             Foldl("", (a, b) => a + " " + b).Trim(' ').Trim('-')).
@@ -216,6 +231,7 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder cycles = new EmbedBuilder();
                     cycles.WithColor(0, 128, 255);
+                    cycles.WithTitle("Cycles:");
                     cycles.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
                         (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
                     cycles.AddField("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
@@ -226,6 +242,7 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder syndicates = new EmbedBuilder();
                     syndicates.WithColor(0, 128, 255);
+                    syndicates.WithTitle("Syndicate Missions: ");
                     foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
                     {
                         syndicates.AddField(mission.Syndicate, "Missions: ");

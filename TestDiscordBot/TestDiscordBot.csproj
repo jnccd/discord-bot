@@ -83,6 +83,7 @@
     <Compile Include="Commands\Latex.cs" />
     <Compile Include="Commands\Markow.cs" />
     <Compile Include="Commands\Place.cs" />
+    <Compile Include="Commands\Poll.cs" />
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\Reactions.cs" />
     <Compile Include="Commands\CircleIsYou.cs" />

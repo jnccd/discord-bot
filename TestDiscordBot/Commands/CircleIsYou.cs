@@ -94,10 +94,7 @@ namespace TestDiscordBot.Commands
             {
                 Game newgame = new Game();
                 newgame.Message = Program.SendText(newgame.TextRenderImage(), message.Channel).Result.First();
-                newgame.Message.AddReactionAsync(left).Wait();
-                newgame.Message.AddReactionAsync(up).Wait();
-                newgame.Message.AddReactionAsync(down).Wait();
-                newgame.Message.AddReactionAsync(right).Wait();
+                newgame.Message.AddReactionsAsync(new IEmote[] { left, up, down, right }).Wait();
                 games.Add(newgame);
             }
             return Task.FromResult(0);
