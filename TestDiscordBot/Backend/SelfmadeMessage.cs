@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Backend
+namespace TestDiscordBot
 {
     public static partial class Extensions
     {

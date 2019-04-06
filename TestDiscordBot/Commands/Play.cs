@@ -1,7 +1,9 @@
-﻿using Discord.Audio;
+﻿using Discord;
+using Discord.Audio;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +14,8 @@ namespace TestDiscordBot
     {
         public Play() : base("play", "Plays youtube videos", false)
         {
-
+            HelpMenu = new EmbedBuilder();
+            HelpMenu.WithTitle("Give it a YoutTube link and it'll work.");
         }
 
         public override Task Execute(SocketMessage message)

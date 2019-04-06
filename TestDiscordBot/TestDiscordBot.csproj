@@ -78,6 +78,7 @@
     <Compile Include="Commands\EditLast.cs" />
     <Compile Include="Commands\EditThis.cs" />
     <Compile Include="Commands\EmojiUsage.cs" />
+    <Compile Include="Commands\Exception.cs" />
     <Compile Include="Commands\GetScreenshot.cs" />
     <Compile Include="Commands\Google.cs" />
     <Compile Include="Commands\Haskell.cs" />
