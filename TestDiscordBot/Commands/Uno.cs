@@ -28,12 +28,13 @@ namespace TestDiscordBot.Commands
             HelpMenu.WithColor(0, 128, 255);
             HelpMenu.WithDescription("Uno Commands:");
             HelpMenu.AddField(PrefixAndCommand + " new + mentioned users", "Creates a new game with the mentioned users");
-            HelpMenu.AddField(PrefixAndCommand + " move + a card", "Puts the card on the stack\n" +
+            HelpMenu.AddField(PrefixAndCommand + " move + cardType + cardColor", "Puts the card on the stack\n" +
                 $"eg. {PrefixAndCommand} move 1 green\n" +
-                $"eg. {PrefixAndCommand} move plus4 rEd" +
+                $"eg. {PrefixAndCommand} move plus4 rEd\n" +
                 $"The latter will move a Plus4 and change the stacks color to Red, Plus4/ChangeColor cards don't have a color though");
             HelpMenu.AddField(PrefixAndCommand + " draw", "Draw a new card");
             HelpMenu.AddField(PrefixAndCommand + " print", "Prints the stack of the game you are currently in");
+            HelpMenu.AddField(PrefixAndCommand + " cancel", "Cancels the game you are currently in");
             HelpMenu.AddField("Valid Cards are: ", UnoCards.Select(x => x.Type + (x.Color == UnoColor.none ? "" : " " + x.Color.ToString())).Aggregate((x, y) => x + ", " + y));
         }
 
@@ -49,6 +50,11 @@ namespace TestDiscordBot.Commands
             public UnoGame(List<SocketUser> Players)
             {
                 this.Players = Players.Select(x => new Tuple<SocketUser, List<UnoCard>>(x, GetStartingDeck())).ToList();
+
+                UnoCard card = GetRandomNumberCard();
+                DrawCardOnStack(card);
+                TopStackCard = card;
+                CurColor = card.Color;
             }
             private static List<UnoCard> GetStartingDeck()
             {
@@ -73,13 +79,17 @@ namespace TestDiscordBot.Commands
                     Program.SendText("It's not your turn :thinking:", channel).Wait();
                     return;
                 }
-                
                 UnoCard newCard = UnoCards.FirstOrDefault(x => (HasColor(t) ? x.Color == c : x.Color == UnoColor.none) && x.Type == t);
+                Tuple<SocketUser, List<UnoCard>> player = Players.Find(x => x.Item1.Id == PlayerID);
+                if (!player.Item2.Exists(x => x.Type == t && x.Color == c))
+                {
+                    Program.SendText("You don't even have that card :thinking:", channel).Wait();
+                    return;
+                }
 
                 if (newCard != null)
                     if (CanPutCardOnTopOfStack(newCard))
                     {
-                        Tuple<SocketUser, List<UnoCard>> player = Players.Find(x => x.Item1.Id == PlayerID);
                         player.Item2.Remove(newCard);
                         SendDeck(player);
                         DrawCardOnStack(newCard);
@@ -158,12 +168,19 @@ namespace TestDiscordBot.Commands
             {
                 return Players[curPlayerIndex].Item1.Id;
             }
+            private UnoCard GetRandomNumberCard()
+            {
+                UnoCard card = UnoCards.GetRandomValue();
+                while (!IsNumber(card.Type))
+                    card = UnoCards.GetRandomValue();
+                return card;
+            }
 
             public void Send(ISocketMessageChannel Channel)
             {
                 Program.SendBitmap(curStack, Channel, $"Players in this game: " +
                     $"{Players.Select(x => $"`{x.Item1.Username}`[{x.Item2.Count}]").Aggregate((x, y) => x + " " + y)}\n" +
-                    $"It's `{Players[curPlayerIndex].Item1.Username}'s` turn and the current color is `{CurColor.ToString()}`").Wait();
+                    $"It's {Players[curPlayerIndex].Item1.Mention}'s turn and the current color is `{CurColor.ToString()}`").Wait();
             }
             public void SendDeck(Tuple<SocketUser, List<UnoCard>> player)
             {
@@ -333,6 +350,8 @@ namespace TestDiscordBot.Commands
                 }
                 UnoGames.Add(newGame);
                 newGame.Send(message.Channel);
+                foreach (Tuple<SocketUser, List<UnoCard>> player in newGame.Players)
+                    newGame.SendDeck(player);
             }
             else if (split.Contains("print_cards") && message.Author.Id == Program.Master.Id) // Size = {Width = 434 Height = 621}
                 foreach (UnoCard c in UnoCards)
@@ -347,13 +366,25 @@ namespace TestDiscordBot.Commands
             }
             else if (split.Length >= 2 && split[1] == "draw")
             {
-                var game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
+                UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
+                if (game.TurnPlayerID() != message.Author.Id)
+                {
+                    Program.SendText("It's not your turn :thinking:", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
                 if (game != null)
                     game.DrawCards(1, message.Author.Id);
+                else
                 {
                     Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
                     return Task.FromResult(default(object));
                 }
+            }
+            else if (split.Length >= 2 && split[1] == "cancel")
+            {
+                UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
+                Program.SendText($"`{message.Author.Username}` canceled the match! :cold_sweat: :scream: :dizzy_face: :skull_crossbones: ", message.Channel).Wait();
+                UnoGames.Remove(game);
             }
             else if (split.Length >= 4 && split[1] == "move")
             {
@@ -369,7 +400,7 @@ namespace TestDiscordBot.Commands
                 Enum.TryParse(split[2].ToLower(), out t);
                 Enum.TryParse(split[3].ToLower(), out c);
                 if (split[2].Length > 0 && char.IsDigit(split[2][0]))
-                    t = ToUnoType(Convert.ToInt32(split[2][0]));
+                    t = ToUnoType(Convert.ToInt32(split[2]));
                 game.PutCardOnTopOfStack(t, c, message.Author.Id, message.Channel);
                 game.Send(message.Channel);
 
