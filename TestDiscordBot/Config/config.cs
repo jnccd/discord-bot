@@ -14,6 +14,7 @@ namespace TestDiscordBot.Config
     public static class Config
     {
         static readonly string configPath = "config.json";
+        static readonly string configBackupPath = "config_backup.json";
         public static ConfigData Data = new ConfigData();
         
         static Config()
@@ -34,6 +35,8 @@ namespace TestDiscordBot.Config
         }
         public static void Save()
         {
+            if (File.Exists(configPath))
+                File.Copy(configPath, configBackupPath, true);
             File.WriteAllText(configPath, JsonConvert.SerializeObject(Data));
         }
         public static void Load()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TestDiscordBot.Chess
 {
@@ -760,7 +761,7 @@ namespace TestDiscordBot.Chess
         public void MovePiece(ChessPoint from, ChessPoint to)
         {
             if (slow)
-                Thread.Sleep(1000);
+                Task.Delay(1000);
 
             ChessPiece FromPiece = GetChessPieceFromPoint(from);
             ChessPlayer MovePlayer = PlayerWhoHasTheMove();
@@ -774,14 +775,14 @@ namespace TestDiscordBot.Chess
                     EndGameNormally(PlayerBottom, from);
 
                     if (slow)
-                        Thread.Sleep(3000);
+                        Task.Delay(3000);
                 }
                 if (Pieces[to.X, to.Y] == BottomKing)
                 {
                     EndGameNormally(PlayerTop, from);
                     
                     if (slow)
-                        Thread.Sleep(3000);
+                        Task.Delay(3000);
                 }
 
                 Pieces[to.X, to.Y] = Pieces[from.X, from.Y];
@@ -804,7 +805,7 @@ namespace TestDiscordBot.Chess
         public void MovePiece(ChessMove M)
         {
             if (slow)
-                Thread.Sleep(1000);
+                Task.Delay(1000);
 
             ChessPoint from = M.From;
             ChessPoint to = M.To;
@@ -821,14 +822,14 @@ namespace TestDiscordBot.Chess
                     EndGameNormally(PlayerBottom, from);
 
                     if (slow)
-                        Thread.Sleep(3000);
+                        Task.Delay(3000);
                 }
                 if (Pieces[to.X, to.Y] == BottomKing)
                 {
                     EndGameNormally(PlayerTop, from);
 
                     if (slow)
-                        Thread.Sleep(3000);
+                        Task.Delay(3000);
                 }
 
                 Pieces[to.X, to.Y] = Pieces[from.X, from.Y];
