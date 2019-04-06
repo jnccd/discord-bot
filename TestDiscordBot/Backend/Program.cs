@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TestDiscordBot.Commands;
 using TestDiscordBot.Config;
+using System.Globalization;
 
 namespace TestDiscordBot
 {
@@ -496,6 +497,7 @@ namespace TestDiscordBot
                 Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
+                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
                     var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
                     reacts.TryGetValue(ErrorEmoji, out var react);
                     if (react.ReactionCount > 1)
@@ -523,6 +525,7 @@ namespace TestDiscordBot
                 Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
+                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
                     var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
                     reacts.TryGetValue(ErrorEmoji, out var react);
                     if (react.ReactionCount > 1)
@@ -760,7 +763,19 @@ namespace TestDiscordBot
                 string videofile = "Downloads\\YoutubeVideo.mp4";
                 Directory.CreateDirectory(Path.GetDirectoryName(videofile));
                 if (File.Exists(videofile))
-                    File.Delete(videofile);
+                {
+                    int i = 0;
+                    while (true)
+                    {
+                        if (File.Exists(videofile) && new FileInfo(videofile).IsFileLocked())
+                            videofile = $"Downloads\\YoutubeVideo{++i}.mp4";
+                        else
+                        {
+                            File.Delete(videofile);
+                            break;
+                        }
+                    }
+                }
 
                 Process P = new Process
                 {
