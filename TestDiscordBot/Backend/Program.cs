@@ -1094,7 +1094,8 @@ namespace TestDiscordBot
             e.WithDescription(DescText);
             e.WithImageUrl(ImgURL);
             e.WithTitle(TitleText);
-            e.WithAuthor(Author);
+            if (Author != null)
+                e.WithAuthor(Author);
             e.WithThumbnailUrl(ThumbnailURL);
             return e;
         }
