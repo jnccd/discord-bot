@@ -273,8 +273,10 @@ namespace TestDiscordBot.Commands
             {
                 if (UpdatedWarframeHandlerSuccessfully())
                 {
+#if !DEBUG
                     NotifyVoidtrader();
                     SendNotifications(GetNotifications());
+#endif
                 }
 
                 while (Config.Config.Data.WarframeIDList.Count > 400)
