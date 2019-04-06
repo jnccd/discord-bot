@@ -94,7 +94,7 @@ namespace TestDiscordBot.Commands
                     });
 
                     while (!exited && (DateTime.Now - start).TotalSeconds < 30)
-                        Thread.Sleep(100);
+                        Task.Delay(100);
                     if (!exited)
                     {
                         exited = true;

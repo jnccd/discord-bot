@@ -64,6 +64,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Backend\Extensions.cs" />
     <Compile Include="Backend\SelfmadeMessage.cs" />
     <Compile Include="Commands\Brainfuck.cs" />
     <Compile Include="Commands\Chess\ChessBoard.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Commands\Warframe\WarframeObjects\SyndicateMission.cs" />
     <Compile Include="Commands\Warframe\WarframeObjects\VoidTrader.cs" />
     <Compile Include="Commands\Warframe\WarframeObjects\WorldState.cs" />
+    <Compile Include="Commands\Play.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -279,6 +281,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Commands\xnageometry\License.txt" />
+    <Content Include="ffmpeg.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="imageres_25.ico" />
     <Content Include="Commands\Place\place.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -290,6 +295,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Commands\Warframe\WarframeObjects\License.txt" />
+    <Content Include="libsodium.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opus.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="youtube-dl.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Discord.Net">

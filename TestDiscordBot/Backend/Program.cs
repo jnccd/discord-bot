@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
+using Discord.Audio;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,232 +23,7 @@ using TestDiscordBot.Config;
 namespace TestDiscordBot
 {
     public class IllegalCommandException : Exception { public IllegalCommandException(string message) : base (message) { } }
-
-    public static partial class Extensions
-    {
-        // String
-        public static List<int> AllIndexesOf(this string str, string value)
-        {
-            if (String.IsNullOrEmpty(value))
-                throw new ArgumentException("the string to find may not be empty", "value");
-            List<int> indexes = new List<int>();
-            for (int index = 0; ; index += value.Length)
-            {
-                index = str.IndexOf(value, index);
-                if (index == -1)
-                    return indexes;
-                indexes.Add(index);
-            }
-        }
-        public static bool ContainsOneOf(this string str, string[] tests)
-        {
-            foreach (string s in tests)
-                if (str.Contains(s))
-                    return true;
-            return false;
-        }
-        public static bool ContainsAllOf(this string str, string[] tests)
-        {
-            foreach (string s in tests)
-                if (!str.Contains(s))
-                    return false;
-            return true;
-        }
-        public static string GetEverythingBetween(this string str, string left, string right)
-        {
-            int leftIndex = str.IndexOf(left);
-            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
-
-            if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
-            {
-                //throw new Exception("String doesnt contain left or right borders!");
-                return "";
-            }
-
-            try
-            {
-                string re = str.Remove(0, leftIndex + left.Length);
-                re = re.Remove(rightIndex - leftIndex - left.Length);
-                return re;
-            }
-            catch
-            {
-                return "";
-            }
-        }
-        public static List<string> GetEverythingBetweenAll(this string str, string left, string right)
-        {
-            List<string> re = new List<string>();
-
-            int leftIndex = str.IndexOf(left);
-            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
-
-            if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
-            {
-                return re;
-            }
-
-            while (leftIndex != -1 && rightIndex != -1)
-            {
-                try
-                {
-                    str = str.Remove(0, leftIndex + left.Length);
-                    re.Add(str.Remove(rightIndex - leftIndex - left.Length));
-                }
-                catch { break; }
-
-                leftIndex = str.IndexOf(left);
-                rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
-            }
-
-            return re;
-        }
-        public static bool StartsWith(this string str, string[] values)
-        {
-            foreach (string s in values)
-                if (str.StartsWith(s))
-                    return true;
-            return false;
-        }
-        public static string ContainsPictureLink(this string str)
-        {
-            string[] split = str.Split(' ');
-            foreach (string s in split)
-                if (s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".png") ||
-                    s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".jpg"))
-                    return s;
-            return null;
-        }
-        public static double ConvertToDouble(this string s)
-        {
-            return Convert.ToDouble(s.Replace('.', ','));
-        }
-        public static string ToCapital(this string s)
-        {
-            string o = "";
-            for (int i = 0; i < s.Length; i++)
-                if (i == 0)
-                    o += char.ToUpper(s[i]);
-                else
-                    o += char.ToLower(s[i]);
-            return o;
-        }
-        public static Bitmap GetBitmapFromURL(this string url)
-        {
-            WebRequest request = WebRequest.Create(url);
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
-            return new Bitmap(responseStream);
-        }
-        public static int LevenshteinDistance(this string s, string t)
-        {
-            if (string.IsNullOrEmpty(s))
-            {
-                if (string.IsNullOrEmpty(t))
-                    return 0;
-                return t.Length;
-            }
-
-            if (string.IsNullOrEmpty(t))
-            {
-                return s.Length;
-            }
-
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
-
-            // initialize the top and right of the table to 0, 1, 2, ...
-            for (int i = 0; i <= n; d[i, 0] = i++) ;
-            for (int j = 1; j <= m; d[0, j] = j++) ;
-
-            for (int i = 1; i <= n; i++)
-            {
-                for (int j = 1; j <= m; j++)
-                {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-                    int min1 = d[i - 1, j] + 1;
-                    int min2 = d[i, j - 1] + 1;
-                    int min3 = d[i - 1, j - 1] + cost;
-                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
-                }
-            }
-            return d[n, m];
-        }
-        public static void ConsoleWriteLine(this string text, ConsoleColor Color)
-        {
-            lock (Console.Title)
-            {
-                Console.CursorLeft = 0;
-                Console.ForegroundColor = Color;
-                Console.WriteLine(text);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
-            }
-        }
-
-        // Discord
-        public static EmbedBuilder ToEmbed(this IMessage m)
-        {
-            EmbedBuilder Embed = new EmbedBuilder();
-            Embed.WithColor(0, 128, 255);
-            Embed.WithAuthor(m.Author);
-            Embed.WithTitle(string.IsNullOrWhiteSpace(m.Content) ?
-                m.Attachments.Select(x => x.Url).
-                Where(x => !x.EndsWith(".png") && !x.EndsWith(".jpg")).
-                Union(new string[] { "-" }).
-                Aggregate((x, y) => y == "-" ? x : x + " " + y) : m.Content);
-            try
-            {
-                if (m.Attachments.Count > 0)
-                    Embed.WithThumbnailUrl(m.Attachments.ElementAt(0).Url);
-            }
-            catch { }
-            return Embed;
-        }
-        public static ulong GetServerID(this SocketMessage m)
-        {
-            return Program.GetGuildFromChannel(m.Channel).Id;
-        }
-
-        // Drawing
-        public static Bitmap CropImage(this Bitmap source, Rectangle section)
-        {
-            // An empty bitmap which will hold the cropped image
-            Bitmap bmp = new Bitmap(section.Width, section.Height);
-
-            using (Graphics g = Graphics.FromImage(bmp))
-
-                // Draw the given area (section) of the source image
-                // at location 0,0 on the empty bitmap (bmp)
-                g.DrawImage(source, 0, 0, section, GraphicsUnit.Pixel);
-
-            return bmp;
-        }
-
-        // Linq Extensions
-        public static b Foldl<a, b>(this IEnumerable<a> xs, b y, Func<b, a, b> f)
-        {
-            foreach (a x in xs)
-                y = f(y, x);
-            return y;
-        }
-        public static b Foldl<a, b>(this IEnumerable<a> xs, Func<b, a, b> f)
-        {
-            return xs.Foldl(default(b), f);
-        }
-        public static a GetRandomValue<a>(this IEnumerable<a> xs)
-        {
-            a[] arr = xs.ToArray();
-            return arr[Program.RDM.Next(arr.Length)];
-        }
-        public static string RemoveLastGroup(this string s, char seperator)
-        {
-            string[] split = s.Split(seperator);
-            return split.Take(split.Length - 1).Foldl("", (a, b) => a + seperator + b).Remove(0, 1);
-        }
-    }
-
+    
     public class Program
     {
         // Console / Execution
@@ -292,7 +68,8 @@ namespace TestDiscordBot
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
         static readonly Emoji ErrorEmoji = new Emoji("🤔");
 
-        static readonly string lockject = "";
+        static readonly string commandExecutionLock = "";
+        static readonly string youtubeDownloadLock = "";
 
         // ------------------------------------------------------------------------------------------------------------
 
@@ -329,9 +106,9 @@ namespace TestDiscordBot
             
             BeforeClose();
             exitedNormally = true;
-
-            client.SetGameAsync("Im actually closed but discord doesnt seem to notice...").Wait();
+            
             client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
+            client.StopAsync().Wait();
             client.LogoutAsync().Wait();
             Environment.Exit(0);
         }
@@ -367,8 +144,7 @@ namespace TestDiscordBot
                     {
                         ShowWindow(GetConsoleWindow(), 4);
                         SystemSounds.Exclamation.Play();
-                        Console.CursorLeft = 0;
-                        Console.Write("Give me a Bot Token: ");
+                        Extensions.ConsoleWrite("Give me a Bot Token: ");
                         Config.Config.Data.BotToken = Console.ReadLine();
                         Config.Config.Save();
                     }
@@ -396,7 +172,7 @@ namespace TestDiscordBot
 
             commands = commands.OrderBy(x => x.CommandLine).ToArray(); // Sort commands in alphabetical order
 
-            while (!ClientReady) { Thread.Sleep(20); }
+            while (!ClientReady) { Task.Delay(20); }
 #if DEBUG
             client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
 #else
@@ -427,20 +203,17 @@ namespace TestDiscordBot
             // Startup Console Display
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Console.CursorLeft = 0;
-            Extensions.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
+            ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    Extensions.ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
+                    ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
             }
-            catch { Extensions.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
-            Console.CursorLeft = 0;
-            Console.Write("Default channel is: ");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.Write(CurrentChannel);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(" on " + GetGuildFromChannel(CurrentChannel).Name);
-            Console.WriteLine("Awaiting your commands: ");
+            catch { ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            ConsoleWrite("Default channel is: ");
+            ConsoleWrite(CurrentChannel, ConsoleColor.Magenta);
+            ConsoleWriteLine(" on " + GetGuildFromChannel(CurrentChannel).Name);
+            ConsoleWriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
             foreach (Command c in commands)
             {
@@ -457,11 +230,6 @@ namespace TestDiscordBot
         {
             while (true)
             {
-                lock (Console.Title)
-                {
-                    Console.CursorLeft = 0;
-                    Console.Write("$");
-                }
                 string input = Console.ReadLine();
 
                 if (input == "exit")
@@ -470,7 +238,7 @@ namespace TestDiscordBot
                 if (!input.StartsWith("/"))
                 {
                     if (CurrentChannel == null)
-                        Console.WriteLine("No channel selected!");
+                        ConsoleWriteLine("No channel selected!");
                     else
                     {
                         try
@@ -479,16 +247,14 @@ namespace TestDiscordBot
                         }
                         catch (Exception e)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine(e);
-                            Console.ForegroundColor = ConsoleColor.White;
+                            ConsoleWriteLine(e, ConsoleColor.Red);
                         }
                     }
                 }
                 else if (input.StartsWith("/file "))
                 {
                     if (CurrentChannel == null)
-                        Console.WriteLine("No channel selected!");
+                        ConsoleWriteLine("No channel selected!");
                     else
                     {
                         string[] splits = input.Split(' ');
@@ -508,26 +274,16 @@ namespace TestDiscordBot
                         if (textChannel != null)
                         {
                             CurrentChannel = (ISocketMessageChannel)textChannel;
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Succsessfully set new channel!");
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write("Current channel is: ");
-                            Console.ForegroundColor = ConsoleColor.Magenta;
-                            Console.WriteLine(CurrentChannel);
-                            Console.ForegroundColor = ConsoleColor.White;
+                            ConsoleWriteLine("Succsessfully set new channel!", ConsoleColor.Green);
+                            ConsoleWrite("Current channel is: ");
+                            ConsoleWriteLine(CurrentChannel, ConsoleColor.Magenta);
                         }
                         else
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Couldn't set new channel!");
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
+                            ConsoleWriteLine("Couldn't set new channel!", ConsoleColor.Red);
                     }
                     catch
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Couldn't set new channel!");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        ConsoleWriteLine("Couldn't set new channel!", ConsoleColor.Red);
                     }
                     #endregion
                 }
@@ -557,9 +313,7 @@ namespace TestDiscordBot
                     }
                     catch (Exception e)
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(e);
-                        Console.ForegroundColor = ConsoleColor.White;
+                        ConsoleWriteLine(e, ConsoleColor.Red);
                     }
                     #endregion
                 }
@@ -597,22 +351,19 @@ namespace TestDiscordBot
                 }
                 else if (input == "/test")
                 {
-                    // TODO: Test
-                    try
+                    Task.Factory.StartNew(() =>
                     {
-                        EmbedBuilder e = new EmbedBuilder();
-                        e.WithDescription("kek");
-                        e.WithTitle("Kek waddup l o l wuw".Split(' ').Foldl("", (x, y) => x + " " + y));
-                        SendEmbed(e, CurrentChannel).Wait();
-                    }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                        Thread.CurrentThread.Name = "TestThread";
+                        try { Test(); }
+                        catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    });
                 }
                 else if (input.StartsWith("/roles")) // ServerID
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        Extensions.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
+                        ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -621,7 +372,7 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        Extensions.ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
+                        ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
                             Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -633,7 +384,7 @@ namespace TestDiscordBot
                     {
                         GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
                             AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3])).Wait();
-                        Extensions.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
+                        ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -642,7 +393,7 @@ namespace TestDiscordBot
                     string[] split = input.Split(' ');
                     try
                     {
-                        Extensions.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
@@ -652,13 +403,22 @@ namespace TestDiscordBot
                     try
                     {
                         var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
-                        Extensions.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                        ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
                     catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
-                    Extensions.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
+                    ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
             }
+        }
+        static void Test()
+        {
+            // TODO: Test
+            string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
+            ISocketAudioChannel channel = GetChannelFromID(473991188974927886) as ISocketAudioChannel;
+            IAudioClient client = channel.ConnectAsync().Result;
+            SendAudioAsync(client, videoPath).WaitAndThrow();
+            channel.DisconnectAsync().WaitAndThrow();
         }
         static void BeforeClose()
         {
@@ -789,11 +549,7 @@ namespace TestDiscordBot
             if (!message.Author.IsBot)
             {
                 if (message.Content.StartsWith(Program.prefix))
-                {
-                    Thread t = new Thread(new ParameterizedThreadStart(ThreadedMessageReceived));
-                    t.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
-                    t.Start(message);
-                }
+                    Task.Run(() => ParallelMessageReceived(message));
 
                 if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 {
@@ -811,10 +567,8 @@ namespace TestDiscordBot
             }
             return Task.FromResult(default(object));
         }
-        private static void ThreadedMessageReceived(object o)
+        private static void ParallelMessageReceived(SocketMessage message)
         {
-            SocketMessage message = (SocketMessage)o;
-
             // Add server
             if (message.Channel is SocketGuildChannel)
             {
@@ -883,7 +637,7 @@ namespace TestDiscordBot
                 return;
             if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
             {
-                await Program.SendText("Experimental commands cant be used here!", message.Channel);
+                await SendText("Experimental commands cant be used here!", message.Channel);
                 return;
             }
 
@@ -891,13 +645,13 @@ namespace TestDiscordBot
             try
             {
                 typingState = message.Channel.EnterTypingState();
-                lock (lockject)
+                lock (commandExecutionLock)
                 {
                     ConcurrentCommandExecutions++;
                     UpdateWorkState();
                 }
 
-                Program.SaveUser(message.Author.Id);
+                SaveUser(message.Author.Id);
                 await command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
@@ -923,7 +677,7 @@ namespace TestDiscordBot
             finally
             {
                 typingState.Dispose();
-                lock (lockject)
+                lock (commandExecutionLock)
                 {
                     ConcurrentCommandExecutions--;
                     UpdateWorkState();
@@ -968,6 +722,63 @@ namespace TestDiscordBot
             get
             {
                 return GetSelf().Id;
+            }
+        }
+
+        // Audio / Video
+        public static async Task SendAudioAsync(IAudioClient audioClient, string path)
+        {
+            Exception ex = null;
+            using (Process ffmpeg = CreateFFMPEGProcess(path))
+            using (AudioOutStream stream = audioClient.CreatePCMStream(AudioApplication.Music))
+            {
+                try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
+                catch (Exception e) { ex = e; }
+                finally { await stream.FlushAsync(); }
+            }
+
+            if (ex != null)
+                throw ex;
+        }
+        private static Process CreateFFMPEGProcess(string path)
+        {
+            return Process.Start(new ProcessStartInfo
+            {
+                FileName = "ffmpeg.exe",
+                Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -filter:a \"volume = 0.05\" -ac 2 -f s16le -ar 48000 pipe:1",
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            });
+        }
+        public static string DownloadVideoFromYouTube(string YoutubeURL)
+        {
+            if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
+                return "";
+
+            lock (youtubeDownloadLock)
+            {
+                string videofile = "Downloads\\YoutubeVideo.mp4";
+                Directory.CreateDirectory(Path.GetDirectoryName(videofile));
+                if (File.Exists(videofile))
+                    File.Delete(videofile);
+
+                Process P = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "youtube-dl.exe",
+                        Arguments = "-f mp4 -o \"" + videofile + "\" " + YoutubeURL,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardInput = true
+                    }
+                };
+
+                P.Start();
+                P.StandardInput.Write("e");
+                P.WaitForExit();
+
+                return videofile;
             }
         }
 
@@ -1073,20 +884,28 @@ namespace TestDiscordBot
                 Console.WriteLine();
                 BeforeClose();
             }
-            Thread.Sleep(250);
+            Task.Delay(250);
             return false;
         }
         static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
         private delegate bool ConsoleEventDelegate(int eventType);
 
-        // ???
-        static void ConsoleWriteLine(string text, ConsoleColor Color)
+        // Wrappers
+        static void ConsoleWriteLine(object text, ConsoleColor Color)
         {
             text.ConsoleWriteLine(Color);
         }
-        static void ConsoleWriteLine(string text)
+        static void ConsoleWriteLine(object text)
         {
-            text.ConsoleWriteLine(ConsoleColor.White);
+            text.ConsoleWriteLine();
+        }
+        static void ConsoleWrite(object text)
+        {
+            text.ConsoleWrite();
+        }
+        static void ConsoleWrite(object text, ConsoleColor Color)
+        {
+            text.ConsoleWrite(Color);
         }
         public static EmbedBuilder CreateEmbedBuilder(string TitleText = "", string DescText = "", string ImgURL = "", IUser Author = null, string ThumbnailURL = "")
         {
