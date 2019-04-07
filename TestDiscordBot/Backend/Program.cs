@@ -126,7 +126,7 @@ namespace TestDiscordBot
             try
             {
                 buildDate = File.ReadAllText("BuildDate.txt").TrimEnd('\n');
-                ("Build from: " + buildDate).ConsoleWriteLine(ConsoleColor.Magenta);
+                ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
             }
             catch
             {
@@ -145,7 +145,7 @@ namespace TestDiscordBot
                     {
                         ShowWindow(GetConsoleWindow(), 4);
                         SystemSounds.Exclamation.Play();
-                        Extensions.ConsoleWrite("Give me a Bot Token: ");
+                        ConsoleWrite("Give me a Bot Token: ");
                         Config.Config.Data.BotToken = Console.ReadLine();
                         Config.Config.Save();
                     }
@@ -173,7 +173,7 @@ namespace TestDiscordBot
 
             commands = commands.OrderBy(x => x.CommandLine).ToArray(); // Sort commands in alphabetical order
 
-            while (!ClientReady) { Task.Delay(20); }
+            while (!ClientReady) { Thread.Sleep(20); }
 #if DEBUG
             client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
 #else
@@ -223,7 +223,7 @@ namespace TestDiscordBot
                     {
                         c.OnConnected();
                     }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             }
         }
@@ -356,7 +356,7 @@ namespace TestDiscordBot
                     {
                         Thread.CurrentThread.Name = "TestThread";
                         try { Test(); }
-                        catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                        catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                     });
                 }
                 else if (input.StartsWith("/roles")) // ServerID
@@ -366,7 +366,7 @@ namespace TestDiscordBot
                     {
                         ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
                 {
@@ -376,7 +376,7 @@ namespace TestDiscordBot
                         ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
                             Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
                 {
@@ -387,7 +387,7 @@ namespace TestDiscordBot
                             AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3])).Wait();
                         ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/channels")) // ChannelID
                 {
@@ -396,7 +396,7 @@ namespace TestDiscordBot
                     {
                         ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/read")) // ChannelID
                 {
@@ -406,7 +406,7 @@ namespace TestDiscordBot
                         var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
                         ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
                     ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
@@ -432,7 +432,7 @@ namespace TestDiscordBot
                 {
                     c.OnExit();
                 }
-                catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             }
             ConsoleWriteLine("Closing... Remove Error Emojis");
             foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
@@ -479,7 +479,7 @@ namespace TestDiscordBot
                     return;
                 }
             }
-            catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+            catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
         }
         private static Task Client_Ready()
         {
@@ -488,7 +488,7 @@ namespace TestDiscordBot
         }
         private static Task Client_Log(LogMessage msg)
         {
-            Extensions.ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
+            ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
             return Task.FromResult(0);
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
@@ -514,7 +514,7 @@ namespace TestDiscordBot
                             c.OnEmojiReactionAdded(arg1, arg2, arg3);
                             c.OnEmojiReactionUpdated(arg1, arg2, arg3);
                         }
-                        catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                        catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                     });
 
             return Task.FromResult(default(object));
@@ -542,7 +542,7 @@ namespace TestDiscordBot
                             c.OnEmojiReactionRemoved(arg1, arg2, arg3);
                             c.OnEmojiReactionUpdated(arg1, arg2, arg3);
                         }
-                        catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                        catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                     });
 
             return Task.FromResult(default(object));
@@ -563,7 +563,7 @@ namespace TestDiscordBot
                             {
                                 c.OnNonCommandMessageRecieved(message);
                             }
-                            catch (Exception e) { Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                            catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                         }
                     });
                 }
@@ -658,10 +658,10 @@ namespace TestDiscordBot
                 await command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    Extensions.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
+                    ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
                         ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
                 else
-                    Extensions.ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
+                    ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
                         "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
             }
             catch (Exception e)
@@ -675,7 +675,7 @@ namespace TestDiscordBot
                 }
                 catch { }
                 
-                Extensions.ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
             }
             finally
             {
@@ -899,28 +899,54 @@ namespace TestDiscordBot
                 Console.WriteLine();
                 BeforeClose();
             }
-            Task.Delay(250);
+            Thread.Sleep(250);
             return false;
         }
         static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
         private delegate bool ConsoleEventDelegate(int eventType);
 
         // Wrappers
-        static void ConsoleWriteLine(object text, ConsoleColor Color)
+        public static void ConsoleWriteLine(object text, ConsoleColor Color)
         {
-            text.ConsoleWriteLine(Color);
+            lock (Console.Title)
+            {
+                if (Console.CursorLeft == 1)
+                    Console.CursorLeft = 0;
+                Console.ForegroundColor = Color;
+                Console.WriteLine(text);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("$");
+            }
         }
         static void ConsoleWriteLine(object text)
         {
-            text.ConsoleWriteLine();
-        }
-        static void ConsoleWrite(object text)
-        {
-            text.ConsoleWrite();
+            lock (Console.Title)
+            {
+                if (Console.CursorLeft == 1)
+                    Console.CursorLeft = 0;
+                Console.WriteLine(text);
+                Console.Write("$");
+            }
         }
         static void ConsoleWrite(object text, ConsoleColor Color)
         {
-            text.ConsoleWrite(Color);
+            lock (Console.Title)
+            {
+                if (Console.CursorLeft == 1)
+                    Console.CursorLeft = 0;
+                Console.ForegroundColor = Color;
+                Console.Write(text);
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
+        static void ConsoleWrite(object text)
+        {
+            lock (Console.Title)
+            {
+                if (Console.CursorLeft == 1)
+                    Console.CursorLeft = 0;
+                Console.Write(text);
+            }
         }
         public static EmbedBuilder CreateEmbedBuilder(string TitleText = "", string DescText = "", string ImgURL = "", IUser Author = null, string ThumbnailURL = "")
         {

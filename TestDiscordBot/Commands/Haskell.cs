@@ -88,13 +88,13 @@ namespace TestDiscordBot.Commands
                         }
                         catch (Exception e)
                         {
-                            e.ToString().ConsoleWriteLine(ConsoleColor.Red);
+                            Program.ConsoleWriteLine(e, ConsoleColor.Red);
                         }
                         exited = true;
                     });
 
                     while (!exited && (DateTime.Now - start).TotalSeconds < 30)
-                        Task.Delay(100);
+                        Thread.Sleep(100);
                     if (!exited)
                     {
                         exited = true;
@@ -116,7 +116,7 @@ namespace TestDiscordBot.Commands
                         Program.SendText("Haskell timeout!", message.Channel).Wait();
                     }
                 }
-                catch (Exception e) { e.ToString().ConsoleWriteLine(ConsoleColor.Red); }
+                catch (Exception e) { Program.ConsoleWriteLine(e, ConsoleColor.Red); }
             }
 
             return Task.FromResult(default(object));

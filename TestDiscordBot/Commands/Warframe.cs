@@ -264,7 +264,7 @@ namespace TestDiscordBot.Commands
             while (true)
             {
                 NotifyAlerts();
-                Task.Delay(updateIntervalMin * 60000);
+                Thread.Sleep(updateIntervalMin * 60000);
             }
         }
         void NotifyAlerts()

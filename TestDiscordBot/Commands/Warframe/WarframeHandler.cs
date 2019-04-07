@@ -21,7 +21,7 @@ namespace Warframe_Alerts
             {
                 var request = WebRequest.Create("https://ws.warframestat.us/pc/");
                 var response = request.GetResponse();
-                var status = (((HttpWebResponse)response).StatusDescription);
+                var status = ((HttpWebResponse)response).StatusDescription;
                 ret = status;
                 var dataStream = response.GetResponseStream();
                 if (dataStream != null)
