@@ -42,7 +42,7 @@ namespace TestDiscordBot.Commands
                 converter.StartInfo.RedirectStandardInput = true;
 
                 converter.Start();
-                Task.Delay(500);
+                Thread.Sleep(500);
                 converter.StandardInput.WriteLine("return");
                 converter.WaitForExit();
 

@@ -162,51 +162,7 @@ namespace TestDiscordBot
             }
             return d[n, m];
         }
-
-        // Console
-        public static void ConsoleWriteLine(this object text, ConsoleColor Color)
-        {
-            lock (Console.Title)
-            {
-                if (Console.CursorLeft == 1)
-                    Console.CursorLeft = 0;
-                Console.ForegroundColor = Color;
-                Console.WriteLine(text);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("$");
-            }
-        }
-        public static void ConsoleWriteLine(this object text)
-        {
-            lock (Console.Title)
-            {
-                if (Console.CursorLeft == 1)
-                    Console.CursorLeft = 0;
-                Console.WriteLine(text);
-                Console.Write("$");
-            }
-        }
-        public static void ConsoleWrite(this object text, ConsoleColor Color)
-        {
-            lock (Console.Title)
-            {
-                if (Console.CursorLeft == 1)
-                    Console.CursorLeft = 0;
-                Console.ForegroundColor = Color;
-                Console.Write(text);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-        }
-        public static void ConsoleWrite(this object text)
-        {
-            lock (Console.Title)
-            {
-                if (Console.CursorLeft == 1)
-                    Console.CursorLeft = 0;
-                Console.Write(text);
-            }
-        }
-
+        
         // Discord
         public static EmbedBuilder ToEmbed(this IMessage m)
         {

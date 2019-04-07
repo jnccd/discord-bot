@@ -761,7 +761,7 @@ namespace TestDiscordBot.Chess
         public void MovePiece(ChessPoint from, ChessPoint to)
         {
             if (slow)
-                Task.Delay(1000);
+                Thread.Sleep(1000);
 
             ChessPiece FromPiece = GetChessPieceFromPoint(from);
             ChessPlayer MovePlayer = PlayerWhoHasTheMove();
@@ -775,14 +775,14 @@ namespace TestDiscordBot.Chess
                     EndGameNormally(PlayerBottom, from);
 
                     if (slow)
-                        Task.Delay(3000);
+                        Thread.Sleep(3000);
                 }
                 if (Pieces[to.X, to.Y] == BottomKing)
                 {
                     EndGameNormally(PlayerTop, from);
                     
                     if (slow)
-                        Task.Delay(3000);
+                        Thread.Sleep(3000);
                 }
 
                 Pieces[to.X, to.Y] = Pieces[from.X, from.Y];
@@ -805,7 +805,7 @@ namespace TestDiscordBot.Chess
         public void MovePiece(ChessMove M)
         {
             if (slow)
-                Task.Delay(1000);
+                Thread.Sleep(1000);
 
             ChessPoint from = M.From;
             ChessPoint to = M.To;
@@ -822,14 +822,14 @@ namespace TestDiscordBot.Chess
                     EndGameNormally(PlayerBottom, from);
 
                     if (slow)
-                        Task.Delay(3000);
+                        Thread.Sleep(3000);
                 }
                 if (Pieces[to.X, to.Y] == BottomKing)
                 {
                     EndGameNormally(PlayerTop, from);
 
                     if (slow)
-                        Task.Delay(3000);
+                        Thread.Sleep(3000);
                 }
 
                 Pieces[to.X, to.Y] = Pieces[from.X, from.Y];
