@@ -162,7 +162,34 @@ namespace TestDiscordBot
             }
             return d[n, m];
         }
-        
+        public static float ModifiedLevenshteinDistance(this string smaller, string longer)
+        {
+            if (string.IsNullOrEmpty(smaller))
+            {
+                if (string.IsNullOrEmpty(longer))
+                    return 0;
+                return longer.Length;
+            }
+
+            if (string.IsNullOrEmpty(longer))
+                return smaller.Length;
+
+            // initialize the top and right of the table to 0, 1, 2, ...
+            float[,] d = new float[smaller.Length + 1, longer.Length + 1];
+            for (int i = 0; i <= smaller.Length; d[i, 0] = i++) ;
+            for (int j = 1; j <= longer.Length; d[0, j] = j++) ;
+
+            for (int i = 1; i <= smaller.Length; i++)
+                for (int j = 1; j <= longer.Length; j++)
+                {
+                    float delete = d[i - 1, j] + 1;
+                    float insert = d[i, j - 1] + 0.5f;
+                    float replace = d[i - 1, j - 1] + ((longer[j - 1] == smaller[i - 1]) ? 0 : 1);
+                    d[i, j] = Math.Min(Math.Min(delete, insert), replace);
+                }
+            return d[smaller.Length, longer.Length];
+        }
+
         // Discord
         public static EmbedBuilder ToEmbed(this IMessage m)
         {
@@ -225,12 +252,6 @@ namespace TestDiscordBot
         }
 
         // ???
-        public static void WaitAndThrow(this Task T)
-        {
-            T.Wait();
-            if (T.IsFaulted)
-                throw T.Exception;
-        }
         public static bool IsFileLocked(this FileInfo file) // from https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
         {
             FileStream stream = null;
