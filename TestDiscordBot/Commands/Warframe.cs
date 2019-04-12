@@ -40,7 +40,7 @@ namespace TestDiscordBot.Commands
         }
         public static string ToTitle(this Fissure f)
         {
-            return $"{f.Tier} {f.MissionType} on {f.Node} until {f.EndTime.ToLongTimeString()}";
+            return $"{f.Tier} {f.MissionType} on {f.Node}, ends in {(f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()}";
         }
     }
 
@@ -59,13 +59,13 @@ namespace TestDiscordBot.Commands
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
             HelpMenu = new EmbedBuilder();
-            HelpMenu.WithDescription("```ruby\n" +
+            HelpMenu.WithDescription("```csharp\n" +
                                       "Use \"" + PrefixAndCommand + " state\" to view the worldState.\n" +
-                                      "Use \"" + PrefixAndCommand + " +FILTER\" to add a term to filter the alerts for.\n" +
-                                      "Use \"" + PrefixAndCommand + " -FILTER\" to remove a filter.\n" +
                                       "Use \"" + PrefixAndCommand + " filters\" to view your filters.\n" +
+                                      "Use \"" + PrefixAndCommand + " +FILTER\" to add a term to filter the events for.\n" +
+                                      "Use \"" + PrefixAndCommand + " -FILTER\" to remove a filter.\n" +
                                       "eg. \"" + PrefixAndCommand + " +Nitain\" to get notified for nitain alerts\n" +
-                                      "Advanced shit: You can add and remove multiple filters in one command by seperating them with a ,\n" +
+                                      "Advanced shit: You can add and remove multiple filters in one command by seperating the commands with a ,\n" +
                                       "               You can also add a 'multifilter' by binding two or more filters together with a &\n" +
                                       "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
                                       "```");
@@ -74,7 +74,7 @@ namespace TestDiscordBot.Commands
         {
             Task.Factory.StartNew(RunNotificationLoop);
         }
-        public override async Task Execute(SocketMessage message)
+        public override Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             DiscordUser user = Config.Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
@@ -87,7 +87,7 @@ namespace TestDiscordBot.Commands
                 embed.AddField("Your Filters: ", (user.WarframeFilters.Count == 0 ?
                     "Well that looks pretty empty" :
                     user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
-                await Program.SendEmbed(embed, message.Channel);
+                Program.SendEmbed(embed, message.Channel).Wait();
             }
             else if (split[1] == "state")
             {
@@ -95,19 +95,20 @@ namespace TestDiscordBot.Commands
                 {
                     EmbedBuilder e = GetStateEmbeds().FirstOrDefault(x => x.Title.ToLower().Contains(split[2].ToLower()));
                     if (e == null)
-                        await Program.SendText($"Could not find \"{split[2]}\"", message.Channel);
+                        Program.SendText($"Could not find \"{split[2]}\"", message.Channel).Wait();
                     else
-                        await Program.SendEmbed(e, message.Channel);
+                        Program.SendEmbed(e, message.Channel).Wait();
                 }
                 else
                     foreach (EmbedBuilder e in GetStateEmbeds())
-                        await Program.SendEmbed(e, message.Channel);
+                        Program.SendEmbed(e, message.Channel).Wait();
             }
             else
             {
                 EmbedBuilder embed = new EmbedBuilder();
                 lock (lockject)
                 {
+                    bool executedSomething = false;
                     string[] filterComs = split.Skip(1).Aggregate((x, y) => x + " " + y).Split(',');
                     foreach (string filterCom in filterComs)
                     {
@@ -122,6 +123,7 @@ namespace TestDiscordBot.Commands
                                 user.WarframeFilters.Add(filter);
                                 embed.AddField("Added filter: ", filter);
                             }
+                            executedSomething = true;
                         }
                         else if (filterComTrim.StartsWith("-"))
                         {
@@ -133,14 +135,21 @@ namespace TestDiscordBot.Commands
                             }
                             else
                                 embed.AddField("You don't even have that filter fam", filter);
+                            executedSomething = true;
                         }
                     }
-                    embed.AddField("Your Filters are now: ", (user.WarframeFilters.Count == 0 ?
-                        "\n\nWell that looks pretty empty" :
-                        user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
+                    if (executedSomething)
+                    {
+                        embed.AddField("Your Filters are now: ", (user.WarframeFilters.Count == 0 ?
+                            "\n\nWell that looks pretty empty" :
+                            user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
+                        Program.SendEmbed(embed, message.Channel).Wait();
+                    }
+                    else
+                        Program.SendEmbed(HelpMenu, message.Channel).Wait();
                 }
-                await Program.SendEmbed(embed, message.Channel);
             }
+            return Task.FromResult(default(object));
         }
         
         List<EmbedBuilder> GetStateEmbeds()

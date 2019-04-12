@@ -357,6 +357,7 @@ namespace TestDiscordBot
                         Thread.CurrentThread.Name = "TestThread";
                         try { Test(); }
                         catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                        ConsoleWrite("$");
                     });
                 }
                 else if (input.StartsWith("/roles")) // ServerID
@@ -415,11 +416,33 @@ namespace TestDiscordBot
         static void Test()
         {
             // TODO: Test
-            string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
-            ISocketAudioChannel channel = GetChannelFromID(473991188974927886) as ISocketAudioChannel;
-            IAudioClient client = channel.ConnectAsync().Result;
-            SendAudioAsync(client, videoPath).WaitAndThrow();
-            channel.DisconnectAsync().WaitAndThrow();
+
+            //string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
+            //HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+            //req.KeepAlive = false;
+            //req.AllowAutoRedirect = true;
+            //req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
+            //WebResponse W = req.GetResponse();
+            //using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+            //{
+            //    string html = sr.ReadToEnd();
+            //    foreach (string s in html.GetEverythingBetweenAll("class=\"btn btn-link\"><span class=\"type_string\">", ":"))
+            //        GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
+            //}
+
+            //string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
+            //ISocketAudioChannel channel = GetChannelFromID(479951814217826305) as ISocketAudioChannel;
+            //IAudioClient client = channel.ConnectAsync().Result;
+            //SendAudioAsync(client, videoPath).Wait();
+            //channel.DisconnectAsync().Wait();
+
+            string search = "ball", match1 = "9ball", match2 = "Kekball";
+
+            ConsoleWriteLine("OldResult1: " + search.LevenshteinDistance(match1));
+            ConsoleWriteLine("OldResult2: " + search.LevenshteinDistance(match2));
+
+            ConsoleWriteLine("Result1: " + search.ModifiedLevenshteinDistance(match1));
+            ConsoleWriteLine("Result2: " + search.ModifiedLevenshteinDistance(match2));
         }
         static void BeforeClose()
         {
@@ -608,21 +631,21 @@ namespace TestDiscordBot
                 else
                 {
                     // No command found
-                    int[] distances = new int[commands.Length];
+                    float[] distances = new float[commands.Length];
                     for (int i = 0; i < commands.Length; i++)
                         if (commands[i].CommandLine != "" && !commands[i].IsHidden)
-                            distances[i] = Extensions.LevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
+                            distances[i] = Extensions.ModifiedLevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
                         else
                             distances[i] = int.MaxValue;
                     int minIndex = 0;
-                    int min = int.MaxValue;
+                    float min = float.MaxValue;
                     for (int i = 0; i < commands.Length; i++)
                         if (distances[i] < min)
                         {
                             minIndex = i;
                             min = distances[i];
                         }
-                    if (min < Math.Min(5, split[0].Length - 1))
+                    if (min < Math.Min(4, split[0].Length - 1))
                     {
                         SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel).Wait();
                         ExecuteCommand(commands[minIndex], message).Wait();
