@@ -169,6 +169,8 @@
     <Content Include="Commands\MemeTemplates\branflakes-57f31c1b5ec6e.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Commands\MemeTemplates\dear-lefties-5894d208f3ff5-design.jpg" />
+    <Content Include="Commands\MemeTemplates\dear-lefties-5894d208f3ff5.png" />
     <Content Include="Commands\MemeTemplates\fairly-odd-parents-57b5b6dea839f-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -217,6 +219,8 @@
     <Content Include="Commands\MemeTemplates\nintendo-switch-580a9a9704047-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Commands\MemeTemplates\no-memes-sky-57b37f9f0d3f8-design.jpg" />
+    <Content Include="Commands\MemeTemplates\no-memes-sky-57b37f9f0d3f8-overlay.png" />
     <Content Include="Commands\MemeTemplates\pucci-58783971b94f0-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
