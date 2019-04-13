@@ -520,7 +520,7 @@ namespace TestDiscordBot
                 Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
-                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
                     var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
                     reacts.TryGetValue(ErrorEmoji, out var react);
                     if (react.ReactionCount > 1)
@@ -548,7 +548,7 @@ namespace TestDiscordBot
                 Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
-                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+                    Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
                     var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
                     reacts.TryGetValue(ErrorEmoji, out var react);
                     if (react.ReactionCount > 1)
