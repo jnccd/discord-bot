@@ -23,7 +23,7 @@ namespace TestDiscordBot.Commands
     {
         public EditLast() : base("editLast", "Edit the last message", false)
         {
-            EmbedBuilder HelpMenu = new EmbedBuilder();
+            HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
             HelpMenu.WithDescription("EditLast Commands:");
             foreach (EditLastCommand ecommand in Commands)
@@ -188,16 +188,15 @@ namespace TestDiscordBot.Commands
                 Exception e = null;
                 try
                 {
-                    Bitmap bmp = lastPic.GetBitmapFromURL();
                     string[] files = Directory.GetFiles("Commands\\MemeTemplates");
                     string[] split = message.Content.Split(' ');
-
+                    
                     string memeTemplateDesign = "";
                     if (split.Length == 3 && split[2] == "-list")
                     {
                         await Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
                                                                         Where(x => x.EndsWith("design")).
-                                                                        Select(x => new string(x.TakeWhile(y => !char.IsDigit(y)).ToArray()).Trim('-')).
+                                                                        Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
                                                                         Aggregate((x, y) => x + "\n" + y), message.Channel);
                         return;
                     }
@@ -216,7 +215,8 @@ namespace TestDiscordBot.Commands
                     string memeName = memeTemplateDesign.RemoveLastGroup('-');
                     string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
                     string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
-
+                    
+                    Bitmap bmp = lastPic.GetBitmapFromURL();
                     if (File.Exists(memeTemplateOverlay))
                     {
                         Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
