@@ -865,8 +865,11 @@ namespace TestDiscordBot
         }
         public static async Task<List<IUserMessage>> SendEmbed(EmbedBuilder Embed, IMessageChannel Channel, string text = "")
         {
+            if (Embed == null)
+                return new List<IUserMessage>();
+
             List<IUserMessage> sendMessages = new List<IUserMessage>();
-            if (Embed.Fields.Count < 25)
+            if (Embed.Fields == null || Embed.Fields.Count < 25)
                 sendMessages.Add(await Channel.SendMessageAsync(text, false, Embed.Build()));
             else
             {
