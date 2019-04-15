@@ -48,7 +48,7 @@ namespace TestDiscordBot.Commands
                         else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
                             lastPic = m.Attachments.ElementAt(0).Url;
                     }
-                    string picLink = m.Content.ContainsPictureLink();
+                    string picLink = m.Content.GetPictureLink();
                     if (string.IsNullOrWhiteSpace(lastPic) && picLink != null)
                         lastPic = picLink;
 
@@ -71,7 +71,7 @@ namespace TestDiscordBot.Commands
                             await Program.SendText("I couldn't find text to edit here :thinking:", message.Channel);
                             return;
                         }
-                        if (!command.textBased && lastPic == null)
+                        if (!command.textBased && string.IsNullOrWhiteSpace(lastPic))
                         {
                             await Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
                             return;
@@ -206,7 +206,7 @@ namespace TestDiscordBot.Commands
                     else
                         memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
 
-                    if (memeTemplateDesign == "")
+                    if (string.IsNullOrWhiteSpace(memeTemplateDesign))
                     {
                         await Program.SendText("I don't have that meme in my registry!", message.Channel);
                         return;
