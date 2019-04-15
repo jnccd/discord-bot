@@ -45,7 +45,7 @@ namespace TestDiscordBot.Commands
                             else if (message.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
                                 inPic = message.Attachments.ElementAt(0).Url;
                         }
-                        string picLink = message.Content.ContainsPictureLink();
+                        string picLink = message.Content.GetPictureLink();
                         if (string.IsNullOrWhiteSpace(inPic) && picLink != null)
                             inPic = picLink;
 
@@ -54,7 +54,7 @@ namespace TestDiscordBot.Commands
                             await Program.SendText("I couldn't find text to edit here :thinking:", message.Channel);
                             return;
                         }
-                        if (!command.textBased && inPic == null)
+                        if (!command.textBased && string.IsNullOrWhiteSpace(inPic))
                         {
                             await Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
                             return;

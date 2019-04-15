@@ -19,7 +19,6 @@ namespace TestDiscordBot.Commands
         public override async void OnNonCommandMessageRecieved(SocketMessage message)
         {
             if (message.Content.Contains("https://discordapp.com/channels/") &&
-                message.Channel is SocketGuildChannel &&
                 Config.Config.Data.MessagePreviewServers.Contains(Program.GetGuildFromChannel(message.Channel).Id))
             {
                 string[] split = message.Content.Split(new char[] { ' ', '\n' });
@@ -28,7 +27,10 @@ namespace TestDiscordBot.Commands
                     {
                         try
                         {
-                            IMessage m = await message.Channel.GetMessageAsync(Convert.ToUInt64(s.Split('/').Last()));
+                            string[] linkSplit = s.Split('/');
+                            IMessage m = await (Program.GetGuildFromID(Convert.ToUInt64(linkSplit[4])).
+                                GetChannel(Convert.ToUInt64(linkSplit[5])) as ITextChannel).
+                                GetMessageAsync(Convert.ToUInt64(linkSplit[6]));
                             EmbedBuilder Embed = m.ToEmbed();
                             Embed.AddField("Preview for: ", s);
                             await Program.SendEmbed(Embed, message.Channel);

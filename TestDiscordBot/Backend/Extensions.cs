@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -97,13 +98,33 @@ namespace TestDiscordBot
                     return true;
             return false;
         }
-        public static string ContainsPictureLink(this string str)
+        public static string GetDiscordPictureLink(this string str)
         {
             string[] split = str.Split(' ');
             foreach (string s in split)
                 if (s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".png") ||
                     s.StartsWith("https://cdn.discordapp.com/") && s.Contains(".jpg"))
                     return s;
+            return null;
+        }
+        public static string GetPictureLink(this string str)
+        {
+            string[] split = str.Split(' ');
+            foreach (string s in split)
+            {
+                Uri uriResult = null;
+                Uri.TryCreate(s, UriKind.Absolute, out uriResult);
+                if (uriResult != null && uriResult.Scheme == Uri.UriSchemeHttps ||
+                    uriResult != null && uriResult.Scheme == Uri.UriSchemeHttp)
+                {
+                    var req = (HttpWebRequest)HttpWebRequest.Create(s);
+                    req.Method = "HEAD";
+                    using (var resp = req.GetResponse())
+                        if (resp.ContentType.ToLower(CultureInfo.InvariantCulture)
+                                .StartsWith("image/"))
+                            return s;
+                }
+            }
             return null;
         }
         public static double ConvertToDouble(this string s)
