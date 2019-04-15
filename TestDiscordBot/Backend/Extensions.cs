@@ -221,11 +221,12 @@ namespace TestDiscordBot
                 m.Attachments.Select(x => x.Url).
                 Where(x => !x.EndsWith(".png") && !x.EndsWith(".jpg")).
                 Union(new string[] { "-" }).
-                Aggregate((x, y) => y == "-" ? x : x + " " + y) : m.Content);
+                Aggregate((x, y) => y == "-" ? x : x + " " + y) : 
+                (m.Content.Length > 256 ? m.Content.Substring(0, 253) + "..." : m.Content));
             try
             {
                 if (m.Attachments.Count > 0)
-                    Embed.WithThumbnailUrl(m.Attachments.ElementAt(0).Url);
+                    Embed.WithImageUrl(m.Attachments.ElementAt(0).Url);
             }
             catch { }
             return Embed;
