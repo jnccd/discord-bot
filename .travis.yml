@@ -2,8 +2,19 @@
 solution: TestDiscordBot.sln
 jobs:
   include:
-    - stage: build
-      name: "Linux build"
+    - dotnet: 2.1.502
+      mono: none
+      env: DOTNETCORE=2
+      name: "Linux .net"
       os: linux
-    - name: "Mac n Cheese build"
+    - mono: latest
+      name: "Linux mono"
+      os: linux
+    - dotnet: 2.1.502
+      mono: none
+      env: DOTNETCORE=2
+      name: "Mac .net"
+      os: osx
+    - mono: latest
+      name: "Mac mono"
       os: osx
