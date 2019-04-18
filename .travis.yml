@@ -4,7 +4,9 @@ jobs:
   include:
     - dotnet: 2.1.502
       mono: none
-      env: DOTNETCORE=2
+      script:
+      - dotnet restore
+      - dotnet build
       name: "Linux .net"
       os: linux
     - mono: latest
@@ -12,7 +14,9 @@ jobs:
       os: linux
     - dotnet: 2.1.502
       mono: none
-      env: DOTNETCORE=2
+      script:
+      - dotnet restore
+      - dotnet build
       name: "Mac .net"
       os: osx
     - mono: latest
