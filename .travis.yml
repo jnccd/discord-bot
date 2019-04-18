@@ -1,24 +1,6 @@
 ﻿language: csharp
 solution: TestDiscordBot.sln
-jobs:
-  include:
-    - dotnet: 2.1.502
-      mono: none
-      script:
-      - dotnet restore
-      - dotnet build
-      name: "Linux .net"
-      os: linux
-    - mono: latest
-      name: "Linux mono"
-      os: linux
-    - dotnet: 2.1.502
-      mono: none
-      script:
-      - dotnet restore
-      - dotnet build
-      name: "Mac .net"
-      os: osx
-    - mono: latest
-      name: "Mac mono"
-      os: osx
+mono: latest
+os:
+  - linux
+  - osx
