@@ -5,5 +5,5 @@ jobs:
     - stage: build
       name: "Linux build"
       os: linux
-    - name: "Mac n Chesse build"
+    - name: "Mac n Cheese build"
       os: osx

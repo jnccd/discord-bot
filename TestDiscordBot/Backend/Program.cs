@@ -71,6 +71,7 @@ namespace TestDiscordBot
 
         static readonly string commandExecutionLock = "";
         static readonly string youtubeDownloadLock = "";
+        static readonly string exitlock = "";
 
         // ------------------------------------------------------------------------------------------------------------
 
@@ -106,12 +107,10 @@ namespace TestDiscordBot
             HandleConsoleCommandsLoop();
             
             BeforeClose();
-            exitedNormally = true;
             
             client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
             client.StopAsync().Wait();
             client.LogoutAsync().Wait();
-            Environment.Exit(0);
         }
         static void StartUp()
         {
@@ -446,22 +445,26 @@ namespace TestDiscordBot
         }
         static void BeforeClose()
         {
-            ConsoleWriteLine("Closing... Files are being saved");
-            Config.Config.Save();
-            ConsoleWriteLine("Closing... Command Exit events are being executed");
-            foreach (Command c in commands)
+            lock (exitlock)
             {
-                try
+                ConsoleWriteLine("Closing... Files are being saved");
+                Config.Config.Save();
+                ConsoleWriteLine("Closing... Command Exit events are being executed");
+                foreach (Command c in commands)
                 {
-                    c.OnExit();
+                    try
+                    {
+                        c.OnExit();
+                    }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 }
-                catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-            }
-            ConsoleWriteLine("Closing... Remove Error Emojis");
-            foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
-            {
-                err.Item1.RemoveAllReactionsAsync().Wait();
-                err.Item1.ModifyAsync(m => m.Content = ErrorMessage).Wait();
+                ConsoleWriteLine("Closing... Remove Error Emojis");
+                foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
+                {
+                    err.Item1.RemoveAllReactionsAsync().Wait();
+                    err.Item1.ModifyAsync(m => m.Content = ErrorMessage).Wait();
+                }
+                exitedNormally = true;
             }
         }
 
