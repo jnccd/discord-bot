@@ -16,7 +16,7 @@ namespace TestDiscordBot.Commands
     {
         readonly string inputPath = "Commands\\Latex\\input.tex";
         readonly string batchPath = "Commands\\Latex\\latex.bat";
-        readonly string outputPath = "Commands\\Latex\\output.png";
+        readonly string folderPath = "Commands\\Latex";
 
         public Latex() : base("latex", "Renders latex strings", false)
         {
@@ -46,19 +46,31 @@ namespace TestDiscordBot.Commands
                 converter.StandardInput.WriteLine("return");
                 converter.WaitForExit();
 
-                Bitmap output = null;
-                using (Bitmap latexOutput = new Bitmap(outputPath))
+                string[] outputFilePaths = Directory.GetFiles(folderPath).Where(x => Path.GetFileNameWithoutExtension(x).Contains("output") && x.EndsWith(".png")).ToArray();
+
+                if (outputFilePaths.Length == 0)
                 {
-                    output = new Bitmap(latexOutput.Width, latexOutput.Height);
-                    using (Graphics graphics = Graphics.FromImage(output))
-                    {
-                        graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, latexOutput.Width, latexOutput.Height));
-                        graphics.DrawImage(latexOutput, new Point(0, 0));
-                    }
+                    Program.SendText("That didn't work.", message.Channel).Wait();
+                    return Task.FromResult(default(object));
                 }
 
-                Program.SendBitmap(output, message.Channel).Wait();
-                output.Dispose();
+                foreach (string outputPath in outputFilePaths)
+                {
+                    Bitmap output = null;
+                    using (Bitmap latexOutput = new Bitmap(outputPath))
+                    {
+                        output = new Bitmap(latexOutput.Width, latexOutput.Height);
+                        using (Graphics graphics = Graphics.FromImage(output))
+                        {
+                            graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, latexOutput.Width, latexOutput.Height));
+                            graphics.DrawImage(latexOutput, new Point(0, 0));
+                        }
+                    }
+                    Program.SendBitmap(output, message.Channel).Wait();
+                    output.Dispose();
+                }
+
+                outputFilePaths.Select(x => { File.Delete(x); return x; } ).ToArray();
             }
 
             return Task.FromResult(default(object));
