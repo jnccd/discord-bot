@@ -106,9 +106,8 @@ namespace TestDiscordBot
         }
         static void AddWord(List<string> output)
         {
-            List<string> list = null;
             string key = output.Skip(Math.Max(0, output.Count() - inputLength)).Aggregate((x, y) => { return x + " " + y; });
-            if (dict.TryGetValue(key, out list))
+            if (dict.TryGetValue(key, out List<string> list))
                 output.Add(list.ElementAt(Program.RDM.Next(list.Count)));
             else
             {

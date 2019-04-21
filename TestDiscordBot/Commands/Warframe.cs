@@ -3,11 +3,10 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using TestDiscordBot.Config;
+using TestDiscordBot.Configuration;
 using Warframe_Alerts;
 using WarframeNET;
 
@@ -77,7 +76,7 @@ namespace TestDiscordBot.Commands
         public override Task Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
-            DiscordUser user = Config.Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
+            DiscordUser user = Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
                 Program.SendEmbed(HelpMenu, message.Channel).Wait();
@@ -288,8 +287,8 @@ namespace TestDiscordBot.Commands
 #endif
                 }
 
-                while (Config.Config.Data.WarframeIDList.Count > 400)
-                    Config.Config.Data.WarframeIDList.RemoveAt(0);
+                while (Config.Data.WarframeIDList.Count > 400)
+                    Config.Data.WarframeIDList.RemoveAt(0);
             }
         }
         bool UpdatedWarframeHandlerSuccessfully()
@@ -302,9 +301,9 @@ namespace TestDiscordBot.Commands
         }
         void NotifyVoidtrader()
         {
-            if (!Config.Config.Data.WarframeVoidTraderArrived && WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0)
+            if (!Config.Data.WarframeVoidTraderArrived && WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0)
             {
-                List<ulong> channels = Config.Config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
+                List<ulong> channels = Config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
 
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.WithDescription("Void trader arrived at " + WarframeHandler.worldState.WS_VoidTrader.Location + " with: ");
@@ -324,7 +323,7 @@ namespace TestDiscordBot.Commands
                 }
 #endif
             }
-            Config.Config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
+            Config.Data.WarframeVoidTraderArrived = WarframeHandler.worldState.WS_VoidTrader.Inventory.Count != 0;
         }
         List<string> GetNotifications()
         {
@@ -332,9 +331,9 @@ namespace TestDiscordBot.Commands
             
             foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions)
                 for (int i = 0; i < mission.jobs.Count; i++)
-                    if (mission.jobs[i].rewardPool != null && !Config.Config.Data.WarframeIDList.Contains(mission.jobs[i].id))
+                    if (mission.jobs[i].rewardPool != null && !Config.Data.WarframeIDList.Contains(mission.jobs[i].id))
                     {
-                        Config.Config.Data.WarframeIDList.Add(mission.jobs[i].id);
+                        Config.Data.WarframeIDList.Add(mission.jobs[i].id);
                         foreach (string reward in mission.jobs[i].rewardPool)
                         {
                             notifications.Add(reward + " currently available from the " + mission.Syndicate + "'s " + (i + 1) + ". bounty until " + mission.EndTime.ToLocalTime().ToLongTimeString());
@@ -342,21 +341,21 @@ namespace TestDiscordBot.Commands
                     }
             
             foreach (Alert a in WarframeHandler.worldState.WS_Alerts)
-                if (!Config.Config.Data.WarframeIDList.Contains(a.Id))
+                if (!Config.Data.WarframeIDList.Contains(a.Id))
                 {
-                    Config.Config.Data.WarframeIDList.Add(a.Id);
+                    Config.Data.WarframeIDList.Add(a.Id);
                     notifications.Add(a.ToTitle() + " - Expires at " + a.EndTime.ToLocalTime().ToLongTimeString() + ", so in " + (int)(a.EndTime.ToLocalTime() - DateTime.Now).TotalMinutes + " minutes");
                 }
             foreach (Invasion i in WarframeHandler.worldState.WS_Invasions)
-                if (!Config.Config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
+                if (!Config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
                 {
-                    Config.Config.Data.WarframeIDList.Add(i.Id);
+                    Config.Data.WarframeIDList.Add(i.Id);
                     notifications.Add(i.ToTitle());
                 }
             foreach (Fissure f in WarframeHandler.worldState.WS_Fissures)
-                if (!Config.Config.Data.WarframeIDList.Contains(f.Id))
+                if (!Config.Data.WarframeIDList.Contains(f.Id))
                 {
-                    Config.Config.Data.WarframeIDList.Add(f.Id);
+                    Config.Data.WarframeIDList.Add(f.Id);
                     notifications.Add(f.ToTitle());
                 }
 
@@ -366,7 +365,7 @@ namespace TestDiscordBot.Commands
         {
             List<Notif> notifications = new List<Notif>();
             foreach (string line in textNotifications)
-                foreach (DiscordUser user in Config.Config.Data.UserList)
+                foreach (DiscordUser user in Config.Data.UserList)
                     foreach (string filter in user.WarframeFilters)
                         if (BooleanContainsAllOf(line, filter))
                         {

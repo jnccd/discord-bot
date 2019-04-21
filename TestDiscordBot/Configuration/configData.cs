@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Config
+namespace TestDiscordBot.Configuration
 {
     public class ConfigData
     {
@@ -21,6 +21,11 @@ namespace TestDiscordBot.Config
         public List<ulong> MessagePreviewServers;
         public bool WarframeVoidTraderArrived;
         public List<string> WarframeIDList;
+        public string TwtichChannelName;
+        public string TwtichBotUsername;
+        public string TwtichAccessToken;
+        public string TwtichRefreshToken;
+        public string TwtichClientID;
 
         public ConfigData()
         {

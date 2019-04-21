@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Config
+namespace TestDiscordBot.Configuration
 {
     public class DiscordServer
     {

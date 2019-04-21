@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Config
+namespace TestDiscordBot.Configuration
 {
     public static class Config
     {
