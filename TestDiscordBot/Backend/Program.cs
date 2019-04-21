@@ -20,6 +20,10 @@ using System.Threading.Tasks;
 using TestDiscordBot.Commands;
 using TestDiscordBot.Config;
 using System.Globalization;
+using TwitchLib.Client.Models;
+using TwitchLib.Client;
+using TwitchLib.Client.Events;
+using TwitchLib.Api;
 
 namespace TestDiscordBot
 {
@@ -416,6 +420,28 @@ namespace TestDiscordBot
         {
             // TODO: Test
 
+            var client = new TwitchClient();
+            client.Initialize(new ConnectionCredentials("gafhaei", "oauth:nope"));
+            client.OnLog += (object o, OnLogArgs arg) => { ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
+            client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => { ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta); };
+            client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWriteLine($"Exception: {e.Exception}", ConsoleColor.Magenta); };
+            client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
+            client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
+            client.Connect();
+
+            //var api = new TwitchAPI();
+            //api.Settings.ClientId = "3o7o8q658z2wy8dt61klsk3ycjlal7";
+            //api.Settings.AccessToken = "xwvigbxrqz48uiq3i0zrli2wqfodku";
+            //var res = api.Helix.Users.GetUsersFollowsAsync("42111676").Result;
+
+            client.JoinChannel("Gafhaei");
+
+            Console.ReadLine();
+
+            client.Disconnect();
+
+
+
             //string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
             //HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
             //req.KeepAlive = false;
@@ -429,19 +455,21 @@ namespace TestDiscordBot
             //        GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
             //}
 
+
             //string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
             //ISocketAudioChannel channel = GetChannelFromID(479951814217826305) as ISocketAudioChannel;
             //IAudioClient client = channel.ConnectAsync().Result;
             //SendAudioAsync(client, videoPath).Wait();
             //channel.DisconnectAsync().Wait();
 
-            string search = "ball", match1 = "9ball", match2 = "Kekball";
 
-            ConsoleWriteLine("OldResult1: " + search.LevenshteinDistance(match1));
-            ConsoleWriteLine("OldResult2: " + search.LevenshteinDistance(match2));
+            //string search = "ball", match1 = "9ball", match2 = "Kekball";
 
-            ConsoleWriteLine("Result1: " + search.ModifiedLevenshteinDistance(match1));
-            ConsoleWriteLine("Result2: " + search.ModifiedLevenshteinDistance(match2));
+            //ConsoleWriteLine("OldResult1: " + search.LevenshteinDistance(match1));
+            //ConsoleWriteLine("OldResult2: " + search.LevenshteinDistance(match2));
+
+            //ConsoleWriteLine("Result1: " + search.ModifiedLevenshteinDistance(match1));
+            //ConsoleWriteLine("Result2: " + search.ModifiedLevenshteinDistance(match2));
         }
         static void BeforeClose()
         {
