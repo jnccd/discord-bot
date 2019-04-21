@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using TestDiscordBot.Configuration;
 
 namespace TestDiscordBot.Commands
 {
@@ -35,10 +36,10 @@ namespace TestDiscordBot.Commands
 
                 foreach (Tuple<string, string> tuple in messages)
                 {
-                    if (tuple.Item1 == Config.Config.Data.LastCommitMessage)
+                    if (tuple.Item1 == Config.Data.LastCommitMessage)
                         break;
 
-                    foreach (ulong id in Config.Config.Data.PatchNoteSubscribedChannels)
+                    foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
                     {
                         try
                         {
@@ -60,8 +61,8 @@ namespace TestDiscordBot.Commands
                 }
 
                 if (messages.Count > 0)
-                    Config.Config.Data.LastCommitMessage = messages.First().Item1;
-                Config.Config.Save();
+                    Config.Data.LastCommitMessage = messages.First().Item1;
+                Config.Save();
             }
         }
         bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
@@ -75,14 +76,14 @@ namespace TestDiscordBot.Commands
             {
                 if (commandmessage.Author.Id == Program.GetGuildFromChannel(commandmessage.Channel).OwnerId || commandmessage.Author.Id == Program.Master.Id)
                 {
-                    if (Config.Config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
+                    if (Config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                     {
-                        Config.Config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
+                        Config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
                         await Program.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
                     }
                     else
                     {
-                        Config.Config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
+                        Config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
                         await Program.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
                     }
                 }

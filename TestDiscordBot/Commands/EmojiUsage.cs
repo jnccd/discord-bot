@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Config;
+using TestDiscordBot.Configuration;
 
 namespace TestDiscordBot.Commands
 {
@@ -18,20 +18,20 @@ namespace TestDiscordBot.Commands
 
         public override void OnConnected()
         {
-            foreach (DiscordServer server in Config.Config.Data.ServerList)
+            foreach (DiscordServer server in Config.Data.ServerList)
                 server.UpdateEmojis();
         }
 
         public override void OnNonCommandMessageRecieved(SocketMessage message)
         {
-            int userIndex = Config.Config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
-            if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(Config.Config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)
+            int userIndex = Config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
+            if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(Config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)
             {
-                Config.Config.Data.UserList[userIndex].LastEmojiMessage = DateTime.Now;
+                Config.Data.UserList[userIndex].LastEmojiMessage = DateTime.Now;
                 string emoji = message.Content.GetEverythingBetween(":", ":");
 
                 ulong serverID = message.GetServerID();
-                DiscordServer server = Config.Config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
+                DiscordServer server = Config.Data.ServerList.FirstOrDefault(x => x.ServerID == serverID);
                 if (server == null)
                     return;
 
@@ -44,7 +44,7 @@ namespace TestDiscordBot.Commands
 
         public override async Task Execute(SocketMessage message)
         {
-            DiscordServer server = Config.Config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
+            DiscordServer server = Config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
             if (server == null)
                 await Program.SendText("Impossible maybe the archives are incomplete!\nThis Server is not in my database yet.", message.Channel);
             else

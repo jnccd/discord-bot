@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Config;
+using TestDiscordBot.Configuration;
 
 namespace TestDiscordBot.Commands
 {
@@ -23,9 +23,9 @@ namespace TestDiscordBot.Commands
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);
 
-            if (Config.Config.Data.UserList.Exists(x => x.UserID == commandmessage.Author.Id))
+            if (Config.Data.UserList.Exists(x => x.UserID == commandmessage.Author.Id))
             {
-                DiscordUser User = Config.Config.Data.UserList.Find(x => x.UserID == commandmessage.Author.Id);
+                DiscordUser User = Config.Data.UserList.Find(x => x.UserID == commandmessage.Author.Id);
                 FieldInfo[] Infos = typeof(DiscordUser).GetFields();
                 foreach (FieldInfo info in Infos)
                 {

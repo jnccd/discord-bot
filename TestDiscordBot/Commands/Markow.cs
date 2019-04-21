@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TestDiscordBot.Config;
+using TestDiscordBot.Configuration;
 
 namespace TestDiscordBot.Commands
 {
@@ -31,7 +31,7 @@ namespace TestDiscordBot.Commands
             // Check for reset
             if (!MarkovHelper.SaveFileExists())
             {
-                Config.Config.Data.LoadedMarkovTextFiles.Clear();
+                Config.Data.LoadedMarkovTextFiles.Clear();
 
                 // Load from Discord
                 foreach (SocketGuild guild in Program.GetGuilds())
@@ -50,7 +50,7 @@ namespace TestDiscordBot.Commands
             string[] files = Directory.GetFiles("Commands\\MarkowSources\\");
             foreach (string file in files)
             {
-                if (!Config.Config.Data.LoadedMarkovTextFiles.Contains(Path.GetFileName(file)))
+                if (!Config.Data.LoadedMarkovTextFiles.Contains(Path.GetFileName(file)))
                 {
                     string[] lines = File.ReadAllLines(file);
                     foreach (string line in lines)
@@ -59,7 +59,7 @@ namespace TestDiscordBot.Commands
                         if (!string.IsNullOrWhiteSpace(trimmed))
                             input += trimmed + "\n";
                     }
-                    Config.Config.Data.LoadedMarkovTextFiles.Add(Path.GetFileName(file));
+                    Config.Data.LoadedMarkovTextFiles.Add(Path.GetFileName(file));
                 }
             }
             

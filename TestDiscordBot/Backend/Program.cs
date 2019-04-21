@@ -1,29 +1,23 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
 using Discord.Audio;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
-using System.Net;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TestDiscordBot.Commands;
-using TestDiscordBot.Config;
 using System.Globalization;
 using TwitchLib.Client.Models;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
-using TwitchLib.Api;
+using TestDiscordBot.Configuration;
 
 namespace TestDiscordBot
 {
@@ -87,7 +81,7 @@ namespace TestDiscordBot
             }
             catch (Exception ex)
             {
-                try { Config.Config.Save(); } catch { }
+                try { Config.Save(); } catch { }
 
                 string strPath = "Log.txt";
                 if (!File.Exists(strPath))
@@ -144,21 +138,21 @@ namespace TestDiscordBot
             {
                 try
                 {
-                    if (Config.Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
+                    if (Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
                     {
                         ShowWindow(GetConsoleWindow(), 4);
                         SystemSounds.Exclamation.Play();
                         ConsoleWrite("Give me a Bot Token: ");
-                        Config.Config.Data.BotToken = Console.ReadLine();
-                        Config.Config.Save();
+                        Config.Data.BotToken = Console.ReadLine();
+                        Config.Save();
                     }
 
-                    client.LoginAsync(TokenType.Bot, Config.Config.Data.BotToken).Wait();
+                    client.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
                     client.StartAsync().Wait();
 
                     gotWorkingToken = true;
                 }
-                catch { Config.Config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
+                catch { Config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
             }
 
             client.MessageReceived += MessageReceived;
@@ -302,7 +296,7 @@ namespace TestDiscordBot
 
                         for (int i = 0; !DeletionComplete; i++)
                         {
-                            M = ((ISocketMessageChannel)GetChannelFromID(Config.Config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
+                            M = ((ISocketMessageChannel)GetChannelFromID(Config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
 
                             if (M != null)
                             {
@@ -323,7 +317,7 @@ namespace TestDiscordBot
                 }
                 else if (input == "/PANIKDELETE")
                 {
-                    foreach (ulong ChannelID in Config.Config.Data.ChannelsWrittenOn)
+                    foreach (ulong ChannelID in Config.Data.ChannelsWrittenOn)
                     {
                         IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
                         foreach (IMessage m in messages)
@@ -346,7 +340,7 @@ namespace TestDiscordBot
                 }
                 else if (input == "/config")
                 {
-                    Console.WriteLine(Config.Config.ToString());
+                    Console.WriteLine(Config.ToString());
                 }
                 else if (input == "/restart")
                 {
@@ -421,26 +415,28 @@ namespace TestDiscordBot
             // TODO: Test
 
             var client = new TwitchClient();
-            client.Initialize(new ConnectionCredentials("gafhaei", "oauth:nope"));
+            client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
             client.OnLog += (object o, OnLogArgs arg) => { ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
-            client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => { ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta); };
-            client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWriteLine($"Exception: {e.Exception}", ConsoleColor.Magenta); };
+            client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => {
+                ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta);
+                if (e.ChatMessage.Message.StartsWith("hi"))
+                    client.SendMessage(e.ChatMessage.Channel, "Hello there");
+            };
+            client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWriteLine($"Exception: {e.Exception}\n{e.Exception.Details}", ConsoleColor.Magenta); };
             client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
             client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
             client.Connect();
+
+            client.JoinChannel(Config.Data.TwtichChannelName);
+
+            Task.Factory.StartNew(() => { Thread.Sleep(15000); client.Disconnect(); ConsoleWriteLine("Disconnected Twitch"); });
 
             //var api = new TwitchAPI();
             //api.Settings.ClientId = "3o7o8q658z2wy8dt61klsk3ycjlal7";
             //api.Settings.AccessToken = "xwvigbxrqz48uiq3i0zrli2wqfodku";
             //var res = api.Helix.Users.GetUsersFollowsAsync("42111676").Result;
 
-            client.JoinChannel("Gafhaei");
-
-            Console.ReadLine();
-
-            client.Disconnect();
-
-
+            
 
             //string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
             //HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
@@ -454,29 +450,19 @@ namespace TestDiscordBot
             //    foreach (string s in html.GetEverythingBetweenAll("class=\"btn btn-link\"><span class=\"type_string\">", ":"))
             //        GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
             //}
-
-
+            
             //string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
             //ISocketAudioChannel channel = GetChannelFromID(479951814217826305) as ISocketAudioChannel;
             //IAudioClient client = channel.ConnectAsync().Result;
             //SendAudioAsync(client, videoPath).Wait();
             //channel.DisconnectAsync().Wait();
-
-
-            //string search = "ball", match1 = "9ball", match2 = "Kekball";
-
-            //ConsoleWriteLine("OldResult1: " + search.LevenshteinDistance(match1));
-            //ConsoleWriteLine("OldResult2: " + search.LevenshteinDistance(match2));
-
-            //ConsoleWriteLine("Result1: " + search.ModifiedLevenshteinDistance(match1));
-            //ConsoleWriteLine("Result2: " + search.ModifiedLevenshteinDistance(match2));
         }
         static void BeforeClose()
         {
             lock (exitlock)
             {
                 ConsoleWriteLine("Closing... Files are being saved");
-                Config.Config.Save();
+                Config.Save();
                 ConsoleWriteLine("Closing... Command Exit events are being executed");
                 foreach (Command c in commands)
                 {
@@ -630,8 +616,8 @@ namespace TestDiscordBot
             if (message.Channel is SocketGuildChannel)
             {
                 ulong serverID = message.GetServerID();
-                if (!Config.Config.Data.ServerList.Exists(x => x.ServerID == serverID))
-                    Config.Config.Data.ServerList.Add(new DiscordServer(serverID));
+                if (!Config.Data.ServerList.Exists(x => x.ServerID == serverID))
+                    Config.Data.ServerList.Add(new DiscordServer(serverID));
             }
 
             if (message.Content.StartsWith(prefix + "help"))
@@ -684,7 +670,7 @@ namespace TestDiscordBot
                 }
             }
 
-            DiscordUser user = Config.Config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
+            DiscordUser user = Config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
             if (user != null)
                 user.TotalCommandsUsed++;
         }
@@ -934,18 +920,18 @@ namespace TestDiscordBot
         // Save
         public static void SaveChannel(IChannel Channel)
         {
-            if (Config.Config.Data.ChannelsWrittenOn == null)
-                Config.Config.Data.ChannelsWrittenOn = new List<ulong>();
-            if (!Config.Config.Data.ChannelsWrittenOn.Contains(Channel.Id))
+            if (Config.Data.ChannelsWrittenOn == null)
+                Config.Data.ChannelsWrittenOn = new List<ulong>();
+            if (!Config.Data.ChannelsWrittenOn.Contains(Channel.Id))
             {
-                Config.Config.Data.ChannelsWrittenOn.Add(Channel.Id);
-                Config.Config.Save();
+                Config.Data.ChannelsWrittenOn.Add(Channel.Id);
+                Config.Save();
             }
         }
         public static void SaveUser(ulong UserID)
         {
-            if (!Config.Config.Data.UserList.Exists(x => x.UserID == UserID))
-                Config.Config.Data.UserList.Add(new DiscordUser(UserID));
+            if (!Config.Data.UserList.Exists(x => x.UserID == UserID))
+                Config.Data.UserList.Add(new DiscordUser(UserID));
         }
         
         // Closing Event
