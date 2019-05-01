@@ -48,13 +48,6 @@ namespace TestDiscordBot.Commands
         const int updateIntervalMin = 5;
         private readonly string lockject = "";
 
-        public class Notif
-        {
-            public List<ulong> userID;
-            public ulong ChannelID;
-            public string line;
-        }
-
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
             HelpMenu = new EmbedBuilder();
@@ -361,22 +354,13 @@ namespace TestDiscordBot.Commands
 
             return notifications;
         }
-        async void SendNotifications(List<string> textNotifications)
+        void SendNotifications(List<string> textNotifications)
         {
-            List<Notif> notifications = new List<Notif>();
             foreach (string line in textNotifications)
                 foreach (DiscordUser user in Config.Data.UserList)
                     foreach (string filter in user.WarframeFilters)
                         if (BooleanContainsAllOf(line, filter))
-                        {
-                            Notif notification = notifications.FirstOrDefault(x => x.ChannelID == user.WarframeChannelID && x.line == line);
-                            if (notification != null && !notification.userID.Contains(user.UserID))
-                                notification.userID.Add(user.UserID);
-                            else
-                                notifications.Add(new Notif() { userID = new List<ulong>() { user.UserID }, ChannelID = user.WarframeChannelID, line = line });
-                        }
-            foreach (Notif n in notifications)
-                await Program.SendText(n.userID.Select(x => Program.GetUserFromId(x).Mention).Aggregate((x, y) => x + " " + y) + "\n" + n.line, n.ChannelID);
+                            Program.GetUserFromId(user.UserID).GetOrCreateDMChannelAsync().Result.SendMessageAsync(line).Wait();
         }
         bool BooleanContainsAllOf(string s, string match)
         {
