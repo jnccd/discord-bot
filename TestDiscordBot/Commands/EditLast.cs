@@ -110,7 +110,7 @@ namespace TestDiscordBot.Commands
             }),
             new EditLastCommand("Spoilerify", "Convert text to a spoiler", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })), "", lastText.Author), message.Channel);
+                    "`" + string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })) + "`", "", lastText.Author), message.Channel);
             }),
             new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
                 await Program.SendEmbed(Program.CreateEmbedBuilder("",
