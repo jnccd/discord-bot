@@ -84,6 +84,7 @@
     <Compile Include="Commands\Profile.cs" />
     <Compile Include="Commands\Reactions.cs" />
     <Compile Include="Commands\CircleIsYou.cs" />
+    <Compile Include="Commands\ServerInfo.cs" />
     <Compile Include="Commands\ShowMessageLinks.cs" />
     <Compile Include="Commands\PatchNotes.cs" />
     <Compile Include="Commands\TicTacToe.cs" />
