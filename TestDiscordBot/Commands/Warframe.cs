@@ -6,11 +6,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using TestDiscordBot.Configuration;
+using MEE7.Configuration;
 using Warframe_Alerts;
 using WarframeNET;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public static partial class Extensions
     {

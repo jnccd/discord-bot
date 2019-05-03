@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class Meme : Command
     {

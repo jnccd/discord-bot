@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public static partial class Extensions
     {

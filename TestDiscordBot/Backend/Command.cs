@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Commands;
+using MEE7.Commands;
 
-namespace TestDiscordBot
+namespace MEE7
 {
     public class Command
     {

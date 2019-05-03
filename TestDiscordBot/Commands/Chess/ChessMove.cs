@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace TestDiscordBot.Chess
+namespace MEE7.Chess
 {
     public class ChessMove : ICloneable
     {

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Configuration;
+using MEE7.Configuration;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class Profile : Command
     {

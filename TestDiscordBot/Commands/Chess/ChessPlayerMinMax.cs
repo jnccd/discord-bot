@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using TestDiscordBot;
+using MEE7;
 
-namespace TestDiscordBot.Chess
+namespace MEE7.Chess
 {
     class ChessPlayerMinMax : ChessPlayer
     {

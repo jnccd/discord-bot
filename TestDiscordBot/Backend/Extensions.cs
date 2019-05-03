@@ -10,7 +10,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot
+namespace MEE7
 {
     public static partial class Extensions
     {

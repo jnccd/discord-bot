@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class ProfilePicture : Command
     {

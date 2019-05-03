@@ -12,14 +12,14 @@ using System.Media;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using TestDiscordBot.Commands;
+using MEE7.Commands;
 using System.Globalization;
 using TwitchLib.Client.Models;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
-using TestDiscordBot.Configuration;
+using MEE7.Configuration;
 
-namespace TestDiscordBot
+namespace MEE7
 {
     public class IllegalCommandException : Exception { public IllegalCommandException(string message) : base (message) { } }
     
@@ -113,6 +113,7 @@ namespace TestDiscordBot
         static void StartUp()
         {
             Thread.CurrentThread.Name = "Main";
+            Console.Title = "MEE7";
             ShowWindow(GetConsoleWindow(), 2);
             Console.ForegroundColor = ConsoleColor.White;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
@@ -344,7 +345,7 @@ namespace TestDiscordBot
                 }
                 else if (input == "/restart")
                 {
-                    Process.Start("TestDiscordBot.exe");
+                    Process.Start("MEE7.exe");
                     break;
                 }
                 else if (input == "/test")
