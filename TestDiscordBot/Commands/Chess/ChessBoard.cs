@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Chess
+namespace MEE7.Chess
 {
     public class InvalidChessPiece : System.Exception { }
 

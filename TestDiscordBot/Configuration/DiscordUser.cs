@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Configuration
+namespace MEE7.Configuration
 {
     public class DiscordUser
     {

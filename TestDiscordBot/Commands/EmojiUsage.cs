@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Configuration;
+using MEE7.Configuration;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class EmojiUsage : Command
     {

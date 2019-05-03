@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TestDiscordBot.Configuration;
+using MEE7.Configuration;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class Markow : Command
     {

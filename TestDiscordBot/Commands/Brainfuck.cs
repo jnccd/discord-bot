@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot;
+using MEE7;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class Brainfuck : Command
     {

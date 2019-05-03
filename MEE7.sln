@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDiscordBot", "TestDiscordBot\TestDiscordBot.csproj", "{C173923A-3B0D-4861-BB65-8806A6012CDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEE7", "TestDiscordBot\MEE7.csproj", "{C173923A-3B0D-4861-BB65-8806A6012CDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4044A906-425E-4CDF-B58D-75B1603D486E}
 	EndGlobalSection
 EndGlobal

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using XnaGeometry;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public static partial class Extensions
     {

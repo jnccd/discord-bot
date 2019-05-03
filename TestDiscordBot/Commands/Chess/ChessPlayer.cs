@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TestDiscordBot.Chess
+namespace MEE7.Chess
 {
     public class ChessPlayer
     {

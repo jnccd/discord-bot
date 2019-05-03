@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace TestDiscordBot
+namespace MEE7
 {
     public class NoEmptyElementException : Exception { public NoEmptyElementException(string message) : base(message) { } }
 

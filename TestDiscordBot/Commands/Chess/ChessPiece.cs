@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestDiscordBot.Chess
+namespace MEE7.Chess
 {
     public enum ChessPieceType
     {

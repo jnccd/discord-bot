@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestDiscordBot.Chess;
+using MEE7.Chess;
 
-namespace TestDiscordBot.Commands
+namespace MEE7.Commands
 {
     public class Chess : Command
     {
