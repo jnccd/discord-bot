@@ -20,9 +20,7 @@ namespace MEE7.Commands
             SocketGuild g = Program.GetGuildFromChannel(message.Channel);
 
             EmbedBuilder info = new EmbedBuilder();
-            EmbedBuilder roles = new EmbedBuilder();
-
-
+            
             info.WithDescription("Server-Information");
             
             info.AddField("Channels", g.Channels.Count, true);
@@ -41,21 +39,32 @@ namespace MEE7.Commands
             info.AddField("Features", g.Features.Count, true);
             info.AddField("Mfa Level", g.MfaLevel, true);
             info.AddField("Icon Url", g.IconUrl, true);
+            if (g.SplashUrl != null)
+                info.AddField("Splash Url", g.SplashUrl, true);
             info.AddField("Verification Level", g.VerificationLevel, true);
             info.AddField("Voice Region Id", g.VoiceRegionId, true);
+            
+            info.AddField("Roles:", g.Roles.OrderByDescending(x => x.Position).ToArray().Select(x => $"[{x.Members.Count()}]{x.Name}").ToArray().Aggregate((x, y) => x + "\n" + y));
 
-
-            roles.WithDescription("Roles: " + g.Roles.Count);
-
-            foreach (SocketRole r in g.Roles.OrderByDescending(x => x.Position))
-                roles.AddField(r.Name, $"Members: {r.Members.Count()}, Permission Int: {r.Permissions}, Created At: {r.CreatedAt.ToLocalTime()}");
-
-            roles.WithFooter($"The user with the most roles is {g.Users.FirstOrDefault(x => x.Roles.Count == g.Users.Max(y => y.Roles.Count)).Username} " +
-                $"with {g.Users.Max(x => x.Roles.Count)} Roles");
-
-
+            int maxRoles = 0; SocketGuildUser maxRolesUser = null;
+            int maxNameLength = 0; SocketGuildUser maxNameLengthUser = null;
+            foreach (SocketGuildUser u in g.Users)
+            {
+                if (u.Roles.Count > maxRoles)
+                {
+                    maxRolesUser = u;
+                    maxRoles = u.Roles.Count;
+                }
+                if (u.Username.Length > maxNameLength)
+                {
+                    maxNameLengthUser = u;
+                    maxNameLength = u.Username.Length;
+                }
+            }
+            info.AddField("User with the most roles:", $"{maxRolesUser.Username} with {maxRoles} Roles");
+            info.AddField("User with the longest name:", maxNameLengthUser.Username);
+            
             Program.SendEmbed(info, message.Channel).Wait();
-            Program.SendEmbed(roles, message.Channel).Wait();
 
             return Task.FromResult(default(object));
         }
