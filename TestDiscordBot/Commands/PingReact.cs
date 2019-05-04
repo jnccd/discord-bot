@@ -11,8 +11,8 @@ namespace MEE7.Commands
 {
     public class PingReact : Command
     {
-        Emoji INTERROBANG = new Emoji("‽");
-        Emoji PING_PONG = new Emoji("🏓");
+        readonly Emoji ANGRY_FACE = new Emoji("😠");
+        readonly Emoji PING_PONG = new Emoji("🏓");
 
         public PingReact() : base("", "", false, true)
         {
@@ -32,7 +32,7 @@ namespace MEE7.Commands
         }
         void PingReaction(IUserMessage message)
         {
-            message.AddReactionsAsync(new IEmote[] { INTERROBANG, PING_PONG });  
+            message.AddReactionsAsync(new IEmote[] { PING_PONG, ANGRY_FACE }).Wait();  
         }
 
         public override Task Execute(SocketMessage message)
