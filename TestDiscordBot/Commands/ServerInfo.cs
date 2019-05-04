@@ -28,7 +28,7 @@ namespace MEE7.Commands
             info.AddField("Text Channels", g.TextChannels.Count, true);
             info.AddField("Voice Channels", g.VoiceChannels.Count, true);
 
-            info.AddField("Owner", g.Owner.Username, true);
+            info.AddField("Owner", g.Owner.GetDisplayName(), true);
             info.AddField("Created At", g.CreatedAt, true);
 
             info.AddField("Member Count", g.MemberCount, true);
@@ -57,14 +57,14 @@ namespace MEE7.Commands
                     maxRolesUser = u;
                     maxRoles = u.Roles.Count;
                 }
-                if (u.Username.Length > maxNameLength)
+                if (u.GetDisplayName().Length > maxNameLength)
                 {
                     maxNameLengthUser = u;
-                    maxNameLength = u.Username.Length;
+                    maxNameLength = u.GetDisplayName().Length;
                 }
             }
-            info.AddField("User with the most roles:", $"{maxRolesUser.Username} with {maxRoles} Roles", true);
-            info.AddField("User with the longest name:", maxNameLengthUser.Username, true);
+            info.AddField("User with the most roles:", $"{maxRolesUser.GetDisplayName()} with {maxRoles} Roles", true);
+            info.AddField("User with the longest name:", maxNameLengthUser.GetDisplayName(), true);
             
             Program.SendEmbed(info, message.Channel).Wait();
 

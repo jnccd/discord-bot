@@ -235,6 +235,12 @@ namespace MEE7
         {
             return Program.GetGuildFromChannel(m.Channel).Id;
         }
+        public static string GetDisplayName(this SocketGuildUser u)
+        {
+            if (u.Nickname != null)
+                return u.Nickname;
+            return u.Username;
+        }
 
         // Drawing
         public static Bitmap CropImage(this Bitmap source, Rectangle section)
