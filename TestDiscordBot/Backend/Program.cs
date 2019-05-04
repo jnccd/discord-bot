@@ -409,6 +409,7 @@ namespace MEE7
                 }
                 else
                     ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
+                ConsoleWrite("$");
             }
         }
         static void Test()
