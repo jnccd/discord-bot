@@ -266,7 +266,35 @@ namespace MEE7
         }
         public static b Foldl<a, b>(this IEnumerable<a> xs, Func<b, a, b> f)
         {
-            return xs.Foldl(default(b), f);
+            return xs.Foldl(default, f);
+        }
+        public static a MaxElement<a>(this IEnumerable<a> xs, Func<a, double> f)
+        {
+            double max = 0; a maxE = default;
+            foreach (a x in xs)
+            {
+                double res = f(x);
+                if (res > max)
+                {
+                    max = res;
+                    maxE = x;
+                }
+            }
+            return maxE;
+        }
+        public static a MinElement<a>(this IEnumerable<a> xs, Func<a, double> f)
+        {
+            double max = 0; a maxE = default;
+            foreach (a x in xs)
+            {
+                double res = f(x);
+                if (res < max)
+                {
+                    max = res;
+                    maxE = x;
+                }
+            }
+            return maxE;
         }
         public static a GetRandomValue<a>(this IEnumerable<a> xs)
         {
