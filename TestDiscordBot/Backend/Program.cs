@@ -31,6 +31,7 @@ namespace MEE7
         static string buildDate;
         static int ConcurrentCommandExecutions = 0;
         public static Random RDM { get; private set; } = new Random();
+        static readonly int AutoSaveIntervalInMinutes = 60;
 
         // Client 
         static DiscordSocketClient client;
@@ -224,6 +225,15 @@ namespace MEE7
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             }
+
+            Task.Run(() => {
+                while (true)
+                {
+                    Thread.Sleep(AutoSaveIntervalInMinutes * 60000);
+                    Config.Save();
+                    ConsoleWriteLine("Autosaved!", ConsoleColor.Yellow);
+                }
+            });
         }
         static void HandleConsoleCommandsLoop()
         {
