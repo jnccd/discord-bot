@@ -241,6 +241,14 @@ namespace MEE7
                 return u.Nickname;
             return u.Username;
         }
+        public static Discord.Color? GetDisplayColor(this SocketGuildUser u)
+        {
+            SocketRole[] r = u.Roles.Where(x => x.Color.RawValue != 0).ToArray();
+            if (r.Length > 0)
+                return new Discord.Color(r.MaxElement(x => x.Position).Color.RawValue);
+            else
+                return null;
+        }
 
         // Drawing
         public static Bitmap CropImage(this Bitmap source, Rectangle section)
