@@ -81,6 +81,7 @@
     <Compile Include="Commands\Haskell.cs" />
     <Compile Include="Commands\Latex.cs" />
     <Compile Include="Commands\Markow.cs" />
+    <Compile Include="Commands\PingReact.cs" />
     <Compile Include="Commands\Place.cs" />
     <Compile Include="Commands\Poll.cs" />
     <Compile Include="Commands\Profile.cs" />

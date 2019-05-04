@@ -306,6 +306,13 @@ namespace MEE7
             }
             return minE;
         }
+        public static bool ContainsAny<a>(this IEnumerable<a> xs, IEnumerable<a> ys)
+        {
+            foreach (a y in ys)
+                if (xs.Contains(y))
+                    return true;
+            return false;
+        }
         public static a GetRandomValue<a>(this IEnumerable<a> xs)
         {
             a[] arr = xs.ToArray();
