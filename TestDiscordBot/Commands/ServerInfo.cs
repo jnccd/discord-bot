@@ -41,10 +41,12 @@ namespace MEE7.Commands
             info.AddField("Icon Url", g.IconUrl, true);
             if (g.SplashUrl != null)
                 info.AddField("Splash Url", g.SplashUrl, true);
+            
+            info.AddField("Roles:", g.Roles.OrderByDescending(x => x.Position).
+                Select(x => $"[{x.Members.Count()}]{x.Name}").Aggregate((x, y) => x + "\n" + y), true);
+
             info.AddField("Verification Level", g.VerificationLevel, true);
             info.AddField("Voice Region Id", g.VoiceRegionId, true);
-            
-            info.AddField("Roles:", g.Roles.OrderByDescending(x => x.Position).ToArray().Select(x => $"[{x.Members.Count()}]{x.Name}").ToArray().Aggregate((x, y) => x + "\n" + y), true);
 
             int maxRoles = 0; SocketGuildUser maxRolesUser = null;
             int maxNameLength = 0; SocketGuildUser maxNameLengthUser = null;
