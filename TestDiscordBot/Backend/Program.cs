@@ -887,6 +887,13 @@ namespace MEE7
             if (Embed == null)
                 return new List<IUserMessage>();
 
+            if (Embed.Color == null)
+            {
+                SocketRole[] r = GetGuildFromChannel(Channel).GetUser(GetSelf().Id).Roles.Where(x => x.Color.RawValue != 0).ToArray();
+                if (r.Length > 0)
+                    Embed.Color = new Discord.Color(r.MaxElement(x => x.Position).Color.RawValue);
+            }
+
             List<IUserMessage> sendMessages = new List<IUserMessage>();
             if (Embed.Fields == null || Embed.Fields.Count < 25)
                 sendMessages.Add(await Channel.SendMessageAsync(text, false, Embed.Build()));
@@ -904,7 +911,7 @@ namespace MEE7
                         ThumbnailUrl = Embed.ThumbnailUrl,
                         Timestamp = Embed.Timestamp,
                         Title = Embed.Title,
-                        Url = Embed.Title
+                        Url = Embed.Url
                     };
                     eb.Url = Embed.Url;
                     for (int i = 0; i < 25 && Embed.Fields.Count > 0; i++)
