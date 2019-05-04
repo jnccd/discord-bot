@@ -593,21 +593,22 @@ namespace MEE7
         {
             if (!message.Author.IsBot)
             {
-                if (message.Content.StartsWith(Program.prefix))
+                if (message.Content.StartsWith(prefix))
                     Task.Run(() => ParallelMessageReceived(message));
 
                 if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 {
-                    Task.Run(() => {
-                        foreach (Command c in commands)
-                        {
+                    foreach (Command c in commands)
+                    {
+                        Task.Run(() => {
                             try
                             {
                                 c.OnNonCommandMessageRecieved(message);
                             }
                             catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                        }
-                    });
+                        });
+                    }
+                    
                 }
             }
             return Task.FromResult(default(object));
