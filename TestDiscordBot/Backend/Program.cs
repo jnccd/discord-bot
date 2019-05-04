@@ -888,11 +888,7 @@ namespace MEE7
                 return new List<IUserMessage>();
 
             if (Embed.Color == null)
-            {
-                SocketRole[] r = GetGuildFromChannel(Channel).GetUser(GetSelf().Id).Roles.Where(x => x.Color.RawValue != 0).ToArray();
-                if (r.Length > 0)
-                    Embed.Color = new Discord.Color(r.MaxElement(x => x.Position).Color.RawValue);
-            }
+                Embed.Color = GetGuildFromChannel(Channel).GetUser(GetSelf().Id).GetDisplayColor();
 
             List<IUserMessage> sendMessages = new List<IUserMessage>();
             if (Embed.Fields == null || Embed.Fields.Count < 25)
