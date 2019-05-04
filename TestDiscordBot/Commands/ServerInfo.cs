@@ -47,24 +47,9 @@ namespace MEE7.Commands
 
             info.AddField("Verification Level", g.VerificationLevel, true);
             info.AddField("Voice Region Id", g.VoiceRegionId, true);
-
-            int maxRoles = 0; SocketGuildUser maxRolesUser = null;
-            int maxNameLength = 0; SocketGuildUser maxNameLengthUser = null;
-            foreach (SocketGuildUser u in g.Users)
-            {
-                if (u.Roles.Count > maxRoles)
-                {
-                    maxRolesUser = u;
-                    maxRoles = u.Roles.Count;
-                }
-                if (u.GetDisplayName().Length > maxNameLength)
-                {
-                    maxNameLengthUser = u;
-                    maxNameLength = u.GetDisplayName().Length;
-                }
-            }
-            info.AddField("User with the most roles:", $"{maxRolesUser.GetDisplayName()} with {maxRoles} Roles", true);
-            info.AddField("User with the longest name:", maxNameLengthUser.GetDisplayName(), true);
+            
+            info.AddField("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles", true);
+            info.AddField("User with the longest name:", g.Users.MaxElement(x => x.GetDisplayName().Length), true);
             
             Program.SendEmbed(info, message.Channel).Wait();
 
