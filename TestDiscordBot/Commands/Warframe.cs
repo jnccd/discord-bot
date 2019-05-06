@@ -83,16 +83,23 @@ namespace MEE7.Commands
             }
             else if (split[1] == "state")
             {
+                List<EmbedBuilder> es = GetStateEmbeds();
+                if (es == null)
+                {
+                    Program.SendText($"Couldn't get information. {WarframeHandler.WebSite} is probably down.", message.Channel).Wait();
+                    return Task.FromResult(default(object));
+                }
+
                 if (split.Length > 2)
                 {
-                    EmbedBuilder e = GetStateEmbeds().FirstOrDefault(x => x.Title.ToLower().Contains(split[2].ToLower()));
+                    EmbedBuilder e = es.FirstOrDefault(x => x.Title.ToLower().Contains(split[2].ToLower()));
                     if (e == null)
                         Program.SendText($"Could not find \"{split[2]}\"", message.Channel).Wait();
                     else
                         Program.SendEmbed(e, message.Channel).Wait();
                 }
                 else
-                    foreach (EmbedBuilder e in GetStateEmbeds())
+                    foreach (EmbedBuilder e in es)
                         Program.SendEmbed(e, message.Channel).Wait();
             }
             else
@@ -146,6 +153,9 @@ namespace MEE7.Commands
         
         List<EmbedBuilder> GetStateEmbeds()
         {
+            if (WarframeHandler.worldState == null)
+                return null;
+
             List<EmbedBuilder> re = new List<EmbedBuilder>();
 
             lock (lockject)
