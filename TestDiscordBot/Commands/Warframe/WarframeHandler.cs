@@ -13,13 +13,14 @@ namespace Warframe_Alerts
     public static class WarframeHandler
     {
         public static WorldState worldState;
+        public static string WebSite = "https://ws.warframestat.us/pc/";
 
         public static string GetJson(ref string ret)
         {
             if (ret == null) throw new ArgumentNullException(nameof(ret));
             try
             {
-                var request = WebRequest.Create("https://ws.warframestat.us/pc/");
+                var request = WebRequest.Create(WebSite);
                 var response = request.GetResponse();
                 var status = ((HttpWebResponse)response).StatusDescription;
                 ret = status;
