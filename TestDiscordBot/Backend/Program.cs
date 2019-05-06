@@ -307,17 +307,18 @@ namespace MEE7
 
                         for (int i = 0; !DeletionComplete; i++)
                         {
-                            M = ((ISocketMessageChannel)GetChannelFromID(Config.Data.ChannelsWrittenOn[i])).GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
-
-                            if (M != null)
+                            try
                             {
-                                try
+                                M = ((ISocketMessageChannel)GetChannelFromID(Config.Data.ChannelsWrittenOn[i])).
+                                    GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
+
+                                if (M != null)
                                 {
                                     M.DeleteAsync().Wait();
                                     DeletionComplete = true;
-                                }
-                                catch { }
+                                } 
                             }
+                            catch { }
                         }
                     }
                     catch (Exception e)
