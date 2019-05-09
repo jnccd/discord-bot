@@ -10,6 +10,10 @@
     <ApplicationIcon>imageres_25.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Commands\HelperClasses\xnageometry\" />
   </ItemGroup>

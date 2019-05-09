@@ -22,7 +22,7 @@ namespace MEE7.Commands
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            EmbedBuilder Embed = new EmbedBuilder();
+            EmbedBuilder Embed = new EmbedBuilder { Title = "Patch Notes:" };
 
             string url = "https://github.com/niklasCarstensen/Discord-Bot/commits/master";
             WebRequest req = HttpWebRequest.Create(url);
@@ -41,7 +41,7 @@ namespace MEE7.Commands
                     if (tuple.Item1 == Config.Data.LastCommitMessage)
                         break;
 
-                    Embed.AddField("Patch Notes:", tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")");
+                    Embed.AddField(tuple.Item1, $"[Link to the github-commit.]({tuple.Item2})");
                 }
 
                 if (messages.Count > 0)
@@ -51,11 +51,12 @@ namespace MEE7.Commands
 
             Embed.Fields.Reverse();
             Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
-            foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
 #if !DEBUG
+            foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
                 Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                Program.ConsoleWriteLine("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")", ConsoleColor.Cyan);
+            if (Embed.Fields.Count > 0)
+                Program.ConsoleWriteLine("Patch Notes:" + Embed.Fields.Select(x => x.Name + x.Value).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
 #endif
         }
         bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
