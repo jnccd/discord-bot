@@ -208,7 +208,7 @@ namespace MEE7
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    ConsoleWriteLine(g.Name + "\t" + g.Id, ConsoleColor.Yellow);
+                    ConsoleWriteLine($"  {g.Name}{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}", ConsoleColor.Yellow);
             }
             catch { ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             ConsoleWrite("Default channel is: ");
