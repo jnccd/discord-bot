@@ -5,9 +5,9 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>MEE7</RootNamespace>
     <AssemblyName>MEE7</AssemblyName>
-    <StartupObject></StartupObject>
+    <StartupObject>MEE7.Program</StartupObject>
     <LangVersion>7.1</LangVersion>
-    <ApplicationIcon />
+    <ApplicationIcon>imageres_25.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
