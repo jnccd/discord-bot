@@ -50,16 +50,18 @@ namespace MEE7.Commands
             }
 
             PatchNotes.Reverse();
-#if !DEBUG
-            EmbedBuilder Embed = new EmbedBuilder { Title = "Patch Notes:" };
-            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
-            Embed.WithDescription(PatchNotes.Aggregate((x, y) => x + "\n\n" + y));
-            foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
-                Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
-#else
             if (PatchNotes.Count > 0)
+            {
+#if !DEBUG
+                EmbedBuilder Embed = new EmbedBuilder { Title = "Patch Notes:" };
+                Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+                Embed.WithDescription(PatchNotes.Aggregate((x, y) => x + "\n\n" + y));
+                foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
+                    Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
+#else
                 Program.ConsoleWriteLine("Patch Notes:" + PatchNotes.Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
 #endif
+            }
         }
         bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
         {
