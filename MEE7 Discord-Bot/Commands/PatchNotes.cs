@@ -21,8 +21,8 @@ namespace MEE7.Commands
         {
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-            EmbedBuilder Embed = new EmbedBuilder { Title = "Patch Notes:" };
+            
+            List<string> PatchNotes = new List<string>();
 
             string url = "https://github.com/niklasCarstensen/Discord-Bot/commits/master";
             WebRequest req = HttpWebRequest.Create(url);
@@ -41,7 +41,7 @@ namespace MEE7.Commands
                     if (tuple.Item1 == Config.Data.LastCommitMessage)
                         break;
 
-                    Embed.AddField(tuple.Item1, $"[Link to the github-commit.]({tuple.Item2})");
+                    PatchNotes.Add($"{tuple.Item1}\n[Link to the github-commit.]({tuple.Item2})");
                 }
 
                 if (messages.Count > 0)
@@ -49,14 +49,16 @@ namespace MEE7.Commands
                 Config.Save();
             }
 
-            Embed.Fields.Reverse();
-            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+            PatchNotes.Reverse();
 #if !DEBUG
+            EmbedBuilder Embed = new EmbedBuilder { Title = "Patch Notes:" };
+            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+            Embed.WithDescription(PatchNotes.Aggregate((x, y) => x + "\n\n" + y));
             foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
                 Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-            if (Embed.Fields.Count > 0)
-                Program.ConsoleWriteLine("Patch Notes:" + Embed.Fields.Select(x => x.Name + x.Value).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
+            if (PatchNotes.Count > 0)
+                Program.ConsoleWriteLine("Patch Notes:" + PatchNotes.Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
 #endif
         }
         bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
