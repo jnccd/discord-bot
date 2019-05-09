@@ -22,6 +22,8 @@ namespace MEE7.Commands
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
+            EmbedBuilder Embed = new EmbedBuilder();
+
             string url = "https://github.com/niklasCarstensen/Discord-Bot/commits/master";
             WebRequest req = HttpWebRequest.Create(url);
             req.Timeout = 10000;
@@ -39,31 +41,22 @@ namespace MEE7.Commands
                     if (tuple.Item1 == Config.Data.LastCommitMessage)
                         break;
 
-                    foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
-                    {
-                        try
-                        {
-                            EmbedBuilder Embed = new EmbedBuilder();
-                            Embed.WithColor(0, 128, 255);
-                            Embed.AddField("Patch Notes:", tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")");
-                            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
-#if !DEBUG
-                            Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
-#else
-                            Program.ConsoleWriteLine("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")", ConsoleColor.Cyan);
-#endif
-                        }
-                        catch (Exception e)
-                        {
-                            Program.ConsoleWriteLine(e, ConsoleColor.Red);
-                        }
-                    }
+                    Embed.AddField("Patch Notes:", tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")");
                 }
 
                 if (messages.Count > 0)
                     Config.Data.LastCommitMessage = messages.First().Item1;
                 Config.Save();
             }
+
+            Embed.Fields.Reverse();
+            Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
+            foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
+#if !DEBUG
+                Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
+#else
+                Program.ConsoleWriteLine("Patch Notes:" + tuple.Item1 + "\n[Link to the github-commit.](" + tuple.Item2 + ")", ConsoleColor.Cyan);
+#endif
         }
         bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
         {
