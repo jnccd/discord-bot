@@ -36,11 +36,15 @@ namespace MEE7.Commands
                     File.Create(inputPath).Dispose();
                 File.WriteAllText(inputPath, latex);
 
-                Process converter = new Process();
-                converter.StartInfo.FileName = batchPath;
-                converter.StartInfo.UseShellExecute = false;
-                converter.StartInfo.RedirectStandardInput = true;
-
+                Process converter = new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        FileName = batchPath,
+                        UseShellExecute = false,
+                        RedirectStandardInput = true
+                    }
+                };
                 converter.Start();
                 Thread.Sleep(500);
                 converter.StandardInput.WriteLine("return");
