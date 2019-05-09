@@ -1,6 +1,0 @@
-﻿language: csharp
-solution: TestDiscordBot.sln
-mono: latest
-os:
-  - linux
-  - osx
