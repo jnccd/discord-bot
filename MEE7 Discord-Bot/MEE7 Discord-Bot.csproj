@@ -187,8 +187,4 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="echo %date% %time% &gt; BuildDate.txt" />
-  </Target>
-
 </Project>
