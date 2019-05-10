@@ -12,7 +12,9 @@ namespace MEE7.Commands
 {
     public class Haskell : Command
     {
-        public Haskell() : base("ghci", "Compiles Haskell Code", false)
+        readonly string inputPath = "Commands\\Haskell\\input.hs";
+
+        public Haskell() : base("ghc", "Compiles Haskell Code", false)
         {
 
         }
@@ -42,13 +44,18 @@ namespace MEE7.Commands
                     string haskellInput = message.Content.Remove(0, 5).Trim(' ').Trim('`');
                     if (haskellInput.StartsWith("haskell"))
                         haskellInput = haskellInput.Remove(0, "haskell".Length);
-                    File.WriteAllText("Commands\\Haskell\\input.hs", haskellInput);
+                    if (!haskellInput.Contains("main = "))
+                        haskellInput = "main = " + haskellInput;
+                    File.WriteAllText(inputPath, haskellInput);
                     Process compiler = new Process();
-                    compiler.StartInfo.FileName = "Commands\\Haskell\\haskell.bat";
+                    compiler.StartInfo.FileName = "runhaskell";
+                    compiler.StartInfo.Arguments = inputPath;
                     compiler.StartInfo.CreateNoWindow = true;
                     compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    compiler.StartInfo.RedirectStandardOutput = true;
+                    compiler.StartInfo.RedirectStandardError = true;
                     compiler.Start();
-
+                    
                     DateTime start = DateTime.Now;
 
                     Task.Factory.StartNew(async () => {
@@ -56,35 +63,22 @@ namespace MEE7.Commands
                         compiler.WaitForExit();
                         try
                         {
-                            if (File.Exists("Commands\\Haskell\\haskellCompile.txt"))
-                            {
-                                string[] output = File.ReadAllLines("Commands\\Haskell\\haskellCompile.txt");
+                            string s = compiler.StandardOutput.ReadToEnd();
+                            string e = compiler.StandardError.ReadToEnd();
 
-                                Debug.WriteLine("Raw Haskell Output: ");
-                                Debug.WriteLine(output.Aggregate((x, y) => x + "\n" + y));
+                            Debug.WriteLine("Raw Haskell Output: ");
+                            Debug.WriteLine(s + " | " + e);
 
-                                string parsedOutput = "";
+                            string output = string.IsNullOrWhiteSpace(s) ? e : s;
+                            output = output.Insert(0, "```ruby\n").Insert(output.Length + "```ruby\n".Length, "```");
 
-                                string workOutput = output.Aggregate((x, y) => x + "\n" + y);
-                                while (workOutput.Contains(">"))
-                                {
-                                    string o = workOutput.GetEverythingBetween("> ", "Pre");
-                                    if (!string.IsNullOrWhiteSpace(o))
-                                        parsedOutput += o;
-                                    workOutput = workOutput.Remove(0, workOutput.IndexOf('>') + 1);
-                                }
-
-                                parsedOutput = parsedOutput.Insert(0, "```ruby\n");
-                                parsedOutput = parsedOutput.Insert(parsedOutput.Length, "```");
-
-                                exited = true;
-                                if (parsedOutput.Length >= 2000)
-                                    await Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
-                                else if (string.IsNullOrWhiteSpace(parsedOutput.Trim('`')))
-                                    await Program.SendText("Your code didn't create any output or an error occured!", message.Channel);
-                                else
-                                    await Program.SendText(parsedOutput, message.Channel);
-                            }
+                            exited = true;
+                            if (output.Length >= 2000)
+                                await Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
+                            else if (string.IsNullOrWhiteSpace(output.Trim('`')))
+                                await Program.SendText("Your code didn't create any output!", message.Channel);
+                            else
+                                await Program.SendText(output, message.Channel);
                         }
                         catch (Exception e)
                         {
@@ -93,7 +87,7 @@ namespace MEE7.Commands
                         exited = true;
                     });
 
-                    while (!exited && (DateTime.Now - start).TotalSeconds < 30)
+                    while (!exited && (DateTime.Now - start).TotalSeconds < 10)
                         Thread.Sleep(100);
                     if (!exited)
                     {
@@ -101,16 +95,6 @@ namespace MEE7.Commands
                         try
                         {
                             compiler.Close();
-                        }
-                        catch { }
-                        try
-                        {
-                            Process[] ghcs = Process.GetProcessesByName("ghc");
-                            foreach (Process p in ghcs)
-                            {
-                                if ((DateTime.Now - p.StartTime).TotalSeconds < 5)
-                                    p.Kill();
-                            }
                         }
                         catch { }
                         Program.SendText("Haskell timeout!", message.Channel).Wait();
