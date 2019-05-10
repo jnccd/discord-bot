@@ -12,9 +12,10 @@ namespace Starter
     {
         static void Main(string[] args)
         {
+            string s = Directory.GetCurrentDirectory();
             while (!Directory.GetCurrentDirectory().EndsWith("MEE7 Discord-Bot"))
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(Directory.GetCurrentDirectory()));
-            Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\MEE7 Discord-Bot");
+            Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\MEE7-Discord-Bot");
 
 #if DEBUG
             string runConfig = "Debug";
