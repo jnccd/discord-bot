@@ -45,7 +45,6 @@ namespace MEE7.Commands
                 };
                 converter.Start();
                 converter.WaitForExit();
-                //Thread.Sleep(500);
 
                 string[] outputFilePaths = Directory.GetFiles(folderPath).Where(x => Path.GetFileNameWithoutExtension(x).Contains("output") && x.EndsWith(".png")).ToArray();
 
