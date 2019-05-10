@@ -49,9 +49,6 @@ namespace MEE7.Commands
                     $"runhaskell {inputPath}".RunAsConsoleCommand(3, () => {
                         Program.SendText("Haskell timeout!", message.Channel).Wait();
                     }, (s, e) => {
-                        Debug.WriteLine("Raw Haskell Output: ");
-                        Debug.WriteLine(s + " | " + e);
-
                         string output = string.IsNullOrWhiteSpace(s) ? e : s;
                         output = output.Insert(0, "```haskell\n").Insert(output.Length + "```haskell\n".Length, "```");
                         
