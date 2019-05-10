@@ -13,7 +13,7 @@ namespace MEE7.Commands
 {
     public class Place : Command
     {
-        readonly string filePath = Program.ExePath + "Commands\\Place\\place.png";
+        readonly string filePath = "Commands\\Place\\place.png";
         const int placeSize = 500;
         const int pixelSize = 10;
         readonly PlaceCommand[] subCommands;

@@ -12,7 +12,7 @@ namespace MEE7
     public static class MarkovHelper
     {
         const byte inputLength = 1;
-        static readonly string savePath = Program.ExePath + "markow" + inputLength + ".json";
+        static readonly string savePath = "markow" + inputLength + ".json";
         static Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
 
         public static bool SaveFileExists()
