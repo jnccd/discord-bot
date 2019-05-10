@@ -2,11 +2,13 @@
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MEE7
@@ -348,6 +350,49 @@ namespace MEE7
 
             //file is not locked
             return false;
+        }
+        public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent)
+        {
+            bool exited = false;
+            string[] split = command.Split(' ');
+
+            if (split.Length == 0)
+                return;
+
+            Process compiler = new Process();
+            compiler.StartInfo.FileName = split.First();
+            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y);
+            compiler.StartInfo.CreateNoWindow = true;
+            compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            compiler.StartInfo.RedirectStandardOutput = true;
+            compiler.StartInfo.RedirectStandardError = true;
+            compiler.Start();
+
+            DateTime start = DateTime.Now;
+
+            Task.Factory.StartNew(() => {
+                Thread.CurrentThread.Name = "RunAsConsoleCommand Thread";
+                compiler.WaitForExit();
+
+                string s = compiler.StandardOutput.ReadToEnd();
+                string e = compiler.StandardError.ReadToEnd();
+
+                exited = true;
+                ExecutedEvent(s, e);
+            });
+
+            while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
+                Thread.Sleep(100);
+            if (!exited)
+            {
+                exited = true;
+                try
+                {
+                    compiler.Close();
+                }
+                catch { }
+                TimeoutEvent();
+            }
         }
     }
 }
