@@ -15,6 +15,8 @@ namespace MEE7
 {
     public static partial class Extensions
     {
+        private static int RunAsConsoleCommandThreadIndex = 0;
+
         // String
         public static List<int> AllIndexesOf(this string str, string value)
         {
@@ -371,7 +373,7 @@ namespace MEE7
             DateTime start = DateTime.Now;
 
             Task.Factory.StartNew(() => {
-                Thread.CurrentThread.Name = "RunAsConsoleCommand Thread";
+                Thread.CurrentThread.Name = "RunAsConsoleCommand Thread " + RunAsConsoleCommandThreadIndex++;
                 compiler.WaitForExit();
 
                 string s = compiler.StandardOutput.ReadToEnd();
