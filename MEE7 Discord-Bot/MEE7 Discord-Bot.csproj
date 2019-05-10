@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Commands\Haskell\" />
     <Folder Include="Commands\HelperClasses\xnageometry\" />
   </ItemGroup>
 
@@ -26,9 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Commands\Haskell\haskell.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Commands\Latex\latex.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
