@@ -84,7 +84,7 @@ namespace MEE7
             {
                 try { Config.Save(); } catch { }
 
-                string strPath = ExePath + "Log.txt";
+                string strPath = "Log.txt";
                 if (!File.Exists(strPath))
                 {
                     File.Create(strPath).Dispose();
@@ -118,6 +118,7 @@ namespace MEE7
             ShowWindow(GetConsoleWindow(), 2);
             Console.ForegroundColor = ConsoleColor.White;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
 
             handler = new ConsoleEventDelegate(ConsoleEventCallback);
             SetConsoleCtrlHandler(handler, true);
@@ -232,7 +233,7 @@ namespace MEE7
                 {
                     Thread.Sleep(AutoSaveIntervalInMinutes * 60000);
                     Config.Save();
-                    ConsoleWriteLine("Autosaved!", ConsoleColor.Yellow);
+                    ConsoleWriteLine($"Autosaved! [{DateTime.Now.ToLongTimeString()}]", ConsoleColor.Yellow);
                 }
             });
         }
@@ -815,7 +816,7 @@ namespace MEE7
 
             lock (youtubeDownloadLock)
             {
-                string videofile = ExePath + "Downloads\\YoutubeVideo.mp4";
+                string videofile = "Downloads\\YoutubeVideo.mp4";
                 Directory.CreateDirectory(Path.GetDirectoryName(videofile));
                 if (File.Exists(videofile))
                 {
@@ -823,7 +824,7 @@ namespace MEE7
                     while (true)
                     {
                         if (File.Exists(videofile) && new FileInfo(videofile).IsFileLocked())
-                            videofile = ExePath + $"Downloads\\YoutubeVideo{++i}.mp4";
+                            videofile = $"Downloads\\YoutubeVideo{++i}.mp4";
                         else
                         {
                             File.Delete(videofile);

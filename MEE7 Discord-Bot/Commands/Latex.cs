@@ -14,9 +14,9 @@ namespace MEE7.Commands
 {
     public class Latex : Command
     {
-        readonly string inputPath = Program.ExePath + "Commands\\Latex\\input.tex";
-        readonly string batchPath = Program.ExePath + "Commands\\Latex\\latex.bat";
-        readonly string folderPath = Program.ExePath + "Commands\\Latex";
+        readonly string inputPath = "Commands\\Latex\\input.tex";
+        readonly string batchPath = "Commands\\Latex\\latex.bat";
+        readonly string folderPath = "Commands\\Latex";
 
         public Latex() : base("latex", "Renders latex strings", false)
         {
@@ -40,15 +40,12 @@ namespace MEE7.Commands
                 {
                     StartInfo = new ProcessStartInfo()
                     {
-                        FileName = batchPath,
-                        UseShellExecute = false,
-                        RedirectStandardInput = true
+                        FileName = batchPath
                     }
                 };
                 converter.Start();
-                Thread.Sleep(500);
-                converter.StandardInput.WriteLine("return");
                 converter.WaitForExit();
+                //Thread.Sleep(500);
 
                 string[] outputFilePaths = Directory.GetFiles(folderPath).Where(x => Path.GetFileNameWithoutExtension(x).Contains("output") && x.EndsWith(".png")).ToArray();
 
