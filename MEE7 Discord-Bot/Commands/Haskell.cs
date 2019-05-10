@@ -70,7 +70,7 @@ namespace MEE7.Commands
                             Debug.WriteLine(s + " | " + e);
 
                             string output = string.IsNullOrWhiteSpace(s) ? e : s;
-                            output = output.Insert(0, "```ruby\n").Insert(output.Length + "```ruby\n".Length, "```");
+                            output = output.Insert(0, "```haskell\n").Insert(output.Length + "```haskell\n".Length, "```");
 
                             exited = true;
                             if (output.Length >= 2000)
@@ -87,7 +87,7 @@ namespace MEE7.Commands
                         exited = true;
                     });
 
-                    while (!exited && (DateTime.Now - start).TotalSeconds < 10)
+                    while (!exited && (DateTime.Now - start).TotalSeconds < 3)
                         Thread.Sleep(100);
                     if (!exited)
                     {

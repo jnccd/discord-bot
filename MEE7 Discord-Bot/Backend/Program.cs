@@ -428,21 +428,7 @@ namespace MEE7
         static void Test()
         {
             // TODO: Test
-
-            string test = File.ReadAllText("test.txt");
-            Process compiler = new Process();
-            compiler.StartInfo.FileName = "runhaskell";
-            compiler.StartInfo.Arguments = "test.txt";
-            compiler.StartInfo.CreateNoWindow = true;
-            compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            compiler.StartInfo.RedirectStandardOutput = true;
-            compiler.StartInfo.RedirectStandardError = true;
-            compiler.Start();
-            string s = compiler.StandardOutput.ReadToEnd();
-            string e = compiler.StandardError.ReadToEnd();
-            ;
-
-
+            
             //var client = new TwitchClient();
             //client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
             //client.OnLog += (object o, OnLogArgs arg) => { ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
