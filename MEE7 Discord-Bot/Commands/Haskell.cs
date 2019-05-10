@@ -25,8 +25,6 @@ namespace MEE7.Commands
             {
                 try
                 {
-                    bool exited = false;
-
                     string[] lines = message.Content.Split('\n');
                     for (int i = 0; i < lines.Length; i++)
                     {
@@ -47,58 +45,23 @@ namespace MEE7.Commands
                     if (!haskellInput.Contains("main = "))
                         haskellInput = "main = " + haskellInput;
                     File.WriteAllText(inputPath, haskellInput);
-                    Process compiler = new Process();
-                    compiler.StartInfo.FileName = "runhaskell";
-                    compiler.StartInfo.Arguments = inputPath;
-                    compiler.StartInfo.CreateNoWindow = true;
-                    compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    compiler.StartInfo.RedirectStandardOutput = true;
-                    compiler.StartInfo.RedirectStandardError = true;
-                    compiler.Start();
-                    
-                    DateTime start = DateTime.Now;
 
-                    Task.Factory.StartNew(async () => {
-                        Thread.CurrentThread.Name = "Haskell Compiler";
-                        compiler.WaitForExit();
-                        try
-                        {
-                            string s = compiler.StandardOutput.ReadToEnd();
-                            string e = compiler.StandardError.ReadToEnd();
-
-                            Debug.WriteLine("Raw Haskell Output: ");
-                            Debug.WriteLine(s + " | " + e);
-
-                            string output = string.IsNullOrWhiteSpace(s) ? e : s;
-                            output = output.Insert(0, "```haskell\n").Insert(output.Length + "```haskell\n".Length, "```");
-
-                            exited = true;
-                            if (output.Length >= 2000)
-                                await Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel);
-                            else if (string.IsNullOrWhiteSpace(output.Trim('`')))
-                                await Program.SendText("Your code didn't create any output!", message.Channel);
-                            else
-                                await Program.SendText(output, message.Channel);
-                        }
-                        catch (Exception e)
-                        {
-                            Program.ConsoleWriteLine(e, ConsoleColor.Red);
-                        }
-                        exited = true;
-                    });
-
-                    while (!exited && (DateTime.Now - start).TotalSeconds < 3)
-                        Thread.Sleep(100);
-                    if (!exited)
-                    {
-                        exited = true;
-                        try
-                        {
-                            compiler.Close();
-                        }
-                        catch { }
+                    $"runhaskell {inputPath}".RunAsConsoleCommand(3, () => {
                         Program.SendText("Haskell timeout!", message.Channel).Wait();
-                    }
+                    }, (s, e) => {
+                        Debug.WriteLine("Raw Haskell Output: ");
+                        Debug.WriteLine(s + " | " + e);
+
+                        string output = string.IsNullOrWhiteSpace(s) ? e : s;
+                        output = output.Insert(0, "```haskell\n").Insert(output.Length + "```haskell\n".Length, "```");
+                        
+                        if (output.Length >= 2000)
+                            Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel).Wait();
+                        else if (string.IsNullOrWhiteSpace(output.Trim('`')))
+                            Program.SendText("Your code didn't create any output!", message.Channel).Wait();
+                        else
+                            Program.SendText(output, message.Channel).Wait();
+                    });
                 }
                 catch (Exception e) { Program.ConsoleWriteLine(e, ConsoleColor.Red); }
             }
