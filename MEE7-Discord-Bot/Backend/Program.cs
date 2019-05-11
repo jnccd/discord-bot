@@ -32,6 +32,11 @@ namespace MEE7
         public static Random RDM { get; private set; } = new Random();
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static readonly string ExePath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\";
+#if DEBUG
+        static readonly string runConfig = "Debug";
+#else
+        static readonly string runConfig = "Release";
+#endif
 
         // Client 
         static DiscordSocketClient client;
@@ -199,7 +204,7 @@ namespace MEE7
                 }
             }
             HelpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
-            HelpMenu.WithFooter($"Running on {Environment.OSVersion.VersionString} | Current Build from: {buildDate}");
+            HelpMenu.WithFooter($"Running on {Environment.OSVersion.VersionString} | {runConfig} build from {buildDate}");
             HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
 
             // Startup Console Display
