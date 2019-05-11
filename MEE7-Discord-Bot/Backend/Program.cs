@@ -17,6 +17,8 @@ using TwitchLib.Client.Models;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using MEE7.Configuration;
+using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace MEE7
 {
@@ -204,7 +206,8 @@ namespace MEE7
                 }
             }
             HelpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
-            HelpMenu.WithFooter($"Running on {Environment.OSVersion.VersionString} | {runConfig} build from {buildDate}");
+            HelpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
+                $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
 
             // Startup Console Display
