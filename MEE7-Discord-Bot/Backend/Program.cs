@@ -436,7 +436,7 @@ namespace MEE7
         {
             // TODO: Test
 
-            // Test12345
+            // Test123456
             
             //var client = new TwitchClient();
             //client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
