@@ -923,7 +923,8 @@ namespace MEE7
                 sendMessages.Add(await Channel.SendMessageAsync(text, false, Embed.Build()));
             else
             {
-                while (Embed.Fields.Count > 0)
+                List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields);
+                while (Fields.Count > 0)
                 {
                     EmbedBuilder eb = new EmbedBuilder
                     {
@@ -937,11 +938,10 @@ namespace MEE7
                         Title = Embed.Title,
                         Url = Embed.Url
                     };
-                    eb.Url = Embed.Url;
-                    for (int i = 0; i < 25 && Embed.Fields.Count > 0; i++)
+                    for (int i = 0; i < 25 && Fields.Count > 0; i++)
                     {
-                        eb.Fields.Add(Embed.Fields[0]);
-                        Embed.Fields.RemoveAt(0);
+                        eb.Fields.Add(Fields[0]);
+                        Fields.RemoveAt(0);
                     }
                     sendMessages.Add(await Channel.SendMessageAsync(text, false, eb.Build()));
                 }
