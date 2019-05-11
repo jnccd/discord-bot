@@ -232,8 +232,15 @@ namespace MEE7
                 while (true)
                 {
                     Thread.Sleep(AutoSaveIntervalInMinutes * 60000);
-                    Config.Save();
-                    ConsoleWriteLine($"Autosaved! [{DateTime.Now.ToLongTimeString()}]", ConsoleColor.Yellow);
+                    if (Config.UnsavedChanges)
+                    {
+                        Config.Save();
+                        ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved!", ConsoleColor.Yellow);
+                    }
+                    else
+                    {
+                        ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved! [Nothing to save]", ConsoleColor.Yellow);
+                    }
                 }
             });
         }

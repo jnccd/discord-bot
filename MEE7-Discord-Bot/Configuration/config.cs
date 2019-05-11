@@ -13,11 +13,28 @@ namespace MEE7.Configuration
 {
     public static class Config
     {
+        static readonly object lockject = new object();
         static readonly string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\";
         static readonly string configPath = exePath + "config.json";
         static readonly string configBackupPath = exePath + "config_backup.json";
-        public static ConfigData Data = new ConfigData();
-        
+        public static bool UnsavedChanges = false;
+        public static ConfigData Data {
+            get
+            {
+                lock (lockject)
+                {
+                    UnsavedChanges = true;
+                    return data;
+                }
+            }
+            set
+            {
+                UnsavedChanges = true;
+                data = value;
+            }
+        }
+        private static ConfigData data = new ConfigData();
+
         static Config()
         {
             if (Config.Exists())
@@ -36,16 +53,23 @@ namespace MEE7.Configuration
         }
         public static void Save()
         {
-            if (File.Exists(configPath))
-                File.Copy(configPath, configBackupPath, true);
-            File.WriteAllText(configPath, JsonConvert.SerializeObject(Data));
+            lock (lockject)
+            {
+                if (File.Exists(configPath))
+                    File.Copy(configPath, configBackupPath, true);
+                File.WriteAllText(configPath, JsonConvert.SerializeObject(Data));
+                UnsavedChanges = false;
+            }
         }
         public static void Load()
         {
-            if (Exists())
-                Data = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(configPath));
-            else
-                Data = new ConfigData();
+            lock (lockject)
+            {
+                if (Exists())
+                    Data = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(configPath));
+                else
+                    Data = new ConfigData();
+            }
         }
         public static new string ToString()
         {
