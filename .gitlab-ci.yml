@@ -2,9 +2,10 @@
 
 stages:
     - build
-    - test
+    - deploy
 
 before_script:
+	- cd \MEE7-Discord-Bot
     - "dotnet restore"
 
 build:
@@ -12,7 +13,7 @@ build:
     script:
         - "dotnet build"
 
-test:
-    stage: test
+deploy:
+    stage: deploy
     script: 
         - "dotnet run"
