@@ -5,7 +5,7 @@ stages:
     - deploy
 
 before_script:
-	- cd \MEE7-Discord-Bot
+    - cd \MEE7-Discord-Bot
     - "dotnet restore"
 
 build:
