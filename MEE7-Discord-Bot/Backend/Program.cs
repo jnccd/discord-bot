@@ -198,8 +198,8 @@ namespace MEE7
                         string.IsNullOrWhiteSpace(desc) ? "-" : desc, true);
                 }
             }
-            HelpMenu.WithDescription("I was made by " + Master.Mention + "\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
-            HelpMenu.WithFooter("Current Build from: " + buildDate);
+            HelpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+            HelpMenu.WithFooter($"Running on {Environment.OSVersion.VersionString} | Current Build from: {buildDate}");
             HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
 
             // Startup Console Display
