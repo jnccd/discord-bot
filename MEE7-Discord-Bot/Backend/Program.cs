@@ -850,23 +850,14 @@ namespace MEE7
                     }
                 }
 
-                Process P = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "youtube-dl.exe",
-                        Arguments = "-f mp4 -o \"" + videofile + "\" " + YoutubeURL,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardInput = true
-                    }
-                };
+                bool worked = false;
+                $"youtube-dl.exe -f mp4 -o \"{videofile}\" {YoutubeURL}".RunAsConsoleCommand(25, () => { }, 
+                    (s, e) => { if (s != null) worked = true; }, (StreamWriter w) => w.Write("e"));
 
-                P.Start();
-                P.StandardInput.Write("e");
-                P.WaitForExit();
-
-                return videofile;
+                if (worked)
+                    return videofile;
+                else
+                    return "";
             }
         }
 
