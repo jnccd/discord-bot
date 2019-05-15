@@ -29,22 +29,17 @@ namespace MEE7.Commands
             {
                 string latex = message.Content.Split(new char[] { ' ', '\n' }).Skip(1).Aggregate((x, y) => x + " " + y);
 
-                if (!latex.StartsWith("\\documentclass["))
-                    latex = "\\documentclass[preview,border=12pt]{standalone}\n\\usepackage{amsmath}\n\\usepackage{tikz}\n\\begin{document}\n" + latex + "\n\\end{document}";
+                if (!latex.StartsWith("\\documentclass"))
+                    latex = "\\documentclass[preview,border=12pt]{standalone}\n\\usepackage{amsmath}\n\\usepackage{tikz}\n\\begin{document}\n" + latex + "\\end{document}";
 
                 if (!File.Exists(inputPath))
                     File.Create(inputPath).Dispose();
                 File.WriteAllText(inputPath, latex);
 
-                Process converter = new Process()
-                {
-                    StartInfo = new ProcessStartInfo()
-                    {
-                        FileName = batchPath
-                    }
-                };
-                converter.Start();
-                converter.WaitForExit();
+                batchPath.RunAsConsoleCommand(3, () => { }, (s, e) => { }, (StreamWriter s) => {
+                    Thread.Sleep(500);
+                    s.WriteLine("return");
+                });
 
                 string[] outputFilePaths = Directory.GetFiles(folderPath).Where(x => Path.GetFileNameWithoutExtension(x).Contains("output") && x.EndsWith(".png")).ToArray();
 

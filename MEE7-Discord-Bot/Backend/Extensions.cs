@@ -353,7 +353,8 @@ namespace MEE7
             //file is not locked
             return false;
         }
-        public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent)
+        public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent, 
+            Action<StreamWriter> RunEvent = null)
         {
             bool exited = false;
             string[] split = command.Split(' ');
@@ -366,9 +367,12 @@ namespace MEE7
             compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y);
             compiler.StartInfo.CreateNoWindow = true;
             compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            compiler.StartInfo.RedirectStandardInput = true;
             compiler.StartInfo.RedirectStandardOutput = true;
             compiler.StartInfo.RedirectStandardError = true;
             compiler.Start();
+
+            RunEvent?.Invoke(compiler.StandardInput);
 
             DateTime start = DateTime.Now;
 
