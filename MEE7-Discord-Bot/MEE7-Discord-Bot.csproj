@@ -15,8 +15,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Commands\HelperClasses\**" />
+    <EmbeddedResource Remove="Commands\HelperClasses\**" />
+    <None Remove="Commands\HelperClasses\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Commands\Haskell\" />
-    <Folder Include="Commands\HelperClasses\xnageometry\" />
   </ItemGroup>
 
   <ItemGroup>
