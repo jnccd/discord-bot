@@ -34,6 +34,7 @@ namespace MEE7
         public static Random RDM { get; private set; } = new Random();
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static readonly string ExePath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\";
+        readonly static string LogPath = "Log.txt";
 #if DEBUG
         static readonly string runConfig = "Debug";
 #else
@@ -90,23 +91,10 @@ namespace MEE7
             catch (Exception ex)
             {
                 try { Config.Save(); } catch { }
-
-                string strPath = "Log.txt";
-                if (!File.Exists(strPath))
-                {
-                    File.Create(strPath).Dispose();
-                }
-                using (StreamWriter sw = File.AppendText(strPath))
-                {
-                    sw.WriteLine();
-                    sw.WriteLine("==========================Error Logging========================");
-                    sw.WriteLine("============Start=============" + DateTime.Now);
-                    sw.WriteLine("Error Message: " + ex.Message);
-                    sw.WriteLine("Stack Trace: " + ex.StackTrace);
-                    sw.WriteLine("=============End=============");
-                }
+                SaveToLog("Error Message: " + ex.Message  + "\nStack Trace: " + ex.StackTrace);
             }
         }
+
         static void ExecuteBot()
         {
             StartUp();
@@ -118,32 +106,65 @@ namespace MEE7
             client.StopAsync().Wait();
             client.LogoutAsync().Wait();
         }
+
         static void StartUp()
         {
-            Thread.CurrentThread.Name = "Main";
             Console.Title = "MEE7";
             ShowWindow(GetConsoleWindow(), 2);
+            Thread.CurrentThread.Name = "Main";
             Console.ForegroundColor = ConsoleColor.White;
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
-
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+            
             handler = new ConsoleEventDelegate(ConsoleEventCallback);
             SetConsoleCtrlHandler(handler, true);
 
+            LoadBuildDate();
+
+            client = new DiscordSocketClient();
+            SetClientEvents();
+
+            Login();
+
+            CreateCommandInstances();
+
+            while (!ClientReady) { Thread.Sleep(20); }
+
+            SetState();
+            Master = client.GetUser(300699566041202699);
+
+            BuildHelpMenu();
+
+            CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
+            PrintConsoleStartup();
+
+            CallOnConnected();
+
+            StartAutosaveLoop();
+        }
+        static void LoadBuildDate()
+        {
             try
             {
                 buildDate = File.ReadAllText("BuildDate.txt").TrimEnd('\n');
-                ConsoleWriteLine("Build from: " + buildDate, ConsoleColor.Magenta);
             }
             catch
             {
                 if (buildDate == null)
                     buildDate = "Error: Couldn't read build date!";
             }
-            client = new DiscordSocketClient();
+        }
+        static void SetClientEvents()
+        {
             client.Log += Client_Log;
             client.JoinedGuild += Client_JoinedGuild;
-
+            client.MessageReceived += MessageReceived;
+            client.Ready += Client_Ready;
+            client.ReactionAdded += Client_ReactionAdded;
+            client.ReactionRemoved += Client_ReactionRemoved;
+        }
+        static void Login()
+        {
             while (!gotWorkingToken)
             {
                 try
@@ -164,12 +185,9 @@ namespace MEE7
                 }
                 catch { Config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
             }
-
-            client.MessageReceived += MessageReceived;
-            client.Ready += Client_Ready;
-            client.ReactionAdded += Client_ReactionAdded;
-            client.ReactionRemoved += Client_ReactionRemoved;
-
+        }
+        static void CreateCommandInstances()
+        {
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
             {
@@ -178,18 +196,18 @@ namespace MEE7
                 if (commands[i].CommandLine.Contains(" ") || commands[i].Prefix.Contains(" "))
                     throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" + commands[i].Prefix + commands[i].CommandLine + "\" in " + commands[i]);
             }
-
-            commands = commands.OrderBy(x => x.CommandLine).ToArray(); // Sort commands in alphabetical order
-
-            while (!ClientReady) { Thread.Sleep(20); }
+            commands = commands.OrderBy(x => x.CommandLine).ToArray();
+        }
+        static void SetState()
+        {
 #if DEBUG
             client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
 #else
             client.SetGameAsync($"{prefix}help", "", ActivityType.Listening).Wait();
 #endif
-            Master = client.GetUser(300699566041202699);
-
-            // Build HelpMenu
+        }
+        static void BuildHelpMenu()
+        {
             HelpMenu.WithColor(0, 128, 255);
             HelpMenu.AddField($"{prefix}help", $"Prints the HelpMenu for a Command" +
                 (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ?
@@ -209,9 +227,9 @@ namespace MEE7
             HelpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
-
-            // Startup Console Display
-            CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
+        }
+        static void PrintConsoleStartup()
+        {
             Console.CursorLeft = 0;
             ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
             try
@@ -222,9 +240,13 @@ namespace MEE7
             catch { ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             ConsoleWrite("Default channel is: ");
             ConsoleWrite(CurrentChannel, ConsoleColor.Magenta);
-            ConsoleWriteLine(" on " + GetGuildFromChannel(CurrentChannel).Name);
+            ConsoleWrite(" on ");
+            ConsoleWriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
             ConsoleWriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
+        }
+        static void CallOnConnected()
+        {
             foreach (Command c in commands)
             {
                 Task.Run(() => {
@@ -235,7 +257,9 @@ namespace MEE7
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             }
-
+        }
+        static void StartAutosaveLoop()
+        {
             Task.Run(() => {
                 while (true)
                 {
@@ -252,6 +276,7 @@ namespace MEE7
                 }
             });
         }
+
         static void HandleConsoleCommandsLoop()
         {
             while (true)
@@ -489,6 +514,7 @@ namespace MEE7
             //SendAudioAsync(client, videoPath).Wait();
             //channel.DisconnectAsync().Wait();
         }
+
         static void BeforeClose()
         {
             lock (exitlock)
@@ -560,7 +586,23 @@ namespace MEE7
         }
         private static Task Client_Log(LogMessage msg)
         {
-            ConsoleWriteLine(msg.ToString(), ConsoleColor.White);
+            ConsoleColor color = ConsoleColor.White;
+            if (msg.Severity == LogSeverity.Critical ||
+                msg.Severity == LogSeverity.Error)
+                color = ConsoleColor.Red;
+            else if (msg.Severity == LogSeverity.Warning)
+                color = ConsoleColor.Yellow;
+            else if (msg.Severity == LogSeverity.Debug)
+                color = ConsoleColor.Magenta;
+
+            string log = msg.ToString();
+            if (log.Length > 500)
+            {
+                SaveToLog(log.ToString());
+                ConsoleWriteLine(DateTime.Now.ToLongTimeString() + " Long log message has been saved to file.", color);
+            }
+            else
+                ConsoleWriteLine(msg.ToString(), color);
             return Task.FromResult(0);
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
@@ -731,11 +773,11 @@ namespace MEE7
                 await command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " + 
-                        ((SocketGuildChannel)message.Channel).Guild.Name + "\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
+                    ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " + 
+                        $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin{ message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
                 else
-                    ConsoleWriteLine("Send " + command.GetType().Name + " at " + DateTime.Now.ToShortTimeString() + "\tin " +
-                        "DMs\tin " + message.Channel.Name + "\tfor " + message.Author.Username, ConsoleColor.Green);
+                    ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                       $"DMs \tfor {message.Author.Username}", ConsoleColor.Green);
             }
             catch (Exception e)
             {
@@ -959,6 +1001,17 @@ namespace MEE7
         {
             if (!Config.Data.UserList.Exists(x => x.UserID == UserID))
                 Config.Data.UserList.Add(new DiscordUser(UserID));
+        }
+        public static void SaveToLog(string message)
+        {
+            using (StreamWriter sw = File.AppendText(LogPath))
+            {
+                sw.WriteLine();
+                sw.WriteLine("==========================Logging========================");
+                sw.WriteLine("============Start=============" + DateTime.Now);
+                sw.WriteLine(message);
+                sw.WriteLine("=============End=============");
+            }
         }
         
         // Closing Event
