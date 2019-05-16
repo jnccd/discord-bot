@@ -372,12 +372,12 @@ namespace MEE7
             compiler.StartInfo.RedirectStandardError = true;
             compiler.Start();
 
-            RunEvent?.Invoke(compiler.StandardInput);
+            Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
 
             DateTime start = DateTime.Now;
 
-            Task.Factory.StartNew(() => {
-                Thread.CurrentThread.Name = "RunAsConsoleCommand Thread " + RunAsConsoleCommandThreadIndex++;
+            Task.Run(() => {
+                Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
                 compiler.WaitForExit();
 
                 string s = compiler.StandardOutput.ReadToEnd();
