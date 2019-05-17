@@ -290,11 +290,15 @@ namespace MEE7
         static void PrintConsoleStartup()
         {
             Console.CursorLeft = 0;
-            ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.Yellow);
+            ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.White);
             try
             {
                 foreach (SocketGuild g in client.Guilds)
-                    ConsoleWriteLine($"  {g.Name}{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}", ConsoleColor.Yellow);
+                {
+                    ConsoleWrite($"  {g.Name}", ConsoleColor.Magenta);
+                    ConsoleWriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}", 
+                        ConsoleColor.White);
+                } 
             }
             catch { ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             ConsoleWrite("Default channel is: ");
@@ -326,11 +330,11 @@ namespace MEE7
                     if (Config.UnsavedChanges)
                     {
                         Config.Save();
-                        ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved!", ConsoleColor.Yellow);
+                        ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved!", ConsoleColor.Cyan);
                     }
                     else
                     {
-                        ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved! [Nothing to save]", ConsoleColor.Yellow);
+                        ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved! [Nothing to save]", ConsoleColor.Cyan);
                     }
                 }
             });
