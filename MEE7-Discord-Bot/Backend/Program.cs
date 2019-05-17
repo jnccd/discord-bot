@@ -26,6 +26,12 @@ namespace MEE7
     
     public class Program
     {
+        #if DEBUG
+        static readonly string runConfig = "Debug";
+        #else
+        static readonly string runConfig = "Release";
+        #endif
+
         // Console / Execution
         static int clearYcoords;
         static bool exitedNormally = false;
@@ -35,12 +41,7 @@ namespace MEE7
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static readonly string ExePath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\";
         readonly static string LogPath = "Log.txt";
-#if DEBUG
-        static readonly string runConfig = "Debug";
-#else
-        static readonly string runConfig = "Release";
-#endif
-
+        
         // Client 
         static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
@@ -106,7 +107,7 @@ namespace MEE7
             client.StopAsync().Wait();
             client.LogoutAsync().Wait();
         }
-
+        
         static void StartUp()
         {
             Console.Title = "MEE7";
@@ -539,6 +540,8 @@ namespace MEE7
                 exitedNormally = true;
             }
         }
+
+        // ------------------------------------------------------------------------------------------------------------
 
         // Events
         private static async Task Client_JoinedGuild(SocketGuild arg)
