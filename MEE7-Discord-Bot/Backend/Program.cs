@@ -19,18 +19,20 @@ using TwitchLib.Client.Events;
 using MEE7.Configuration;
 using System.Reflection;
 using System.Runtime.Versioning;
+using TwitchLib.Api;
+using System.Net;
 
 namespace MEE7
 {
     public class IllegalCommandException : Exception { public IllegalCommandException(string message) : base (message) { } }
-    
+
     public class Program
     {
-        #if DEBUG
+#if DEBUG
         static readonly string runConfig = "Debug";
-        #else
+#else
         static readonly string runConfig = "Release";
-        #endif
+#endif
 
         // Console / Execution
         static int clearYcoords;
@@ -41,7 +43,7 @@ namespace MEE7
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static readonly string ExePath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\";
         readonly static string LogPath = "Log.txt";
-        
+
         // Client 
         static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
@@ -71,7 +73,7 @@ namespace MEE7
         }
         static ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
         static ISocketMessageChannel CurrentChannel;
-        static List<Tuple<RestUserMessage, Exception>> CachedErrorMessages = 
+        static List<Tuple<RestUserMessage, Exception>> CachedErrorMessages =
             new List<Tuple<RestUserMessage, Exception>>();
         static readonly string ErrorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
@@ -80,6 +82,62 @@ namespace MEE7
         static readonly string commandExecutionLock = "";
         static readonly string youtubeDownloadLock = "";
         static readonly string exitlock = "";
+
+        // Tests
+        private static readonly int CurrentlyActiveTestIndex = 0;
+        private static readonly Action[] Tests = new Action[] {
+            // Hello World
+            () => {
+                ConsoleWriteLine("Hello world!");
+            },
+            // Video Playing
+            () => {
+                string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
+                ISocketAudioChannel channel = GetChannelFromID(479951814217826305) as ISocketAudioChannel;
+                IAudioClient client = channel.ConnectAsync().Result;
+                SendAudioAsync(client, videoPath).Wait();
+                channel.DisconnectAsync().Wait();
+            },
+            // Module Crawler
+            () => {
+                string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
+                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                req.KeepAlive = false;
+                req.AllowAutoRedirect = true;
+                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
+                WebResponse W = req.GetResponse();
+                using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+                {
+                    string html = sr.ReadToEnd();
+                    foreach (string s in html.GetEverythingBetweenAll("class=\"btn btn-link\"><span class=\"type_string\">", ":"))
+                        GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
+                }
+            },
+            // Twtich
+            () => {
+                var client = new TwitchClient();
+                client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
+                client.OnLog += (object o, OnLogArgs arg) => { ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
+                client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => {
+                    ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta);
+                    if (e.ChatMessage.Message.StartsWith("hi"))
+                        client.SendMessage(e.ChatMessage.Channel, "Hello there");
+                };
+                client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWriteLine($"Exception: {e.Exception}\n{e.Exception.Details}", ConsoleColor.Magenta); };
+                client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
+                client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
+                client.Connect();
+
+                client.JoinChannel(Config.Data.TwtichChannelName);
+
+                Task.Factory.StartNew(() => { Thread.Sleep(15000); client.Disconnect(); ConsoleWriteLine("Disconnected Twitch"); });
+
+                var api = new TwitchAPI();
+                api.Settings.ClientId = Config.Data.TwitchAPIClientID;
+                api.Settings.AccessToken = Config.Data.TwitchAPIAccessToken;
+                var res = api.Helix.Users.GetUsersFollowsAsync("42111676").Result;
+            }
+        };
 
         // ------------------------------------------------------------------------------------------------------------
 
@@ -402,12 +460,17 @@ namespace MEE7
                     Process.Start("MEE7.exe");
                     break;
                 }
-                else if (input == "/test")
+                else if (input.StartsWith("/test"))
                 {
                     Task.Factory.StartNew(() =>
                     {
                         Thread.CurrentThread.Name = "TestThread";
-                        try { Test(); }
+                        string[] split = input.Split(' ');
+                        int index = CurrentlyActiveTestIndex;
+                        if (split.Length > 0)
+                            try { index = Convert.ToInt32(split[1]); } catch { }
+                        ConsoleWriteLine($"Running test {index}");
+                        try { Tests[index].Invoke(); }
                         catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                         ConsoleWrite("$");
                     });
@@ -465,55 +528,6 @@ namespace MEE7
                     ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
                 ConsoleWrite("$");
             }
-        }
-        static void Test()
-        {
-            // TODO: Test
-
-            // Test12345678
-            
-            //var client = new TwitchClient();
-            //client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
-            //client.OnLog += (object o, OnLogArgs arg) => { ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
-            //client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => {
-            //    ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta);
-            //    if (e.ChatMessage.Message.StartsWith("hi"))
-            //        client.SendMessage(e.ChatMessage.Channel, "Hello there");
-            //};
-            //client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWriteLine($"Exception: {e.Exception}\n{e.Exception.Details}", ConsoleColor.Magenta); };
-            //client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
-            //client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
-            //client.Connect();
-
-            //client.JoinChannel(Config.Data.TwtichChannelName);
-
-            //Task.Factory.StartNew(() => { Thread.Sleep(15000); client.Disconnect(); ConsoleWriteLine("Disconnected Twitch"); });
-
-            //var api = new TwitchAPI();
-            //api.Settings.ClientId = "3o7o8q658z2wy8dt61klsk3ycjlal7";
-            //api.Settings.AccessToken = "xwvigbxrqz48uiq3i0zrli2wqfodku";
-            //var res = api.Helix.Users.GetUsersFollowsAsync("42111676").Result;
-
-
-
-            //string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
-            //HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
-            //req.KeepAlive = false;
-            //req.AllowAutoRedirect = true;
-            //req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
-            //WebResponse W = req.GetResponse();
-            //using (StreamReader sr = new StreamReader(W.GetResponseStream()))
-            //{
-            //    string html = sr.ReadToEnd();
-            //    foreach (string s in html.GetEverythingBetweenAll("class=\"btn btn-link\"><span class=\"type_string\">", ":"))
-            //        GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
-            //}
-
-            //string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
-            //ISocketAudioChannel channel = GetChannelFromID(479951814217826305) as ISocketAudioChannel;
-            //IAudioClient client = channel.ConnectAsync().Result;
-            //SendAudioAsync(client, videoPath).Wait();
-            //channel.DisconnectAsync().Wait();
         }
 
         static void BeforeClose()

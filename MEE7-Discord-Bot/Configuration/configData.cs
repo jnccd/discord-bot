@@ -26,6 +26,8 @@ namespace MEE7.Configuration
         public string TwtichAccessToken;
         public string TwtichRefreshToken;
         public string TwtichClientID;
+        public string TwitchAPIClientID;
+        public string TwitchAPIAccessToken;
 
         public ConfigData()
         {
