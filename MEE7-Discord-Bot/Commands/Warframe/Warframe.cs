@@ -203,7 +203,7 @@ namespace MEE7.Commands
                 }
                 re.Add(voidtrader);
 
-                if (WarframeHandler.worldState.WS_NightWave.ActiveChallenges.Count != 0)
+                if (WarframeHandler.worldState.WS_NightWave?.ActiveChallenges.Count > 0)
                 {
                     EmbedBuilder nightwave = new EmbedBuilder();
                     nightwave.WithColor(0, 128, 255);
@@ -215,7 +215,7 @@ namespace MEE7.Commands
                     re.Add(nightwave);
                 }
                 
-                if (WarframeHandler.worldState.WS_Sortie.Variants.Count != 0)
+                if (WarframeHandler.worldState.WS_Sortie?.Variants.Count > 0)
                 {
                     EmbedBuilder sortie = new EmbedBuilder();
                     sortie.WithColor(0, 128, 255);
@@ -226,7 +226,7 @@ namespace MEE7.Commands
                     re.Add(sortie);
                 }
                 
-                if (WarframeHandler.worldState.WS_Events.Count != 0)
+                if (WarframeHandler.worldState.WS_Events?.Count > 0)
                 {
                     EmbedBuilder events = new EmbedBuilder();
                     events.WithColor(0, 128, 255);
