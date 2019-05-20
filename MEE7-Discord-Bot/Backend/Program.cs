@@ -812,7 +812,9 @@ namespace MEE7
                 }
                 catch { }
                 
-                ConsoleWriteLine(e.ToString(), ConsoleColor.Red);
+                ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
+                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}", ConsoleColor.Red);
+                SaveToLog(e.ToString());
             }
             finally
             {
