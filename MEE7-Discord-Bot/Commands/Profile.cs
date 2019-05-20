@@ -41,17 +41,17 @@ namespace MEE7.Commands
                                 value += e.Current + "\n";
                         }
                         catch { }
-                        Embed.AddField(info.Name + ":", value == "" ? "null" : value);
+                        Embed.AddFieldDirectly(info.Name + ":", value == "" ? "null" : value);
                     }
                     else
-                        Embed.AddField(info.Name + ":", info.GetValue(User));
+                        Embed.AddFieldDirectly(info.Name + ":", info.GetValue(User));
                 }
 
                 Embed.WithDescription("Profile of " + commandmessage.Author.Mention);
             }
             else
             {
-                Embed.AddField("Error!", "The bot hasn't made a profile of you yet.");
+                Embed.AddFieldDirectly("Error!", "The bot hasn't made a profile of you yet.");
             }
             await Program.SendEmbed(Embed, commandmessage.Channel);
         }

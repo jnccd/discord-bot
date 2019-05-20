@@ -41,7 +41,7 @@ namespace MEE7.Commands
                     Select(x => new Tuple<string, string>("https://" + x.GetEverythingBetween("https://", "\" target=\""),
                                                  WebUtility.HtmlDecode(x.GetEverythingBetween("</a> ", "<")))).ToArray();
                 foreach (Tuple<string, string> hit in hits)
-                    embed.AddField(hit.Item1, hit.Item2);
+                    embed.AddFieldDirectly(hit.Item1, hit.Item2);
             }
             
             await Program.SendEmbed(embed, message.Channel);

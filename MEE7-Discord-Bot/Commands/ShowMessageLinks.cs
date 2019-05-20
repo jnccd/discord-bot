@@ -31,7 +31,7 @@ namespace MEE7.Commands
                                 GetChannel(Convert.ToUInt64(linkSplit[5])) as ITextChannel).
                                 GetMessageAsync(Convert.ToUInt64(linkSplit[6]));
                             EmbedBuilder Embed = m.ToEmbed();
-                            //Embed.AddField("Preview for: ", s);
+                            //Embed.AddFieldDirectly("Preview for: ", s);
                             await Program.SendEmbed(Embed, message.Channel);
                         } catch { }
                     }

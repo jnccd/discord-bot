@@ -268,7 +268,7 @@ namespace MEE7
         static void BuildHelpMenu()
         {
             HelpMenu.WithColor(0, 128, 255);
-            HelpMenu.AddField($"{prefix}help", $"Prints the HelpMenu for a Command" +
+            HelpMenu.AddFieldDirectly($"{prefix}help", $"Prints the HelpMenu for a Command" +
                 (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ?
                 $", eg. {prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") +
                 "\nCommands with a HelpMenu are marked with a (h)", true);
@@ -277,7 +277,7 @@ namespace MEE7
                 if (commands[i].CommandLine != "" && !commands[i].IsHidden)
                 {
                     string desc = ((commands[i].Desc == null ? "" : commands[i].Desc + "   ")).Trim(' ');
-                    HelpMenu.AddField(commands[i].Prefix + commands[i].CommandLine +
+                    HelpMenu.AddFieldDirectly(commands[i].Prefix + commands[i].CommandLine +
                         (commands[i].IsExperimental ? " [EXPERIMENTAL]" : "") + (commands[i].HelpMenu == null ? "" : " (h)"),
                         string.IsNullOrWhiteSpace(desc) ? "-" : desc, true);
                 }

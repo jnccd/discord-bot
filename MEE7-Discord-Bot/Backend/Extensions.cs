@@ -252,6 +252,10 @@ namespace MEE7
             else
                 return null;
         }
+        public static void AddFieldDirectly(this EmbedBuilder e, string Name, object Value, bool IsInline = false)
+        {
+            e.Fields.Add(new EmbedFieldBuilder() { Name = Name, Value = Value, IsInline = IsInline });
+        }
 
         // Drawing
         public static Bitmap CropImage(this Bitmap source, Rectangle section)

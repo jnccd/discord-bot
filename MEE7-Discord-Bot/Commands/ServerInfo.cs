@@ -23,33 +23,33 @@ namespace MEE7.Commands
             
             info.WithDescription("Server-Information");
             
-            info.AddField("Channels", g.Channels.Count, true);
-            info.AddField("Category Channels", g.CategoryChannels.Count, true);
-            info.AddField("Text Channels", g.TextChannels.Count, true);
-            info.AddField("Voice Channels", g.VoiceChannels.Count, true);
+            info.AddFieldDirectly("Channels", g.Channels.Count, true);
+            info.AddFieldDirectly("Category Channels", g.CategoryChannels.Count, true);
+            info.AddFieldDirectly("Text Channels", g.TextChannels.Count, true);
+            info.AddFieldDirectly("Voice Channels", g.VoiceChannels.Count, true);
 
-            info.AddField("Owner", g.Owner.GetDisplayName(), true);
-            info.AddField("Created At", g.CreatedAt, true);
+            info.AddFieldDirectly("Owner", g.Owner.GetDisplayName(), true);
+            info.AddFieldDirectly("Created At", g.CreatedAt, true);
 
-            info.AddField("Member Count", g.MemberCount, true);
-            info.AddField("Human Count", g.Users.Where(x => !x.IsBot).Count(), true);
-            info.AddField("Bot Count", g.Users.Where(x => x.IsBot).Count(), true);
+            info.AddFieldDirectly("Member Count", g.MemberCount, true);
+            info.AddFieldDirectly("Human Count", g.Users.Where(x => !x.IsBot).Count(), true);
+            info.AddFieldDirectly("Bot Count", g.Users.Where(x => x.IsBot).Count(), true);
             
-            info.AddField("Emotes", g.Emotes.Count, true);
-            info.AddField("Features", g.Features.Count, true);
-            info.AddField("Mfa Level", g.MfaLevel, true);
-            info.AddField("Icon Url", g.IconUrl, true);
+            info.AddFieldDirectly("Emotes", g.Emotes.Count, true);
+            info.AddFieldDirectly("Features", g.Features.Count, true);
+            info.AddFieldDirectly("Mfa Level", g.MfaLevel, true);
+            info.AddFieldDirectly("Icon Url", g.IconUrl, true);
             if (g.SplashUrl != null)
-                info.AddField("Splash Url", g.SplashUrl, true);
+                info.AddFieldDirectly("Splash Url", g.SplashUrl, true);
             
-            info.AddField("Roles:", g.Roles.OrderByDescending(x => x.Position).
+            info.AddFieldDirectly("Roles:", g.Roles.OrderByDescending(x => x.Position).
                 Select(x => $"[{x.Members.Count()}]{x.Name}").Aggregate((x, y) => x + "\n" + y), true);
 
-            info.AddField("Verification Level", g.VerificationLevel, true);
-            info.AddField("Voice Region Id", g.VoiceRegionId, true);
+            info.AddFieldDirectly("Verification Level", g.VerificationLevel, true);
+            info.AddFieldDirectly("Voice Region Id", g.VoiceRegionId, true);
             
-            info.AddField("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles", true);
-            info.AddField("User with the longest name:", g.Users.MaxElement(x => x.GetDisplayName().Length), true);
+            info.AddFieldDirectly("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles", true);
+            info.AddFieldDirectly("User with the longest name:", g.Users.MaxElement(x => x.GetDisplayName().Length), true);
             
             Program.SendEmbed(info, message.Channel).Wait();
 

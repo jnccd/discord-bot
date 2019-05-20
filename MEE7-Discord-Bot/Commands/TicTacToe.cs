@@ -24,10 +24,10 @@ namespace MEE7.Commands
             {
                 EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
-                Embed.AddField(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
-                Embed.AddField(Prefix + CommandLine + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " +
+                Embed.AddFieldDirectly(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+                Embed.AddFieldDirectly(Prefix + CommandLine + " set + coordinates", "Sets your symbol at the specified coordinates in the form of \"1,2\" " +
                     "no spaces allowed eg. " + Prefix + CommandLine + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
-                Embed.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
+                Embed.AddFieldDirectly(Prefix + CommandLine + " game", "Prints the game you are currently in");
                 Embed.WithDescription("TicTacToe Commands:");
                 await Program.SendEmbed(Embed, commandmessage.Channel);
             }

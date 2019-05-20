@@ -27,15 +27,15 @@ namespace MEE7.Commands
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
             HelpMenu.WithDescription("Uno Commands:");
-            HelpMenu.AddField(PrefixAndCommand + " new + mentioned users", "Creates a new game with the mentioned users");
-            HelpMenu.AddField(PrefixAndCommand + " move + cardType + cardColor", "Puts the card on the stack\n" +
+            HelpMenu.AddFieldDirectly(PrefixAndCommand + " new + mentioned users", "Creates a new game with the mentioned users");
+            HelpMenu.AddFieldDirectly(PrefixAndCommand + " move + cardType + cardColor", "Puts the card on the stack\n" +
                 $"eg. {PrefixAndCommand} move 1 green\n" +
                 $"eg. {PrefixAndCommand} move plus4 rEd\n" +
                 $"The latter will move a Plus4 and change the stacks color to Red, Plus4/ChangeColor cards don't have a color though");
-            HelpMenu.AddField(PrefixAndCommand + " draw", "Draw a new card");
-            HelpMenu.AddField(PrefixAndCommand + " print", "Prints the stack of the game you are currently in");
-            HelpMenu.AddField(PrefixAndCommand + " cancel", "Cancels the game you are currently in");
-            HelpMenu.AddField("Valid Cards are: ", UnoCards.Select(x => x.Type + (x.Color == UnoColor.none ? "" : " " +
+            HelpMenu.AddFieldDirectly(PrefixAndCommand + " draw", "Draw a new card");
+            HelpMenu.AddFieldDirectly(PrefixAndCommand + " print", "Prints the stack of the game you are currently in");
+            HelpMenu.AddFieldDirectly(PrefixAndCommand + " cancel", "Cancels the game you are currently in");
+            HelpMenu.AddFieldDirectly("Valid Cards are: ", UnoCards.Select(x => x.Type + (x.Color == UnoColor.none ? "" : " " +
                 x.Color.ToString())).Aggregate((x, y) => x + ", " + y));
         }
 

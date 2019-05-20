@@ -332,7 +332,7 @@ namespace MEE7.Commands
                 Embed.WithColor(0, 128, 255);
                 foreach (PlaceCommand Pcommand in subCommands)
                 {
-                    Embed.AddField(Prefix + CommandLine + " " + Pcommand.command, Pcommand.desc);
+                    Embed.AddFieldDirectly(Prefix + CommandLine + " " + Pcommand.command, Pcommand.desc);
                 }
                 Embed.WithDescription("Place Commands:");
                 await Program.SendEmbed(Embed, message.Channel);
