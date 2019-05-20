@@ -282,7 +282,8 @@ namespace MEE7
                         string.IsNullOrWhiteSpace(desc) ? "-" : desc, true);
                 }
             }
-            HelpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code [here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+            HelpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code " +
+                $"[here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
             HelpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
@@ -353,7 +354,7 @@ namespace MEE7
                 {
                     if (CurrentChannel == null)
                         ConsoleWriteLine("No channel selected!");
-                    else
+                    else if (!string.IsNullOrWhiteSpace(input))
                     {
                         try
                         {
