@@ -618,7 +618,7 @@ namespace MEE7
                 color = ConsoleColor.Magenta;
 
             string log = msg.ToString();
-            if (log.Length > 500)
+            if (log.Length > Console.BufferWidth || log.Contains("\n"))
             {
                 SaveToLog(log.ToString());
                 ConsoleWriteLine(DateTime.Now.ToLongTimeString() + " Long log message has been saved to file.", color);
