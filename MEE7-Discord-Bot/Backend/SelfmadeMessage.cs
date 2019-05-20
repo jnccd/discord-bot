@@ -41,6 +41,10 @@ namespace MEE7
 
         public Func<RequestOptions, Task> DeleteFunc = (RequestOptions options) => { throw new NotImplementedException(); };
 
+        public SelfmadeMessage()
+        {
+            
+        }
         public SelfmadeMessage(IMessage m)
         {
             Content = m.Content;

@@ -52,7 +52,8 @@ namespace MEE7.Commands
                 EmbedBuilder embed = new EmbedBuilder();
                 for (int i = 0; i < server.EmojiUsage.Keys.Count; i++)
                 {
-                    embed.AddField(":" + server.EmojiUsage.Keys.ElementAt(i) + ":", "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!");
+                    embed.Fields.Add(new EmbedFieldBuilder() { Name = ":" + server.EmojiUsage.Keys.ElementAt(i) + ":",
+                        Value = "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!" });
                 }
                 embed.WithColor(0, 128, 255);
                 await Program.SendEmbed(embed, message.Channel);
