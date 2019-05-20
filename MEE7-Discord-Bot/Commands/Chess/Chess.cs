@@ -18,10 +18,10 @@ namespace MEE7.Commands
         {
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
-            HelpMenu.AddField(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
-            HelpMenu.AddField(Prefix + CommandLine + " move + 2 coordinates", "Moves a chess piece from the first point to the second\n" +
+            HelpMenu.AddFieldDirectly(Prefix + CommandLine + " newGame + a mentioned user", "Creates a new game against the mentioned user");
+            HelpMenu.AddFieldDirectly(Prefix + CommandLine + " move + 2 coordinates", "Moves a chess piece from the first point to the second\n" +
                 "eg. " + Prefix + CommandLine + " move 1,1 3,1");
-            HelpMenu.AddField(Prefix + CommandLine + " game", "Prints the game you are currently in");
+            HelpMenu.AddFieldDirectly(Prefix + CommandLine + " game", "Prints the game you are currently in");
             HelpMenu.WithDescription("Chess Commands:");
         }
 

@@ -51,7 +51,7 @@ namespace MEE7.Commands
                 Embed.WithColor(0, 128, 255);
                 foreach (Reaction react in reactions)
                 {
-                    Embed.AddField(Prefix + CommandLine + " " + react.name, react.desc);
+                    Embed.AddFieldDirectly(Prefix + CommandLine + " " + react.name, react.desc);
                 }
                 Embed.WithDescription("Reactions:");
                 await Program.SendEmbed(Embed, message.Channel);

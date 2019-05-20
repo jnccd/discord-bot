@@ -27,7 +27,7 @@ namespace MEE7.Commands
             HelpMenu.WithColor(0, 128, 255);
             HelpMenu.WithDescription("EditLast Commands:");
             foreach (EditLastCommand ecommand in Commands)
-                HelpMenu.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
+                HelpMenu.AddFieldDirectly(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
         }
         public override async Task Execute(SocketMessage message)
         {
@@ -126,7 +126,7 @@ namespace MEE7.Commands
                 {
                     SocketChannel targetChannel = Program.GetChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
                     EmbedBuilder Embed = lastText.ToEmbed();
-                    Embed.AddField("Crosspost from: ", $"<#{message.Channel.Id}>");
+                    Embed.AddFieldDirectly("Crosspost from: ", $"<#{message.Channel.Id}>");
                     await Program.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
                 } catch { }
             }),

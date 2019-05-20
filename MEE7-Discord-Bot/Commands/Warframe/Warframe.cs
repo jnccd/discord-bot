@@ -76,7 +76,7 @@ namespace MEE7.Commands
             else if(split[1] == "filters")
             {
                 EmbedBuilder embed = new EmbedBuilder();
-                embed.AddField("Your Filters: ", (user.WarframeFilters.Count == 0 ?
+                embed.AddFieldDirectly("Your Filters: ", (user.WarframeFilters.Count == 0 ?
                     "Well that looks pretty empty" :
                     user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
                 Program.SendEmbed(embed, message.Channel).Wait();
@@ -116,11 +116,11 @@ namespace MEE7.Commands
                         {
                             string filter = filterComTrim.Remove(0, 1).Trim(' ');
                             if (user.WarframeFilters.Contains(filter))
-                                embed.AddField("You already have that filter fam", filter);
+                                embed.AddFieldDirectly("You already have that filter fam", filter);
                             else
                             {
                                 user.WarframeFilters.Add(filter);
-                                embed.AddField("Added filter: ", filter);
+                                embed.AddFieldDirectly("Added filter: ", filter);
                             }
                             executedSomething = true;
                         }
@@ -130,16 +130,16 @@ namespace MEE7.Commands
                             if (user.WarframeFilters.Contains(filter))
                             {
                                 user.WarframeFilters.Remove(filter);
-                                embed.AddField("Removed filter: ", filter);
+                                embed.AddFieldDirectly("Removed filter: ", filter);
                             }
                             else
-                                embed.AddField("You don't even have that filter fam", filter);
+                                embed.AddFieldDirectly("You don't even have that filter fam", filter);
                             executedSomething = true;
                         }
                     }
                     if (executedSomething)
                     {
-                        embed.AddField("Your Filters are now: ", (user.WarframeFilters.Count == 0 ?
+                        embed.AddFieldDirectly("Your Filters are now: ", (user.WarframeFilters.Count == 0 ?
                             "\n\nWell that looks pretty empty" :
                             user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
                         Program.SendEmbed(embed, message.Channel).Wait();
@@ -175,7 +175,7 @@ namespace MEE7.Commands
                     invasions.WithColor(0, 128, 255);
                     invasions.WithTitle("Invasions:");
                     foreach (Invasion inv in WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted))
-                        invasions.AddField($"{inv.AttackingFaction}({inv.AttackerReward.ToTitle()}) vs. {inv.DefendingFaction}({inv.DefenderReward.ToTitle()})",
+                        invasions.AddFieldDirectly($"{inv.AttackingFaction}({inv.AttackerReward.ToTitle()}) vs. {inv.DefendingFaction}({inv.DefenderReward.ToTitle()})",
                             $"{inv.Node} - {inv.Description} - {inv.Completion}%");
                     re.Add(invasions);
                 }
@@ -199,7 +199,7 @@ namespace MEE7.Commands
                 {
                     voidtrader.WithTitle("Baro-senpai is here :weary:\nBut only until" + WarframeHandler.worldState.WS_VoidTrader.EndTime);
                     foreach (VoidTraderItem item in WarframeHandler.worldState.WS_VoidTrader.Inventory)
-                        voidtrader.AddField(item.Item, $"{item.Credits}:moneybag: {item.Ducats}D");
+                        voidtrader.AddFieldDirectly(item.Item, $"{item.Credits}:moneybag: {item.Ducats}D");
                 }
                 re.Add(voidtrader);
 
@@ -211,7 +211,7 @@ namespace MEE7.Commands
                     nightwave.WithDescription($"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
                         $"{WarframeHandler.worldState.WS_NightWave.Phase}");
                     foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
-                        nightwave.AddField($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
+                        nightwave.AddFieldDirectly($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
                     re.Add(nightwave);
                 }
                 
@@ -243,9 +243,9 @@ namespace MEE7.Commands
                     EmbedBuilder cycles = new EmbedBuilder();
                     cycles.WithColor(0, 128, 255);
                     cycles.WithTitle("Cycles:");
-                    cycles.AddField("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
+                    cycles.AddFieldDirectly("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
                         (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
-                    cycles.AddField("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
+                    cycles.AddFieldDirectly("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
                         (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
                     re.Add(cycles);
                 }
@@ -256,10 +256,10 @@ namespace MEE7.Commands
                     syndicates.WithTitle("Syndicate Missions: ");
                     foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions.Where(x => x.jobs != null && x.jobs.Count > 0))
                     {
-                        syndicates.AddField(mission.Syndicate, "Missions: ");
+                        syndicates.AddFieldDirectly(mission.Syndicate, "Missions: ");
                         for (int i = 0; i < mission.jobs.Count; i++)
                             if (mission.jobs[i].rewardPool != null)
-                                syndicates.AddField("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
+                                syndicates.AddFieldDirectly("Mission #" + (i + 1), $"{mission.jobs[i].rewardPool.Aggregate((x, y) => y == "" ? x : x + ", " + y)} and " +
                                     $"{mission.jobs[i].standingStages.Sum()} :arrow_up: until {mission.EndTime.ToLocalTime().ToLongTimeString()}");
                     }
                     re.Add(syndicates);
@@ -314,7 +314,7 @@ namespace MEE7.Commands
                 embed.WithTitle("Baro-senpai is here :weary:");
                 embed.WithTimestamp(new DateTimeOffset(WarframeHandler.worldState.WS_VoidTrader.EndTime));
                 foreach (VoidTraderItem item in WarframeHandler.worldState.WS_VoidTrader.Inventory)
-                    embed.AddField(item.Item, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" +
+                    embed.AddFieldDirectly(item.Item, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" +
                              HttpUtility.HtmlEncode(item.Item).Replace(' ', '+') + ") - " + item.Credits + "c " + item.Ducats + "D");
 
 #if !DEBUG

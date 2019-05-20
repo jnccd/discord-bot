@@ -18,7 +18,7 @@ namespace MEE7.Commands
             HelpMenu.WithColor(0, 128, 255);
             HelpMenu.WithDescription("EditThis Commands:");
             foreach (EditLastCommand ecommand in EditLast.Commands)
-                HelpMenu.AddField(Prefix + CommandLine + " " + ecommand.command, ecommand.desc.Replace("editLast", "editThis"));
+                HelpMenu.AddFieldDirectly(Prefix + CommandLine + " " + ecommand.command, ecommand.desc.Replace("editLast", "editThis"));
         }
 
         public override async Task Execute(SocketMessage message)
