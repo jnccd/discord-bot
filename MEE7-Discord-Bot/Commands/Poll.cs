@@ -13,7 +13,7 @@ namespace MEE7.Commands
         public readonly IEmote[] emotes = new IEmote[] { new Emoji("0⃣"), new Emoji("1⃣"), new Emoji("2⃣"), new Emoji("3⃣"), new Emoji("4⃣"),
                 new Emoji("5⃣"), new Emoji("6⃣"), new Emoji("7⃣"), new Emoji("8⃣"), new Emoji("9⃣") };
 
-        public Poll() : base("poll", "Creates a poll for Darky", false)
+        public Poll() : base("poll", "Creates a poll", false)
         {
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
