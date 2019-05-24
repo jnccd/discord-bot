@@ -28,11 +28,11 @@ namespace MEE7
 
     public class Program
     {
-#if DEBUG
-        static readonly string runConfig = "Debug";
-#else
-        static readonly string runConfig = "Release";
-#endif
+        #if DEBUG
+            static readonly string runConfig = "Debug";
+        #else
+            static readonly string runConfig = "Release";
+        #endif
 
         // Console / Execution
         static int clearYcoords;
@@ -139,8 +139,7 @@ namespace MEE7
             }
         };
 
-        // ------------------------------------------------------------------------------------------------------------
-
+        // --- Main ---------------------------------------------------------------------------------------------------------
         static void Main(string[] args)
         {
             try
@@ -559,9 +558,7 @@ namespace MEE7
                 exitedNormally = true;
             }
         }
-
-        // ------------------------------------------------------------------------------------------------------------
-
+        
         // Events
         private static async Task Client_JoinedGuild(SocketGuild arg)
         {
