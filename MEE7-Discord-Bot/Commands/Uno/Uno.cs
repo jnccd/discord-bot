@@ -333,7 +333,7 @@ namespace MEE7.Commands
             string[] split = message.Content.Split(' ');
             if (split.Contains("new"))
             {
-                UnoGame newGame = new UnoGame(message.MentionedUsers.Union(new SocketUser[] { message.Author }).ToList());
+                UnoGame newGame = new UnoGame(message.MentionedUsers.Distinct().Append(message.Author).ToList());
                 if (newGame.Players.Count < 2)
                 {
                     Program.SendText("You need more players to play Uno!", message.Channel).Wait();

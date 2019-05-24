@@ -972,7 +972,7 @@ namespace MEE7
             if (Embed == null)
                 return new List<IUserMessage>();
 
-            if (Embed.Color == null)
+            if (Embed.Color == null && !(Channel is IDMChannel))
                 Embed.Color = GetGuildFromChannel(Channel).GetUser(GetSelf().Id).GetDisplayColor();
 
             List<IUserMessage> sendMessages = new List<IUserMessage>();
