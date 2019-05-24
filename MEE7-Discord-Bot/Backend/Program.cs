@@ -270,7 +270,7 @@ namespace MEE7
             HelpMenu.AddFieldDirectly($"{prefix}help", $"Prints the HelpMenu for a Command" +
                 (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ?
                 $", eg. {prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") +
-                "\nCommands with a HelpMenu are marked with a (h)", true);
+                "\nCommands with a HelpMenu are marked with a (h)");
             for (int i = 0; i < commands.Length; i++)
             {
                 if (commands[i].CommandLine != "" && !commands[i].IsHidden)
