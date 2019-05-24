@@ -28,14 +28,14 @@ namespace MEE7.Commands
             if (split.Length < 2)
             {
                 Program.SendText($"Duuude no I need more Information, or different Information\nHave a look into my HelpMenu ({Prefix}help {CommandLine})", 
-                    message.Channel).GetAwaiter().GetResult();
+                    message.Channel).Wait();
                 return Task.FromResult(default(object));
             }
             string[] pollOptions = split[1].Split(',');
             if (pollOptions.Length > 9)
             {
                 Program.SendText("Duuude thats too many answer possibilities, 9 should be enough\nIf you want more ask the Discord Devs for a 10 Emoji", 
-                    message.Channel).GetAwaiter().GetResult();
+                    message.Channel).Wait();
                 return Task.FromResult(default(object));
             }
 
@@ -43,7 +43,7 @@ namespace MEE7.Commands
             IUserMessage pollMessage = Program.SendEmbed(Program.CreateEmbedBuilder($":bar_chart: **{split[0].Remove(0, PrefixAndCommand.Length + 1)}**", 
                 pollOptions.Select(x => emotes[i++].Name + " " + x).Aggregate((x, y) => x + "\n" + y)),
                 message.Channel).Result.First();
-            pollMessage.AddReactionsAsync(emotes.Take(pollOptions.Length).ToArray());
+            pollMessage.AddReactionsAsync(emotes.Take(pollOptions.Length).ToArray()).Wait();
 
             return Task.FromResult(default(object));
         }
