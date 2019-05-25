@@ -18,7 +18,7 @@ namespace MEE7.Commands
 
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override void Execute(SocketMessage commandmessage)
         {
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);
@@ -53,7 +53,7 @@ namespace MEE7.Commands
             {
                 Embed.AddFieldDirectly("Error!", "The bot hasn't made a profile of you yet.");
             }
-            await Program.SendEmbed(Embed, commandmessage.Channel);
+            Program.SendEmbed(Embed, commandmessage.Channel).Wait();
         }
     }
 }

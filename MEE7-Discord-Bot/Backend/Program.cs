@@ -669,7 +669,7 @@ namespace MEE7
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
-            return Task.FromResult(default(object));
+            return Task.FromResult(0);
         }
         private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
@@ -693,7 +693,7 @@ namespace MEE7
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
-            return Task.FromResult(default(object));
+            return Task.FromResult(0);
         }
         private static Task MessageReceived(SocketMessage message)
         {
@@ -704,7 +704,7 @@ namespace MEE7
                     try { OnNonCommandMessageRecieved.InvokeParalell(message); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
-            return Task.FromResult(default(object));
+            return Task.FromResult(0);
         }
         private static void ParallelMessageReceived(SocketMessage message)
         {
@@ -791,7 +791,7 @@ namespace MEE7
                 }
 
                 SaveUser(message.Author.Id);
-                await command.Execute(message);
+                command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
                     ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " + 

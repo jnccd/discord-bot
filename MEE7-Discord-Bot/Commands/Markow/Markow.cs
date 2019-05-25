@@ -24,7 +24,7 @@ namespace MEE7.Commands
             Program.OnExit += OnExit;
         }
 
-        public async void OnConnected()
+        public void OnConnected()
         {
             DateTime start = DateTime.Now;
             string input = "";
@@ -42,7 +42,7 @@ namespace MEE7.Commands
                         foreach (SocketChannel channel in guild.Channels)
                             if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
                             {
-                                IEnumerable<IMessage> messages = await ((ISocketMessageChannel)channel).GetMessagesAsync().FlattenAsync();
+                                IEnumerable<IMessage> messages = ((ISocketMessageChannel)channel).GetMessagesAsync().FlattenAsync().Result;
                                 foreach (IMessage m in messages)
                                     if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.prefix) && m.Content[0] != '!')
                                         input += m.Content + "\n";
@@ -88,18 +88,18 @@ namespace MEE7.Commands
                 MarkovHelper.SaveDict();
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             try
             {
                 string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 5, 2000);
-                await Program.SendText(output, message.Channel);
+                Program.SendText(output, message.Channel).Wait();
             }
             catch (NoEmptyElementException)
             {
-                await Program.SendText("Markow isn't ready yet!", message.Channel);
+                Program.SendText("Markow isn't ready yet!", message.Channel).Wait();
             }
         }
     }

@@ -23,7 +23,7 @@ namespace MEE7.Commands
             subCommands = new PlaceCommand[] {
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",
                 (string[] split, ISocketMessageChannel Channel) => { return true; },
-                async (SocketMessage commandmessage, string filePath, string[] split) => { await Program.SendFile(filePath, commandmessage.Channel); }),
+                (SocketMessage commandmessage, string filePath, string[] split) => { Program.SendFile(filePath, commandmessage.Channel).Wait(); }),
             new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) + 
             ")\neg. " + Prefix + CommandLine + " drawPixel 10,45 Red",
                 (string[] split, ISocketMessageChannel Channel) => {
@@ -323,7 +323,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
@@ -335,9 +335,9 @@ namespace MEE7.Commands
                     Embed.AddFieldDirectly(Prefix + CommandLine + " " + Pcommand.command, Pcommand.desc);
                 }
                 Embed.WithDescription("Place Commands:");
-                await Program.SendEmbed(Embed, message.Channel);
+                Program.SendEmbed(Embed, message.Channel).Wait();
 
-                await Program.SendFile(filePath, message.Channel);
+                Program.SendFile(filePath, message.Channel).Wait();
             }
             else
             {

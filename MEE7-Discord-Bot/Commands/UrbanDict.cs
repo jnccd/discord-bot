@@ -15,18 +15,18 @@ namespace MEE7.Commands
 
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length <= 1)
             {
-                await Program.SendText("I need something to search!", message.Channel);
+                Program.SendText("I need something to search!", message.Channel).Wait();
                 return;
             }
 
             string url = string.Format("https://www.urbandictionary.com/define.php?term=" + WebUtility.UrlEncode(string.Join(" ", split.Skip(1).ToArray())));
-            await Program.SendText(url, message.Channel);
+            Program.SendText(url, message.Channel).Wait();
         }
     }
 }

@@ -63,7 +63,7 @@ namespace MEE7.Commands
                                       "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
                                       "```");
         }
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             DiscordUser user = Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
@@ -84,7 +84,7 @@ namespace MEE7.Commands
                 if (es == null)
                 {
                     Program.SendText($"Couldn't get information. {WarframeHandler.WebSite} is probably down.", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
 
                 if (split.Length > 2)
@@ -145,7 +145,7 @@ namespace MEE7.Commands
                         Program.SendEmbed(HelpMenu, message.Channel).Wait();
                 }
             }
-            return Task.FromResult(default(object));
+            return;
         }
         
         List<EmbedBuilder> GetStateEmbeds()

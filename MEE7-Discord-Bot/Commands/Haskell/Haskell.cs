@@ -19,7 +19,7 @@ namespace MEE7.Commands
 
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             lock (this)
             {
@@ -35,7 +35,7 @@ namespace MEE7.Commands
                                 "Foreign.", "GHC.", "Trace.", "Type.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
                             {
                                 Program.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel).Wait();
-                                return Task.FromResult(default(object));
+                                return;
                             }
                     }
 
@@ -63,7 +63,7 @@ namespace MEE7.Commands
                 catch (Exception e) { Program.ConsoleWriteLine(e, ConsoleColor.Red); }
             }
 
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

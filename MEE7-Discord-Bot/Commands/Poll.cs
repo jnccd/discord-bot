@@ -22,21 +22,21 @@ namespace MEE7.Commands
                 $"Nothing much,The Sky,My dick");
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split('\n');
             if (split.Length < 2)
             {
                 Program.SendText($"Duuude no I need more Information, or different Information\nHave a look into my HelpMenu ({Prefix}help {CommandLine})", 
                     message.Channel).Wait();
-                return Task.FromResult(default(object));
+                return;
             }
             string[] pollOptions = split[1].Split(',');
             if (pollOptions.Length > 9)
             {
                 Program.SendText("Duuude thats too many answer possibilities, 9 should be enough\nIf you want more ask the Discord Devs for a 10 Emoji", 
                     message.Channel).Wait();
-                return Task.FromResult(default(object));
+                return;
             }
 
             int i = 0;
@@ -45,7 +45,7 @@ namespace MEE7.Commands
                 message.Channel).Result.First();
             pollMessage.AddReactionsAsync(emotes.Take(pollOptions.Length).ToArray()).Wait();
 
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

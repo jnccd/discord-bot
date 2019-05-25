@@ -89,7 +89,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             lock (this)
             {
@@ -98,7 +98,6 @@ namespace MEE7.Commands
                 newgame.Message.AddReactionsAsync(new IEmote[] { left, up, down, right }).Wait();
                 games.Add(newgame);
             }
-            return Task.FromResult(0);
         }
     }
 }

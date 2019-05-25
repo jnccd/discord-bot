@@ -68,7 +68,7 @@ namespace MEE7.Commands
             return true;
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override void Execute(SocketMessage commandmessage)
         {
             if (commandmessage.Channel is SocketGuildChannel)
             {
@@ -77,22 +77,22 @@ namespace MEE7.Commands
                     if (Config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                     {
                         Config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
-                        await Program.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel);
+                        Program.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel).Wait();
                     }
                     else
                     {
                         Config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
-                        await Program.SendText("Subscribed to Patch Notes!", commandmessage.Channel);
+                        Program.SendText("Subscribed to Patch Notes!", commandmessage.Channel).Wait();
                     }
                 }
                 else
                 {
-                    await Program.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel);
+                    Program.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel).Wait();
                 }
             }
             else
             {
-                await Program.SendText("You can't use this in DMs", commandmessage.Channel);
+                Program.SendText("You can't use this in DMs", commandmessage.Channel).Wait();
             }
         }
     }

@@ -17,14 +17,14 @@ namespace MEE7.Commands
 
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             EmbedBuilder embed = new EmbedBuilder();
 
             if (split.Length <= 1)
             {
-                await Program.SendText("I need something to search!", message.Channel);
+                Program.SendText("I need something to search!", message.Channel).Wait();
                 return;
             }
             
@@ -44,7 +44,7 @@ namespace MEE7.Commands
                     embed.AddFieldDirectly(hit.Item1, hit.Item2);
             }
             
-            await Program.SendEmbed(embed, message.Channel);
+            Program.SendEmbed(embed, message.Channel).Wait();
         }
     }
 }

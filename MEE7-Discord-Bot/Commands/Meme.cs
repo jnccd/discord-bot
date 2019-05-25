@@ -29,7 +29,7 @@ namespace MEE7.Commands
                 "a subreddit yourself by adding it as an argument, eg. `$meme me_irl`");
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override void Execute(SocketMessage commandmessage)
         {
             // Getting a subreddit
             bool worked = false;
@@ -40,7 +40,7 @@ namespace MEE7.Commands
                 url = "https://www.reddit.com/r/" + commandmessage.Content.Split(new char[] { ' ', '\n' })[1] + "/";
                 if (!RedditHelper.IsReachable(url))
                 {
-                    await Program.SendText("Thats not a valid subreddit!", commandmessage.Channel);
+                    Program.SendText("Thats not a valid subreddit!", commandmessage.Channel).Wait();
                     return;
                 }
             }
