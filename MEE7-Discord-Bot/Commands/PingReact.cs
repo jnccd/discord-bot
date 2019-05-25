@@ -35,9 +35,9 @@ namespace MEE7.Commands
             message.AddReactionsAsync(new IEmote[] { PING_PONG, ANGRY_FACE }).Wait();  
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

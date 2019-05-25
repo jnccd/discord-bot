@@ -23,7 +23,7 @@ namespace MEE7.Commands
 
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             lock (this)
             {
@@ -46,7 +46,7 @@ namespace MEE7.Commands
                 if (outputFilePaths.Length == 0)
                 {
                     Program.SendText("That didn't work.", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
 
                 foreach (string outputPath in outputFilePaths)
@@ -68,7 +68,7 @@ namespace MEE7.Commands
                 outputFilePaths.Select(x => { File.Delete(x); return x; } ).ToArray();
             }
 
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

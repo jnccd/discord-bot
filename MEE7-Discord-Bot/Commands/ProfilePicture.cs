@@ -14,7 +14,7 @@ namespace MEE7.Commands
 
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override void Execute(SocketMessage commandmessage)
         {
             SocketUser target;
             if (commandmessage.MentionedUsers.Count > 0)
@@ -36,11 +36,11 @@ namespace MEE7.Commands
 
             try
             {
-                await Program.SendText(target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel);
+                Program.SendText(target.GetAvatarUrl(Discord.ImageFormat.Auto, size), commandmessage.Channel).Wait();
             }
             catch
             {
-                await Program.SendText("That guy doesn't have a profile Picture UwU", commandmessage.Channel);
+                Program.SendText("That guy doesn't have a profile Picture UwU", commandmessage.Channel).Wait();
             }
         }
     }

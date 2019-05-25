@@ -17,7 +17,7 @@ namespace MEE7.Commands
 
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             if (message.Author.Id == Program.Master.Id)
             {
@@ -27,7 +27,7 @@ namespace MEE7.Commands
                 Graphics graphics = Graphics.FromImage(bmp);
                 graphics.CopyFromScreen(AllScreenBounds.X, AllScreenBounds.Y, 0, 0, new Size(AllScreenBounds.Width, AllScreenBounds.Height), CopyPixelOperation.SourceCopy);
                 
-                await Program.SendBitmap(bmp, message.Channel);
+                Program.SendBitmap(bmp, message.Channel).Wait();
             }
         }
     }

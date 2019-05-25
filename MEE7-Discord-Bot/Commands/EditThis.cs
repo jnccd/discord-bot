@@ -21,11 +21,11 @@ namespace MEE7.Commands
                 HelpMenu.AddFieldDirectly(Prefix + CommandLine + " " + ecommand.command, ecommand.desc.Replace("editLast", "editThis"));
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             List<string> split = message.Content.Split(new char[] { ' ', '\n' }).ToList();
             if (split.Count == 1)
-                await Program.SendEmbed(HelpMenu, message.Channel);
+                Program.SendEmbed(HelpMenu, message.Channel).Wait();
             else
             {
                 foreach (EditLastCommand command in EditLast.Commands)
@@ -51,21 +51,21 @@ namespace MEE7.Commands
 
                         if (command.textBased && string.IsNullOrWhiteSpace(inText))
                         {
-                            await Program.SendText("I couldn't find text to edit here :thinking:", message.Channel);
+                            Program.SendText("I couldn't find text to edit here :thinking:", message.Channel).Wait();
                             return;
                         }
                         if (!command.textBased && string.IsNullOrWhiteSpace(inPic))
                         {
-                            await Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
+                            Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel).Wait();
                             return;
                         }
 
-                        await command.execute(message, new SelfmadeMessage(message).EditContent(inText.Trim(' ')), inPic);
+                        command.execute(message, new SelfmadeMessage(message).EditContent(inText.Trim(' ')), inPic);
 
                         return;
                     }
                 }
-                await Program.SendText("That subcommand doesn't exist :thinking:", message.Channel);
+                Program.SendText("That subcommand doesn't exist :thinking:", message.Channel).Wait();
             }
         }
     }

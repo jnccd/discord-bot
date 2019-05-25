@@ -29,9 +29,9 @@ namespace MEE7.Commands
             foreach (EditLastCommand ecommand in Commands)
                 HelpMenu.AddFieldDirectly(Prefix + CommandLine + " " + ecommand.command, ecommand.desc);
         }
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
-            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync().FlattenAsync();
+            IEnumerable<IMessage> messages = message.Channel.GetMessagesAsync().FlattenAsync().Result;
             IMessage lastText = null;
             string lastPic = null;
             ulong ownID = Program.OwnID;
@@ -59,7 +59,7 @@ namespace MEE7.Commands
 
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
-                await Program.SendEmbed(HelpMenu, message.Channel);
+                Program.SendEmbed(HelpMenu, message.Channel).Wait();
             else
             {
                 foreach (EditLastCommand command in Commands)
@@ -68,69 +68,69 @@ namespace MEE7.Commands
                     {
                         if (command.textBased && lastText == null)
                         {
-                            await Program.SendText("I couldn't find text to edit here :thinking:", message.Channel);
+                            Program.SendText("I couldn't find text to edit here :thinking:", message.Channel).Wait();
                             return;
                         }
                         if (!command.textBased && string.IsNullOrWhiteSpace(lastPic))
                         {
-                            await Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel);
+                            Program.SendText("I couldn't find a picture to edit here :thinking:", message.Channel).Wait();
                             return;
                         }
 
-                        await command.execute(message, lastText, lastPic);
+                        command.execute(message, lastText, lastPic);
 
                         return;
                     }
                 }
-                await Program.SendText("That subcommand doesn't exist :thinking:", message.Channel);
+                Program.SendText("That subcommand doesn't exist :thinking:", message.Channel).Wait();
             }
         }
 
         public static EditLastCommand[] Commands = new EditLastCommand[] {
-            new EditLastCommand("swedish", "Convert text to swedish", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("", 
-                    string.Join("", lastText.Content.Select(x => x == lastText.Content.Last() ? x + "f" : x.ToString())), "", lastText.Author), message.Channel);
+            new EditLastCommand("swedish", "Convert text to swedish", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("", 
+                    string.Join("", lastText.Content.Select(x => x == lastText.Content.Last() ? x + "f" : x.ToString())), "", lastText.Author), message.Channel).Wait();
             }),
-            new EditLastCommand("mock", "Mock the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("", 
+            new EditLastCommand("mock", "Mock the text above", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("", 
                     string.Join("", lastText.Content.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })), 
-                    "https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", lastText.Author), message.Channel);
+                    "https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", lastText.Author), message.Channel).Wait();
             }),
-            new EditLastCommand("crab", "Crab the text above", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("", ":crab: " + lastText.Content + " :crab:", "", lastText.Author), message.Channel);
-                await Program.SendText("https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel);
+            new EditLastCommand("crab", "Crab the text above", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("", ":crab: " + lastText.Content + " :crab:", "", lastText.Author), message.Channel).Wait();
+                Program.SendText("https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s", message.Channel).Wait();
             }),
-            new EditLastCommand("CAPS", "Convert text to CAPS",true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), "", lastText.Author), message.Channel);
+            new EditLastCommand("CAPS", "Convert text to CAPS",true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x); })), "", lastText.Author), message.Channel).Wait();
             }),
-            new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), "", lastText.Author), message.Channel);
+            new EditLastCommand("SUPERCAPS", "Convert text to SUPER CAPS", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    string.Join("", lastText.Content.Select((x) => { return char.ToUpper(x) + " "; })), "", lastText.Author), message.Channel).Wait();
             }),
-            new EditLastCommand("Spoilerify", "Convert text to a spoiler", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    "`" + string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })) + "`", "", lastText.Author), message.Channel);
+            new EditLastCommand("Spoilerify", "Convert text to a spoiler", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    "`" + string.Join("", lastText.Content.Select((x) => { return "||" + x + "||"; })) + "`", "", lastText.Author), message.Channel).Wait();
             }),
-            new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    lastText.Content.Replace("|", ""), "", lastText.Author), message.Channel);
+            new EditLastCommand("Unspoilerify", "Convert spoiler text to readable text", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    lastText.Content.Replace("|", ""), "", lastText.Author), message.Channel).Wait();
             }),
-            new EditLastCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", true, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await Program.SendEmbed(Program.CreateEmbedBuilder("",
-                    lastText.Content.Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y).Remove(0, 1), "", lastText.Author), message.Channel);
+            new EditLastCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", true, (SocketMessage message, IMessage lastText, string lastPic) => {
+                Program.SendEmbed(Program.CreateEmbedBuilder("",
+                    lastText.Content.Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y).Remove(0, 1), "", lastText.Author), message.Channel).Wait();
             }),
             new EditLastCommand("Crosspost", $"Crossposts the message into another channel\neg. {Program.prefix}editLast Crossost #general",
-                true, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                true, (SocketMessage message, IMessage lastText, string lastPic) => {
                 try
                 {
                     SocketChannel targetChannel = Program.GetChannelFromID(Convert.ToUInt64(message.Content.Split(' ')[2].Trim(new char[] { '<', '>', '#' })));
                     EmbedBuilder Embed = lastText.ToEmbed();
                     Embed.AddFieldDirectly("Crosspost from: ", $"<#{message.Channel.Id}>");
-                    await Program.SendEmbed(Embed, targetChannel as ISocketMessageChannel);
+                    Program.SendEmbed(Embed, targetChannel as ISocketMessageChannel).Wait();
                 } catch { }
             }),
-            new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", false, (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = lastPic.GetBitmapFromURL();
 
                 for (int x = 0; x < bmp.Width; x++)
@@ -141,9 +141,9 @@ namespace MEE7.Commands
                         bmp.SetPixel(x, y, c);
                     }
 
-                await Program.SendBitmap(bmp, message.Channel);
+                Program.SendBitmap(bmp, message.Channel).Wait();
             }),
-            new EditLastCommand("invert", "Invert the color of each pixel", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("invert", "Invert the color of each pixel", false, (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = lastPic.GetBitmapFromURL();
 
                 for (int x = 0; x < bmp.Width; x++)
@@ -154,15 +154,15 @@ namespace MEE7.Commands
                         bmp.SetPixel(x, y, c);
                     }
 
-                await Program.SendBitmap(bmp, message.Channel);
+                Program.SendBitmap(bmp, message.Channel).Wait();
             }),
-            new EditLastCommand("Rekt", "Finds colored rectangles in pictures", false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+            new EditLastCommand("Rekt", "Finds colored rectangles in pictures", false, (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = lastPic.GetBitmapFromURL();
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
                 if (message.Content.Split(' ').Length < 2)
                 {
-                    await Program.SendText("This command requires a color as an additional argument!", message.Channel);
+                    Program.SendText("This command requires a color as an additional argument!", message.Channel).Wait();
                     return;
                 }
 
@@ -170,7 +170,7 @@ namespace MEE7.Commands
                 Rectangle redRekt = FindRectangle(bmp, System.Drawing.Color.FromArgb(254, 34, 34), 20);
 
                 if (redRekt.Width == 0)
-                    await Program.SendText("No rekt!", message.Channel);
+                    Program.SendText("No rekt!", message.Channel).Wait();
                 else
                 {
                     using (Graphics graphics = Graphics.FromImage(output))
@@ -179,12 +179,12 @@ namespace MEE7.Commands
                         graphics.DrawRectangle(Pens.Red, redRekt);
                     }
 
-                    await Program.SendBitmap(output, message.Channel);
+                    Program.SendBitmap(output, message.Channel).Wait();
                 }
             }),
             new EditLastCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list",
-                false, async (SocketMessage message, IMessage lastText, string lastPic) => {
-                await memifyLock.WaitAsync();
+                false, (SocketMessage message, IMessage lastText, string lastPic) => {
+                memifyLock.WaitAsync().Wait();
                 Exception e = null;
                 try
                 {
@@ -194,10 +194,10 @@ namespace MEE7.Commands
                     string memeTemplateDesign = "";
                     if (split.Length == 3 && split[2] == "-list")
                     {
-                        await Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                        Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
                                                                         Where(x => x.EndsWith("design")).
                                                                         Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
-                                                                        Aggregate((x, y) => x + "\n" + y), message.Channel);
+                                                                        Aggregate((x, y) => x + "\n" + y), message.Channel).Wait();
                         return;
                     }
                     else if (split.Length > 2)
@@ -208,7 +208,7 @@ namespace MEE7.Commands
 
                     if (string.IsNullOrWhiteSpace(memeTemplateDesign))
                     {
-                        await Program.SendText("I don't have that meme in my registry!", message.Channel);
+                        Program.SendText("I don't have that meme in my registry!", message.Channel).Wait();
                         return;
                     }
 
@@ -230,7 +230,7 @@ namespace MEE7.Commands
                            graphics.DrawImage(overlay, new Point(0, 0));
                         }
 
-                        await Program.SendBitmap(output, message.Channel);
+                        Program.SendBitmap(output, message.Channel).Wait();
                     }
                     else if (File.Exists(memeTemplate))
                     {
@@ -243,7 +243,7 @@ namespace MEE7.Commands
                         using (Graphics graphics = Graphics.FromImage(template))
                             graphics.DrawImage(bmp, redRekt);
 
-                        await Program.SendBitmap(template, message.Channel);
+                        Program.SendBitmap(template, message.Channel).Wait();
                     }
                     else
                         Program.SendText("Something went wrong :thinking:", message.Channel).Wait();
@@ -269,7 +269,7 @@ namespace MEE7.Commands
                                                                        Where(x => x.EndsWith("-design")).
                                                                        Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
                                                                        Aggregate((x, y) => x + "\n" + y), message.Channel).Wait();
-                            return Task.FromResult(default(object));
+                            return;
                         }
 
                         string font = "Arial";
@@ -296,7 +296,7 @@ namespace MEE7.Commands
                             if (memeDesign == null)
                             {
                                 Program.SendText("Error, couldn't find that meme design!", message.Channel).Wait();
-                                return Task.FromResult(default(object));
+                                return;
                             }
                             memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
                             split.RemoveRange(index, 2);
@@ -310,7 +310,7 @@ namespace MEE7.Commands
                         if (string.IsNullOrWhiteSpace(memeTemplate))
                         {
                             Program.SendText("I don't have that meme in my registry!", message.Channel).Wait();
-                            return Task.FromResult(default(object));
+                            return;
                         }
 
                         if (File.Exists(memeTemplate))
@@ -324,7 +324,7 @@ namespace MEE7.Commands
                             if (redRekt.Width == 0)
                             {
                                 Program.SendText("Error, couldn't find a rectangle to write in!", message.Channel).Wait();
-                                return Task.FromResult(default(object));
+                                return;
                             }
                             fontSize = redRekt.Height / 5f / fontSize;
                             using (Graphics graphics = Graphics.FromImage(template))
@@ -335,12 +335,12 @@ namespace MEE7.Commands
                         else
                             throw new Exception("uwu");
 
-                        return Task.FromResult(default(object));
+                        return;
                     }),
             new EditLastCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
                 "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation " +
                 "strength]",
-                false, async (SocketMessage message, IMessage lastText, string lastPic) => {
+                false, (SocketMessage message, IMessage lastText, string lastPic) => {
                 Bitmap bmp = lastPic.GetBitmapFromURL();
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
@@ -373,7 +373,7 @@ namespace MEE7.Commands
                         output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
                     }
 
-                await Program.SendBitmap(output, message.Channel);
+                Program.SendBitmap(output, message.Channel).Wait();
             })
         };
         static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
@@ -466,9 +466,9 @@ namespace MEE7.Commands
         {
             public bool textBased;
             public string command, desc;
-            public Func<SocketMessage, IMessage, string, Task> execute;
+            public Action<SocketMessage, IMessage, string> execute;
 
-            public EditLastCommand(string command, string desc, bool textBased, Func<SocketMessage, IMessage, string, Task> execute)
+            public EditLastCommand(string command, string desc, bool textBased, Action<SocketMessage, IMessage, string> execute)
             {
                 this.textBased = textBased;
                 this.command = command;

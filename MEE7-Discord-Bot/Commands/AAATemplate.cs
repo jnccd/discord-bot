@@ -15,11 +15,9 @@ namespace MEE7.Commands
 
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             // <Insert command code here>
-            // return Task.FromResult(default(object));
-            throw new NotImplementedException();
         }
     }
 }

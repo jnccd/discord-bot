@@ -15,7 +15,7 @@ namespace MEE7.Commands
 
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             throw new Exception();
         }

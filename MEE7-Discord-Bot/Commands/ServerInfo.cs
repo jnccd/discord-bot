@@ -15,7 +15,7 @@ namespace MEE7.Commands
 
         }
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             SocketGuild g = Program.GetGuildFromChannel(message.Channel);
 
@@ -53,7 +53,7 @@ namespace MEE7.Commands
             
             Program.SendEmbed(info, message.Channel).Wait();
 
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

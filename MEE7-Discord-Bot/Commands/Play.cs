@@ -27,12 +27,12 @@ namespace MEE7
         }
         List<PlayInstance> instances = new List<PlayInstance>();
 
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             if (!message.Content.Contains(" "))
             {
                 Program.SendEmbed(HelpMenu, message.Channel).Wait();
-                return Task.FromResult(default(object));
+                return;
             }
 
             SocketGuild g = Program.GetGuildFromChannel(message.Channel);
@@ -42,7 +42,7 @@ namespace MEE7
             if (!videoURL.StartsWith("https://www.youtube.com/watch?"))
             {
                 Program.SendText("That doesn't look like a youtube video link :thinking:", message.Channel).Wait();
-                return Task.FromResult(default(object));
+                return;
             }
 
             if (channel != null)
@@ -86,9 +86,9 @@ namespace MEE7
             else
             {
                 Program.SendText("You are not in an AudioChannel on this server!", message.Channel).Wait();
-                return Task.FromResult(default(object));
+                return;
             }
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

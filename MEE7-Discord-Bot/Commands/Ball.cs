@@ -16,7 +16,7 @@ namespace MEE7.Commands
 
         }
 
-        public override async Task Execute(SocketMessage commandmessage)
+        public override void Execute(SocketMessage commandmessage)
         {
             string m = commandmessage.Content.ToLower();
             if (m.Split(' ').Length >= 4 && m.Contains("?"))
@@ -29,17 +29,13 @@ namespace MEE7.Commands
                         sum += m.ToCharArray()[i] << i;
 
                     int answerIndex = Math.Abs((int)(sum % answers.Length));
-                    await Program.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel);
+                    Program.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel).Wait();
                 }
                 else
-                {
-                    await Program.SendText("I can only answer yes no questions!", commandmessage.Channel);
-                }
+                    Program.SendText("I can only answer yes no questions!", commandmessage.Channel).Wait();
             }
             else
-            {
-                await Program.SendText("Thats not a question!", commandmessage.Channel);
-            }
+                Program.SendText("Thats not a question!", commandmessage.Channel).Wait();
         }
     }
 }

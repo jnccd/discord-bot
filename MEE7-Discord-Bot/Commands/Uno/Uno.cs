@@ -328,7 +328,7 @@ namespace MEE7.Commands
             return null;
         }
         
-        public override Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(' ');
             if (split.Contains("new"))
@@ -337,17 +337,17 @@ namespace MEE7.Commands
                 if (newGame.Players.Count < 2)
                 {
                     Program.SendText("You need more players to play Uno!", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
                 if (newGame.Players.Exists(x => x.Item1.IsBot))
                 {
                     Program.SendText("Bots can't play Uno!", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
                 if (UnoGames.Exists(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id)))
                 {
                     Program.SendText("You are already in a uno game!", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
                 UnoGames.Add(newGame);
                 newGame.Send(message.Channel);
@@ -371,14 +371,14 @@ namespace MEE7.Commands
                 if (game.TurnPlayerID() != message.Author.Id)
                 {
                     Program.SendText("It's not your turn :thinking:", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
                 if (game != null)
                     game.DrawCards(1, message.Author.Id);
                 else
                 {
                     Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
             }
             else if (split.Length >= 2 && split[1] == "cancel")
@@ -393,7 +393,7 @@ namespace MEE7.Commands
                 if (game == null)
                 {
                     Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
-                    return Task.FromResult(default(object));
+                    return;
                 }
                 
                 UnoCardType t = UnoCardType.one;
@@ -414,7 +414,7 @@ namespace MEE7.Commands
             }
             else
                 Program.SendEmbed(HelpMenu, message.Channel).Wait();
-            return Task.FromResult(default(object));
+            return;
         }
     }
 }

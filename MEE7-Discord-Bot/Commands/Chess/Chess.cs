@@ -25,42 +25,42 @@ namespace MEE7.Commands
             HelpMenu.WithDescription("Chess Commands:");
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length < 2 || split[1] == "help")
-                await Program.SendEmbed(HelpMenu, message.Channel);
+                Program.SendEmbed(HelpMenu, message.Channel).Wait();
             else if (split[1] == "newGame")
             {
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
-                    await Program.SendText("You are already in a game!", message.Channel);
+                    Program.SendText("You are already in a game!", message.Channel).Wait();
                     return;
                 }
 
                 if (message.MentionedUsers.Count != 1)
                 {
-                    await Program.SendText("You need exactly one User to play against!", message.Channel);
+                    Program.SendText("You need exactly one User to play against!", message.Channel).Wait();
                     return;
                 }
 
                 if (message.MentionedUsers.ElementAt(0).IsBot || message.Author.IsBot)
                 {
-                    await Program.SendText("You can't play against Bots!", message.Channel);
+                    Program.SendText("You can't play against Bots!", message.Channel).Wait();
                     return;
                 }
                 
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.MentionedUsers.ElementAt(0).Id ||
                         x.PlayerTop.UserID == message.MentionedUsers.ElementAt(0).Id))
                 {
-                    await Program.SendText(message.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel);
+                    Program.SendText(message.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel).Wait();
                     return;
                 }
 
                 Boards.Add(new ChessBoard(new ChessPlayerDiscord(message.Author.Id),
                            new ChessPlayerDiscord(message.MentionedUsers.ElementAt(0).Id)));
-                await Program.SendText("Created new chess game!", message.Channel);
+                Program.SendText("Created new chess game!", message.Channel).Wait();
                 SendBoard(message);
             }
             else if (split[1] == "game")
@@ -70,7 +70,7 @@ namespace MEE7.Commands
                 int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
                 if (!Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
-                    await Program.SendText("You are not in a game!", message.Channel);
+                    Program.SendText("You are not in a game!", message.Channel).Wait();
                     return;
                 }
 
@@ -78,13 +78,13 @@ namespace MEE7.Commands
 
                 if (split.Length != 4)
                 {
-                    await Program.SendText("I need exactly 2 coordinates", message.Channel);
+                    Program.SendText("I need exactly 2 coordinates", message.Channel).Wait();
                     return;
                 }
 
                 if (Board.PlayerWhoHasTheMove().UserID != message.Author.Id)
                 {
-                    await Program.SendText("Its not your turn", message.Channel);
+                    Program.SendText("Its not your turn", message.Channel).Wait();
                     return;
                 }
 
@@ -96,7 +96,7 @@ namespace MEE7.Commands
                 }
                 catch
                 {
-                    await Program.SendText("I dont understand the first set of your coordinates!", message.Channel);
+                    Program.SendText("I dont understand the first set of your coordinates!", message.Channel).Wait();
                     return;
                 }
 
@@ -108,7 +108,7 @@ namespace MEE7.Commands
                 }
                 catch
                 {
-                    await Program.SendText("I dont understand the second set of your coordinates!", message.Channel);
+                    Program.SendText("I dont understand the second set of your coordinates!", message.Channel).Wait();
                     return;
                 }
 
@@ -119,18 +119,18 @@ namespace MEE7.Commands
 
                     if (Board.GameEnded)
                     {
-                        await Program.SendText($"Player {(Board.Winner == Board.PlayerWhite ? "White" : "Black")} won!", message.Channel);
+                        Program.SendText($"Player {(Board.Winner == Board.PlayerWhite ? "White" : "Black")} won!", message.Channel).Wait();
                         Boards.Remove(Board);
                     }
                 }
                 catch
                 {
-                    await Program.SendText("Oi thats not a legal move!", message.Channel);
+                    Program.SendText("Oi thats not a legal move!", message.Channel).Wait();
                     return;
                 }
             }
             else
-                await Program.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", message.Channel);
+                Program.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", message.Channel).Wait();
         }
 
         public void SendBoard(SocketMessage message)

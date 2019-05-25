@@ -22,7 +22,7 @@ namespace MEE7.Commands
             public int Number;
         }
 
-        public override async Task Execute(SocketMessage message)
+        public override void Execute(SocketMessage message)
         {
             int pc = 0;
             int steps = 0;
@@ -70,7 +70,7 @@ namespace MEE7.Commands
                                 pc++;
                                 if (pc >= message.Content.Length)
                                 {
-                                    await Program.SendText("Check the [] Brackets!", message.Channel);
+                                    Program.SendText("Check the [] Brackets!", message.Channel).Wait();
                                     return;
                                 }
                                 if (message.Content[pc] == '[')
@@ -90,7 +90,7 @@ namespace MEE7.Commands
                                 pc--;
                                 if (pc < 0)
                                 {
-                                    await Program.SendText("Check the [] Brackets!", message.Channel);
+                                    Program.SendText("Check the [] Brackets!", message.Channel).Wait();
                                     return;
                                 }
                                 if (message.Content[pc] == ']')
@@ -104,7 +104,7 @@ namespace MEE7.Commands
 
                 if (steps > 5000)
                 {
-                    await Program.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel);
+                    Program.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel).Wait();
                     return;
                 }
 
@@ -112,7 +112,7 @@ namespace MEE7.Commands
                 steps++;
             }
 
-            await Program.SendText($"```ruby\n {output}```", message.Channel);
+            Program.SendText($"```ruby\n {output}```", message.Channel).Wait();
         }
     }
 }

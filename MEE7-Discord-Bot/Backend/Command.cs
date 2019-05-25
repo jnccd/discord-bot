@@ -54,9 +54,9 @@ namespace MEE7
             IsHidden = isHidden;
         }
         
-        public virtual Task Execute(SocketMessage message)
+        public virtual void Execute(SocketMessage message)
         {
-            return Task.FromResult(default(object));
+            
         }
     }
 }
