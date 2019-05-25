@@ -234,7 +234,7 @@ namespace MEE7
             catch { }
             return Embed;
         }
-        public static ulong GetServerID(this SocketMessage m)
+        public static ulong GetServerID(this IMessage m)
         {
             return Program.GetGuildFromChannel(m.Channel).Id;
         }

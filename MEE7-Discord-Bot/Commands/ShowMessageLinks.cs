@@ -13,10 +13,10 @@ namespace MEE7.Commands
     {
         public ShowMessageLinks() : base("toggleMessageLinkPreviews", "Preview linked messages", false)
         {
-
+            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }
 
-        public override async void OnNonCommandMessageRecieved(SocketMessage message)
+        public async void OnNonCommandMessageRecieved(SocketMessage message)
         {
             if (Config.Data.MessagePreviewServers.Contains(Program.GetGuildFromChannel(message.Channel).Id))
             {

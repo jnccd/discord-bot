@@ -19,10 +19,12 @@ namespace MEE7.Commands
 
         public Markow() : base("markow", "Generates text", false)
         {
-
+            Program.OnConnected += OnConnected;
+            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
+            Program.OnExit += OnExit;
         }
 
-        public override async void OnConnected()
+        public async void OnConnected()
         {
             DateTime start = DateTime.Now;
             string input = "";
@@ -72,15 +74,15 @@ namespace MEE7.Commands
             loadedDict = true;
             Program.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
-        public override async void OnNonCommandMessageRecieved(SocketMessage message)
+        public void OnNonCommandMessageRecieved(IMessage message)
         {
-            IEnumerable<IMessage> messages = await message.Channel.GetMessagesAsync(2).FlattenAsync();
+            IEnumerable<IMessage> messages = message.Channel.GetMessagesAsync(2).FlattenAsync().Result;
             if (messages.Count() == 2)
                 MarkovHelper.AddToDict(messages.ElementAt(1).Content, message.Content);
             else
                 MarkovHelper.AddToDict(message.Content);
         }
-        public override void OnExit()
+        public void OnExit()
         {
             if (loadedDict)
                 MarkovHelper.SaveDict();

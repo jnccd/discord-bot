@@ -50,6 +50,7 @@ namespace MEE7.Commands
 
         public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
         {
+            Program.OnConnected += () => Task.Factory.StartNew(RunNotificationLoop);
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("```csharp\n" +
                                       "Use \"" + PrefixAndCommand + " state\" to view the worldState.\n" +
@@ -61,10 +62,6 @@ namespace MEE7.Commands
                                       "               You can also add a 'multifilter' by binding two or more filters together with a &\n" +
                                       "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
                                       "```");
-        }
-        public override void OnConnected()
-        {
-            Task.Factory.StartNew(RunNotificationLoop);
         }
         public override Task Execute(SocketMessage message)
         {

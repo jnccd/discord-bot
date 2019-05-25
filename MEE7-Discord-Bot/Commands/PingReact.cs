@@ -16,10 +16,10 @@ namespace MEE7.Commands
 
         public PingReact() : base("", "", false, true)
         {
-
+            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }
 
-        public override void OnNonCommandMessageRecieved(SocketMessage message)
+        public void OnNonCommandMessageRecieved(SocketMessage message)
         {
             if (message.MentionedUsers.Count == 0 && message.MentionedRoles.Count == 0 || !(message is IUserMessage))
                 return;
