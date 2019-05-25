@@ -71,6 +71,8 @@ namespace MEE7
         public static event ConnectedHandler OnConnected;
         public delegate void ExitHandler();
         public static event ExitHandler OnExit;
+        public delegate void TestHandler();
+        public static event TestHandler OnTest;
 
         // Discord
         private static SocketUser Pmaster;
@@ -153,21 +155,22 @@ namespace MEE7
             },
             // 4 - Events
             () => {
-                Task.Run(() => throw new Exception());
-
-                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                OnTest += () => {
                     ConsoleWriteLine("lul1");
                 };
-                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                OnTest += () => {
                     throw new Exception();
                 };
-                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                OnTest += () => {
                     ConsoleWriteLine("lul2");
                 };
-                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                OnTest += () => {
                     ConsoleWriteLine("lul3");
                 };
-                OnNonCommandMessageRecieved.Invoke(null);
+                OnTest += () => {
+                    throw new Exception();
+                };
+                OnTest.InvokeParalell();
             }
         };
 
@@ -698,7 +701,7 @@ namespace MEE7
                 Task.Run(() => ParallelMessageReceived(message));
             if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 Task.Run(() => {
-                    try { OnNonCommandMessageRecieved(message); }
+                    try { OnNonCommandMessageRecieved.InvokeParalell(message); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             return Task.FromResult(default(object));

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using static MEE7.Program;
 
 namespace MEE7
 {
@@ -403,6 +404,16 @@ namespace MEE7
                 catch { }
                 TimeoutEvent();
             }
+        }
+        public static void InvokeParalell(this NonCommandMessageRecievedHandler h, SocketMessage parameters)
+        {
+            foreach (NonCommandMessageRecievedHandler h1 in h.GetInvocationList())
+                Task.Run(() => h1.Invoke(parameters));
+        }
+        public static void InvokeParalell(this TestHandler t)
+        {
+            foreach (TestHandler t1 in t.GetInvocationList())
+                Task.Run(() => t1.Invoke());
         }
     }
 }
