@@ -405,9 +405,11 @@ namespace MEE7
                 TimeoutEvent();
             }
         }
-        public static void InvokeParalell(this Delegate d, params object[] args)
+        public static void InvokeParalell(this Delegate del, params object[] args)
         {
-            Parallel.ForEach(d.GetInvocationList(), x => x.DynamicInvoke(args));
+            foreach (var d in del.GetInvocationList())
+                Task.Run(() => { try { d.DynamicInvoke(args); }
+                                 catch { } });
         }
     }
 }
