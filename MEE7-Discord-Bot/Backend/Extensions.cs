@@ -405,15 +405,9 @@ namespace MEE7
                 TimeoutEvent();
             }
         }
-        public static void InvokeParalell(this NonCommandMessageRecievedHandler h, SocketMessage parameters)
+        public static void InvokeParalell(this Delegate d, params object[] args)
         {
-            foreach (NonCommandMessageRecievedHandler h1 in h.GetInvocationList())
-                Task.Run(() => h1.Invoke(parameters));
-        }
-        public static void InvokeParalell(this TestHandler t)
-        {
-            foreach (TestHandler t1 in t.GetInvocationList())
-                Task.Run(() => t1.Invoke());
+            Parallel.ForEach(d.GetInvocationList(), x => x.DynamicInvoke(args));
         }
     }
 }
