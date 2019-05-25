@@ -58,30 +58,5 @@ namespace MEE7
         {
             return Task.FromResult(default(object));
         }
-
-        public virtual void OnNonCommandMessageRecieved(SocketMessage message)
-        {
-
-        }
-        public virtual void OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
-        {
-
-        }
-        public virtual void OnEmojiReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
-        {
-
-        }
-        public virtual void OnEmojiReactionUpdated(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
-        {
-
-        }
-        public virtual void OnConnected()
-        {
-
-        }
-        public virtual void OnExit()
-        {
-
-        }
     }
 }

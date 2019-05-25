@@ -13,16 +13,17 @@ namespace MEE7.Commands
     {
         public EmojiUsage() : base("emojiUsage", "Which emojis are actually used?", false)
         {
-            
+            Program.OnConnected += OnConnected;
+            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }
 
-        public override void OnConnected()
+        public void OnConnected()
         {
             foreach (DiscordServer server in Config.Data.ServerList)
                 server.UpdateEmojis();
         }
 
-        public override void OnNonCommandMessageRecieved(SocketMessage message)
+        public void OnNonCommandMessageRecieved(IMessage message)
         {
             int userIndex = Config.Data.UserList.FindIndex(x => x.UserID == message.Author.Id);
             if (message.Content.Count(x => x == ':') >= 2 && userIndex >= 0 && DateTime.Now.Subtract(Config.Data.UserList[userIndex].LastEmojiMessage).TotalMinutes > 5)

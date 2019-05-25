@@ -14,10 +14,10 @@ namespace MEE7.Commands
     {
         public PatchNotes() : base("togglePatchNotes", "Get annoying messages", false)
         {
-
+            Program.OnConnected += OnConnected;
         }
 
-        public override void OnConnected()
+        public void OnConnected()
         {
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;

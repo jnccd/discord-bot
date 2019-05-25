@@ -41,7 +41,7 @@ namespace MEE7
         static int ConcurrentCommandExecutions = 0;
         public static Random RDM { get; private set; } = new Random();
         static readonly int AutoSaveIntervalInMinutes = 60;
-        public static readonly string ExePath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\";
+        public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\";
         readonly static string LogPath = "Log.txt";
 
         // Client 
@@ -57,6 +57,20 @@ namespace MEE7
                                       from assemblyType in domainAssembly.GetTypes()
                                       where assemblyType.IsSubclassOf(typeof(Command))
                                       select assemblyType).ToArray();
+
+        // Command Events
+        public delegate void NonCommandMessageRecievedHandler(SocketMessage message);
+        public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
+        public delegate void EmojiReactionAddedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
+        public static event EmojiReactionAddedHandler OnEmojiReactionAdded;
+        public delegate void EmojiReactionRemovedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
+        public static event EmojiReactionRemovedHandler OnEmojiReactionRemoved;
+        public delegate void EmojiReactionUpdatedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
+        public static event EmojiReactionUpdatedHandler OnEmojiReactionUpdated;
+        public delegate void ConnectedHandler();
+        public static event ConnectedHandler OnConnected;
+        public delegate void ExitHandler();
+        public static event ExitHandler OnExit;
 
         // Discord
         private static SocketUser Pmaster;
@@ -86,11 +100,11 @@ namespace MEE7
         // Tests
         private static readonly int CurrentlyActiveTestIndex = 0;
         private static readonly Action[] Tests = new Action[] {
-            // Hello World
+            // 0 - Hello World
             () => {
                 ConsoleWriteLine("Hello world!");
             },
-            // Video Playing
+            // 1 - Video Playing
             () => {
                 string videoPath = Directory.GetCurrentDirectory() + "\\" + DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
                 ISocketAudioChannel channel = GetChannelFromID(479951814217826305) as ISocketAudioChannel;
@@ -98,7 +112,7 @@ namespace MEE7
                 SendAudioAsync(client, videoPath).Wait();
                 channel.DisconnectAsync().Wait();
             },
-            // Module Crawler
+            // 2 - Module Crawler
             () => {
                 string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
                 HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
@@ -113,7 +127,7 @@ namespace MEE7
                         GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
                 }
             },
-            // Twtich
+            // 3 - Twtich
             () => {
                 var client = new TwitchClient();
                 client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
@@ -136,6 +150,24 @@ namespace MEE7
                 api.Settings.ClientId = Config.Data.TwitchAPIClientID;
                 api.Settings.AccessToken = Config.Data.TwitchAPIAccessToken;
                 var res = api.Helix.Users.GetUsersFollowsAsync("42111676").Result;
+            },
+            // 4 - Events
+            () => {
+                Task.Run(() => throw new Exception());
+
+                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                    ConsoleWriteLine("lul1");
+                };
+                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                    throw new Exception();
+                };
+                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                    ConsoleWriteLine("lul2");
+                };
+                OnNonCommandMessageRecieved += (SocketMessage message) => {
+                    ConsoleWriteLine("lul3");
+                };
+                OnNonCommandMessageRecieved.Invoke(null);
             }
         };
 
@@ -310,16 +342,10 @@ namespace MEE7
         }
         static void CallOnConnected()
         {
-            foreach (Command c in commands)
-            {
-                Task.Run(() => {
-                    try
-                    {
-                        c.OnConnected();
-                    }
-                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                });
-            }
+            Task.Run(() => {
+                try { OnConnected(); }
+                catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+            });
         }
         static void StartAutosaveLoop()
         {
@@ -541,14 +567,8 @@ namespace MEE7
                 ConsoleWriteLine("Closing... Files are being saved");
                 Config.Save();
                 ConsoleWriteLine("Closing... Command Exit events are being executed");
-                foreach (Command c in commands)
-                {
-                    try
-                    {
-                        c.OnExit();
-                    }
-                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                }
+                try { OnExit(); }
+                catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 ConsoleWriteLine("Closing... Remove Error Emojis");
                 foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
                 {
@@ -640,15 +660,11 @@ namespace MEE7
                 }
             });
             if (arg3.UserId != OwnID)
-                foreach (Command c in commands)
-                    Task.Run(() => {
-                        try
-                        {
-                            c.OnEmojiReactionAdded(arg1, arg2, arg3);
-                            c.OnEmojiReactionUpdated(arg1, arg2, arg3);
-                        }
-                        catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                    });
+                Task.Run(() => {
+                    try {  OnEmojiReactionAdded(arg1, arg2, arg3);
+                           OnEmojiReactionUpdated(arg1, arg2, arg3); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                });
 
             return Task.FromResult(default(object));
         }
@@ -668,40 +684,23 @@ namespace MEE7
                 }
             });
             if (arg3.UserId != OwnID)
-                foreach (Command c in commands)
-                    Task.Run(() => {
-                        try
-                        {
-                            c.OnEmojiReactionRemoved(arg1, arg2, arg3);
-                            c.OnEmojiReactionUpdated(arg1, arg2, arg3);
-                        }
-                        catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                    });
+                Task.Run(() => {
+                    try { OnEmojiReactionRemoved(arg1, arg2, arg3);
+                          OnEmojiReactionUpdated(arg1, arg2, arg3); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                });
 
             return Task.FromResult(default(object));
         }
         private static Task MessageReceived(SocketMessage message)
         {
-            if (!message.Author.IsBot)
-            {
-                if (message.Content.StartsWith(prefix))
-                    Task.Run(() => ParallelMessageReceived(message));
-
-                if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
-                {
-                    foreach (Command c in commands)
-                    {
-                        Task.Run(() => {
-                            try
-                            {
-                                c.OnNonCommandMessageRecieved(message);
-                            }
-                            catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                        });
-                    }
-                    
-                }
-            }
+            if (!message.Author.IsBot && message.Content.StartsWith(prefix))
+                Task.Run(() => ParallelMessageReceived(message));
+            if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
+                Task.Run(() => {
+                    try { OnNonCommandMessageRecieved(message); }
+                    catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                });
             return Task.FromResult(default(object));
         }
         private static void ParallelMessageReceived(SocketMessage message)

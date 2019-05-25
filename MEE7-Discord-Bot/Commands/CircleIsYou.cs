@@ -48,10 +48,11 @@ namespace MEE7.Commands
 
         public CircleIsYou() : base("circleIsYou", "You are a circle :0", false, true)
         {
-
+            Program.OnEmojiReactionUpdated += OnEmojiReactionUpdated;
+            Program.OnExit += OnExit;
         }
-        
-        public override void OnEmojiReactionUpdated(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+
+        public void OnEmojiReactionUpdated(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
             lock (this)
             {
@@ -79,7 +80,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override void OnExit()
+        public void OnExit()
         {
             lock (this)
             {
