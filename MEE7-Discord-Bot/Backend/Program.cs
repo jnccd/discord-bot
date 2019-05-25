@@ -112,7 +112,7 @@ namespace MEE7
                 SendAudioAsync(client, videoPath).Wait();
                 channel.DisconnectAsync().Wait();
             },
-            /* 2 - Module Crawler */ () => {
+            /* 2 - Uni Module Crawler */ () => {
                 string url = "https://mdb.ps.informatik.uni-kiel.de/show.cgi?Category/show/Category91";
                 HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
                 req.KeepAlive = false;
@@ -165,7 +165,7 @@ namespace MEE7
                 OnTest += () => {
                     throw new Exception();
                 };
-                OnTest.InvokeParalell();
+                OnTest.InvokeParallel();
             }
         };
 
@@ -659,8 +659,8 @@ namespace MEE7
             });
             if (arg3.UserId != OwnID)
                 Task.Run(() => {
-                    try { OnEmojiReactionAdded?.Invoke(arg1, arg2, arg3);
-                          OnEmojiReactionUpdated?.Invoke(arg1, arg2, arg3); }
+                    try { OnEmojiReactionAdded?.InvokeParallel(arg1, arg2, arg3);
+                          OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
@@ -683,8 +683,8 @@ namespace MEE7
             });
             if (arg3.UserId != OwnID)
                 Task.Run(() => {
-                    try { OnEmojiReactionRemoved?.Invoke(arg1, arg2, arg3);
-                          OnEmojiReactionUpdated?.Invoke(arg1, arg2, arg3); }
+                    try { OnEmojiReactionRemoved?.InvokeParallel(arg1, arg2, arg3);
+                          OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
@@ -696,7 +696,7 @@ namespace MEE7
                 Task.Run(() => ParallelMessageReceived(message));
             if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
                 Task.Run(() => {
-                    try { OnNonCommandMessageRecieved.InvokeParalell(message); }
+                    try { OnNonCommandMessageRecieved.InvokeParallel(message); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             return Task.FromResult(default(object));
