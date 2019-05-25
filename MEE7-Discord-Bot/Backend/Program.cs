@@ -608,7 +608,7 @@ namespace MEE7
 
                 if (!hasWrite)
                 {
-                    IDMChannel c = await g.Owner.GetOrCreateDMChannelAsync();
+                    IDMChannel c = g.Owner.GetOrCreateDMChannelAsync().Result;
                     await c.SendMessageAsync("How can one be on your server and not have the right to write messages!? This is outrageous, its unfair!");
                     return;
                 }
@@ -624,7 +624,7 @@ namespace MEE7
         private static Task Client_Ready()
         {
             ClientReady = true;
-            return Task.FromResult(0);
+            return Task.FromResult(default(object));
         }
         private static Task Client_Log(LogMessage msg)
         {
@@ -645,7 +645,7 @@ namespace MEE7
             }
             else
                 ConsoleWriteLine(msg.ToString(), color);
-            return Task.FromResult(0);
+            return Task.FromResult(default(object));
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
@@ -664,12 +664,12 @@ namespace MEE7
             });
             if (arg3.UserId != OwnID)
                 Task.Run(() => {
-                    try {  OnEmojiReactionAdded(arg1, arg2, arg3);
-                           OnEmojiReactionUpdated(arg1, arg2, arg3); }
+                    try { OnEmojiReactionAdded?.Invoke(arg1, arg2, arg3);
+                          OnEmojiReactionUpdated?.Invoke(arg1, arg2, arg3); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
-            return Task.FromResult(0);
+            return Task.FromResult(default(object));
         }
         private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
@@ -688,12 +688,12 @@ namespace MEE7
             });
             if (arg3.UserId != OwnID)
                 Task.Run(() => {
-                    try { OnEmojiReactionRemoved(arg1, arg2, arg3);
-                          OnEmojiReactionUpdated(arg1, arg2, arg3); }
+                    try { OnEmojiReactionRemoved?.Invoke(arg1, arg2, arg3);
+                          OnEmojiReactionUpdated?.Invoke(arg1, arg2, arg3); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
-            return Task.FromResult(0);
+            return Task.FromResult(default(object));
         }
         private static Task MessageReceived(SocketMessage message)
         {
@@ -704,7 +704,7 @@ namespace MEE7
                     try { OnNonCommandMessageRecieved.InvokeParalell(message); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
-            return Task.FromResult(0);
+            return Task.FromResult(default(object));
         }
         private static void ParallelMessageReceived(SocketMessage message)
         {
@@ -739,7 +739,7 @@ namespace MEE7
                 Command called = commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == split[0].ToLower());
                 if (called != null)
                 {
-                    ExecuteCommand(called, message).Wait();
+                    ExecuteCommand(called, message);
                 }
                 else
                 {
@@ -761,7 +761,7 @@ namespace MEE7
                     if (min < Math.Min(4, split[0].Length - 1))
                     {
                         SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel).Wait();
-                        ExecuteCommand(commands[minIndex], message).Wait();
+                        ExecuteCommand(commands[minIndex], message);
                     }
                 }
             }
@@ -770,13 +770,13 @@ namespace MEE7
             if (user != null)
                 user.TotalCommandsUsed++;
         }
-        private static async Task ExecuteCommand(Command command, SocketMessage message)
+        private static void ExecuteCommand(Command command, SocketMessage message)
         {
             if (command.GetType() == typeof(Template) && !ExperimentalChannels.Contains(message.Channel.Id))
                 return;
             if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
             {
-                await SendText("Experimental commands cant be used here!", message.Channel);
+                SendText("Experimental commands cant be used here!", message.Channel).Wait();
                 return;
             }
 
@@ -804,9 +804,9 @@ namespace MEE7
             {
                 try // Try in case I dont have the permissions to write at all
                 {
-                    RestUserMessage m = await message.Channel.SendMessageAsync(ErrorMessage);
+                    RestUserMessage m = message.Channel.SendMessageAsync(ErrorMessage).Result;
 
-                    await m.AddReactionAsync(ErrorEmoji);
+                    m.AddReactionAsync(ErrorEmoji).Wait();
                     CachedErrorMessages.Add(new Tuple<RestUserMessage, Exception>(m, e));
                 }
                 catch { }
