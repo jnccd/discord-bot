@@ -192,7 +192,7 @@ namespace MEE7.Commands
                 voidtrader.WithColor(0, 128, 255);
                 if (WarframeHandler.worldState.WS_VoidTrader.Inventory.Count == 0)
                 {
-                    voidtrader.WithTitle($"Baro-Senpai is currently gone\nBut don't despair he will come back:");
+                    voidtrader.WithTitle($"Baro-Senpai is currently gone\nBut don't despair he will come back");
                     voidtrader.WithTimestamp(WarframeHandler.worldState.WS_VoidTrader.StartTime.ToLocalTime());
                 }
                 else
