@@ -1,7 +1,8 @@
 ﻿image: microsoft/dotnet:2.2-sdk
 
-job: 
-    - script: "echo 'Hi fam'"
+job:
+    script: 
+        - "echo 'test'"
 
 stages:
     - build
