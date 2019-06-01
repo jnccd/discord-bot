@@ -197,9 +197,11 @@ namespace MEE7.Commands
                 }
                 else
                 {
-                    voidtrader.WithTitle("Baro-senpai is here :weary:\nBut only until" + WarframeHandler.worldState.WS_VoidTrader.EndTime);
+                    voidtrader.WithTitle("Baro-senpai is here :weary:");
                     foreach (VoidTraderItem item in WarframeHandler.worldState.WS_VoidTrader.Inventory)
-                        voidtrader.AddFieldDirectly(item.Item, $"{item.Credits}:moneybag: {item.Ducats}D");
+                        voidtrader.AddFieldDirectly(item.Item, $"{item.Credits}:moneybag: {item.Ducats}:regional_indicator_d:");
+                    voidtrader.WithFooter("He will leave again ");
+                    voidtrader.WithTimestamp(WarframeHandler.worldState.WS_VoidTrader.EndTime.ToLocalTime());
                 }
                 re.Add(voidtrader);
 
@@ -308,21 +310,12 @@ namespace MEE7.Commands
             {
                 List<ulong> channels = Config.Data.UserList.Select(x => x.WarframeChannelID).Distinct().ToList();
 
-                EmbedBuilder embed = new EmbedBuilder();
-                embed.WithDescription("Void trader arrived at " + WarframeHandler.worldState.WS_VoidTrader.Location + " with: ");
-                embed.WithFooter("He will leave again at " + WarframeHandler.worldState.WS_VoidTrader.EndTime);
-                embed.WithTitle("Baro-senpai is here :weary:");
-                embed.WithTimestamp(new DateTimeOffset(WarframeHandler.worldState.WS_VoidTrader.EndTime));
-                foreach (VoidTraderItem item in WarframeHandler.worldState.WS_VoidTrader.Inventory)
-                    embed.AddFieldDirectly(item.Item, "[Link](https://warframe.fandom.com/wiki/Special:Search?query=" +
-                             HttpUtility.HtmlEncode(item.Item).Replace(' ', '+') + ") - " + item.Credits + "c " + item.Ducats + "D");
-
 #if !DEBUG
                 foreach (ulong id in channels)
                 {
                     SocketChannel channel = Program.GetChannelFromID(id);
                     if (channel is ISocketMessageChannel)
-                        Program.SendEmbed(embed, (ISocketMessageChannel)channel).Wait();
+                        Program.SendEmbed(GetStateEmbeds().FirstOrDefault(x => x.Title.StartsWith("Baro")), (ISocketMessageChannel)channel).Wait();
                 }
 #endif
             }
