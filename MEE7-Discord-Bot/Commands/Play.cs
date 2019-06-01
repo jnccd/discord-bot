@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Audio;
 using Discord.WebSocket;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,19 +16,10 @@ namespace MEE7
         public Play() : base("play", "Plays youtube videos", false)
         {
             HelpMenu = new EmbedBuilder();
-            HelpMenu.WithTitle("Give it a YoutTube link and it'll work.");
+            HelpMenu.WithTitle("Give it a YoutTube link and it'll ~~maybe~~ work.");
         }
-        
-        class PlayInstance
-        {
-            public Task playThread;
-            public IAudioClient client;
-            public ISocketAudioChannel channel;
-            public string VideoPath;
-        }
-        List<PlayInstance> instances = new List<PlayInstance>();
 
-        public override void Execute(SocketMessage message)
+        public override async void Execute(SocketMessage message)
         {
             if (!message.Content.Contains(" "))
             {
@@ -47,41 +39,24 @@ namespace MEE7
 
             if (channel != null)
             {
-                PlayInstance instance = instances.FirstOrDefault(x => x.channel.Id == channel.Id);
-                if (instance == null)
-                {
-                    Task thread;
-                    lock (this)
-                    {
-                        string path = Program.DownloadVideoFromYouTube(videoURL);
-                        IAudioClient client = channel.ConnectAsync().Result;
-                        thread = Program.SendAudioAsync(client, path);
-                        instance = new PlayInstance { playThread = thread, channel = channel, client = client, VideoPath = path };
-                        instances.Add(instance);
-                    }
-                    thread.Wait();
-                    channel.DisconnectAsync().Wait();
-                    instances.Remove(instance);
-                }
-                else
-                {
-                    Task thread;
-                    lock (this)
-                    {
-                        instance.channel.DisconnectAsync().Wait();
-                        instances.Remove(instance);
+                try { channel.DisconnectAsync().Wait(); } catch { }
 
-                        string path = Program.DownloadVideoFromYouTube(videoURL);
-                        IAudioClient client = channel.ConnectAsync().Result;
-                        thread = Program.SendAudioAsync(client, path);
-                        instance = new PlayInstance { playThread = thread, channel = channel, client = client, VideoPath = path };
-                        instances.Add(instance);
+                try
+                {
+                    IAudioClient client = await channel.ConnectAsync();
+                    using (StreamReader audioStream = Program.GetAudioStreamFromYouTubeVideo(videoURL, "mp3"))
+                    using (MemoryStream mem = new MemoryStream())
+                    {
+                        audioStream.BaseStream.CopyTo(mem);
+                        using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
+                            new StreamMediaFoundationReader(mem)))
+                            Program.SendAudioAsync(client, naudioStream).Wait();
                     }
-
-                    thread.Wait();
-                    channel.DisconnectAsync().Wait();
-                    instances.Remove(instance);
                 }
+                catch (Exception e)
+                { }
+
+                try { channel.DisconnectAsync().Wait(); } catch { }
             }
             else
             {
