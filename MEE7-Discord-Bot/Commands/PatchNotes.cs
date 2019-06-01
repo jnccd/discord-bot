@@ -41,7 +41,7 @@ namespace MEE7.Commands
                     if (tuple.Item1 == Config.Data.LastCommitMessage)
                         break;
 
-                    PatchNotes.Add($"{tuple.Item1}\n[Link to the github-commit.]({tuple.Item2})");
+                    PatchNotes.Add($"[{tuple.Item1}]({tuple.Item2})");
                 }
 
                 if (messages.Count > 0)
@@ -55,7 +55,7 @@ namespace MEE7.Commands
 #if !DEBUG
                 EmbedBuilder Embed = new EmbedBuilder { Title = "Patch Notes:" };
                 Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
-                Embed.WithDescription(PatchNotes.Aggregate((x, y) => x + "\n\n" + y));
+                Embed.WithDescription(PatchNotes.Aggregate((x, y) => x + "\n" + y));
                 foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
                     Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
