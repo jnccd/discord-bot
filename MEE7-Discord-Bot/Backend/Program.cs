@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using TwitchLib.Api;
 using System.Net;
+using NAudio.Wave;
 
 namespace MEE7
 {
@@ -862,20 +863,6 @@ namespace MEE7
         }
 
         // Audio / Video
-        public static async Task SendAudioAsync(IAudioClient audioClient, string path)
-        {
-            Exception ex = null;
-            using (Process ffmpeg = CreateFFMPEGProcess(path))
-            using (AudioOutStream stream = audioClient.CreatePCMStream(AudioApplication.Music))
-            {
-                try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
-                catch (Exception e) { ex = e; }
-                finally { await stream.FlushAsync(); }
-            }
-
-            if (ex != null)
-                throw ex;
-        }
         private static Process CreateFFMPEGProcess(string path)
         {
             return Process.Start(new ProcessStartInfo
@@ -919,6 +906,52 @@ namespace MEE7
                 else
                     return "";
             }
+        }
+        public static StreamReader GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat)
+        {
+            if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
+                return null;
+
+            Process P = new Process
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = "youtube-dl",
+                    Arguments = $"--audio-format {audioFormat} -o - {YoutubeURL}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardError = true
+                }
+            };
+            P.Start();
+            return P.StandardOutput;
+        }
+        public static async Task SendAudioAsync(IAudioClient audioClient, Stream stream)
+        {
+            Exception ex = null;
+            using (AudioOutStream audioStream = audioClient.CreatePCMStream(AudioApplication.Music))
+            {
+                try { await stream.CopyToAsync(audioStream); }
+                catch (Exception e) { ex = e; }
+                finally { await audioStream.FlushAsync(); }
+            }
+
+            if (ex != null)
+                throw ex;
+        }
+        public static async Task SendAudioAsync(IAudioClient audioClient, string path)
+        {
+            Exception ex = null;
+            using (Process ffmpeg = CreateFFMPEGProcess(path))
+            using (AudioOutStream stream = audioClient.CreatePCMStream(AudioApplication.Music))
+            {
+                try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
+                catch (Exception e) { ex = e; }
+                finally { await stream.FlushAsync(); }
+            }
+
+            if (ex != null)
+                throw ex;
         }
 
         // Send Wrappers
