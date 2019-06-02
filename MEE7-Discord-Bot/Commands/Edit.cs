@@ -17,9 +17,13 @@ namespace MEE7.Commands
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
 
             HelpMenu = new EmbedBuilder();
-            HelpMenu.WithDescription("Edit Commands:");
-            foreach (EditCommand ecommand in Commands)
-                HelpMenu.AddFieldDirectly(PrefixAndCommand + " " + ecommand.Command, ecommand.Desc);
+            HelpMenu.WithDescription("Operators:\n" +
+                "> Concatinates functions\n" +
+                "| Ends the command parsing and lets you add additional arguments\n" +
+                "\nEdit Commands:");
+            HelpMenu.AddFieldDirectly("Input Commands:", InputCommands.Select(c => $"{PrefixAndCommand} {c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
+            HelpMenu.AddFieldDirectly("Text Commands:", TextCommands.Select(c => $"{PrefixAndCommand} {c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
+            HelpMenu.AddFieldDirectly("Picture Commands:", PictureCommands.Select(c => $"{PrefixAndCommand} {c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
         }
 
         public override void Execute(SocketMessage message)
@@ -126,10 +130,10 @@ namespace MEE7.Commands
                     pic = picLink;
                 return pic;
             }),
-            new EditCommand("thisT", "Gets the this messages text after |", (SocketMessage m, object o) => {
+            new EditCommand("thisT", "Gets this messages text after |", (SocketMessage m, object o) => {
                 return m.Content.Split('|').Skip(1).Foldl("", (ts, t) => ts + t);
             }),
-            new EditCommand("thisP", "Gets the this messages picture", (SocketMessage m, object o) => {
+            new EditCommand("thisP", "Gets this messages picture / picture link after |", (SocketMessage m, object o) => {
                 string pic = null;
                 if (m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
                 {
@@ -148,7 +152,7 @@ namespace MEE7.Commands
         readonly EditCommand[] TextCommands = new EditCommand[]
         {
             new EditCommand("swedish", "Convert the text to swedish", (SocketMessage m, object o) => {
-                return string.Join("", (o as string).Reverse().Skip(1).Reverse().Select(x => x + "f")) + (o as string).Last();
+                return string.Join("", (o as string).Select(x => x + "f"));
             }, typeof(string)),
             new EditCommand("mock", "Mock the text", (SocketMessage m, object o) => {
                 return Program.CreateEmbedBuilder("",
