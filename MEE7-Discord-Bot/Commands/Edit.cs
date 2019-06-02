@@ -19,15 +19,20 @@ namespace MEE7.Commands
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("Operators:\n" +
                 "> Concatinates functions\n" +
+                "() Let you add additional arguments for the command (optional)\n" +
+               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
-            HelpMenu.AddFieldDirectly("Input Commands:", InputCommands.Select(c => $"{PrefixAndCommand} {c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
-            HelpMenu.AddFieldDirectly("Text Commands:", TextCommands.Select(c => $"{PrefixAndCommand} {c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
-            HelpMenu.AddFieldDirectly("Picture Commands:", PictureCommands.Select(c => $"{PrefixAndCommand} {c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
+            HelpMenu.AddFieldDirectly("Input Commands:", InputCommands.Select(c => $"{c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
+            HelpMenu.AddFieldDirectly("Text Commands:", TextCommands.Select(c => $"{c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
+            HelpMenu.AddFieldDirectly("Picture Commands:", PictureCommands.Select(c => $"{c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
         }
 
         public override void Execute(SocketMessage message)
         {
-            PrintResult(RunCommands(message), message);
+            if (message.Content.Length <= PrefixAndCommand.Length + 1)
+                Program.SendEmbed(HelpMenu, message.Channel).Wait();
+            else
+                PrintResult(RunCommands(message), message);
         }
         object RunCommands(SocketMessage message)
         {
@@ -46,7 +51,7 @@ namespace MEE7.Commands
                 string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray());
                 string args = c.GetEverythingBetween("(", ")");
 
-                EditCommand command = Commands.FirstOrDefault(x => x.Command == cwoargs);
+                EditCommand command = Commands.FirstOrDefault(x => x.Command.ToLower() == cwoargs.ToLower());
                 if (command == null)
                 {
                     Program.SendText($"I don't know a command called {cwoargs}", message.Channel).Wait();
@@ -178,7 +183,7 @@ namespace MEE7.Commands
                 return (o as string).Replace("|", "");
             }),
             new EditCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", (SocketMessage m, string a, object o) => {
-                return (o as string).Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y).Remove(0, 1);
+                return (o as string).Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
             }),
         };
 
