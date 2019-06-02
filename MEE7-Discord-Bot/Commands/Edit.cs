@@ -176,8 +176,11 @@ namespace MEE7.Commands
             new EditCommand("SUPERCAPS", "Convert text to SUPER CAPS", (SocketMessage m, string a, object o) => {
                 return string.Join("", (o as string).Select((x) => { return char.ToUpper(x) + " "; }));
             }),
-            new EditCommand("Spoilerify", "Convert text to a spoiler", (SocketMessage m, string a, object o) => {
+            new EditCommand("CopySpoilerify", "Convert text to a spoiler", (SocketMessage m, string a, object o) => {
                 return "`" + string.Join("", (o as string).Select((x) => { return "||" + x + "||"; })) + "`";
+            }),
+            new EditCommand("Spoilerify", "Convert text to a spoiler", (SocketMessage m, string a, object o) => {
+                return string.Join("", (o as string).Select((x) => { return "||" + x + "||"; }));
             }),
             new EditCommand("Unspoilerify", "Convert spoiler text to readable text", (SocketMessage m, string a, object o) => {
                 return (o as string).Replace("|", "");
