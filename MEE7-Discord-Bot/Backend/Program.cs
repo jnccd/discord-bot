@@ -370,7 +370,7 @@ namespace MEE7
             while (true)
             {
                 string input = Console.ReadLine();
-
+                
                 if (input == "exit")
                     break;
 
@@ -695,7 +695,7 @@ namespace MEE7
         {
             if (!message.Author.IsBot && message.Content.StartsWith(prefix))
                 Task.Run(() => ParallelMessageReceived(message));
-            if (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':')
+            if (message.Content.Length > 0 && (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':'))
                 Task.Run(() => {
                     try { OnNonCommandMessageRecieved.InvokeParallel(message); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
@@ -791,7 +791,7 @@ namespace MEE7
 
                 if (message.Channel is SocketGuildChannel)
                     ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " + 
-                        $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin{ message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
+                        $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
                 else
                     ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                        $"DMs \tfor {message.Author.Username}", ConsoleColor.Green);
