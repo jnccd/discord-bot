@@ -39,14 +39,7 @@ namespace MEE7
             public string Desc;
         }
 
-        public Command(string command, string desc, bool isExperimental)
-        {
-            Desc = desc;
-            CommandLine = command;
-            IsExperimental = isExperimental;
-            IsHidden = false;
-        }
-        public Command(string command, string desc, bool isExperimental, bool isHidden)
+        public Command(string command, string desc, bool isExperimental = false, bool isHidden = false)
         {
             Desc = desc;
             CommandLine = command;
