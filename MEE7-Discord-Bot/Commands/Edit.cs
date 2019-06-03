@@ -236,11 +236,12 @@ namespace MEE7.Commands
             new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-
+                
+                System.Drawing.Color c;
                 if (string.IsNullOrWhiteSpace(a))
-                    throw new ArgumentException("This command requires a color as an additional argument!");
-
-                System.Drawing.Color c = System.Drawing.Color.FromName(a);
+                    c = System.Drawing.Color.FromArgb(254, 34, 34);
+                else
+                    c = System.Drawing.Color.FromName(a);
                 Rectangle redRekt = FindRectangle(bmp, c, 20);
 
                 if (redRekt.Width == 0)
