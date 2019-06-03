@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using XnaGeometry;
 using MEE7;
+using System.IO;
 
 namespace MEE7.Commands
 {
@@ -39,7 +40,7 @@ namespace MEE7.Commands
                 Max();
             HelpMenu.AddFieldDirectly(Name, "```" + editCommands.
                 Select(c => CommandToCommandTypeString(c) +
-                $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length + 3).ToArray())}{c.Desc}\n").
+                $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
                 Combine() + "```");
         }
 
@@ -74,9 +75,9 @@ namespace MEE7.Commands
                     return null;
                 }
 
-                if (command.ExpectedInputType != null && (currentData == null || currentData.GetType() != command.ExpectedInputType))
+                if (command.InputType != null && (currentData == null || currentData.GetType() != command.InputType))
                 {
-                    Program.SendText($"Wrong Data Type Error in {c}\nExpected: {command.ExpectedInputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
+                    Program.SendText($"Wrong Data Type Error in {c}\nExpected: {command.InputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
                     return null;
                 }
 
@@ -86,7 +87,7 @@ namespace MEE7.Commands
                 }
                 catch (Exception e)
                 {
-                    Program.SendText($"[{c}] {e.Message}\n  " +
+                    Program.SendText($"[{c}] {e.Message} " +
                         $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}",
                         message.Channel).Wait();
                     return null;
@@ -118,10 +119,10 @@ namespace MEE7.Commands
         class EditCommand
         {
             public string Command, Desc;
-            public Type ExpectedInputType;
+            public Type InputType, OutputType;
             public Func<SocketMessage, string, object, object> Function;
 
-            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type ExpectedInputType = null)
+            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType = null, Type OutputType = null)
             {
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
                     throw new IllegalCommandException("Illegal Symbol!");
@@ -129,7 +130,8 @@ namespace MEE7.Commands
                 this.Command = Command;
                 this.Desc = Desc;
                 this.Function = Function;
-                this.ExpectedInputType = ExpectedInputType;
+                this.InputType = InputType;
+                this.OutputType = OutputType;
             }
         }
         readonly IEnumerable<EditCommand> Commands;
@@ -231,224 +233,191 @@ namespace MEE7.Commands
 
                 return bmp;
             }, typeof(Bitmap)),
-        //    new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, object o) => {
-        //        Bitmap bmp = (o as string).GetBitmapFromURL();
-        //        Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, string a, object o) => {
+                Bitmap bmp = (o as Bitmap);
+                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
-        //        if (message.Content.Split(' ').Length < 2)
-        //        {
-        //            Program.SendText("This command requires a color as an additional argument!", message.Channel).Wait();
-        //            return;
-        //        }
+                if (string.IsNullOrWhiteSpace(a))
+                    throw new ArgumentException("This command requires a color as an additional argument!");
 
-        //        System.Drawing.Color c = System.Drawing.Color.FromName(message.Content.Split(' ')[2]);
-        //        Rectangle redRekt = FindRectangle(bmp, System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                System.Drawing.Color c = System.Drawing.Color.FromName(a);
+                Rectangle redRekt = FindRectangle(bmp, c, 20);
 
-        //        if (redRekt.Width == 0)
-        //            Program.SendText("No rekt!", message.Channel).Wait();
-        //        else
-        //        {
-        //            using (Graphics graphics = Graphics.FromImage(output))
-        //            {
-        //                graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, bmp.Width, bmp.Height));
-        //                graphics.DrawRectangle(Pens.Red, redRekt);
-        //            }
+                if (redRekt.Width == 0)
+                    throw new Exception("No rekt!");
+                else
+                {
+                    using (Graphics graphics = Graphics.FromImage(output))
+                    {
+                        graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, bmp.Width, bmp.Height));
+                        graphics.DrawRectangle(Pens.Red, redRekt);
+                    }
 
-        //            return bmp;
-        //        }
-        //    }),
-        //    new EditCommand("memify", "Turn the last Picture into a meme, get a list of available templates with the argument -list",
-        //        (SocketMessage m, object o) => {
-        //        memifyLock.WaitAsync().Wait();
-        //        Exception e = null;
-        //        try
-        //        {
-        //            string[] files = Directory.GetFiles("Commands\\MemeTemplates");
-        //            string[] split = message.Content.Split(' ');
+                    return bmp;
+                }
+            }),
+            new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list",
+                (SocketMessage m, string a, object o) => {
+                lock (memifyLock)
+                {
+                    string[] files = Directory.GetFiles("Commands\\MemeTemplates");
+                    string[] split = a.Split(' ');
 
-        //            string memeTemplateDesign = "";
-        //            if (split.Length == 3 && split[2] == "-list")
-        //            {
-        //                Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
-        //                                                                Where(x => x.EndsWith("design")).
-        //                                                                Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
-        //                                                                Aggregate((x, y) => x + "\n" + y), message.Channel).Wait();
-        //                return;
-        //            }
-        //            else if (split.Length > 2)
-        //                memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[2]) &&
-        //                                                      Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
-        //            else
-        //                memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
+                    string memeTemplateDesign = "";
+                    if (a == "-list")
+                        throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                                                                        Where(x => x.EndsWith("design")).
+                                                                        Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
+                                                                        Aggregate((x, y) => x + "\n" + y));
+                    else if (!string.IsNullOrWhiteSpace(a))
+                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(a) &&
+                                                              Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
+                    else
+                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
 
-        //            if (string.IsNullOrWhiteSpace(memeTemplateDesign))
-        //            {
-        //                Program.SendText("I don't have that meme in my registry!", message.Channel).Wait();
-        //                return;
-        //            }
+                    if (string.IsNullOrWhiteSpace(memeTemplateDesign))
+                        throw new Exception("I don't have that meme in my registry!");
 
-        //            string memeName = memeTemplateDesign.RemoveLastGroup('-');
-        //            string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
-        //            string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
+                    string memeName = memeTemplateDesign.RemoveLastGroup('-');
+                    string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
+                    string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
-        //            Bitmap bmp = lastPic.GetBitmapFromURL();
-        //            if (File.Exists(memeTemplateOverlay))
-        //            {
-        //                Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
-        //                Bitmap overlay;
-        //                using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
-        //                    overlay = (Bitmap)Bitmap.FromStream(stream);
-        //                Bitmap output = new Bitmap(overlay.Width, overlay.Height);
-        //                using (Graphics graphics = Graphics.FromImage(output))
-        //                {
-        //                   graphics.DrawImage(bmp, redRekt);
-        //                   graphics.DrawImage(overlay, new Point(0, 0));
-        //                }
+                    Bitmap bmp = o as Bitmap;
+                    if (File.Exists(memeTemplateOverlay))
+                    {
+                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        Bitmap overlay;
+                        using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
+                            overlay = (Bitmap)Bitmap.FromStream(stream);
+                        Bitmap output = new Bitmap(overlay.Width, overlay.Height);
+                        using (Graphics graphics = Graphics.FromImage(output))
+                        {
+                           graphics.DrawImage(bmp, redRekt);
+                           graphics.DrawImage(overlay, new Point(0, 0));
+                        }
 
-        //                Program.SendBitmap(output, message.Channel).Wait();
-        //            }
-        //            else if (File.Exists(memeTemplate))
-        //            {
-        //                Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
-        //                if (redRekt.Width == 0)
-        //                    redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(255, 0, 0), 20);
-        //                Bitmap template;
-        //                using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-        //                    template = (Bitmap)Bitmap.FromStream(stream);
-        //                using (Graphics graphics = Graphics.FromImage(template))
-        //                    graphics.DrawImage(bmp, redRekt);
+                        return output;
+                    }
+                    else if (File.Exists(memeTemplate))
+                    {
+                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        if (redRekt.Width == 0)
+                            redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                        Bitmap template;
+                        using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
+                            template = (Bitmap)Bitmap.FromStream(stream);
+                        using (Graphics graphics = Graphics.FromImage(template))
+                            graphics.DrawImage(bmp, redRekt);
 
-        //                Program.SendBitmap(template, message.Channel).Wait();
-        //            }
-        //            else
-        //                Program.SendText("Something went wrong :thinking:", message.Channel).Wait();
-        //        }
-        //        catch (Exception ex) { e = ex; }
-        //        finally
-        //        {
-        //            memifyLock.Release();
-        //            if (e != null)
-        //                throw e;
-        //        }
-        //    }),
-        //    new EditCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
-        //        "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", (SocketMessage m, object o) => {
-        //                string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
-        //                List<string> split = message.Content.Split(' ').ToList();
-        //                split.RemoveRange(0, 2);
+                        return template;
+                    }
+                    else
+                        throw new Exception("Something went wrong :thinking:");
+                }
+            }),
+            new EditCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
+                "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", (SocketMessage m, string a, object o) => {
+                        string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
+                        List<string> split = a.Split(' ').ToList();
 
-        //                if (split.Contains("-list"))
-        //                {
-        //                    Program.SendText("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
-        //                                                               Where(x => x.EndsWith("-design")).
-        //                                                               Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
-        //                                                               Aggregate((x, y) => x + "\n" + y), message.Channel).Wait();
-        //                    return;
-        //                }
+                        if (split.Contains("-list"))
+                            throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                                                                       Where(x => x.EndsWith("-design")).
+                                                                       Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
+                                                                       Aggregate((x, y) => x + "\n" + y));
 
-        //                string font = "Arial";
-        //                float fontSize = 1;
-        //                int index = split.FindIndex(x => x == "-f");
-        //                if (index != -1)
-        //                {
-        //                    font = split[index + 1];
-        //                    split.RemoveRange(index, 2);
-        //                }
-        //                index = split.FindIndex(x => x == "-r");
-        //                if (index != -1)
-        //                {
-        //                    fontSize = (float)split[index + 1].ConvertToDouble();
-        //                    split.RemoveRange(index, 2);
-        //                }
-        //                index = split.FindIndex(x => x == "-m");
-        //                string memeTemplate = "";
-        //                string memeDesign = "";
-        //                if (index != -1)
-        //                {
-        //                    memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[index + 1]) &&
-        //                        Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
-        //                    if (memeDesign == null)
-        //                    {
-        //                        Program.SendText("Error, couldn't find that meme design!", message.Channel).Wait();
-        //                        return;
-        //                    }
-        //                    memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
-        //                    split.RemoveRange(index, 2);
-        //                }
-        //                else
-        //                {
-        //                    memeDesign = files.Where(x => x.Contains("-design")).GetRandomValue();
-        //                    memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
-        //                }
+                        string font = "Arial";
+                        float fontSize = 1;
+                        int index = split.FindIndex(x => x == "-f");
+                        if (index != -1)
+                        {
+                            font = split[index + 1];
+                            split.RemoveRange(index, 2);
+                        }
+                        index = split.FindIndex(x => x == "-r");
+                        if (index != -1)
+                        {
+                            fontSize = (float)split[index + 1].ConvertToDouble();
+                            split.RemoveRange(index, 2);
+                        }
+                        index = split.FindIndex(x => x == "-m");
+                        string memeTemplate = "";
+                        string memeDesign = "";
+                        if (index != -1)
+                        {
+                            memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[index + 1]) &&
+                                Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
+                            if (memeDesign == null)
+                                throw new Exception("Error, couldn't find that meme design!");
+                            memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
+                            split.RemoveRange(index, 2);
+                        }
+                        else
+                        {
+                            memeDesign = files.Where(x => x.Contains("-design")).GetRandomValue();
+                            memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
+                        }
 
-        //                if (string.IsNullOrWhiteSpace(memeTemplate))
-        //                {
-        //                    Program.SendText("I don't have that meme in my registry!", message.Channel).Wait();
-        //                    return;
-        //                }
+                        if (string.IsNullOrWhiteSpace(memeTemplate))
+                            throw new Exception("I don't have that meme in my registry!");
 
-        //                if (File.Exists(memeTemplate))
-        //                {
-        //                    Bitmap template, design;
-        //                    using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-        //                        template = (Bitmap)Bitmap.FromStream(stream);
-        //                    using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
-        //                        design = (Bitmap)Bitmap.FromStream(stream);
-        //                    Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
-        //                    if (redRekt.Width == 0)
-        //                    {
-        //                        Program.SendText("Error, couldn't find a rectangle to write in!", message.Channel).Wait();
-        //                        return;
-        //                    }
-        //                    fontSize = redRekt.Height / 5f / fontSize;
-        //                    using (Graphics graphics = Graphics.FromImage(template))
-        //                        graphics.DrawString(lastText.Content, new Font(font, fontSize), Brushes.Black, redRekt);
+                        if (File.Exists(memeTemplate))
+                        {
+                            Bitmap template, design;
+                            using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
+                                template = (Bitmap)Bitmap.FromStream(stream);
+                            using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
+                                design = (Bitmap)Bitmap.FromStream(stream);
+                            Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                            if (redRekt.Width == 0)
+                                throw new Exception("Error, couldn't find a rectangle to write in!");
+                            fontSize = redRekt.Height / 5f / fontSize;
+                            using (Graphics graphics = Graphics.FromImage(template))
+                                graphics.DrawString(o as string, new Font(font, fontSize), Brushes.Black, redRekt);
 
-        //                    Program.SendBitmap(template, message.Channel).Wait();
-        //                }
-        //                else
-        //                    throw new Exception("uwu");
+                            return template;
+                        }
+                        else
+                            throw new Exception("uwu");
+                    }),
+            new EditCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"expand 0.5,0.5 1\"" +
+                "\nThe argument syntax is: [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation " +
+                "strength]",
+                (SocketMessage m, string a, object o) => {
+                Bitmap bmp = o as Bitmap;
+                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+                Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
+                float Strength = 1;
+                string[] split = a.Split(new char[] { ' ', '\n' });
 
-        //                return;
-        //            }),
-        //    new EditCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\nWithout any arguments it will automatically call \"liq expand 0.5,0.5 1\"" +
-        //        "\nThe syntax is: liq [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the pciture] [strength, eg. 0.7, for 70% transformation " +
-        //        "strength]",
-        //        (SocketMessage m, object o) => {
-        //        Bitmap bmp = lastPic.GetBitmapFromURL();
-        //        Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-        //        Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
-        //        float Strength = 1;
-        //        string[] split = message.Content.Split(new char[] { ' ', '\n' });
+                TransformMode mode = TransformMode.Expand;
+                try
+                {
+                    Enum.TryParse(split[0].ToCapital(), out mode);
+                } catch { }
 
-        //        try
-        //        {
-        //            string cen = split[3];
-        //            string[] cent = cen.Split(',');
-        //            center.X = (float)cent[0].ConvertToDouble() * bmp.Width;
-        //            center.Y = (float)cent[1].ConvertToDouble() * bmp.Height;
-        //        } catch { }
+                try
+                {
+                    string cen = split[1];
+                    string[] cent = cen.Split(',');
+                    center.X = (float)cent[0].ConvertToDouble() * bmp.Width;
+                    center.Y = (float)cent[1].ConvertToDouble() * bmp.Height;
+                } catch { }
 
-        //        try
-        //        {
-        //            Strength = (float)split[4].ConvertToDouble();
-        //        } catch { }
+                try
+                {
+                    Strength = (float)split[2].ConvertToDouble();
+                } catch { }
+                    
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
+                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
+                    }
 
-        //        TransformMode mode = TransformMode.Expand;
-        //        try
-        //        {
-        //            Enum.TryParse(split[2].ToCapital(), out mode);
-        //        } catch { }
-
-        //        for (int x = 0; x < bmp.Width; x++)
-        //            for (int y = 0; y < bmp.Height; y++)
-        //            {
-        //                Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
-        //                output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
-        //            }
-
-        //        Program.SendBitmap(output, message.Channel).Wait();
-        //    })
+                return output;
+            })
         };
         static SemaphoreSlim memifyLock = new SemaphoreSlim(1, 1);
         private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
