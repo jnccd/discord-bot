@@ -52,9 +52,7 @@ namespace MEE7
                             new StreamMediaFoundationReader(mem)))
                             Program.SendAudioAsync(client, naudioStream).Wait();
                     }
-                }
-                catch (Exception e)
-                { }
+                } catch { }
 
                 try { channel.DisconnectAsync().Wait(); } catch { }
             }

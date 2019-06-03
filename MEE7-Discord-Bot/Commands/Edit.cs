@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using XnaGeometry;
+using MEE7;
 
 namespace MEE7.Commands
 {
@@ -17,14 +18,29 @@ namespace MEE7.Commands
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
 
             HelpMenu = new EmbedBuilder();
-            HelpMenu.WithDescription("Operators:\n" +
+            HelpMenu.WithDescription("Operators:\n```" +
                 "> Concatinates functions\n" +
                 "() Let you add additional arguments for the command (optional)\n" +
-               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
+               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify```\n" +
                 "\nEdit Commands:");
-            HelpMenu.AddFieldDirectly("Input Commands:", InputCommands.Select(c => $"{c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
-            HelpMenu.AddFieldDirectly("Text Commands:", TextCommands.Select(c => $"{c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
-            HelpMenu.AddFieldDirectly("Picture Commands:", PictureCommands.Select(c => $"{c.Command} | {c.Desc}\n").Foldl("", (x, y) => x + y));
+            AddToHelpmenu("Input Commands:", InputCommands);
+            AddToHelpmenu("Text Commands:", TextCommands);
+            AddToHelpmenu("Picture Commands:", PictureCommands);
+        }
+        void AddToHelpmenu(string Name, EditCommand[] editCommands)
+        {
+            string CommandToCommandTypeString(EditCommand c) => $"{c.Command}: " +
+            //  $"`{(c.ExpectedInputType == null ? "_" : c.ExpectedInputType.ToReadableString())}` -> " +
+            //  $"`{c.Function(default, "", c.ExpectedInputType.GetDefault()).GetType().ToReadableString()}`" +
+                $"";
+            int maxlength = editCommands.
+                Select(CommandToCommandTypeString).
+                Select(x => x.Length).
+                Max();
+            HelpMenu.AddFieldDirectly(Name, "```" + editCommands.
+                Select(c => CommandToCommandTypeString(c) +
+                $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length + 3).ToArray())}{c.Desc}\n").
+                Combine() + "```");
         }
 
         public override void Execute(SocketMessage message)
@@ -155,7 +171,6 @@ namespace MEE7.Commands
                 return pic.GetBitmapFromURL();
             }),
         };
-
         readonly EditCommand[] TextCommands = new EditCommand[]
         {
             new EditCommand("swedish", "Convert the text to swedish", (SocketMessage m, string a, object o) => {
@@ -189,7 +204,6 @@ namespace MEE7.Commands
                 return (o as string).Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
             }),
         };
-
         readonly EditCommand[] PictureCommands = new EditCommand[] {
             new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
@@ -521,6 +535,5 @@ namespace MEE7.Commands
         {
             return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
         }
-
     }
 }

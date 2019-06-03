@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -213,6 +214,10 @@ namespace MEE7
                 }
             return d[smaller.Length, longer.Length];
         }
+        public static string Combine(this IEnumerable<string> s)
+        {
+            return s.Foldl("", (x, y) => x + y);
+        }
 
         // Discord
         public static EmbedBuilder ToEmbed(this IMessage m)
@@ -409,6 +414,28 @@ namespace MEE7
             foreach (var d in del.GetInvocationList())
                 Task.Run(() => { try { d.DynamicInvoke(args); }
                                  catch { } });
+        }
+        /// <summary>
+        /// For the given type, returns its representation in C# code.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="genericArgs">Used internally, ignore.</param>
+        /// <param name="arrayBrackets">Used internally, ignore.</param>
+        /// <returns>The representation of the type in C# code.</returns>
+        public static string ToReadableString(this Type type)
+        {
+            return type.ToString().
+                Replace("`System.Object`System.Linq.Enumerable+RepeatIterator`1[System.Char]", "string").
+                Replace("`System.Object`System.Linq.Enumerable+RepeatIterator`1[", "").
+                Replace("]", "[]").
+                Split('.').Last().Replace("`", "'").Replace("´", "'");
+        }
+        public static object GetDefault(this Type type) // from https://stackoverflow.com/questions/325426/programmatic-equivalent-of-defaulttype
+        {
+            if (type.IsValueType)
+                return Activator.CreateInstance(type);
+            else
+                return null;
         }
     }
 }
