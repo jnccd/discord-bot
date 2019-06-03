@@ -254,7 +254,7 @@ namespace MEE7.Commands
                         graphics.DrawRectangle(Pens.Red, redRekt);
                     }
 
-                    return bmp;
+                    return output;
                 }
             }),
             new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list",
