@@ -172,7 +172,7 @@ namespace MEE7.Commands
                 return pic.GetBitmapFromURL();
             }),
             new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
-                return Program.GetUserFromId(Convert.ToUInt64(a)).GetAvatarUrl(ImageFormat.Png).GetBitmapFromURL();
+                return Program.GetUserFromId(Convert.ToUInt64(a)).GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
             }),
         };
         readonly EditCommand[] TextCommands = new EditCommand[]
@@ -237,7 +237,7 @@ namespace MEE7.Commands
             new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-                
+
                 System.Drawing.Color c;
                 if (string.IsNullOrWhiteSpace(a))
                     c = System.Drawing.Color.FromArgb(254, 34, 34);
@@ -411,7 +411,7 @@ namespace MEE7.Commands
                 {
                     Strength = (float)split[2].ConvertToDouble();
                 } catch { }
-                    
+
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
                     {
@@ -420,7 +420,34 @@ namespace MEE7.Commands
                     }
 
                 return output;
-            })
+            }),
+            new EditCommand("horzEdgeDetection", "Detects horizontal edges", (SocketMessage m, string a, object o) => {
+                Bitmap bmp = o as Bitmap;
+                int[,] kernel = new int[3,3] { {  1,  2,  1 }, 
+                                               {  0,  0,  0 }, 
+                                               { -1, -2, -1 } };
+
+                int kernelW = kernel.GetLength(0);
+                int kernelH = kernel.GetLength(1);
+                Bitmap output = new Bitmap(bmp.Width - kernel.GetLength(0) + 1, bmp.Height - kernel.GetLength(1) + 1);
+
+                for (int x = 0; x < output.Width; x++)
+                    for (int y = 0; y < output.Height; y++)
+                    {
+                        int activation = 0;
+                        for (int xk = x; xk < x + kernelW; xk++)
+                            for (int yk = y; yk < y + kernelH; yk++)
+                                activation += kernel[xk - x, yk - y] * bmp.GetPixel(xk, yk).GetGrayScale();
+                        activation += 255 / 2;
+                        if (activation > 255)
+                            activation = 255;
+                        if (activation < 0)
+                            activation = 0;
+                        output.SetPixel(x, y, System.Drawing.Color.FromArgb(activation, activation, activation));
+                    }
+
+                return output;
+            }),
         };
         static readonly object memifyLock = new object();
         private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
