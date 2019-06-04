@@ -24,15 +24,15 @@ namespace MEE7.Commands
                 "() Let you add additional arguments for the command (optional)\n" +
                $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
-            AddToHelpmenu("Input Commands:", InputCommands);
-            AddToHelpmenu("Text Commands:", TextCommands);
-            AddToHelpmenu("Picture Commands:", PictureCommands);
+            AddToHelpmenu("Input Commands", InputCommands);
+            AddToHelpmenu("Text Commands", TextCommands);
+            AddToHelpmenu("Picture Commands", PictureCommands);
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
             string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**: " +
-            //  $"`{(c.ExpectedInputType == null ? "_" : c.ExpectedInputType.ToReadableString())}` -> " +
-            //  $"`{c.Function(default, "", c.ExpectedInputType.GetDefault()).GetType().ToReadableString()}`" +
+                //  $"`{(c.ExpectedInputType == null ? "_" : c.ExpectedInputType.ToReadableString())}` -> " +
+                //  $"`{c.Function(default, "", c.ExpectedInputType.GetDefault()).GetType().ToReadableString()}`" +
                 $"";
             int maxlength = editCommands.
                 Select(CommandToCommandTypeString).

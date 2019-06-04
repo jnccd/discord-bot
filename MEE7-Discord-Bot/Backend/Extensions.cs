@@ -259,7 +259,20 @@ namespace MEE7
         }
         public static void AddFieldDirectly(this EmbedBuilder e, string Name, object Value, bool IsInline = false)
         {
-            e.Fields.Add(new EmbedFieldBuilder() { Name = Name, Value = Value, IsInline = IsInline });
+            string text = Value.ToString();
+            if (text.Length < 1024)
+                e.Fields.Add(new EmbedFieldBuilder() { Name = Name, Value = Value, IsInline = IsInline });
+            else
+            {
+                int i;
+                for (i = 1; text.Length >= 1015; i++)
+                {
+                    int cutIndex = text.AllIndexesOf("\n").Where(x => x <= 1020).Max();
+                    e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text.Substring(0, cutIndex), IsInline = IsInline });
+                    text = text.Remove(0, cutIndex);
+                }
+                e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text, IsInline = IsInline });
+            }
         }
 
         // Drawing
