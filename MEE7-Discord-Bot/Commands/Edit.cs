@@ -19,10 +19,10 @@ namespace MEE7.Commands
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
 
             HelpMenu = new EmbedBuilder();
-            HelpMenu.WithDescription("Operators:\n```" +
+            HelpMenu.WithDescription("Operators:\n" +
                 "> Concatinates functions\n" +
                 "() Let you add additional arguments for the command (optional)\n" +
-               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify```\n" +
+               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
             AddToHelpmenu("Input Commands:", InputCommands);
             AddToHelpmenu("Text Commands:", TextCommands);
@@ -30,7 +30,7 @@ namespace MEE7.Commands
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
-            string CommandToCommandTypeString(EditCommand c) => $"{c.Command}: " +
+            string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**: " +
             //  $"`{(c.ExpectedInputType == null ? "_" : c.ExpectedInputType.ToReadableString())}` -> " +
             //  $"`{c.Function(default, "", c.ExpectedInputType.GetDefault()).GetType().ToReadableString()}`" +
                 $"";
@@ -38,10 +38,10 @@ namespace MEE7.Commands
                 Select(CommandToCommandTypeString).
                 Select(x => x.Length).
                 Max();
-            HelpMenu.AddFieldDirectly(Name, "```" + editCommands.
+            HelpMenu.AddFieldDirectly(Name, "" + editCommands.
                 Select(c => CommandToCommandTypeString(c) +
                 $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
-                Combine() + "```");
+                Combine() + "");
         }
 
         public override void Execute(SocketMessage message)
