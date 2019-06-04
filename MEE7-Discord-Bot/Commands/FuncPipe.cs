@@ -14,7 +14,7 @@ namespace MEE7.Commands
 {
     public class FuncPipe : Command
     {
-        public FuncPipe() : base("funcPipe", "Edit stuff using various functions")
+        public FuncPipe() : base("func", "Edit stuff using various functions")
         {
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
 
