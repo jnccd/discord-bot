@@ -421,7 +421,7 @@ namespace MEE7.Commands
 
                 return output;
             }),
-            new EditCommand("horzEdgeDetection", "Detects horizontal edges", (SocketMessage m, string a, object o) => {
+            new EditCommand("sobelEdges", "Detects horizontal edges", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = o as Bitmap;
                 int[,] kernel = new int[3,3] { {  1,  2,  1 }, 
                                                {  0,  0,  0 }, 
