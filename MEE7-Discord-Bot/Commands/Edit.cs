@@ -12,9 +12,9 @@ using System.IO;
 
 namespace MEE7.Commands
 {
-    public class Edit : Command
+    public class FuncPipe : Command
     {
-        public Edit() : base("edit", "Edit stuff")
+        public FuncPipe() : base("funcPipe", "Edit stuff using various functions")
         {
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
 
