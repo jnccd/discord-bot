@@ -421,36 +421,29 @@ namespace MEE7.Commands
 
                 return output;
             }),
-            new EditCommand("sobelEdges", "Detects horizontal edges", (SocketMessage m, string a, object o) => {
-                Bitmap bmp = o as Bitmap;
-                int[,] kernel = new int[3,3] { {  1,  2,  1 }, 
-                                               {  0,  0,  0 }, 
-                                               { -1, -2, -1 } };
-
-                int kernelW = kernel.GetLength(0);
-                int kernelH = kernel.GetLength(1);
-                Bitmap output = new Bitmap(bmp.Width - kernel.GetLength(0) + 1, bmp.Height - kernel.GetLength(1) + 1);
-
-                for (int x = 0; x < output.Width; x++)
-                    for (int y = 0; y < output.Height; y++)
-                    {
-                        int activation = 0;
-                        for (int xk = x; xk < x + kernelW; xk++)
-                            for (int yk = y; yk < y + kernelH; yk++)
-                                activation += kernel[xk - x, yk - y] * bmp.GetPixel(xk, yk).GetGrayScale();
-                        activation += 255 / 2;
-                        if (activation > 255)
-                            activation = 255;
-                        if (activation < 0)
-                            activation = 0;
-                        output.SetPixel(x, y, System.Drawing.Color.FromArgb(activation, activation, activation));
-                    }
-
-                return output;
-            }),
+            new EditCommand("sobelEdges", "´Highlights horizontal edges", (SocketMessage m, string a, object o) =>
+                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                        {  0,  0,  0 },
+                                                        { -1, -2, -1 } }, 1, true)),
+            new EditCommand("sobelEdgesColor", "´Highlights horizontal edges", (SocketMessage m, string a, object o) =>
+                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                        {  0,  0,  0 },
+                                                        { -1, -2, -1 } })),
+            new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) =>
+                ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
+                                                        { -1,  5, -1 },
+                                                        {  0, -1,  0 } })),
+            new EditCommand("boxBlur", "well guess what it does", (SocketMessage m, string a, object o) =>
+                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
+                                                        {  1,  1,  1 },
+                                                        {  1,  1,  1 } })),
+            new EditCommand("gaussianBlur", "well guess what it does", (SocketMessage m, string a, object o) =>
+                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                        {  2,  4,  2 },
+                                                        {  1,  2,  1 } }, 1/16f)),
         };
         static readonly object memifyLock = new object();
-        private static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
+        static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
         {
             Vector2 diff = point - center;
             Vector2 move = diff;
@@ -509,8 +502,8 @@ namespace MEE7.Commands
 
             return target;
         }
-        private enum TransformMode { Expand, Collapse, Stir, Fall }
-        private static Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
+        enum TransformMode { Expand, Collapse, Stir, Fall }
+        static Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
         {
             for (int x = 1; x < Pic.Width; x++)
                 for (int y = 1; y < Pic.Height; y++)
@@ -530,9 +523,59 @@ namespace MEE7.Commands
 
             return new Rectangle();
         }
-        private static bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
+        static bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
         {
             return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
+        }
+        static Bitmap ApplyKernel(Bitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
+        {
+            int kernelW = kernel.GetLength(0);
+            int kernelH = kernel.GetLength(1);
+            Bitmap output = new Bitmap(bmp.Width - kernel.GetLength(0) + 1, bmp.Height - kernel.GetLength(1) + 1);
+
+            if (grayscale)
+            {
+                for (int x = 0; x < output.Width; x++)
+                    for (int y = 0; y < output.Height; y++)
+                    {
+                        int activation = 0;
+                        for (int xk = x; xk < x + kernelW; xk++)
+                            for (int yk = y; yk < y + kernelH; yk++)
+                                activation += kernel[xk - x, yk - y] * bmp.GetPixel(xk, yk).GetGrayScale();
+                        activation = (int)(activation * factor);
+                        activation += 255 / 2;
+                        if (activation > 255)
+                            activation = 255;
+                        if (activation < 0)
+                            activation = 0;
+                        output.SetPixel(x, y, System.Drawing.Color.FromArgb(activation, activation, activation));
+                    }
+            }
+            else
+            {
+                for (int x = 0; x < output.Width; x++)
+                    for (int y = 0; y < output.Height; y++)
+                    {
+                        int[] activation = new int[3] { 0, 0, 0 };
+                        for (int i = 0; i < activation.Length; i++)
+                        {
+                            for (int xk = x; xk < x + kernelW; xk++)
+                                for (int yk = y; yk < y + kernelH; yk++)
+                                    activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
+                                        bmp.GetPixel(xk, yk).R : (i == 1 ?
+                                        bmp.GetPixel(xk, yk).G : bmp.GetPixel(xk, yk).B));
+                            activation[i] = (int)(activation[i] * factor);
+                            activation[i] += 255 / 2;
+                            if (activation[i] > 255)
+                                activation[i] = 255;
+                            if (activation[i] < 0)
+                                activation[i] = 0;
+                        }
+                        output.SetPixel(x, y, System.Drawing.Color.FromArgb(activation[0], activation[1], activation[2]));
+                    }
+            }
+
+            return output;
         }
     }
 }
