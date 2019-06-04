@@ -172,7 +172,7 @@ namespace MEE7.Commands
                 return pic.GetBitmapFromURL();
             }),
             new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
-                return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
+                return Program.GetUserFromId(Convert.ToUInt64(a)).GetAvatarUrl(ImageFormat.Png).GetBitmapFromURL();
             }),
         };
         readonly EditCommand[] TextCommands = new EditCommand[]
