@@ -437,5 +437,9 @@ namespace MEE7
             else
                 return null;
         }
+        public static int GetGrayScale(this System.Drawing.Color c)
+        {
+            return (c.R + c.G + c.B) / 3;
+        }
     }
 }
