@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Color = System.Drawing.Color;
 
 namespace MEE7
 {
@@ -289,10 +290,8 @@ namespace MEE7
 
             return bmp;
         }
-        public static int GetGrayScale(this System.Drawing.Color c)
-        {
-            return (c.R + c.G + c.B) / 3;
-        }
+        public static int GetGrayScale(this Color c) => (c.R + c.G + c.B) / 3;
+        public static int GetColorDiff(this Color c, Color C) => c.R - C.R + c.G - C.G + c.B - C.B;
 
         // Linq Extensions
         public static b Foldl<a, b>(this IEnumerable<a> xs, b y, Func<b, a, b> f)
