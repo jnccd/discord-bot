@@ -12,6 +12,7 @@ namespace MEE7.Commands
 {
     public class Edit : Command
     {
+        // Backend
         public Edit() : base("edit", "Edit stuff using various functions")
         {
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
@@ -133,6 +134,7 @@ namespace MEE7.Commands
         }
         readonly IEnumerable<EditCommand> Commands;
 
+        // Command Library
         enum TransformMode { Expand, Collapse, Stir, Fall }
         static readonly object memifyLock = new object();
 
@@ -509,20 +511,10 @@ namespace MEE7.Commands
                                                                    {  1,  2,  1 } }, 1/16f);
                 }, typeof(Bitmap)),
             new EditCommand("jkrowling", "Gay rights", (SocketMessage m, string a, object o) => {
-                Bitmap bmp = o as Bitmap;
-                Color[] backgroundColors = new Color[] { bmp.GetPixel(0, 0),
-                    bmp.GetPixel(0, bmp.Height - 1), bmp.GetPixel(bmp.Width - 1, 0),
-                    bmp.GetPixel(bmp.Width - 1, bmp.Height - 1) };
-                bool ShouldBeRecolored(Color C) => backgroundColors.Select(c => Math.Abs(c.GetColorDiff(C)) > 70).Aggregate((x,y) => x && y) && C.A > 5;
-                return FlagColor(ShouldBeRecolored, new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
+                return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, o as Bitmap);
             }, typeof(Bitmap)),
             new EditCommand("merkel", "German rights", (SocketMessage m, string a, object o) => {
-                Bitmap bmp = o as Bitmap;
-                Color[] backgroundColors = new Color[] { bmp.GetPixel(0, 0),
-                    bmp.GetPixel(0, bmp.Height - 1), bmp.GetPixel(bmp.Width - 1, 0),
-                    bmp.GetPixel(bmp.Width - 1, bmp.Height - 1) };
-                bool ShouldBeRecolored(Color C) => backgroundColors.Select(c => Math.Abs(c.GetColorDiff(C)) > 70).Aggregate((x,y) => x && y) && C.A > 5;
-                return FlagColor(ShouldBeRecolored, new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
+                return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, o as Bitmap);
             }, typeof(Bitmap)),
         };
         static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
@@ -599,6 +591,16 @@ namespace MEE7.Commands
             }
 
             return output;
+        }
+        static Bitmap FlagColor(Color[] Cs, Bitmap P, bool Horz = false)
+        {
+            bool ShouldBeRecolored(Color C) => 
+                new Color[] { P.GetPixel(0, 0),
+                    P.GetPixel(0, P.Height - 1), P.GetPixel(P.Width - 1, 0),
+                    P.GetPixel(P.Width - 1, P.Height - 1) }.
+                    Select(c => Math.Abs(c.GetColorDiff(C)) > 70).
+                    Aggregate((x, y) => x && y) && C.A > 5;
+            return FlagColor(ShouldBeRecolored, Cs, P, Horz);
         }
         static Bitmap FlagColor(Func<Color, bool> ShouldBeRecolored, Color[] Cs, Bitmap P, bool Horz = false)
         {
