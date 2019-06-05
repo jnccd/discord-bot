@@ -135,6 +135,9 @@ namespace MEE7.Commands
         }
         readonly IEnumerable<EditCommand> Commands;
 
+        enum TransformMode { Expand, Collapse, Stir, Fall }
+        static readonly object memifyLock = new object();
+
         readonly EditCommand[] InputCommands = new EditCommand[] {
             new EditCommand("lastT", "Gets the last messages text", (SocketMessage m, string a, object o) => {
                 return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
@@ -387,6 +390,8 @@ namespace MEE7.Commands
                 "\nThe argument syntax is: [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the picture] " +
                 "[strength, eg. 0.7, for 70% transformation strength]",
                 (SocketMessage m, string a, object o) => {
+                
+                
                 Bitmap bmp = o as Bitmap;
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
@@ -433,16 +438,16 @@ namespace MEE7.Commands
                 ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
                                                         { -1,  5, -1 },
                                                         {  0, -1,  0 } })),
-            new EditCommand("boxBlur", "well guess what it does", (SocketMessage m, string a, object o) =>
+            new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) =>
                 ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
                                                         {  1,  1,  1 },
-                                                        {  1,  1,  1 } })),
-            new EditCommand("gaussianBlur", "well guess what it does", (SocketMessage m, string a, object o) =>
+                                                        {  1,  1,  1 } }, 1/9f)),
+            new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) =>
                 ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                         {  2,  4,  2 },
                                                         {  1,  2,  1 } }, 1/16f)),
         };
-        static readonly object memifyLock = new object();
+        
         static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
         {
             Vector2 diff = point - center;
@@ -502,7 +507,7 @@ namespace MEE7.Commands
 
             return target;
         }
-        enum TransformMode { Expand, Collapse, Stir, Fall }
+        
         static Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
         {
             for (int x = 1; x < Pic.Width; x++)
