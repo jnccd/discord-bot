@@ -289,6 +289,10 @@ namespace MEE7
 
             return bmp;
         }
+        public static int GetGrayScale(this System.Drawing.Color c)
+        {
+            return (c.R + c.G + c.B) / 3;
+        }
 
         // Linq Extensions
         public static b Foldl<a, b>(this IEnumerable<a> xs, b y, Func<b, a, b> f)
@@ -442,17 +446,6 @@ namespace MEE7
                 Replace("`System.Object`System.Linq.Enumerable+RepeatIterator`1[", "").
                 Replace("]", "[]").
                 Split('.').Last().Replace("`", "'").Replace("´", "'");
-        }
-        public static object GetDefault(this Type type) // from https://stackoverflow.com/questions/325426/programmatic-equivalent-of-defaulttype
-        {
-            if (type.IsValueType)
-                return Activator.CreateInstance(type);
-            else
-                return null;
-        }
-        public static int GetGrayScale(this System.Drawing.Color c)
-        {
-            return (c.R + c.G + c.B) / 3;
         }
     }
 }
