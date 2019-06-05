@@ -4,11 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using XnaGeometry;
-using MEE7;
 using System.IO;
+using Color = System.Drawing.Color;
 
 namespace MEE7.Commands
 {
@@ -217,8 +215,8 @@ namespace MEE7.Commands
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
                     {
-                        System.Drawing.Color c = bmp.GetPixel(x, y);
-                        c = System.Drawing.Color.FromArgb(c.B, c.R, c.G);
+                        Color c = bmp.GetPixel(x, y);
+                        c = Color.FromArgb(c.B, c.R, c.G);
                         bmp.SetPixel(x, y, c);
                     }
 
@@ -230,8 +228,8 @@ namespace MEE7.Commands
                 for (int x = 0; x < bmp.Width; x++)
                     for (int y = 0; y < bmp.Height; y++)
                     {
-                        System.Drawing.Color c = bmp.GetPixel(x, y);
-                        c = System.Drawing.Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
+                        Color c = bmp.GetPixel(x, y);
+                        c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
                         bmp.SetPixel(x, y, c);
                     }
 
@@ -241,11 +239,11 @@ namespace MEE7.Commands
                 Bitmap bmp = (o as Bitmap);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
-                System.Drawing.Color c;
+                Color c;
                 if (string.IsNullOrWhiteSpace(a))
-                    c = System.Drawing.Color.FromArgb(254, 34, 34);
+                    c = Color.FromArgb(254, 34, 34);
                 else
-                    c = System.Drawing.Color.FromName(a);
+                    c = Color.FromName(a);
                 Rectangle redRekt = FindRectangle(bmp, c, 20);
 
                 if (redRekt.Width == 0)
@@ -260,7 +258,7 @@ namespace MEE7.Commands
 
                     return output;
                 }
-            }),
+            }, typeof(Bitmap)),
             new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list",
                 (SocketMessage m, string a, object o) => {
                 lock (memifyLock)
@@ -290,7 +288,7 @@ namespace MEE7.Commands
                     Bitmap bmp = o as Bitmap;
                     if (File.Exists(memeTemplateOverlay))
                     {
-                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
                         Bitmap overlay;
                         using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
                             overlay = (Bitmap)Bitmap.FromStream(stream);
@@ -305,9 +303,9 @@ namespace MEE7.Commands
                     }
                     else if (File.Exists(memeTemplate))
                     {
-                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(254, 34, 34), 20);
+                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
                         if (redRekt.Width == 0)
-                            redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                            redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(255, 0, 0), 20);
                         Bitmap template;
                         using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
                             template = (Bitmap)Bitmap.FromStream(stream);
@@ -319,7 +317,7 @@ namespace MEE7.Commands
                     else
                         throw new Exception("Something went wrong :thinking:");
                 }
-            }),
+            }, typeof(Bitmap)),
             new EditCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
                 "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", (SocketMessage m, string a, object o) => {
                 string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
@@ -373,7 +371,7 @@ namespace MEE7.Commands
                         template = (Bitmap)Bitmap.FromStream(stream);
                     using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
                         design = (Bitmap)Bitmap.FromStream(stream);
-                    Rectangle redRekt = FindRectangle(design, System.Drawing.Color.FromArgb(255, 0, 0), 20);
+                    Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
                     if (redRekt.Width == 0)
                         throw new Exception("Error, couldn't find a rectangle to write in!");
                     fontSize = redRekt.Height / 5f / fontSize;
@@ -390,8 +388,67 @@ namespace MEE7.Commands
                 "\nThe argument syntax is: [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the picture] " +
                 "[strength, eg. 0.7, for 70% transformation strength]",
                 (SocketMessage m, string a, object o) => {
-                
-                
+
+                Vector2 Transform(Vector2 point, Vector2 centerT, Bitmap within, float strength, TransformMode modeT)
+                {
+                    Vector2 diff = point - centerT;
+                    Vector2 move = diff;
+                    move.Normalize();
+
+                    Vector2 target = Vector2.Zero;
+                    float transformedLength = 0;
+                    float rotationAngle = 0;
+                    double cos = 0;
+                    double sin = 0;
+                    float div = ((within.Width + within.Height) / 7);
+                    float maxDistance = (float)(centerT / div).LengthSquared();
+                    switch (modeT)
+                    {
+                        case TransformMode.Expand:
+                            transformedLength = (float)(diff / div).LengthSquared() * strength;
+                            target = point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
+                            break;
+
+                        case TransformMode.Collapse:
+                            transformedLength = (float)(diff / div).LengthSquared() * strength;
+                            target = point + diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
+                            break;
+
+                        case TransformMode.Stir:
+                            transformedLength = (float)(diff / div).LengthSquared() * strength;
+                            rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
+                            cos = Math.Cos(rotationAngle);
+                            sin = Math.Sin(rotationAngle);
+                            target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
+                                                 (float)(sin * (point.X - centerT.X) + cos * (point.Y - centerT.Y) + centerT.Y));
+                            break;
+
+                        case TransformMode.Fall:
+                            transformedLength = (float)(diff / div).LengthSquared() * strength;
+                            rotationAngle = transformedLength / 3;
+                            cos = Math.Cos(rotationAngle);
+                            sin = Math.Sin(rotationAngle);
+                            target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
+                                                 (float)(sin * (point.X - centerT.X) + cos * (point.Y - centerT.Y) + centerT.Y));
+                            break;
+                    }
+
+                    if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
+                        target.X = point.X;
+                    if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
+                        target.Y = point.Y;
+                    if (target.X < 0)
+                        target.X = 0;
+                    if (target.X > within.Width - 1)
+                        target.X = within.Width - 1;
+                    if (target.Y < 0)
+                        target.Y = 0;
+                    if (target.Y > within.Height - 1)
+                        target.Y = within.Height - 1;
+
+                    return target;
+                }
+
                 Bitmap bmp = o as Bitmap;
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
@@ -425,91 +482,56 @@ namespace MEE7.Commands
                     }
 
                 return output;
+            }, typeof(Bitmap)),
+            new EditCommand("sobelEdges", "´Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                               {  0,  0,  0 },
+                                                               { -1, -2, -1 } }, 1, true);
+                }, typeof(Bitmap)),
+            new EditCommand("sobelEdgesColor", "´Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                               {  0,  0,  0 },
+                                                               { -1, -2, -1 } });
             }),
-            new EditCommand("sobelEdges", "´Highlights horizontal edges", (SocketMessage m, string a, object o) =>
-                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                        {  0,  0,  0 },
-                                                        { -1, -2, -1 } }, 1, true)),
-            new EditCommand("sobelEdgesColor", "´Highlights horizontal edges", (SocketMessage m, string a, object o) =>
-                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                        {  0,  0,  0 },
-                                                        { -1, -2, -1 } })),
-            new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) =>
-                ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
-                                                        { -1,  5, -1 },
-                                                        {  0, -1,  0 } })),
-            new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) =>
-                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
-                                                        {  1,  1,  1 },
-                                                        {  1,  1,  1 } }, 1/9f)),
-            new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) =>
-                ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                        {  2,  4,  2 },
-                                                        {  1,  2,  1 } }, 1/16f)),
+            new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
+                return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
+                                                               { -1,  5, -1 },
+                                                               {  0, -1,  0 } });
+            }, typeof(Bitmap)),
+            new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
+                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
+                                                               {  1,  1,  1 },
+                                                               {  1,  1,  1 } }, 1/9f);
+            }, typeof(Bitmap)),
+            new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
+                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                                   {  2,  4,  2 },
+                                                                   {  1,  2,  1 } }, 1/16f);
+                }, typeof(Bitmap)),
+            new EditCommand("jkrowling", "Gay rights", (SocketMessage m, string a, object o) => {
+                Bitmap bmp = o as Bitmap;
+                Color[] backgroundColors = new Color[] { bmp.GetPixel(0, 0),
+                    bmp.GetPixel(0, bmp.Height - 1), bmp.GetPixel(bmp.Width - 1, 0),
+                    bmp.GetPixel(bmp.Width - 1, bmp.Height - 1) };
+                bool ShouldBeRecolored(Color C) => backgroundColors.Select(c => Math.Abs(c.GetColorDiff(C)) > 70).Aggregate((x,y) => x && y) && C.A > 5;
+                return FlagColor(ShouldBeRecolored, new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
+            }, typeof(Bitmap)),
+            new EditCommand("merkel", "German rights", (SocketMessage m, string a, object o) => {
+                Bitmap bmp = o as Bitmap;
+                Color[] backgroundColors = new Color[] { bmp.GetPixel(0, 0),
+                    bmp.GetPixel(0, bmp.Height - 1), bmp.GetPixel(bmp.Width - 1, 0),
+                    bmp.GetPixel(bmp.Width - 1, bmp.Height - 1) };
+                bool ShouldBeRecolored(Color C) => backgroundColors.Select(c => Math.Abs(c.GetColorDiff(C)) > 70).Aggregate((x,y) => x && y) && C.A > 5;
+                return FlagColor(ShouldBeRecolored, new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
+            }, typeof(Bitmap)),
         };
-        
-        static Vector2 Transform(Vector2 point, Vector2 center, Bitmap within, float strength, TransformMode mode)
+        static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
         {
-            Vector2 diff = point - center;
-            Vector2 move = diff;
-            move.Normalize();
-
-            Vector2 target = Vector2.Zero;
-            float transformedLength = 0;
-            float rotationAngle = 0;
-            double cos = 0;
-            double sin = 0;
-            float div = ((within.Width + within.Height) / 7);
-            float maxDistance = (float)(center / div).LengthSquared();
-            switch (mode)
+            bool IsSameColor(Color C1, Color C2)
             {
-                case TransformMode.Expand:
-                    transformedLength = (float)(diff / div).LengthSquared() * strength;
-                    target = point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
-                    break;
-
-                case TransformMode.Collapse:
-                    transformedLength = (float)(diff / div).LengthSquared() * strength;
-                    target = point + diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
-                    break;
-
-                case TransformMode.Stir:
-                    transformedLength = (float)(diff / div).LengthSquared() * strength;
-                    rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
-                    cos = Math.Cos(rotationAngle);
-                    sin = Math.Sin(rotationAngle);
-                    target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
-                                         (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
-                    break;
-
-                case TransformMode.Fall:
-                    transformedLength = (float)(diff / div).LengthSquared() * strength;
-                    rotationAngle = transformedLength / 3;
-                    cos = Math.Cos(rotationAngle);
-                    sin = Math.Sin(rotationAngle);
-                    target = new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
-                                         (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
-                    break;
+                return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
             }
 
-            if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
-                target.X = point.X;
-            if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
-                target.Y = point.Y;
-            if (target.X < 0)
-                target.X = 0;
-            if (target.X > within.Width - 1)
-                target.X = within.Width - 1;
-            if (target.Y < 0)
-                target.Y = 0;
-            if (target.Y > within.Height - 1)
-                target.Y = within.Height - 1;
-
-            return target;
-        }
-        
-        static Rectangle FindRectangle(Bitmap Pic, System.Drawing.Color C, int MinSize)
-        {
             for (int x = 1; x < Pic.Width; x++)
                 for (int y = 1; y < Pic.Height; y++)
                     if (IsSameColor(Pic.GetPixel(x, y), C))
@@ -527,10 +549,6 @@ namespace MEE7.Commands
                     }
 
             return new Rectangle();
-        }
-        static bool IsSameColor(System.Drawing.Color C1, System.Drawing.Color C2)
-        {
-            return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
         }
         static Bitmap ApplyKernel(Bitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
         {
@@ -553,7 +571,7 @@ namespace MEE7.Commands
                             activation = 255;
                         if (activation < 0)
                             activation = 0;
-                        output.SetPixel(x, y, System.Drawing.Color.FromArgb(activation, activation, activation));
+                        output.SetPixel(x, y, Color.FromArgb(activation, activation, activation));
                     }
             }
             else
@@ -576,11 +594,27 @@ namespace MEE7.Commands
                             if (activation[i] < 0)
                                 activation[i] = 0;
                         }
-                        output.SetPixel(x, y, System.Drawing.Color.FromArgb(activation[0], activation[1], activation[2]));
+                        output.SetPixel(x, y, Color.FromArgb(activation[0], activation[1], activation[2]));
                     }
             }
 
             return output;
+        }
+        static Bitmap FlagColor(Func<Color, bool> ShouldBeRecolored, Color[] Cs, Bitmap P, bool Horz = false)
+        {
+            for (int x = 0; x < P.Width; x++)
+                for (int y = 0; y < P.Height; y++)
+                {
+                    Color c = P.GetPixel(x, y);
+                    if (c.A != 0)
+                        ;
+                    if (ShouldBeRecolored(c))
+                        if (Horz)
+                            P.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
+                        else
+                            P.SetPixel(x, y, Cs[y * Cs.Length / P.Height]);
+                }
+            return P;
         }
     }
 }
