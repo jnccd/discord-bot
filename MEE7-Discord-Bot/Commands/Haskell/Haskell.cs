@@ -54,7 +54,7 @@ namespace MEE7.Commands
                         
                         if (output.Length >= 2000)
                             Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel).Wait();
-                        else if (string.IsNullOrWhiteSpace(output.Trim('`')))
+                        else if (output.Trim('`').Trim('\n') == "haskell")
                             Program.SendText("Your code didn't create any output!", message.Channel).Wait();
                         else
                             Program.SendText(output, message.Channel).Wait();
