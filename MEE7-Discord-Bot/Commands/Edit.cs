@@ -516,6 +516,9 @@ namespace MEE7.Commands
             new EditCommand("merkel", "German rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, o as Bitmap);
             }, typeof(Bitmap)),
+            new EditCommand("transRights", "The input image says trans rights", (SocketMessage m, string a, object o) => {
+                return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, o as Bitmap);
+            }, typeof(Bitmap)),
         };
         static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
         {
@@ -608,8 +611,6 @@ namespace MEE7.Commands
                 for (int y = 0; y < P.Height; y++)
                 {
                     Color c = P.GetPixel(x, y);
-                    if (c.A != 0)
-                        ;
                     if (ShouldBeRecolored(c))
                         if (Horz)
                             P.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
