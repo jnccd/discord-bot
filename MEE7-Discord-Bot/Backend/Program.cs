@@ -167,6 +167,9 @@ namespace MEE7
                     throw new Exception();
                 };
                 OnTest.InvokeParallel();
+            },
+            /* 5 - Thingy */ () => {
+                ConsoleWriteLine(1 / 6f);
             }
         };
 

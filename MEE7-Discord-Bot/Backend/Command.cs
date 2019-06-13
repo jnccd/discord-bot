@@ -32,13 +32,20 @@ namespace MEE7
         }
 
         public EmbedBuilder HelpMenu;
-        public class SubCommand
+        private class SubCommand
         {
             public SubCommand[] SubCommands;
             public string Command;
             public string Desc;
         }
 
+        public Command()
+        {
+            Desc = "-";
+            CommandLine = this.GetType().Name;
+            IsExperimental = true;
+            IsHidden = true;
+        }
         public Command(string command, string desc, bool isExperimental = false, bool isHidden = false)
         {
             Desc = desc;
