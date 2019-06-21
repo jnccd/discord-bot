@@ -1,215 +1,17 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using XnaGeometry;
-using System.IO;
 using Color = System.Drawing.Color;
 
 namespace MEE7.Commands
 {
-    public class Edit : Command
+    public partial class Edit : Command
     {
-        // Backend
-        public Edit() : base("edit", "Edit stuff using various functions")
-        {
-            Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
-
-            HelpMenu = new EmbedBuilder();
-            HelpMenu.WithDescription("Operators:\n" +
-                "> Concatinates functions\n" +
-                "() Let you add additional arguments for the command (optional)\n" +
-               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
-                "\nEdit Commands:");
-            AddToHelpmenu("Input Commands", InputCommands);
-            AddToHelpmenu("Text Commands", TextCommands);
-            AddToHelpmenu("Picture Commands", PictureCommands);
-        }
-        void AddToHelpmenu(string Name, EditCommand[] editCommands)
-        {
-            string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**: " +
-                //  $"`{(c.ExpectedInputType == null ? "_" : c.ExpectedInputType.ToReadableString())}` -> " +
-                //  $"`{c.Function(default, "", c.ExpectedInputType.GetDefault()).GetType().ToReadableString()}`" +
-                $"";
-            int maxlength = editCommands.
-                Select(CommandToCommandTypeString).
-                Select(x => x.Length).
-                Max();
-            HelpMenu.AddFieldDirectly(Name, "" + editCommands.
-                Select(c => CommandToCommandTypeString(c) +
-                $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
-                Combine() + "");
-        }
-
-        public override void Execute(SocketMessage message)
-        {
-            if (message.Content.Length <= PrefixAndCommand.Length + 1)
-                Program.SendEmbed(HelpMenu, message.Channel).Wait();
-            else
-                PrintResult(RunCommands(message), message);
-        }
-        object RunCommands(SocketMessage message)
-        {
-            string input = message.Content.Remove(0, PrefixAndCommand.Length + 1);
-            IEnumerable<string> commands = input.Split('|').First().Split('>').Select(x => x.Trim(' '));
-            object currentData = null;
-
-            if (commands.Count() > 50)
-            {
-                Program.SendText($"That's too many commands for one message.", message.Channel).Wait();
-                return null;
-            }
-
-            foreach (string c in commands)
-            {
-                string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray());
-                string args = c.GetEverythingBetween("(", ")");
-
-                EditCommand command = Commands.FirstOrDefault(x => x.Command.ToLower() == cwoargs.ToLower());
-                if (command == null)
-                {
-                    Program.SendText($"I don't know a command called {cwoargs}", message.Channel).Wait();
-                    return null;
-                }
-
-                if (command.InputType != null && (currentData == null || currentData.GetType() != command.InputType))
-                {
-                    Program.SendText($"Wrong Data Type Error in {c}\nExpected: {command.InputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
-                    return null;
-                }
-
-                try
-                {
-                    currentData = command.Function(message, args, currentData);
-                }
-                catch (Exception e)
-                {
-                    Program.SendText($"[{c}] {e.Message}",
-                        message.Channel).Wait();
-                    return null;
-                }
-            }
-
-            return currentData;
-        }
-        void PrintResult(object currentData, SocketMessage message)
-        {
-            if (currentData is EmbedBuilder)
-                Program.SendEmbed(currentData as EmbedBuilder, message.Channel).Wait();
-            else if (currentData is Tuple<string, EmbedBuilder>)
-            {
-                var t = currentData as Tuple<string, EmbedBuilder>;
-                Program.SendEmbed(t.Item2, message.Channel).Wait();
-                Program.SendText(t.Item1, message.Channel).Wait();
-            }
-            else if (currentData is Bitmap)
-                Program.SendBitmap(currentData as Bitmap, message.Channel).Wait();
-            else if (currentData == null)
-#pragma warning disable CS0642 // Its supposed to be like this
-                ;
-#pragma warning restore CS0642
-            else
-                Program.SendText(currentData.ToString(), message.Channel).Wait();
-        }
-
-        class EditCommand
-        {
-            public string Command, Desc;
-            public Type InputType, OutputType;
-            public Func<SocketMessage, string, object, object> Function;
-
-            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType = null, Type OutputType = null)
-            {
-                if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
-                    throw new IllegalCommandException("Illegal Symbol!");
-
-                this.Command = Command;
-                this.Desc = Desc;
-                this.Function = Function;
-                this.InputType = InputType;
-                this.OutputType = OutputType;
-            }
-        }
-        readonly IEnumerable<EditCommand> Commands;
-
-        // Command Library
         enum TransformMode { Expand, Collapse, Stir, Fall }
         static readonly object memifyLock = new object();
 
-        readonly EditCommand[] InputCommands = new EditCommand[] {
-            new EditCommand("lastT", "Gets the last messages text", (SocketMessage m, string a, object o) => {
-                return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
-            }),
-            new EditCommand("lastP", "Gets the last messages picture", (SocketMessage m, string a, object o) => {
-                IMessage lm = m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last();
-                string pic = null;
-                if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
-                {
-                    if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                        pic = lm.Attachments.ElementAt(0).Url;
-                    else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                        pic = lm.Attachments.ElementAt(0).Url;
-                }
-                string picLink = lm.Content.GetPictureLink();
-                if (string.IsNullOrWhiteSpace(pic) && picLink != null)
-                    pic = picLink;
-                return pic.GetBitmapFromURL();
-            }),
-            new EditCommand("thisT", "Outputs the given arguments", (SocketMessage m, string a, object o) => {
-                return a;
-            }),
-            new EditCommand("thisP", "Gets this messages picture / picture link in the arguments", (SocketMessage m, string a, object o) => {
-                string pic = null;
-                if (m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
-                {
-                    if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                        pic = m.Attachments.ElementAt(0).Url;
-                    else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                        pic = m.Attachments.ElementAt(0).Url;
-                }
-                string picLink = a.GetPictureLink();
-                if (string.IsNullOrWhiteSpace(pic) && picLink != null)
-                    pic = picLink;
-                return pic.GetBitmapFromURL();
-            }),
-            new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
-                return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { '<', '>', '@' }))).GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
-            }),
-        };
-        readonly EditCommand[] TextCommands = new EditCommand[]
-        {
-            new EditCommand("swedish", "Convert the text to swedish", (SocketMessage m, string a, object o) => {
-                return string.Join("", (o as string).Select(x => x + "f"));
-            }, typeof(string)),
-            new EditCommand("mock", "Mock the text", (SocketMessage m, string a, object o) => {
-                return Program.CreateEmbedBuilder("",
-                    string.Join("", (o as string).Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })),
-                    "https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob", m.Author);
-            }, typeof(string)),
-            new EditCommand("crab", "Crab the text", (SocketMessage m, string a, object o) => {
-                return ":crab: " + (o as string) + " :crab:\n https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s";
-            }, typeof(string)),
-            new EditCommand("CAPS", "Convert text to CAPS", (SocketMessage m, string a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return char.ToUpper(x); }));
-            }),
-            new EditCommand("SUPERCAPS", "Convert text to SUPER CAPS", (SocketMessage m, string a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return char.ToUpper(x) + " "; }));
-            }),
-            new EditCommand("CopySpoilerify", "Convert text to a spoiler", (SocketMessage m, string a, object o) => {
-                return "`" + string.Join("", (o as string).Select((x) => { return "||" + x + "||"; })) + "`";
-            }),
-            new EditCommand("Spoilerify", "Convert text to a spoiler", (SocketMessage m, string a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return "||" + x + "||"; }));
-            }),
-            new EditCommand("Unspoilerify", "Convert spoiler text to readable text", (SocketMessage m, string a, object o) => {
-                return (o as string).Replace("|", "");
-            }),
-            new EditCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", (SocketMessage m, string a, object o) => {
-                return (o as string).Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
-            }),
-        };
         readonly EditCommand[] PictureCommands = new EditCommand[] {
             new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
@@ -597,7 +399,7 @@ namespace MEE7.Commands
         }
         static Bitmap FlagColor(Color[] Cs, Bitmap P, bool Horz = false)
         {
-            bool ShouldBeRecolored(Color C) => 
+            bool ShouldBeRecolored(Color C) =>
                 new Color[] { P.GetPixel(0, 0),
                     P.GetPixel(0, P.Height - 1), P.GetPixel(P.Width - 1, 0),
                     P.GetPixel(P.Width - 1, P.Height - 1) }.
