@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Audio;
+using Discord.WebSocket;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,23 @@ namespace MEE7.Commands
     public partial class Edit : Command
     {
         readonly EditCommand[] AudioCommands = new EditCommand[] {
+            new EditCommand("playAudio", "Plays audio in voicechat", (SocketMessage m, string a, object o) => {
+                SocketGuild g = Program.GetGuildFromChannel(m.Channel);
+                ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
+                if (channel != null)
+                {
+                    try { channel.DisconnectAsync().Wait(); } catch { }
+
+                    IAudioClient client = channel.ConnectAsync().Result;
+                    using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(o as WaveStream))
+                            Program.SendAudioAsync(client, naudioStream).Wait();
+
+                    try { channel.DisconnectAsync().Wait(); } catch { }
+                }
+                else
+                    Program.SendText("You are not in an AudioChannel on this server!", m.Channel).Wait();
+                return null;
+            }, typeof(WaveStream), null),
             new EditCommand("drawAudio", "Draw the samples", (SocketMessage m, string a, object o) => {
 
                 WaveStream w = o as WaveStream;
