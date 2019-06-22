@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using NAudio.Wave;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -82,6 +83,18 @@ namespace MEE7.Commands
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
                     }
             }, null, typeof(WaveStream)),
+            new EditCommand("giftest", "Creates a test gif", (SocketMessage m, string a, object o) => {
+                var stuffs = new List<Bitmap>();
+
+                for (int i = 0; i < 50; i++)
+                {
+                    stuffs.Add(new Bitmap(400, 400));
+                    using (Graphics g = Graphics.FromImage(stuffs.Last()))
+                        g.FillRectangle(Brushes.Blue, new Rectangle(i*3,i*3,100,100));
+                }
+
+                return stuffs.ToArray();
+            }, null, typeof(Bitmap[])),
         };
     }
 }

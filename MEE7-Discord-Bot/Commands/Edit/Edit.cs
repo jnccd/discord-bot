@@ -7,6 +7,7 @@ using System.Linq;
 using XnaGeometry;
 using System.IO;
 using Color = System.Drawing.Color;
+using BumpKit;
 
 namespace MEE7.Commands
 {
@@ -109,9 +110,26 @@ namespace MEE7.Commands
                 Program.SendText(t.Item1, message.Channel).Wait();
             }
             else if (currentData is Bitmap)
-                Program.SendBitmap(currentData as Bitmap, message.Channel).Wait();
+            {
+                var b = currentData as Bitmap;
+                Program.SendBitmap(b, message.Channel).Wait();
+                b.Dispose();
+            }
+            else if (currentData is Bitmap[])
+            {
+                var bs = currentData as Bitmap[];
+                Stream s = new MemoryStream();
+                var g = new GifEncoder(s);
+                foreach (Bitmap b in bs)
+                {
+                    g.AddFrame(b);
+                    b.Dispose();
+                }
+                Program.SendFile(s, message.Channel, "gif").Wait();
+                g.Dispose();
+            }
             else if (currentData == null)
-#pragma warning disable CS0642 // Its supposed to be like this
+#pragma warning disable CS0642
                 ;
 #pragma warning restore CS0642
             else
