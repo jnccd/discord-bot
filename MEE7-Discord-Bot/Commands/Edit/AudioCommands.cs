@@ -50,6 +50,8 @@ namespace MEE7.Commands
                     {
                         float sample = BitConverter.ToSingle(buffer, i * 4) * 200 + 250;
                         int index = (int)(((c.Position - buffer.Length) / 4.0 + i) / (c.Length / 4.0) * 1000);
+                        if (index >= normSamplesMax.Length)
+                            continue;
                         if (normSamplesMax[index] < sample)
                             normSamplesMax[index] = sample;
                         if (normSamplesMin[index] > sample)
