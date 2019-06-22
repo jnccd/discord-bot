@@ -290,12 +290,12 @@ namespace MEE7.Commands
 
                 return output;
             }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sobelEdges", "´Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+            new EditCommand("sobelEdges", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                {  0,  0,  0 },
                                                                { -1, -2, -1 } }, 1, true);
                 }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sobelEdgesColor", "´Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+            new EditCommand("sobelEdgesColor", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                {  0,  0,  0 },
                                                                { -1, -2, -1 } });
