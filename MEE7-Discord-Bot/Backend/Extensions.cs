@@ -403,11 +403,11 @@ namespace MEE7
                 Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
                 compiler.WaitForExit();
 
-                string s = compiler.StandardOutput.ReadToEnd();
+                string o = compiler.StandardOutput.ReadToEnd();
                 string e = compiler.StandardError.ReadToEnd();
 
                 exited = true;
-                ExecutedEvent(s, e);
+                ExecutedEvent(o, e);
             });
 
             while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
