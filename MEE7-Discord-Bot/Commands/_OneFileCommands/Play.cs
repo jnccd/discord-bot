@@ -42,21 +42,20 @@ namespace MEE7
             {
                 try { channel.DisconnectAsync().Wait(); } catch { }
 
-                try
+                IAudioClient client = await channel.ConnectAsync();
+                using (Process P = Program.GetAudioStreamFromYouTubeVideo(videoURL, "mp3"))
+                using (MemoryStream mem = new MemoryStream())
                 {
-                    IAudioClient client = await channel.ConnectAsync();
-                    using (StreamReader audioStream = Program.GetAudioStreamFromYouTubeVideo(videoURL, "mp3", out Process P))
-                    using (MemoryStream mem = new MemoryStream())
+                    while (true)
                     {
-                        P.WaitForExit();
-                        audioStream.BaseStream.CopyTo(mem);
-                        string debug1 = audioStream.ReadToEnd();
-                        string debug2 = P.StandardError.ReadToEnd();
-                        using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
-                            new Mp3FileReader(mem)))
-                            Program.SendAudioAsync(client, naudioStream).Wait();
+                        Task.Delay(1001).Wait();
+                        if (string.IsNullOrWhiteSpace(P.StandardError.ReadLine()))
+                            break;
                     }
-                } catch { }
+                    P.StandardOutput.BaseStream.CopyTo(mem);
+                    using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem)))
+                        Program.SendAudioAsync(client, naudioStream).Wait();
+                }
 
                 try { channel.DisconnectAsync().Wait(); } catch { }
             }
