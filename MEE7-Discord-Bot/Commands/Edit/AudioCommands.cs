@@ -30,6 +30,8 @@ namespace MEE7.Commands
                 }
                 else
                     Program.SendText("You are not in an AudioChannel on this server!", m.Channel).Wait();
+
+                (o as WaveStream).Dispose();
                 return null;
             }, typeof(WaveStream), null),
             new EditCommand("drawAudio", "Draw the samples", (SocketMessage m, string a, object o) => {
@@ -67,6 +69,7 @@ namespace MEE7.Commands
                         SelectMany(x => x).
                         ToArray());
 
+                w.Dispose();
                 return output;
 
             }, typeof(WaveStream), typeof(Bitmap)),

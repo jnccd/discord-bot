@@ -86,7 +86,8 @@ namespace MEE7.Commands
                 }
                 catch (Exception e)
                 {
-                    Program.SendText($"[{c}] {e.Message}",
+                    Program.SendText($"[{c}] {e.Message}" + 
+                        $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}",
                         message.Channel).Wait();
                     return null;
                 }
