@@ -2,8 +2,11 @@
 using Discord.WebSocket;
 using NAudio.Wave;
 using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
@@ -63,6 +66,21 @@ namespace MEE7.Commands
             new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
                 return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { '<', '>', '@' }))).GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
             }, null, typeof(Bitmap)),
+            new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
+                (SocketMessage m, string a, object o) => {
+                    MemoryStream mem = new MemoryStream();
+                    using (Process P = Program.GetAudioStreamFromYouTubeVideo(a, "mp3"))
+                    {
+                        while (true)
+                        {
+                            Task.Delay(1001).Wait();
+                            if (string.IsNullOrWhiteSpace(P.StandardError.ReadLine()))
+                                break;
+                        }
+                        P.StandardOutput.BaseStream.CopyTo(mem);
+                        return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
+                    }
+            }, null, typeof(WaveStream)),
         };
     }
 }
