@@ -910,12 +910,13 @@ namespace MEE7
                     return "";
             }
         }
-        public static StreamReader GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat)
+        public static StreamReader GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat, out Process P)
         {
+            P = null;
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
 
-            Process P = new Process
+            P = new Process
             {
                 StartInfo = new ProcessStartInfo()
                 {

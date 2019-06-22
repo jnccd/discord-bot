@@ -43,6 +43,9 @@ namespace MEE7.Commands
                     pic = picLink;
                 return pic.GetBitmapFromURL();
             }),
+            new EditCommand("thisA", "Gets any audio files attached to this message", (SocketMessage m, string a, object o) => {
+                return m.Attachments.First(x => x.Url.EndsWith(".ogg") || x.Url.EndsWith(".wav")  || x.Url.EndsWith(".mp3")); // TODO: fix
+            }),
             new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
                 return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { '<', '>', '@' }))).GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
             }),

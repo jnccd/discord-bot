@@ -1,8 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using XnaGeometry;
 using Color = System.Drawing.Color;
 
 namespace MEE7.Commands
