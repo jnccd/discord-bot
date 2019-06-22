@@ -29,8 +29,8 @@ namespace MEE7.Commands
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
             string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**: " +
-                //  $"`{(c.ExpectedInputType == null ? "_" : c.ExpectedInputType.ToReadableString())}` -> " +
-                //  $"`{c.Function(default, "", c.ExpectedInputType.GetDefault()).GetType().ToReadableString()}`" +
+                  $"`{(c.InputType == null ? "_" : c.InputType.ToReadableString())}` -> " +
+                  $"`{(c.OutputType == null ? "_" : c.OutputType.ToReadableString())}`" +
                 $"";
             int maxlength = editCommands.
                 Select(CommandToCommandTypeString).
