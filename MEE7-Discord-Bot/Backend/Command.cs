@@ -32,12 +32,12 @@ namespace MEE7
         }
 
         public EmbedBuilder HelpMenu;
-        private class SubCommand
-        {
-            public SubCommand[] SubCommands;
-            public string Command;
-            public string Desc;
-        }
+        //private class SubCommand
+        //{
+        //    public SubCommand[] SubCommands;
+        //    public string Command;
+        //    public string Desc;
+        //}
 
         public Command()
         {
