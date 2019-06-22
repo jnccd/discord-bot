@@ -910,13 +910,12 @@ namespace MEE7
                     return "";
             }
         }
-        public static StreamReader GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat, out Process P)
+        public static Process GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat)
         {
-            P = null;
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
 
-            P = new Process
+            Process P = new Process
             {
                 StartInfo = new ProcessStartInfo()
                 {
@@ -928,7 +927,7 @@ namespace MEE7
                 }
             };
             P.Start();
-            return P.StandardOutput;
+            return P;
         }
         public static async Task SendAudioAsync(IAudioClient audioClient, Stream stream)
         {
