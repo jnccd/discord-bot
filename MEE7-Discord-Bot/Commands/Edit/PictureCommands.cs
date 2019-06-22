@@ -28,7 +28,7 @@ namespace MEE7.Commands
                     }
 
                 return bmp;
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("invert", "Invert the color of each pixel", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
 
@@ -41,7 +41,7 @@ namespace MEE7.Commands
                     }
 
                 return bmp;
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
@@ -65,7 +65,7 @@ namespace MEE7.Commands
 
                     return output;
                 }
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list",
                 (SocketMessage m, string a, object o) => {
                 lock (memifyLock)
@@ -124,7 +124,7 @@ namespace MEE7.Commands
                     else
                         throw new Exception("Something went wrong :thinking:");
                 }
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
                 "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", (SocketMessage m, string a, object o) => {
                 string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
@@ -189,7 +189,7 @@ namespace MEE7.Commands
                 }
                 else
                     throw new Exception("uwu");
-            }),
+            }, typeof(string), typeof(Bitmap)),
             new EditCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\n" +
                 "Without any arguments it will automatically call \"expand 0.5,0.5 1\"" +
                 "\nThe argument syntax is: [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the picture] " +
@@ -289,41 +289,41 @@ namespace MEE7.Commands
                     }
 
                 return output;
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("sobelEdges", "´Highlights horizontal edges", (SocketMessage m, string a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                {  0,  0,  0 },
                                                                { -1, -2, -1 } }, 1, true);
-                }, typeof(Bitmap)),
+                }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("sobelEdgesColor", "´Highlights horizontal edges", (SocketMessage m, string a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                {  0,  0,  0 },
                                                                { -1, -2, -1 } });
-            }),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
                                                                { -1,  5, -1 },
                                                                {  0, -1,  0 } });
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
                                                                {  1,  1,  1 },
                                                                {  1,  1,  1 } }, 1/9f);
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                    {  2,  4,  2 },
                                                                    {  1,  2,  1 } }, 1/16f);
-                }, typeof(Bitmap)),
+                }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("jkrowling", "Gay rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, o as Bitmap);
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("merkel", "German rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, o as Bitmap);
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("transRights", "The input image says trans rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, o as Bitmap);
-            }, typeof(Bitmap)),
+            }, typeof(Bitmap), typeof(Bitmap)),
         };
         static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
         {

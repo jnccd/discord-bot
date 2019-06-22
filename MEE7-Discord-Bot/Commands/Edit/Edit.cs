@@ -52,7 +52,7 @@ namespace MEE7.Commands
         object RunCommands(SocketMessage message)
         {
             string input = message.Content.Remove(0, PrefixAndCommand.Length + 1);
-            IEnumerable<string> commands = input.Split('|').First().Split('>').Select(x => x.Trim(' '));
+            IEnumerable<string> commands = input.Split('|').First().Split(" > ").Select(x => x.Trim(' '));
             object currentData = null;
 
             if (commands.Count() > 50)
@@ -75,7 +75,7 @@ namespace MEE7.Commands
 
                 if (command.InputType != null && (currentData == null || currentData.GetType() != command.InputType))
                 {
-                    Program.SendText($"Wrong Data Type Error in {c}\nExpected: {command.InputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
+                    Program.SendText($"Wrong Input Data Type Error in {c}\nExpected: {command.InputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
                     return null;
                 }
 
@@ -87,6 +87,12 @@ namespace MEE7.Commands
                 {
                     Program.SendText($"[{c}] {e.Message}",
                         message.Channel).Wait();
+                    return null;
+                }
+
+                if (command.OutputType != null && (currentData == null || currentData.GetType() != command.OutputType))
+                {
+                    Program.SendText($"Wrong Output Data Type Error in {c}\nExpected: {command.OutputType}\nReturned: {currentData.GetType()}", message.Channel).Wait();
                     return null;
                 }
             }
@@ -119,7 +125,7 @@ namespace MEE7.Commands
             public Type InputType, OutputType;
             public Func<SocketMessage, string, object, object> Function;
 
-            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType = null, Type OutputType = null)
+            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType, Type OutputType)
             {
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
                     throw new IllegalCommandException("Illegal Symbol!");
