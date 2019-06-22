@@ -64,7 +64,6 @@ namespace MEE7
                 Program.SendText("You are not in an AudioChannel on this server!", message.Channel).Wait();
                 return;
             }
-            return;
         }
     }
 }
