@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -44,12 +45,15 @@ namespace MEE7
                 try
                 {
                     IAudioClient client = await channel.ConnectAsync();
-                    using (StreamReader audioStream = Program.GetAudioStreamFromYouTubeVideo(videoURL, "mp3"))
+                    using (StreamReader audioStream = Program.GetAudioStreamFromYouTubeVideo(videoURL, "mp3", out Process P))
                     using (MemoryStream mem = new MemoryStream())
                     {
+                        P.WaitForExit();
                         audioStream.BaseStream.CopyTo(mem);
+                        string debug1 = audioStream.ReadToEnd();
+                        string debug2 = P.StandardError.ReadToEnd();
                         using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
-                            new StreamMediaFoundationReader(mem)))
+                            new Mp3FileReader(mem)))
                             Program.SendAudioAsync(client, naudioStream).Wait();
                     }
                 } catch { }

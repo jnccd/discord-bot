@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using NAudio.Wave;
+using NVorbis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -146,13 +148,10 @@ namespace MEE7
                     o += char.ToLower(s[i]);
             return o;
         }
-        public static Bitmap GetBitmapFromURL(this string url)
-        {
-            WebRequest request = WebRequest.Create(url);
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
-            return new Bitmap(responseStream);
-        }
+        public static Bitmap GetBitmapFromURL(this string url) => new Bitmap(WebRequest.Create(url).GetResponse().GetResponseStream());
+        public static Mp3FileReader Getmp3AudioFromURL(this string url) => new Mp3FileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
+        public static WaveFileReader GetwavAudioFromURL(this string url) => new WaveFileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
+        public static VorbisReader GetoggAudioFromURL(this string url) => new VorbisReader(WebRequest.Create(url).GetResponse().GetResponseStream(), true);
         public static int LevenshteinDistance(this string s, string t)
         {
             if (string.IsNullOrEmpty(s))

@@ -540,7 +540,7 @@ namespace XnaGeometry
         {
             Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
 
-            // TODO: Are there options on some platforms to implement a vectorized version of this?
+            // TDO: Are there options on some platforms to implement a vectorized version of this?
 
             for (var i = 0; i < sourceArray.Length; i++)
             {
@@ -595,7 +595,7 @@ namespace XnaGeometry
         public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
         {
 			// This has not been tested
-			// TODO: This could probably be unrolled so will look into it later
+			// TDO: This could probably be unrolled so will look into it later
 			Matrix matrix = quat.ToMatrix();
 			Transform(ref vec, ref matrix, out result);
         }
