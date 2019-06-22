@@ -47,12 +47,16 @@ namespace MEE7.Commands
             }, null, typeof(Bitmap)),
             new EditCommand("thisA", "Gets mp3 or wav audio files attached to this message", (SocketMessage m, string a, object o) => {
                 string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
-                if (string.IsNullOrWhiteSpace(url))
+                if (!string.IsNullOrWhiteSpace(url))
                     return url.Getmp3AudioFromURL();
 
                 url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".wav")).Url;
-                if (string.IsNullOrWhiteSpace(url))
+                if (!string.IsNullOrWhiteSpace(url))
                     return url.GetwavAudioFromURL();
+
+                url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".ogg")).Url;
+                if (!string.IsNullOrWhiteSpace(url))
+                    return url.GetoggAudioFromURL();
 
                 throw new Exception("No audio file found!");
             }, null, typeof(WaveStream)),

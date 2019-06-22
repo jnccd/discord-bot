@@ -148,7 +148,15 @@ namespace MEE7
             return o;
         }
         public static Bitmap GetBitmapFromURL(this string url) => new Bitmap(WebRequest.Create(url).GetResponse().GetResponseStream());
-        public static Mp3FileReader Getmp3AudioFromURL(this string url) => new Mp3FileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
+        public static Mp3FileReader Getmp3AudioFromURL(this string url)
+        {
+            Stream ms = new MemoryStream();
+            using (Stream stream = WebRequest.Create(url).GetResponse().GetResponseStream())
+                stream.CopyTo(ms);
+
+            ms.Position = 0;
+            return new Mp3FileReader(ms);
+        }
         public static WaveFileReader GetwavAudioFromURL(this string url) => new WaveFileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
         public static VorbisReader GetoggAudioFromURL(this string url) => new VorbisReader(WebRequest.Create(url).GetResponse().GetResponseStream(), true);
         public static int LevenshteinDistance(this string s, string t)
@@ -443,6 +451,15 @@ namespace MEE7
                 Replace("`System.Object`System.Linq.Enumerable+RepeatIterator`1[", "").
                 Replace("]", "[]").
                 Split('.').Last().Replace("`", "'").Replace("´", "'");
+        }
+        public static byte[] ToArray(this Stream stream)
+        {
+            byte[] buffer = new byte[4096];
+            int reader = 0;
+            MemoryStream memoryStream = new MemoryStream();
+            while ((reader = stream.Read(buffer, 0, buffer.Length)) != 0)
+                memoryStream.Write(buffer, 0, reader);
+            return memoryStream.ToArray();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace MEE7.Commands
     {
         public Edit() : base("edit", "Edit stuff using various functions")
         {
-            Commands = InputCommands.Union(TextCommands.Union(PictureCommands));
+            Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
 
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("Operators:\n" +
@@ -25,6 +25,7 @@ namespace MEE7.Commands
             AddToHelpmenu("Input Commands", InputCommands);
             AddToHelpmenu("Text Commands", TextCommands);
             AddToHelpmenu("Picture Commands", PictureCommands);
+            AddToHelpmenu("Picture Commands", AudioCommands);
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
@@ -73,7 +74,7 @@ namespace MEE7.Commands
                     return null;
                 }
 
-                if (command.InputType != null && (currentData == null || currentData.GetType() != command.InputType))
+                if (command.InputType != null && (currentData == null || !command.InputType.IsAssignableFrom(currentData.GetType())))
                 {
                     Program.SendText($"Wrong Input Data Type Error in {c}\nExpected: {command.InputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
                     return null;
@@ -90,7 +91,7 @@ namespace MEE7.Commands
                     return null;
                 }
 
-                if (command.OutputType != null && (currentData == null || currentData.GetType() != command.OutputType))
+                if (command.OutputType != null && (currentData == null || !command.OutputType.IsAssignableFrom(currentData.GetType())))
                 {
                     Program.SendText($"Wrong Output Data Type Error in {c}\nExpected: {command.OutputType}\nReturned: {currentData.GetType()}", message.Channel).Wait();
                     return null;
