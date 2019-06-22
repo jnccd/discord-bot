@@ -119,8 +119,7 @@ namespace MEE7
             string[] split = str.Split(' ');
             foreach (string s in split)
             {
-                Uri uriResult = null;
-                Uri.TryCreate(s, UriKind.Absolute, out uriResult);
+                Uri.TryCreate(s, UriKind.Absolute, out Uri uriResult);
                 if (uriResult != null && uriResult.Scheme == Uri.UriSchemeHttps ||
                     uriResult != null && uriResult.Scheme == Uri.UriSchemeHttp)
                 {
