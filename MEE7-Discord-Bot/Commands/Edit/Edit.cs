@@ -8,6 +8,8 @@ using XnaGeometry;
 using System.IO;
 using Color = System.Drawing.Color;
 using BumpKit;
+using System.Reflection;
+using System.Linq.Expressions;
 
 namespace MEE7.Commands
 {
@@ -15,6 +17,15 @@ namespace MEE7.Commands
     {
         public Edit() : base("edit", "Edit stuff using various functions")
         {
+            var test = this.GetType().GetMethods().
+                Where(x => 
+                x.Name.StartsWith("Flag")).
+                Select(x => {
+                    var input = Expression.Parameter(typeof(object), "input");
+                    return new EditCommand(x.Name, (string)GetType().GetProperty(x.Name + "_Desc").GetValue(this), 
+                        Expression.Lambda<Func<SocketMessage, string, object, object>>(Expression.Call(Expression.Convert(input, this.GetType()), x), input).Compile(),
+                        (Type)GetType().GetProperty(x.Name + "_Input").GetValue(this), (Type)GetType().GetProperty(x.Name + "_Output").GetValue(this));
+                }).ToArray();
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
 
             HelpMenu = new EmbedBuilder();
