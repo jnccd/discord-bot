@@ -8,11 +8,11 @@
     <StartupObject>MEE7.Program</StartupObject>
     <LangVersion>7.1</LangVersion>
     <ApplicationIcon>imageres_25.ico</ApplicationIcon>
+    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
