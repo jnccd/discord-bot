@@ -37,7 +37,7 @@ namespace MEE7.Commands
             AddToHelpmenu("Input Commands", InputCommands);
             AddToHelpmenu("Text Commands", TextCommands);
             AddToHelpmenu("Picture Commands", PictureCommands);
-            AddToHelpmenu("Picture Commands", AudioCommands);
+            AddToHelpmenu("Audio Commands", AudioCommands);
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
