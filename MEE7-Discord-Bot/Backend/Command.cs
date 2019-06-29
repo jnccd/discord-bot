@@ -9,7 +9,7 @@ using MEE7.Commands;
 
 namespace MEE7
 {
-    public class Command
+    public abstract class Command
     {
         public string Desc { get; private set; }
         public string CommandLine { get; private set; }
@@ -32,6 +32,8 @@ namespace MEE7
         }
 
         public EmbedBuilder HelpMenu;
+
+        // May be implemented later
         //private class SubCommand
         //{
         //    public SubCommand[] SubCommands;
@@ -43,7 +45,7 @@ namespace MEE7
         {
             Desc = "-";
             CommandLine = this.GetType().Name;
-            IsExperimental = true;
+            IsExperimental = false;
             IsHidden = true;
         }
         public Command(string command, string desc, bool isExperimental = false, bool isHidden = false)
@@ -53,10 +55,7 @@ namespace MEE7
             IsExperimental = isExperimental;
             IsHidden = isHidden;
         }
-        
-        public virtual void Execute(SocketMessage message)
-        {
-            
-        }
+
+        public abstract void Execute(SocketMessage message);
     }
 }
