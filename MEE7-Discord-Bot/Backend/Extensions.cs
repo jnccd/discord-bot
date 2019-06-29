@@ -221,9 +221,9 @@ namespace MEE7
                 }
             return d[smaller.Length, longer.Length];
         }
-        public static string Combine(this IEnumerable<string> s)
+        public static string Combine(this IEnumerable<string> s, string combinator = "")
         {
-            return s.Foldl("", (x, y) => x + y);
+            return s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
         public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent,
             Action<StreamWriter> RunEvent = null)
