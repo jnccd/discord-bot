@@ -21,19 +21,34 @@ namespace MEE7.Commands._OneFileCommands
                 return;
             }
 
-            string google = ("https://www.google.de/search?source=hp&ei=vJwXXbu-OcfMaJqEiugE&q=" + WebUtility.UrlEncode(split.Skip(1).Combine())).GetHTMLfromURL();
-            string urban = ("https://www.urbandictionary.com/define.php?term=" + WebUtility.UrlEncode(split.Skip(1).Combine())).GetHTMLfromURL();
-            string wiki = ("https://de.wikipedia.org/wiki/" + WebUtility.UrlEncode(split.Skip(1).Combine())).GetHTMLfromURL();
+            string search = WebUtility.UrlEncode(split.Skip(1).Combine(" "));
 
-            string wikiParse = wiki.GetEverythingBetween("<div class=\"mw-parser-output\">", "<tbody><tr>");
-            string urbanTopCard = urban.GetEverythingBetween("<span class=\"category right hide unknown\">", "<div class=\"def-footer\">");
+            //string google = ("https://www.google.de/search?source=hp&ei=vJwXXbu-OcfMaJqEiugE&q=" + WebUtility.UrlEncode(search)).GetHTMLfromURL();
+            string urban = ("https://www.urbandictionary.com/define.php?term=" + search).GetHTMLfromURL();
+            string wiki = ("https://de.wikipedia.org/wiki/" + search).GetHTMLfromURL();
 
-            string regexParse = Regex.Replace(wikiParse, "<[^>]*>", "");
-            string regexParseUrb = Regex.Replace(urbanTopCard.Replace("<br/>", "\n"), "<[^>]*>", "").Remove(0, "unknown".Length);
+            string wikiParse = "";
+            try {
+                string wikiArticle = wiki.GetEverythingBetween("<div class=\"mw-parser-output\">", "<tbody><tr>");
+                wikiParse = WebUtility.HtmlDecode(Regex.Replace(wikiArticle, "<[^>]*>", ""));
+            } catch { }
+
+            string urbanParse = "";
+            try {
+                string urbanTopCard = urban.GetEverythingBetween("<span class=\"category right hide unknown\">", "<div class=\"def-footer\">");
+                urbanParse = WebUtility.HtmlDecode(
+                    Regex.Replace(urbanTopCard.
+                        Replace("<br/>", "\n").
+                        Replace("<div class=\"example\">", "\n\n").
+                        Replace("<div class=\"tags\">", "\n\n"), "<[^>]*>", "").
+                    Remove(0, "unknown".Length));
+            } catch { }
 
             EmbedBuilder b = new EmbedBuilder();
-            try { b.AddField("Wikipedia:", regexParse);           } catch { }
-            try { b.AddField("Urban Dictionary:", regexParseUrb); } catch { }
+            if (!string.IsNullOrWhiteSpace(wikiParse))
+                b.AddFieldDirectly("Wikipedia:", wikiParse);
+            if (!string.IsNullOrWhiteSpace(urbanParse))
+                b.AddFieldDirectly("Urban Dictionary:", urbanParse);
             Program.SendEmbed(b, message.Channel).Wait();
         }
     }
