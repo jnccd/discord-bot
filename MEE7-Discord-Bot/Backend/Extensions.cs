@@ -10,9 +10,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TheArtOfDev.HtmlRenderer.WinForms;
 using Color = System.Drawing.Color;
 
 namespace MEE7
@@ -225,6 +225,74 @@ namespace MEE7
         {
             return s.Foldl("", (x, y) => x + y);
         }
+        public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent,
+            Action<StreamWriter> RunEvent = null)
+        {
+            bool exited = false;
+            string[] split = command.Split(' ');
+
+            if (split.Length == 0)
+                return;
+
+            Process compiler = new Process();
+            compiler.StartInfo.FileName = split.First();
+            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y);
+            compiler.StartInfo.CreateNoWindow = true;
+            compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            compiler.StartInfo.RedirectStandardInput = true;
+            compiler.StartInfo.RedirectStandardOutput = true;
+            compiler.StartInfo.RedirectStandardError = true;
+            compiler.Start();
+
+            Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
+
+            DateTime start = DateTime.Now;
+
+            Task.Run(() => {
+                Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
+                compiler.WaitForExit();
+
+                string o = compiler.StandardOutput.ReadToEnd();
+                string e = compiler.StandardError.ReadToEnd();
+
+                exited = true;
+                ExecutedEvent(o, e);
+            });
+
+            while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
+                Thread.Sleep(100);
+            if (!exited)
+            {
+                exited = true;
+                try
+                {
+                    compiler.Close();
+                }
+                catch { }
+                TimeoutEvent();
+            }
+        }
+        public static string GetHTMLfromURL(this string URL)
+        {
+            try {
+                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
+                req.KeepAlive = false;
+                req.AllowAutoRedirect = true;
+                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
+                using (WebResponse w = req.GetResponse())
+                using (Stream s = w.GetResponseStream())
+                using (StreamReader sr = new StreamReader(s))
+                    return sr.ReadToEnd();
+            } catch { return ""; }
+        }
+        public static Bitmap ConvertHtmlToImage(this string HTML, int width = 600, int height = 800)
+        {
+            Bitmap b = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(b))
+                g.FillRectangle(Brushes.White, new Rectangle(0, 0, width, height));
+            HtmlRender.Render(Graphics.FromImage(b), HTML, new PointF(0, 0), new SizeF(500, 500));
+            return b;
+        }
 
         // Discord
         public static EmbedBuilder ToEmbed(this IMessage m)
@@ -383,53 +451,6 @@ namespace MEE7
 
             //file is not locked
             return false;
-        }
-        public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent, 
-            Action<StreamWriter> RunEvent = null)
-        {
-            bool exited = false;
-            string[] split = command.Split(' ');
-
-            if (split.Length == 0)
-                return;
-
-            Process compiler = new Process();
-            compiler.StartInfo.FileName = split.First();
-            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y);
-            compiler.StartInfo.CreateNoWindow = true;
-            compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            compiler.StartInfo.RedirectStandardInput = true;
-            compiler.StartInfo.RedirectStandardOutput = true;
-            compiler.StartInfo.RedirectStandardError = true;
-            compiler.Start();
-
-            Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
-
-            DateTime start = DateTime.Now;
-
-            Task.Run(() => {
-                Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
-                compiler.WaitForExit();
-
-                string o = compiler.StandardOutput.ReadToEnd();
-                string e = compiler.StandardError.ReadToEnd();
-
-                exited = true;
-                ExecutedEvent(o, e);
-            });
-
-            while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
-                Thread.Sleep(100);
-            if (!exited)
-            {
-                exited = true;
-                try
-                {
-                    compiler.Close();
-                }
-                catch { }
-                TimeoutEvent();
-            }
         }
         public static void InvokeParallel(this Delegate del, params object[] args)
         {
