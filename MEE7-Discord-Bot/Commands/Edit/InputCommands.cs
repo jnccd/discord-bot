@@ -65,7 +65,7 @@ namespace MEE7.Commands
                 throw new Exception("No audio file found!");
             }, null, typeof(WaveStream)),
             new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
-                return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@' }))).
+                return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).
                 GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
             }, null, typeof(Bitmap)),
             new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 

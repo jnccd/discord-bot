@@ -57,7 +57,7 @@ namespace MEE7.Configuration
             {
                 if (File.Exists(configPath))
                     File.Copy(configPath, configBackupPath, true);
-                File.WriteAllText(configPath, JsonConvert.SerializeObject(Data));
+                File.WriteAllText(configPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
                 UnsavedChanges = false;
             }
         }
