@@ -130,11 +130,11 @@ namespace MEE7.Commands
             else if (currentData is Bitmap[])
             {
                 using (MemoryStream s = new MemoryStream())
-                using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
                 {
-                    foreach (Bitmap b in currentData as Bitmap[])
-                        c.AddFrame(b);
-
+                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
+                        foreach (Bitmap b in currentData as Bitmap[])
+                            c.AddFrame(b);
+                    
                     Program.SendFile(s, message.Channel, "gif").Wait();
                 }
             }

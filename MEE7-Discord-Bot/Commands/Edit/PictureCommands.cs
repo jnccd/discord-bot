@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using XnaGeometry;
+using BumpKit;
+using System.Numerics;
 using Color = System.Drawing.Color;
 
 namespace MEE7.Commands
@@ -201,7 +202,7 @@ namespace MEE7.Commands
                     Vector2 diff = point - centerT;
                     Vector2 move = diff;
                     move.Normalize();
-
+                    
                     Vector2 target = Vector2.Zero;
                     float transformedLength = 0;
                     float rotationAngle = 0;
@@ -324,6 +325,35 @@ namespace MEE7.Commands
             new EditCommand("transRights", "The input image says trans rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, o as Bitmap);
             }, typeof(Bitmap), typeof(Bitmap)),
+            new EditCommand("rainbow", "I'll try spinning that's a good trick!", (SocketMessage m, string a, object o) => {
+                Bitmap b = o as Bitmap;
+                Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
+
+                using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
+                    for (int x = 0; x < b.Width; x++)
+                        for (int y = 0; y < b.Height; y++)
+                        {
+                            Color col = c.GetPixel(x, y);
+                            HSVimage[x, y] = new Vector3(col.GetHue(), col.GetSaturation(), col.GetValue());
+                        }
+
+                int steps = 10;
+                int stepWidth = 360 / steps;
+                Bitmap[] re = new Bitmap[steps];
+                for (int i = 0; i < steps; i++)
+                {
+                    re[i] = new Bitmap(b.Width, b.Height);
+                    using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(re[i]))
+                        for (int x = 0; x < b.Width; x++)
+                            for (int y = 0; y < b.Height; y++)
+                            {
+                                HSVimage[x, y].X += stepWidth;
+                                c.SetPixel(x, y, HSVimage[x, y].HsvToRgb());
+                            }
+                }
+
+                return re;
+            }, typeof(Bitmap), typeof(Bitmap[])),
         };
         static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
         {
