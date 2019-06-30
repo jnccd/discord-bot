@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using XnaGeometry;
 using System.IO;
 using Color = System.Drawing.Color;
 using BumpKit;

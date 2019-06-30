@@ -68,6 +68,9 @@ namespace MEE7.Commands
                 return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).
                 GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
             }, null, typeof(Bitmap)),
+            new EditCommand("serverPicture", "Gets the server picture from a server id", (SocketMessage m, string a, object o) => {
+                return Program.GetGuildFromID(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
+            }, null, typeof(Bitmap)),
             new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
                 (SocketMessage m, string a, object o) => {
                     MemoryStream mem = new MemoryStream();
@@ -83,18 +86,6 @@ namespace MEE7.Commands
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
                     }
             }, null, typeof(WaveStream)),
-            new EditCommand("giftest", "Creates a test gif", (SocketMessage m, string a, object o) => {
-                var stuffs = new List<Bitmap>();
-
-                for (int i = 0; i < 50; i++)
-                {
-                    stuffs.Add(new Bitmap(400, 400));
-                    using (Graphics g = Graphics.FromImage(stuffs.Last()))
-                        g.FillRectangle(Brushes.Blue, new Rectangle(i*3,i*3,100,100));
-                }
-
-                return stuffs.ToArray();
-            }, null, typeof(Bitmap[])),
         };
     }
 }

@@ -328,16 +328,18 @@ namespace MEE7.Commands
             new EditCommand("rainbow", "I'll try spinning that's a good trick!", (SocketMessage m, string a, object o) => {
                 Bitmap b = o as Bitmap;
                 Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
+                int[,] Alphas = new int[b.Width, b.Height];
 
                 using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
                     for (int x = 0; x < b.Width; x++)
                         for (int y = 0; y < b.Height; y++)
                         {
                             Color col = c.GetPixel(x, y);
+                            Alphas[x, y] = col.A;
                             HSVimage[x, y] = new Vector3(col.GetHue(), col.GetSaturation(), col.GetValue());
                         }
 
-                int steps = 10;
+                int steps = 20;
                 int stepWidth = 360 / steps;
                 Bitmap[] re = new Bitmap[steps];
                 for (int i = 0; i < steps; i++)
@@ -348,7 +350,7 @@ namespace MEE7.Commands
                             for (int y = 0; y < b.Height; y++)
                             {
                                 HSVimage[x, y].X += stepWidth;
-                                c.SetPixel(x, y, HSVimage[x, y].HsvToRgb());
+                                c.SetPixel(x, y, Color.FromArgb(Alphas[x, y], HSVimage[x, y].HsvToRgb()));
                             }
                 }
 
