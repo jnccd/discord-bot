@@ -277,13 +277,14 @@ namespace MEE7
             try {
                 HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
                 req.KeepAlive = false;
+                req.Timeout = 3000;
                 req.AllowAutoRedirect = true;
                 req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
                 using (WebResponse w = req.GetResponse())
                 using (Stream s = w.GetResponseStream())
                 using (StreamReader sr = new StreamReader(s))
                     return sr.ReadToEnd();
-            } catch { return ""; }
+            } catch (Exception e) { return $"Exception: {e}"; }
         }
         public static Bitmap ConvertHtmlToImage(this string HTML, int width = 600, int height = 800)
         {
