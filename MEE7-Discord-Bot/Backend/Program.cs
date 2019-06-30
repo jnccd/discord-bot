@@ -971,7 +971,7 @@ namespace MEE7
             if (fileName == "")
                 fileName = DateTime.Now.ToBinary().ToString();
             stream.Position = 0;
-            return await Channel.SendFileAsync(stream, fileName + "." + fileEnd, text);
+            return await Channel.SendFileAsync(stream, fileName + "." + fileEnd.TrimStart('.'), text);
         }
         public static async Task<IUserMessage> SendBitmap(Bitmap bmp, IMessageChannel Channel, string text = "")
         {
