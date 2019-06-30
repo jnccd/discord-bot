@@ -22,16 +22,26 @@ namespace MEE7.Commands._OneFileCommands
             }
 
             string search = WebUtility.UrlEncode(split.Skip(1).Combine(" "));
+            string wikiSearch = split.Skip(1).Combine("_");
 
             //string google = ("https://www.google.de/search?source=hp&ei=vJwXXbu-OcfMaJqEiugE&q=" + WebUtility.UrlEncode(search)).GetHTMLfromURL();
             string urban = ("https://www.urbandictionary.com/define.php?term=" + search).GetHTMLfromURL();
-            string wiki = ("https://de.wikipedia.org/wiki/" + search).GetHTMLfromURL();
+            string wiki = ("https://en.wikipedia.org/wiki/" + wikiSearch).GetHTMLfromURL();
 
             string wikiParse = "";
             try {
                 string wikiArticle = wiki.GetEverythingBetween("<div class=\"mw-parser-output\">", "<tbody><tr>");
                 wikiParse = WebUtility.HtmlDecode(Regex.Replace(wikiArticle, "<[^>]*>", ""));
             } catch { }
+            if (string.IsNullOrWhiteSpace(wikiParse))
+            {
+                try
+                {
+                    string wikiArticle = wiki.GetEverythingBetween("</table>", "<div id=\"toc\" class=\"toc\">");
+                    wikiParse = WebUtility.HtmlDecode(Regex.Replace(wikiArticle, "<[^>]*>", ""));
+                }
+                catch { }
+            }
 
             string urbanParse = "";
             try {
