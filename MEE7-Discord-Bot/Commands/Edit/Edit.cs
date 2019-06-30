@@ -10,6 +10,7 @@ using Color = System.Drawing.Color;
 using BumpKit;
 using System.Reflection;
 using System.Linq.Expressions;
+using AnimatedGif;
 
 namespace MEE7.Commands
 {
@@ -128,22 +129,16 @@ namespace MEE7.Commands
             }
             else if (currentData is Bitmap[])
             {
-                var bs = currentData as Bitmap[];
-                Stream s = new MemoryStream();
-                var g = new GifEncoder(s);
-                foreach (Bitmap b in bs)
+                using (MemoryStream s = new MemoryStream())
+                using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
                 {
-                    g.AddFrame(b);
-                    b.Dispose();
+                    foreach (Bitmap b in currentData as Bitmap[])
+                        c.AddFrame(b);
+
+                    Program.SendFile(s, message.Channel, "gif").Wait();
                 }
-                Program.SendFile(s, message.Channel, "gif").Wait();
-                g.Dispose();
             }
-            else if (currentData == null)
-#pragma warning disable CS0642
-                ;
-#pragma warning restore CS0642
-            else
+            else if (currentData != null)
                 Program.SendText(currentData.ToString(), message.Channel).Wait();
         }
 
