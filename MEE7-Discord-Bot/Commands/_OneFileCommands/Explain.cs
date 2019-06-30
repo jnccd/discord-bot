@@ -23,10 +23,9 @@ namespace MEE7.Commands._OneFileCommands
 
             string search = WebUtility.UrlEncode(split.Skip(1).Combine(" "));
             string wikiSearch = split.Skip(1).Combine("_");
-
-            //string google = ("https://www.google.de/search?source=hp&ei=vJwXXbu-OcfMaJqEiugE&q=" + WebUtility.UrlEncode(search)).GetHTMLfromURL();
-            string urban = ("https://www.urbandictionary.com/define.php?term=" + search).GetHTMLfromURL();
-            string wiki = ("https://en.wikipedia.org/wiki/" + wikiSearch).GetHTMLfromURL();
+            
+            string urban = ($"https://www.urbandictionary.com/define.php?term={search}").GetHTMLfromURL();
+            string wiki = ($"https://en.wikipedia.org/wiki/{wikiSearch}").GetHTMLfromURL();
 
             string wikiParse = "";
             try {
@@ -53,7 +52,7 @@ namespace MEE7.Commands._OneFileCommands
                         Replace("<div class=\"tags\">", "\n\n"), "<[^>]*>", "").
                     Remove(0, "unknown".Length));
             } catch { }
-
+            
             EmbedBuilder b = new EmbedBuilder();
             if (!string.IsNullOrWhiteSpace(wikiParse))
                 b.AddFieldDirectly("Wikipedia:", wikiParse);
