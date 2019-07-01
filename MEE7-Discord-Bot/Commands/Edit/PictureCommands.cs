@@ -349,8 +349,10 @@ namespace MEE7.Commands
                         for (int x = 0; x < b.Width; x++)
                             for (int y = 0; y < b.Height; y++)
                             {
-                                HSVimage[x, y].X += stepWidth;
                                 c.SetPixel(x, y, Color.FromArgb(Alphas[x, y], HSVimage[x, y].HsvToRgb()));
+                                HSVimage[x, y].X += stepWidth;
+                                while (HSVimage[x, y].X > 360)
+                                    HSVimage[x, y].X -= 360;
                             }
                 }
 
