@@ -20,27 +20,29 @@ namespace MEE7.Commands
             new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
 
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Color c = bmp.GetPixel(x, y);
-                        c = Color.FromArgb(c.B, c.R, c.G);
-                        bmp.SetPixel(x, y, c);
-                    }
-
+                using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                    for (int x = 0; x < bmp.Width; x++)
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            Color c = bmp.GetPixel(x, y);
+                            c = Color.FromArgb(c.B, c.R, c.G);
+                            con.SetPixel(x, y, c);
+                        }
+                
                 return bmp;
             }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("invert", "Invert the color of each pixel", (SocketMessage m, string a, object o) => {
                 Bitmap bmp = (o as Bitmap);
 
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Color c = bmp.GetPixel(x, y);
-                        c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
-                        bmp.SetPixel(x, y, c);
-                    }
-
+                using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                    for (int x = 0; x < bmp.Width; x++)
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            Color c = bmp.GetPixel(x, y);
+                            c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
+                            con.SetPixel(x, y, c);
+                        }
+                
                 return bmp;
             }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, string a, object o) => {
@@ -282,12 +284,14 @@ namespace MEE7.Commands
                     Strength = (float)split[2].ConvertToDouble();
                 } catch { }
 
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
-                        output.SetPixel(x, y, bmp.GetPixel((int)target.X, (int)target.Y));
-                    }
+                using (UnsafeBitmapContext ocon = new UnsafeBitmapContext(output))
+                using (UnsafeBitmapContext bcon = new UnsafeBitmapContext(bmp))
+                    for (int x = 0; x < bmp.Width; x++)
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
+                            ocon.SetPixel(x, y, bcon.GetPixel((int)target.X, (int)target.Y));
+                        }
 
                 return output;
             }, typeof(Bitmap), typeof(Bitmap)),
@@ -392,44 +396,46 @@ namespace MEE7.Commands
 
             if (grayscale)
             {
-                for (int x = 0; x < output.Width; x++)
-                    for (int y = 0; y < output.Height; y++)
-                    {
-                        int activation = 0;
-                        for (int xk = x; xk < x + kernelW; xk++)
-                            for (int yk = y; yk < y + kernelH; yk++)
-                                activation += kernel[xk - x, yk - y] * bmp.GetPixel(xk, yk).GetGrayScale();
-                        activation = (int)(activation * factor);
-                        activation += 255 / 2;
-                        if (activation > 255)
-                            activation = 255;
-                        if (activation < 0)
-                            activation = 0;
-                        output.SetPixel(x, y, Color.FromArgb(activation, activation, activation));
-                    }
+                using (UnsafeBitmapContext c = new UnsafeBitmapContext(output))
+                    for (int x = 0; x < output.Width; x++)
+                        for (int y = 0; y < output.Height; y++)
+                        {
+                            int activation = 0;
+                            for (int xk = x; xk < x + kernelW; xk++)
+                                for (int yk = y; yk < y + kernelH; yk++)
+                                    activation += kernel[xk - x, yk - y] * bmp.GetPixel(xk, yk).GetGrayScale();
+                            activation = (int)(activation * factor);
+                            activation += 255 / 2;
+                            if (activation > 255)
+                                activation = 255;
+                            if (activation < 0)
+                                activation = 0;
+                            c.SetPixel(x, y, Color.FromArgb(activation, activation, activation));
+                        }
             }
             else
             {
-                for (int x = 0; x < output.Width; x++)
-                    for (int y = 0; y < output.Height; y++)
-                    {
-                        int[] activation = new int[3] { 0, 0, 0 };
-                        for (int i = 0; i < activation.Length; i++)
+                using (UnsafeBitmapContext c = new UnsafeBitmapContext(output))
+                    for (int x = 0; x < output.Width; x++)
+                        for (int y = 0; y < output.Height; y++)
                         {
-                            for (int xk = x; xk < x + kernelW; xk++)
-                                for (int yk = y; yk < y + kernelH; yk++)
-                                    activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
-                                        bmp.GetPixel(xk, yk).R : (i == 1 ?
-                                        bmp.GetPixel(xk, yk).G : bmp.GetPixel(xk, yk).B));
-                            activation[i] = (int)(activation[i] * factor);
-                            activation[i] += 255 / 2;
-                            if (activation[i] > 255)
-                                activation[i] = 255;
-                            if (activation[i] < 0)
-                                activation[i] = 0;
+                            int[] activation = new int[3] { 0, 0, 0 };
+                            for (int i = 0; i < activation.Length; i++)
+                            {
+                                for (int xk = x; xk < x + kernelW; xk++)
+                                    for (int yk = y; yk < y + kernelH; yk++)
+                                        activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
+                                            bmp.GetPixel(xk, yk).R : (i == 1 ?
+                                            bmp.GetPixel(xk, yk).G : bmp.GetPixel(xk, yk).B));
+                                activation[i] = (int)(activation[i] * factor);
+                                activation[i] += 255 / 2;
+                                if (activation[i] > 255)
+                                    activation[i] = 255;
+                                if (activation[i] < 0)
+                                    activation[i] = 0;
+                            }
+                            c.SetPixel(x, y, Color.FromArgb(activation[0], activation[1], activation[2]));
                         }
-                        output.SetPixel(x, y, Color.FromArgb(activation[0], activation[1], activation[2]));
-                    }
             }
 
             return output;
@@ -446,16 +452,17 @@ namespace MEE7.Commands
         }
         static Bitmap FlagColor(Func<Color, bool> ShouldBeRecolored, Color[] Cs, Bitmap P, bool Horz = false)
         {
-            for (int x = 0; x < P.Width; x++)
-                for (int y = 0; y < P.Height; y++)
-                {
-                    Color c = P.GetPixel(x, y);
-                    if (ShouldBeRecolored(c))
-                        if (Horz)
-                            P.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
-                        else
-                            P.SetPixel(x, y, Cs[y * Cs.Length / P.Height]);
-                }
+            using (UnsafeBitmapContext c = new UnsafeBitmapContext(P))
+                for (int x = 0; x < P.Width; x++)
+                    for (int y = 0; y < P.Height; y++)
+                    {
+                        Color col = P.GetPixel(x, y);
+                        if (ShouldBeRecolored(col))
+                            if (Horz)
+                                c.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
+                            else
+                                c.SetPixel(x, y, Cs[y * Cs.Length / P.Height]);
+                    }
             return P;
         }
     }
