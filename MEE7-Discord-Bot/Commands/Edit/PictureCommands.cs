@@ -401,9 +401,10 @@ namespace MEE7.Commands
                         for (int y = 0; y < output.Height; y++)
                         {
                             int activation = 0;
-                            for (int xk = x; xk < x + kernelW; xk++)
-                                for (int yk = y; yk < y + kernelH; yk++)
-                                    activation += kernel[xk - x, yk - y] * bmp.GetPixel(xk, yk).GetGrayScale();
+                            using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
+                                for (int xk = x; xk < x + kernelW; xk++)
+                                    for (int yk = y; yk < y + kernelH; yk++)
+                                        activation += kernel[xk - x, yk - y] * cb.GetPixel(xk, yk).GetGrayScale();
                             activation = (int)(activation * factor);
                             activation += 255 / 2;
                             if (activation > 255)
@@ -422,11 +423,12 @@ namespace MEE7.Commands
                             int[] activation = new int[3] { 0, 0, 0 };
                             for (int i = 0; i < activation.Length; i++)
                             {
-                                for (int xk = x; xk < x + kernelW; xk++)
-                                    for (int yk = y; yk < y + kernelH; yk++)
-                                        activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
-                                            bmp.GetPixel(xk, yk).R : (i == 1 ?
-                                            bmp.GetPixel(xk, yk).G : bmp.GetPixel(xk, yk).B));
+                                using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
+                                    for (int xk = x; xk < x + kernelW; xk++)
+                                        for (int yk = y; yk < y + kernelH; yk++)
+                                            activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
+                                                cb.GetPixel(xk, yk).R : (i == 1 ?
+                                                cb.GetPixel(xk, yk).G : cb.GetPixel(xk, yk).B));
                                 activation[i] = (int)(activation[i] * factor);
                                 activation[i] += 255 / 2;
                                 if (activation[i] > 255)
