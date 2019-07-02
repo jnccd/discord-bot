@@ -134,7 +134,7 @@ namespace MEE7.Commands
                 {
                     using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
                         foreach (Bitmap b in currentData as Bitmap[])
-                            c.AddFrame(b);
+                            c.AddFrame(b, -1, GifQuality.Bit8);
 
                     Program.SendFile(s, message.Channel, "gif").Wait();
 
