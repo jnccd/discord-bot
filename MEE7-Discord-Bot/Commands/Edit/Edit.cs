@@ -15,17 +15,19 @@ namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
+        //public EditCommand InputC_Test1234 = new EditCommand("profilePicture", "Gets a profile picture", InputC_Test1234_Func, null, typeof(Bitmap));
+        //static object InputC_Test1234_Func(SocketMessage m, string a, object o)
+        //{
+        //    return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
+        //}
+
         public Edit() : base("edit", "Edit stuff using various functions")
         {
-            var test = this.GetType().GetMethods().
-                Where(x => 
-                x.Name.StartsWith("Flag")).
-                Select(x => {
-                    var input = Expression.Parameter(typeof(object), "input");
-                    return new EditCommand(x.Name, (string)GetType().GetProperty(x.Name + "_Desc").GetValue(this), 
-                        Expression.Lambda<Func<SocketMessage, string, object, object>>(Expression.Call(Expression.Convert(input, this.GetType()), x), input).Compile(),
-                        (Type)GetType().GetProperty(x.Name + "_Input").GetValue(this), (Type)GetType().GetProperty(x.Name + "_Output").GetValue(this));
-                }).ToArray();
+            //var mem = this.GetType().GetMembers();
+            //var fef = this.GetType().GetFields();
+            //var prop = this.GetType().GetProperties();
+            //var test = this.GetType().GetFields().Where(x => x.FieldType == typeof(EditCommand)).Select(x => x.GetValue(this)).ToArray();
+
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
 
             HelpMenu = new EmbedBuilder();
@@ -133,15 +135,18 @@ namespace MEE7.Commands
                     using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
                         foreach (Bitmap b in currentData as Bitmap[])
                             c.AddFrame(b);
-                    
+
                     Program.SendFile(s, message.Channel, "gif").Wait();
+
+                    foreach (Bitmap b in currentData as Bitmap[])
+                        b.Dispose();
                 }
             }
             else if (currentData != null)
                 Program.SendText(currentData.ToString(), message.Channel).Wait();
         }
 
-        class EditCommand
+        public class EditCommand
         {
             public string Command, Desc;
             public Type InputType, OutputType;

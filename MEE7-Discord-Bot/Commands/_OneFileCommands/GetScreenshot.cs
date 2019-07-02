@@ -23,11 +23,13 @@ namespace MEE7.Commands
             {
                 Rectangle AllScreenBounds = new Rectangle(-1360, 0, 1360 + 1600, 900);
 
-                Bitmap bmp = new Bitmap(AllScreenBounds.Width, AllScreenBounds.Height, PixelFormat.Format32bppArgb);
-                Graphics graphics = Graphics.FromImage(bmp);
-                graphics.CopyFromScreen(AllScreenBounds.X, AllScreenBounds.Y, 0, 0, new Size(AllScreenBounds.Width, AllScreenBounds.Height), CopyPixelOperation.SourceCopy);
-                
-                Program.SendBitmap(bmp, message.Channel).Wait();
+                using (Bitmap bmp = new Bitmap(AllScreenBounds.Width, AllScreenBounds.Height, PixelFormat.Format32bppArgb))
+                {
+                    using (Graphics graphics = Graphics.FromImage(bmp))
+                        graphics.CopyFromScreen(AllScreenBounds.X, AllScreenBounds.Y, 0, 0, new Size(AllScreenBounds.Width, AllScreenBounds.Height), CopyPixelOperation.SourceCopy);
+
+                    Program.SendBitmap(bmp, message.Channel).Wait();
+                }
             }
         }
     }
