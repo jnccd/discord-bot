@@ -351,7 +351,7 @@ namespace MEE7
                 e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text, IsInline = IsInline });
             }
         }
-
+        
         // Drawing
         public static Bitmap CropImage(this Bitmap source, Rectangle section)
         {
@@ -473,6 +473,18 @@ namespace MEE7
         public static float GetValue(this Color c)
         {
             return new float[] { c.R / 255f, c.G / 255f, c.B / 255f }.Max();
+        }
+        public static Bitmap RotateImage(this Bitmap b, float AngleInDegrees, Vector2 RotationOrigin)
+        {
+            Bitmap re = new Bitmap(b.Width, b.Height);
+            using (Graphics g = Graphics.FromImage(re))
+            {
+                g.TranslateTransform(RotationOrigin.X, RotationOrigin.Y);
+                g.RotateTransform(AngleInDegrees);
+                g.TranslateTransform(-RotationOrigin.X, -RotationOrigin.Y);
+                g.DrawImage(b, Point.Empty);
+            }
+            return re;
         }
 
         // Linq Extensions
