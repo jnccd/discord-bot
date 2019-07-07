@@ -14,7 +14,7 @@ namespace MEE7.Commands
             }, typeof(string), typeof(string)),
             new EditCommand("mock", "Mock the text", (SocketMessage m, string a, object o) => {
                 return string.Join("", (o as string).Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) + 
-                    "https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
+                    "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
             }, typeof(string), typeof(string)),
             new EditCommand("crab", "Crab the text", (SocketMessage m, string a, object o) => {
                 return ":crab: " + (o as string) + " :crab:\n https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s";
