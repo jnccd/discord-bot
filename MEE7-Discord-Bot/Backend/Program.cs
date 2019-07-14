@@ -741,8 +741,10 @@ namespace MEE7
         }
         static void UpdateWorkState()
         {
-            if (ConcurrentCommandExecutions > 0)
+            if (ConcurrentCommandExecutions > 1)
                 client.SetStatusAsync(UserStatus.DoNotDisturb);
+            else if (ConcurrentCommandExecutions > 0)
+                client.SetStatusAsync(UserStatus.AFK);
             else
                 client.SetStatusAsync(UserStatus.Online);
         }
