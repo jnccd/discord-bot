@@ -416,18 +416,11 @@ namespace MEE7
                 }
                 else if (input.StartsWith("/test"))
                 {
-                    Task.Factory.StartNew(() =>
-                    {
-                        Thread.CurrentThread.Name = "TestThread";
-                        string[] split = input.Split(' ');
-                        int index = CurrentlyActiveTestIndex;
-                        if (split.Length > 0)
-                            try { index = Convert.ToInt32(split[1]); } catch { }
-                        ConsoleWriteLine($"Running test {index}");
-                        try { Tests[index].Invoke(); }
-                        catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                        ConsoleWrite("$");
-                    });
+                    string[] split = input.Split(' ');
+                    int index = -1;
+                    if (split.Length > 0)
+                        try { index = Convert.ToInt32(split[1]); } catch { }
+                    Tests.Run(index);
                 }
                 else if (input.StartsWith("/roles")) // ServerID
                 {

@@ -16,8 +16,20 @@ namespace MEE7
 {
     public class Tests
     {
-        public delegate void TestHandler();
-        public static event TestHandler OnTest;
+        private delegate void TestHandler();
+        private static event TestHandler OnTest;
+
+        public static void Run(int index)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                Thread.CurrentThread.Name = "TestThread";
+                Program.ConsoleWriteLine($"Running test {index}");
+                try { TestFunctions[index].Invoke(); }
+                catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                Program.ConsoleWrite("$");
+            });
+        }
 
         private static readonly int CurrentlyActiveTestIndex = 0;
         private static readonly Action[] TestFunctions = new Action[] {

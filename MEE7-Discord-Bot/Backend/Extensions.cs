@@ -18,7 +18,7 @@ using Color = System.Drawing.Color;
 
 namespace MEE7
 {
-    public static partial class Extensions
+    public static class Extensions
     {
         private static int RunAsConsoleCommandThreadIndex = 0;
 
@@ -351,7 +351,12 @@ namespace MEE7
                 e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text, IsInline = IsInline });
             }
         }
-        
+        public static SelfmadeMessage EditContent(this SelfmadeMessage m, string newContent)
+        {
+            m.Content = newContent;
+            return m;
+        }
+
         // Drawing
         public static Bitmap CropImage(this Bitmap source, Rectangle section)
         {
@@ -485,6 +490,13 @@ namespace MEE7
                 g.DrawImage(b, Point.Empty);
             }
             return re;
+        }
+        public static Point RotatePointAroundPoint(this Point P, Point RotationOrigin, double angle)
+        {
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+            return new Point((int)(cos * (P.X - RotationOrigin.X) - sin * (P.Y - RotationOrigin.Y) + RotationOrigin.X),
+                             (int)(sin * (P.X - RotationOrigin.X) + cos * (P.Y - RotationOrigin.Y) + RotationOrigin.Y));
         }
 
         // Linq Extensions
