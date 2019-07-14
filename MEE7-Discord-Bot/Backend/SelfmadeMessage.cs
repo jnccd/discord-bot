@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MEE7
+namespace MEE7.Backend
 {
     public class SelfmadeMessage : IMessage
     {

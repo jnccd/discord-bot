@@ -12,7 +12,7 @@ using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 
-namespace MEE7
+namespace MEE7.Backend
 {
     public class Tests
     {

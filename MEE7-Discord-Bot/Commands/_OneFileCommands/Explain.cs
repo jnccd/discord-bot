@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Discord;
 using Discord.WebSocket;
+using MEE7.Backend;
 
 namespace MEE7.Commands._OneFileCommands
 {
