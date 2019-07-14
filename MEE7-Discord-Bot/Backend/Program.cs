@@ -1,34 +1,33 @@
 ﻿using Discord;
+using Discord.Audio;
 using Discord.Rest;
 using Discord.WebSocket;
-using Discord.Audio;
+using MEE7.Backend;
+using MEE7.Commands;
+using MEE7.Configuration;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using MEE7.Commands;
-using System.Globalization;
-using MEE7.Configuration;
-using System.Reflection;
-using System.Runtime.Versioning;
-using NAudio.Wave;
 
 namespace MEE7
 {
-    public class IllegalCommandException : Exception { public IllegalCommandException(string message) : base (message) { } }
-
     public class Program
     {
-        #if DEBUG
-            static readonly string runConfig = "Debug";
-        #else
-            static readonly string runConfig = "Release";
-        #endif
+#if DEBUG
+        static readonly string runConfig = "Debug";
+#else
+        static readonly string runConfig = "Release";
+#endif
 
         // Console / Execution
         static int clearYcoords;
@@ -92,7 +91,7 @@ namespace MEE7
         static readonly string commandExecutionLock = "";
         static readonly string youtubeDownloadLock = "";
         static readonly string exitlock = "";
-        
+
         // --- Main ---------------------------------------------------------------------------------------------------------
         static void Main(string[] args)
         {
@@ -103,7 +102,7 @@ namespace MEE7
             catch (Exception ex)
             {
                 try { Config.Save(); } catch { }
-                SaveToLog("Error Message: " + ex.Message  + "\nStack Trace: " + ex.StackTrace);
+                SaveToLog("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
             }
         }
 
@@ -111,14 +110,14 @@ namespace MEE7
         {
             StartUp();
             HandleConsoleCommandsLoop();
-            
+
             BeforeClose();
-            
+
             client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
             client.StopAsync().Wait();
             client.LogoutAsync().Wait();
         }
-        
+
         static void StartUp()
         {
             Console.Title = "MEE7";
@@ -127,7 +126,7 @@ namespace MEE7
             Console.ForegroundColor = ConsoleColor.White;
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-            
+
             handler = new ConsoleEventDelegate(ConsoleEventCallback);
             SetConsoleCtrlHandler(handler, true);
 
@@ -252,9 +251,9 @@ namespace MEE7
                 foreach (SocketGuild g in client.Guilds)
                 {
                     ConsoleWrite($"  {g.Name}", ConsoleColor.Magenta);
-                    ConsoleWriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}", 
+                    ConsoleWriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
                         ConsoleColor.White);
-                } 
+                }
             }
             catch { ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             ConsoleWrite("Default channel is: ");
@@ -266,14 +265,16 @@ namespace MEE7
         }
         static void CallOnConnected()
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 try { OnConnected(); }
                 catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
             });
         }
         static void StartAutosaveLoop()
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 while (true)
                 {
                     Thread.Sleep(AutoSaveIntervalInMinutes * 60000);
@@ -295,7 +296,7 @@ namespace MEE7
             while (true)
             {
                 string input = Console.ReadLine();
-                
+
                 if (input == "exit")
                     break;
 
@@ -371,7 +372,7 @@ namespace MEE7
                                 {
                                     M.DeleteAsync().Wait();
                                     DeletionComplete = true;
-                                } 
+                                }
                             }
                             catch { }
                         }
@@ -495,7 +496,7 @@ namespace MEE7
                 exitedNormally = true;
             }
         }
-        
+
         // Events
         private static async Task Client_JoinedGuild(SocketGuild arg)
         {
@@ -563,7 +564,8 @@ namespace MEE7
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
-            Task.Run(async () => {
+            Task.Run(async () =>
+            {
                 Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
@@ -577,9 +579,13 @@ namespace MEE7
                 }
             });
             if (arg3.UserId != OwnID)
-                Task.Run(() => {
-                    try { OnEmojiReactionAdded?.InvokeParallel(arg1, arg2, arg3);
-                          OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3); }
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        OnEmojiReactionAdded?.InvokeParallel(arg1, arg2, arg3);
+                        OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3);
+                    }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
@@ -587,7 +593,8 @@ namespace MEE7
         }
         private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
-            Task.Run(async () => {
+            Task.Run(async () =>
+            {
                 Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
@@ -601,9 +608,13 @@ namespace MEE7
                 }
             });
             if (arg3.UserId != OwnID)
-                Task.Run(() => {
-                    try { OnEmojiReactionRemoved?.InvokeParallel(arg1, arg2, arg3);
-                          OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3); }
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        OnEmojiReactionRemoved?.InvokeParallel(arg1, arg2, arg3);
+                        OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3);
+                    }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
@@ -614,7 +625,8 @@ namespace MEE7
             if (!message.Author.IsBot && message.Content.StartsWith(prefix))
                 Task.Run(() => ParallelMessageReceived(message));
             if (message.Content.Length > 0 && (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':'))
-                Task.Run(() => {
+                Task.Run(() =>
+                {
                     try { OnNonCommandMessageRecieved.InvokeParallel(message); }
                     catch (Exception e) { ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
@@ -708,7 +720,7 @@ namespace MEE7
                 command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " + 
+                    ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                         $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
                 else
                     ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
@@ -724,7 +736,7 @@ namespace MEE7
                     CachedErrorMessages.Add(new Tuple<RestUserMessage, Exception>(m, e));
                 }
                 catch { }
-                
+
                 ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
                     $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}", ConsoleColor.Red);
                 SaveToLog(e.ToString());
@@ -748,7 +760,7 @@ namespace MEE7
             else
                 client.SetStatusAsync(UserStatus.Online);
         }
-        
+
         // Client Getters
         public static SocketUser GetUserFromId(ulong UserId)
         {
@@ -818,7 +830,7 @@ namespace MEE7
                 }
 
                 bool worked = false;
-                $"youtube-dl.exe -f mp4 -o \"{videofile}\" {YoutubeURL}".RunAsConsoleCommand(25, () => { }, 
+                $"youtube-dl.exe -f mp4 -o \"{videofile}\" {YoutubeURL}".RunAsConsoleCommand(25, () => { },
                     (s, e) => { if (s != null) worked = true; }, (StreamWriter w) => w.Write("e"));
 
                 if (worked)
@@ -984,7 +996,7 @@ namespace MEE7
                 sw.WriteLine("=============End=============");
             }
         }
-        
+
         // Closing Event
         static bool ConsoleEventCallback(int eventType)
         {

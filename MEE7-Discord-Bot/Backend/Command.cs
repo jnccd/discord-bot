@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MEE7.Commands;
 
-namespace MEE7
+namespace MEE7.Backend
 {
     public abstract class Command
     {

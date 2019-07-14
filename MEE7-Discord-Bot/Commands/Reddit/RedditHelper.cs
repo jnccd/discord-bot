@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using MEE7.Backend;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MEE7
+namespace MEE7.Commands
 {
     public static class RedditHelper
     {

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using TheArtOfDev.HtmlRenderer.WinForms;
 using Color = System.Drawing.Color;
 
-namespace MEE7
+namespace MEE7.Backend
 {
     public static class Extensions
     {

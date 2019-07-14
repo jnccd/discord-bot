@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using MEE7;
+using MEE7.Backend;
 
 namespace MEE7.Chess
 {
     class ChessPlayerMinMax : ChessPlayer
     {
-        static int[] pawnScores = {
+        static readonly int[] pawnScores = {
 0,  0,  0,  0,  0,  0,  0,  0,
 50, 50, 50, 50, 50, 50, 50, 50,
 10, 10, 20, 30, 30, 20, 10, 10,
@@ -18,7 +19,7 @@ namespace MEE7.Chess
  5, -5,-10,  0,  0,-10, -5,  5,
  5, 10, 10,-20,-20, 10, 10,  5,
  0,  0,  0,  0,  0,  0,  0,  0 };
-        static int[] knightScores = {
+        static readonly int[] knightScores = {
 -50,-40,-30,-30,-30,-30,-40,-50,
 -40,-20,  0,  0,  0,  0,-20,-40,
 -30,  0, 10, 15, 15, 10,  0,-30,
@@ -27,7 +28,7 @@ namespace MEE7.Chess
 -30,  5, 10, 15, 15, 10,  5,-30,
 -40,-20,  0,  5,  5,  0,-20,-40,
 -50,-40,-30,-30,-30,-30,-40,-50 };
-        static int[] bishopScores = {
+        static readonly int[] bishopScores = {
 -20,-10,-10,-10,-10,-10,-10,-20,
 -10,  0,  0,  0,  0,  0,  0,-10,
 -10,  0,  5, 10, 10,  5,  0,-10,
@@ -36,7 +37,7 @@ namespace MEE7.Chess
 -10, 10, 10, 10, 10, 10, 10,-10,
 -10,  5,  0,  0,  0,  0,  5,-10,
 -20,-10,-10,-10,-10,-10,-10,-20 };
-        static int[] rookScores = {
+        static readonly int[] rookScores = {
  0,  0,  0,  0,  0,  0,  0,  0,
  5, 10, 10, 10, 10, 10, 10,  5,
 -5,  0,  0,  0,  0,  0,  0, -5,
@@ -45,7 +46,7 @@ namespace MEE7.Chess
 -5,  0,  0,  0,  0,  0,  0, -5,
 -5,  0,  0,  0,  0,  0,  0, -5,
  0,  0,  0,  5,  5,  0,  0,  0 };
-        static int[] queenScores = {
+        static readonly int[] queenScores = {
 -20,-10,-10, -5, -5,-10,-10,-20,
 -10,  0,  0,  0,  0,  0,  0,-10,
 -10,  0,  5,  5,  5,  5,  0,-10,
@@ -54,7 +55,7 @@ namespace MEE7.Chess
 -10,  5,  5,  5,  5,  5,  0,-10,
 -10,  0,  5,  0,  0,  0,  0,-10,
 -20,-10,-10, -5, -5,-10,-10,-20 };
-        static int[] kingScores = {
+        static readonly int[] kingScores = {
 -30,-40,-40,-50,-50,-40,-40,-30,
 -30,-40,-40,-50,-50,-40,-40,-30,
 -30,-40,-40,-50,-50,-40,-40,-30,
@@ -198,16 +199,20 @@ namespace MEE7.Chess
         {
             if (depth == 0)
             {
-                ChessMove m = new ChessMove();
-                m.rating = EvaluationFunction(Board);
+                ChessMove m = new ChessMove
+                {
+                    rating = EvaluationFunction(Board)
+                };
                 return m;
             }
             ChessMove[] Moves;
             if (maximising)
             {
                 Moves = GetAllMoves(Board, this);
-                ChessMove bestMove = new ChessMove();
-                bestMove.rating = int.MinValue;
+                ChessMove bestMove = new ChessMove
+                {
+                    rating = int.MinValue
+                };
                 for (int i = 0; i < Moves.Length; i++)
                 {
                     ChessBoard Clone = (ChessBoard)Board.Clone();
@@ -230,8 +235,10 @@ namespace MEE7.Chess
             else
             {
                 Moves = GetAllMoves(Board, Board.GetOponent(this));
-                ChessMove bestMove = new ChessMove();
-                bestMove.rating = int.MaxValue;
+                ChessMove bestMove = new ChessMove
+                {
+                    rating = int.MaxValue
+                };
                 for (int i = 0; i < Moves.Length; i++)
                 {
                     ChessBoard Clone = (ChessBoard)Board.Clone();
