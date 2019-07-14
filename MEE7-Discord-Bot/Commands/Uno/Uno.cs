@@ -9,17 +9,6 @@ using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
-    public static partial class Extensions
-    {
-        public static Point RotatePointAroundPoint(this Point P, Point RotationOrigin, double angle)
-        {
-            double cos = Math.Cos(angle);
-            double sin = Math.Sin(angle);
-            return new Point((int)(cos * (P.X - RotationOrigin.X) - sin * (P.Y - RotationOrigin.Y) + RotationOrigin.X),
-                             (int)(sin * (P.X - RotationOrigin.X) + cos * (P.Y - RotationOrigin.Y) + RotationOrigin.Y));
-        }
-    }
-
     public class Uno : Command
     {
         public Uno() : base("uno", "Play uno with other humanoids", false)
@@ -327,7 +316,7 @@ namespace MEE7.Commands
             }
             return null;
         }
-        
+
         public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(' ');

@@ -12,37 +12,6 @@ using WarframeNET;
 
 namespace MEE7.Commands
 {
-    public static partial class Extensions
-    {
-        public static string ToReadable(this TimeSpan t)
-        {
-            return string.Format("{0}{1}{2}{3}", t.Days > 0 ? t.Days + "d " : "",
-                                                 t.Hours > 0 ? t.Hours + "h " : "",
-                                                 t.Minutes > 0 ? t.Minutes + "m " : "",
-                                                 t.Seconds > 0 ? t.Seconds + "s " : "0s ").Trim(' ');
-        }
-        public static string ToTitle(this Reward r)
-        {
-            List<string> inputs = new List<string> { (r.Items.Count == 0 ? "" : r.Items.Aggregate((x, y) => x + " " + y)),
-                                                     (r.CountedItems.Count == 0 ? "" : r.CountedItems.Select(x => (x.Count > 1 ? x.Count + " " : "") + x.Type).Aggregate((x, y) => x + " " + y)),
-                                                     (r.Credits == 0 ? "" : r.Credits + "c") };
-            inputs.RemoveAll(x => string.IsNullOrWhiteSpace(x));
-            return inputs.Count == 0 ? "" : inputs.Aggregate((x, y) => (x + " - " + y));
-        }
-        public static string ToTitle(this Alert a)
-        {
-            return a.Mission.Reward.ToTitle() + " - " + a.Mission.Node;
-        }
-        public static string ToTitle(this Invasion inv)
-        {
-            return inv.AttackingFaction + "(" + inv.AttackerReward.ToTitle() + ") vs. " + inv.DefendingFaction + "(" + inv.DefenderReward.ToTitle() + ") - " + inv.Node + " - " + inv.Description + " - " + inv.Completion + "%";
-        }
-        public static string ToTitle(this Fissure f)
-        {
-            return $"{f.Tier} {f.MissionType} on {f.Node}, ends in {(f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()}";
-        }
-    }
-
     public class Warframe : Command
     {
         const int updateIntervalMin = 5;
@@ -162,7 +131,7 @@ namespace MEE7.Commands
                     EmbedBuilder alerts = new EmbedBuilder();
                     alerts.WithColor(0, 128, 255);
                     alerts.WithTitle("Alerts:");
-                    alerts.WithDescription(WarframeHandler.worldState.WS_Alerts.Select(x => x.ToTitle()).Aggregate((x, y) => x + "\n" + y));
+                    alerts.WithDescription(WarframeHandler.worldState.WS_Alerts.Select(x => ToTitle(x)).Aggregate((x, y) => x + "\n" + y));
                     re.Add(alerts);
                 }
                 
@@ -172,7 +141,7 @@ namespace MEE7.Commands
                     invasions.WithColor(0, 128, 255);
                     invasions.WithTitle("Invasions:");
                     foreach (Invasion inv in WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted))
-                        invasions.AddFieldDirectly($"{inv.AttackingFaction}({inv.AttackerReward.ToTitle()}) vs. {inv.DefendingFaction}({inv.DefenderReward.ToTitle()})",
+                        invasions.AddFieldDirectly($"{inv.AttackingFaction}({ToTitle(inv.AttackerReward)}) vs. {inv.DefendingFaction}({ToTitle(inv.DefenderReward)})",
                             $"{inv.Node} - {inv.Description} - {inv.Completion}%");
                     re.Add(invasions);
                 }
@@ -183,7 +152,7 @@ namespace MEE7.Commands
                     fissures.WithColor(0, 128, 255);
                     fissures.WithTitle("Fissures:");
                     fissures.WithDescription(WarframeHandler.worldState.WS_Fissures.OrderBy(x => x.TierNumber).
-                        Select(f => f.Tier + " - " + f.MissionType + " - " + (f.EndTime.ToLocalTime() - DateTime.Now).ToReadable()).
+                        Select(f => f.Tier + " - " + f.MissionType + " - " + ToReadable(f.EndTime.ToLocalTime() - DateTime.Now)).
                         Aggregate((x, y) => x + "\n" + y));
                     re.Add(fissures);
                 }
@@ -235,7 +204,7 @@ namespace MEE7.Commands
                     events.WithTitle("Events:");
                     events.WithDescription(WarframeHandler.worldState.WS_Events.
                         Select(x => x.Description + " - Until: " + x.EndTime.ToLongDateString() + " - " + x.Rewards.
-                            Select(y => y.ToTitle()).
+                            Select(y => ToTitle(y)).
                             Foldl("", (a, b) => a + " " + b).Trim(' ').Trim('-')).
                         Foldl("", (x, y) => x + "\n" + y));
                     re.Add(events);
@@ -246,9 +215,9 @@ namespace MEE7.Commands
                     cycles.WithColor(0, 128, 255);
                     cycles.WithTitle("Cycles:");
                     cycles.AddFieldDirectly("Cetus: ", WarframeHandler.worldState.WS_CetusCycle.TimeOfDay() + " " +
-                        (WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
+                        ToReadable(WarframeHandler.worldState.WS_CetusCycle.Expiry.ToLocalTime() - DateTime.Now));
                     cycles.AddFieldDirectly("Fortuna: ", WarframeHandler.worldState.WS_FortunaCycle.Temerature() + " " +
-                        (WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now).ToReadable());
+                        ToReadable(WarframeHandler.worldState.WS_FortunaCycle.Expiry.ToLocalTime() - DateTime.Now));
                     re.Add(cycles);
                 }
 
@@ -340,19 +309,19 @@ namespace MEE7.Commands
                 if (!Config.Data.WarframeIDList.Contains(a.Id))
                 {
                     Config.Data.WarframeIDList.Add(a.Id);
-                    notifications.Add(a.ToTitle() + " - Expires at " + a.EndTime.ToLocalTime().ToLongTimeString() + ", so in " + (int)(a.EndTime.ToLocalTime() - DateTime.Now).TotalMinutes + " minutes");
+                    notifications.Add(ToTitle(a) + " - Expires at " + a.EndTime.ToLocalTime().ToLongTimeString() + ", so in " + (int)(a.EndTime.ToLocalTime() - DateTime.Now).TotalMinutes + " minutes");
                 }
             foreach (Invasion i in WarframeHandler.worldState.WS_Invasions)
                 if (!Config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
                 {
                     Config.Data.WarframeIDList.Add(i.Id);
-                    notifications.Add(i.ToTitle());
+                    notifications.Add(ToTitle(i));
                 }
             foreach (Fissure f in WarframeHandler.worldState.WS_Fissures)
                 if (!Config.Data.WarframeIDList.Contains(f.Id))
                 {
                     Config.Data.WarframeIDList.Add(f.Id);
-                    notifications.Add(f.ToTitle());
+                    notifications.Add(ToTitle(f));
                 }
 
             return notifications;
@@ -379,6 +348,34 @@ namespace MEE7.Commands
                     return false;
             }
             return true;
+        }
+
+        public static string ToReadable(TimeSpan t)
+        {
+            return string.Format("{0}{1}{2}{3}", t.Days > 0 ? t.Days + "d " : "",
+                                                 t.Hours > 0 ? t.Hours + "h " : "",
+                                                 t.Minutes > 0 ? t.Minutes + "m " : "",
+                                                 t.Seconds > 0 ? t.Seconds + "s " : "0s ").Trim(' ');
+        }
+        public static string ToTitle(Reward r)
+        {
+            List<string> inputs = new List<string> { (r.Items.Count == 0 ? "" : r.Items.Aggregate((x, y) => x + " " + y)),
+                                                     (r.CountedItems.Count == 0 ? "" : r.CountedItems.Select(x => (x.Count > 1 ? x.Count + " " : "") + x.Type).Aggregate((x, y) => x + " " + y)),
+                                                     (r.Credits == 0 ? "" : r.Credits + "c") };
+            inputs.RemoveAll(x => string.IsNullOrWhiteSpace(x));
+            return inputs.Count == 0 ? "" : inputs.Aggregate((x, y) => (x + " - " + y));
+        }
+        public static string ToTitle(Alert a)
+        {
+            return ToTitle(a.Mission.Reward) + " - " + a.Mission.Node;
+        }
+        public static string ToTitle(Invasion inv)
+        {
+            return inv.AttackingFaction + "(" + ToTitle(inv.AttackerReward) + ") vs. " + inv.DefendingFaction + "(" + ToTitle(inv.DefenderReward) + ") - " + inv.Node + " - " + inv.Description + " - " + inv.Completion + "%";
+        }
+        public static string ToTitle(Fissure f)
+        {
+            return $"{f.Tier} {f.MissionType} on {f.Node}, ends in {ToReadable(f.EndTime.ToLocalTime() - DateTime.Now)}";
         }
     }
 }

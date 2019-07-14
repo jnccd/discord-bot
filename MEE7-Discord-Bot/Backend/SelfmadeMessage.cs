@@ -7,15 +7,6 @@ using System.Threading.Tasks;
 
 namespace MEE7
 {
-    public static partial class Extensions
-    {
-        public static SelfmadeMessage EditContent(this SelfmadeMessage m, string newContent)
-        {
-            m.Content = newContent;
-            return m;
-        }
-    }
-
     public class SelfmadeMessage : IMessage
     {
         public string Content;
