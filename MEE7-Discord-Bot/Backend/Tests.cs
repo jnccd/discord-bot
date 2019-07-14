@@ -24,7 +24,8 @@ namespace MEE7
             Task.Factory.StartNew(() =>
             {
                 Thread.CurrentThread.Name = "TestThread";
-                Program.ConsoleWriteLine($"Running test {(index == -1 ? CurrentlyActiveTestIndex : index)}");
+                index = index == -1 ? CurrentlyActiveTestIndex : index;
+                Program.ConsoleWriteLine($"Running test {index}");
                 try { TestFunctions[index].Invoke(); }
                 catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 Program.ConsoleWrite("$");
