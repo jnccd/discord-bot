@@ -28,7 +28,7 @@ namespace MEE7.Commands
             //var fef = this.GetType().GetFields();
             //var prop = this.GetType().GetProperties();
             //var test = this.GetType().GetFields().Where(x => x.FieldType == typeof(EditCommand)).Select(x => x.GetValue(this)).ToArray();
-
+            
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
 
             HelpMenu = new EmbedBuilder();
