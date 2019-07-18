@@ -159,7 +159,7 @@ namespace MEE7
                     if (Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
                     {
                         ShowWindow(GetConsoleWindow(), 4);
-                        //SystemSounds.Exclamation.Play(); Support for SystemSounds is planned for .Net Core 3.0
+                        //SystemSounds.Exclamation.Play(); TODO: Support for SystemSounds is planned for .Net Core 3.0
                         ConsoleWrapper.ConsoleWrite("Give me a Bot Token: ");
                         Config.Data.BotToken = Console.ReadLine();
                         Config.Save();
@@ -187,11 +187,10 @@ namespace MEE7
         }
         static void SetState()
         {
-#if DEBUG
-            client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
-#else
-            client.SetGameAsync($"{prefix}help", "", ActivityType.Listening).Wait();
-#endif
+            if (runConfig == "Debug")
+                client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
+            else
+                client.SetGameAsync($"{prefix}help", "", ActivityType.Listening).Wait();
         }
         static void BuildHelpMenu()
         {
@@ -239,11 +238,7 @@ namespace MEE7
         }
         static void CallOnConnected()
         {
-            Task.Run(() =>
-            {
-                try { OnConnected(); }
-                catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-            });
+            OnConnected.InvokeParallel();
         }
         static void StartAutosaveLoop()
         {
