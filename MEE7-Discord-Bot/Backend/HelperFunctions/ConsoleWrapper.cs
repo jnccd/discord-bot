@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MEE7.Backend
+namespace MEE7.Backend.HelperFunctions
 {
     public static class ConsoleWrapper
     {

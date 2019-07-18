@@ -19,7 +19,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MEE7.Backend
+namespace MEE7.Backend.HelperFunctions
 {
     public static class DiscordNETWrapper
     {

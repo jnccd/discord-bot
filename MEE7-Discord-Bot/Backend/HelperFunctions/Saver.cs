@@ -1,25 +1,10 @@
 ﻿using Discord;
-using Discord.Audio;
-using Discord.Rest;
-using Discord.WebSocket;
-using MEE7.Backend;
-using MEE7.Commands;
 using MEE7.Configuration;
-using NAudio.Wave;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace MEE7.Backend
+namespace MEE7.Backend.HelperFunctions
 {
     public static class Saver
     {
