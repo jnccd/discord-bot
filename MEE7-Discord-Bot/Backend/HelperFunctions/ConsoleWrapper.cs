@@ -6,9 +6,11 @@ namespace MEE7.Backend.HelperFunctions
 {
     public static class ConsoleWrapper
     {
+        private static readonly object lockject = new object();
+
         public static void ConsoleWriteLine(object text, ConsoleColor Color)
         {
-            lock (Console.Title)
+            lock (lockject)
             {
                 if (Console.CursorLeft == 1)
                     Console.CursorLeft = 0;
@@ -20,7 +22,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void ConsoleWriteLine(object text)
         {
-            lock (Console.Title)
+            lock (lockject)
             {
                 if (Console.CursorLeft == 1)
                     Console.CursorLeft = 0;
@@ -30,7 +32,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void ConsoleWrite(object text, ConsoleColor Color)
         {
-            lock (Console.Title)
+            lock (lockject)
             {
                 if (Console.CursorLeft == 1)
                     Console.CursorLeft = 0;
@@ -41,7 +43,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void ConsoleWrite(object text)
         {
-            lock (Console.Title)
+            lock (lockject)
             {
                 if (Console.CursorLeft == 1)
                     Console.CursorLeft = 0;
