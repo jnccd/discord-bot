@@ -9,6 +9,7 @@ using BumpKit;
 using System.Numerics;
 using MEE7.Backend;
 using Color = System.Drawing.Color;
+using MEE7.Backend.HelperFunctions.Extensions;
 
 namespace MEE7.Commands
 {

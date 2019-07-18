@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions.Extensions;
 
 namespace MEE7.Commands
 {

@@ -3,6 +3,7 @@ using Discord.Audio;
 using Discord.Rest;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Commands;
 using MEE7.Configuration;
 using NAudio.Wave;

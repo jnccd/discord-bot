@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MEE7.Configuration;
+using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {

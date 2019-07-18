@@ -8,8 +8,6 @@ namespace MEE7.Backend.HelperFunctions.Extensions
 {
     public static class Extensions
     {
-        private static int RunAsConsoleCommandThreadIndex = 0;
-
         public static bool IsFileLocked(this FileInfo file) // from https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
         {
             FileStream stream = null;
@@ -71,6 +69,11 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             v.X = v.X / l;
             v.Y = v.Y / l;
             return v;
+        }
+
+        internal static float ModifiedLevenshteinDistance(string v1, string v2)
+        {
+            throw new NotImplementedException();
         }
     }
 }

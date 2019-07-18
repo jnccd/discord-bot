@@ -16,6 +16,8 @@ namespace MEE7.Backend.HelperFunctions.Extensions
 {
     public static class StringExtensions
     {
+        private static int RunAsConsoleCommandThreadIndex = 0;
+
         public static List<int> AllIndexesOf(this string str, string value)
         {
             if (String.IsNullOrEmpty(value))

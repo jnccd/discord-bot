@@ -2,6 +2,7 @@
 using Discord.Audio;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
