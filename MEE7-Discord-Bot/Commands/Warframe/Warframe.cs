@@ -185,7 +185,8 @@ namespace MEE7.Commands
                     nightwave.WithDescription($"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
                         $"{WarframeHandler.worldState.WS_NightWave.Phase}");
                     foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
-                        nightwave.AddFieldDirectly($"{x.Title} - {x.Desc}", $"{x.Reputation} :arrow_up: until {x.Expiry}");
+                        nightwave.AddFieldDirectly($"{(x.IsDaily ? "[Daily] " : "")}{(x.IsElite ? "[Elite] " : "")}{x.Title} - {x.Desc}", 
+                            $"{x.Reputation} :arrow_up: until {x.Expiry}");
                     re.Add(nightwave);
                 }
                 
