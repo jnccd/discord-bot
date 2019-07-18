@@ -41,7 +41,7 @@ namespace MEE7.Commands
                 url = "https://www.reddit.com/r/" + commandmessage.Content.Split(new char[] { ' ', '\n' })[1] + "/";
                 if (!RedditHelper.IsReachable(url))
                 {
-                    Program.SendText("Thats not a valid subreddit!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("Thats not a valid subreddit!", commandmessage.Channel).Wait();
                     return;
                 }
             }

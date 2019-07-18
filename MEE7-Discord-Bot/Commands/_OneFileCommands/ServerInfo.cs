@@ -52,7 +52,7 @@ namespace MEE7.Commands
             info.AddFieldDirectly("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles", true);
             info.AddFieldDirectly("User with the longest name:", g.Users.MaxElement(x => x.GetDisplayName().Length), true);
             
-            Program.SendEmbed(info, message.Channel).Wait();
+            DiscordNETWrapper.SendEmbed(info, message.Channel).Wait();
 
             return;
         }

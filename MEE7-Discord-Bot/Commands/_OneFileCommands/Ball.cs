@@ -30,13 +30,13 @@ namespace MEE7.Commands
                         sum += m.ToCharArray()[i] << i;
 
                     int answerIndex = Math.Abs((int)(sum % answers.Length));
-                    Program.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel).Wait();
                 }
                 else
-                    Program.SendText("I can only answer yes no questions!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("I can only answer yes no questions!", commandmessage.Channel).Wait();
             }
             else
-                Program.SendText("Thats not a question!", commandmessage.Channel).Wait();
+                DiscordNETWrapper.SendText("Thats not a question!", commandmessage.Channel).Wait();
         }
     }
 }

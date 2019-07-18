@@ -31,37 +31,37 @@ namespace MEE7.Commands
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length < 2 || split[1] == "help")
-                Program.SendEmbed(HelpMenu, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             else if (split[1] == "newGame")
             {
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
-                    Program.SendText("You are already in a game!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are already in a game!", message.Channel).Wait();
                     return;
                 }
 
                 if (message.MentionedUsers.Count != 1)
                 {
-                    Program.SendText("You need exactly one User to play against!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You need exactly one User to play against!", message.Channel).Wait();
                     return;
                 }
 
                 if (message.MentionedUsers.ElementAt(0).IsBot || message.Author.IsBot)
                 {
-                    Program.SendText("You can't play against Bots!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You can't play against Bots!", message.Channel).Wait();
                     return;
                 }
                 
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.MentionedUsers.ElementAt(0).Id ||
                         x.PlayerTop.UserID == message.MentionedUsers.ElementAt(0).Id))
                 {
-                    Program.SendText(message.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText(message.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel).Wait();
                     return;
                 }
 
                 Boards.Add(new ChessBoard(new ChessPlayerDiscord(message.Author.Id),
                            new ChessPlayerDiscord(message.MentionedUsers.ElementAt(0).Id)));
-                Program.SendText("Created new chess game!", message.Channel).Wait();
+                DiscordNETWrapper.SendText("Created new chess game!", message.Channel).Wait();
                 SendBoard(message);
             }
             else if (split[1] == "game")
@@ -71,7 +71,7 @@ namespace MEE7.Commands
                 int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
                 if (!Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
-                    Program.SendText("You are not in a game!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are not in a game!", message.Channel).Wait();
                     return;
                 }
 
@@ -79,13 +79,13 @@ namespace MEE7.Commands
 
                 if (split.Length != 4)
                 {
-                    Program.SendText("I need exactly 2 coordinates", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("I need exactly 2 coordinates", message.Channel).Wait();
                     return;
                 }
 
                 if (Board.PlayerWhoHasTheMove().UserID != message.Author.Id)
                 {
-                    Program.SendText("Its not your turn", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("Its not your turn", message.Channel).Wait();
                     return;
                 }
 
@@ -97,7 +97,7 @@ namespace MEE7.Commands
                 }
                 catch
                 {
-                    Program.SendText("I dont understand the first set of your coordinates!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("I dont understand the first set of your coordinates!", message.Channel).Wait();
                     return;
                 }
 
@@ -109,7 +109,7 @@ namespace MEE7.Commands
                 }
                 catch
                 {
-                    Program.SendText("I dont understand the second set of your coordinates!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("I dont understand the second set of your coordinates!", message.Channel).Wait();
                     return;
                 }
 
@@ -120,25 +120,25 @@ namespace MEE7.Commands
 
                     if (Board.GameEnded)
                     {
-                        Program.SendText($"Player {(Board.Winner == Board.PlayerWhite ? "White" : "Black")} won!", message.Channel).Wait();
+                        DiscordNETWrapper.SendText($"Player {(Board.Winner == Board.PlayerWhite ? "White" : "Black")} won!", message.Channel).Wait();
                         Boards.Remove(Board);
                     }
                 }
                 catch
                 {
-                    Program.SendText("Oi thats not a legal move!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("Oi thats not a legal move!", message.Channel).Wait();
                     return;
                 }
             }
             else
-                Program.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", message.Channel).Wait();
+                DiscordNETWrapper.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", message.Channel).Wait();
         }
 
         public void SendBoard(SocketMessage message)
         {
             ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id || 
             x.PlayerTop.UserID == message.Author.Id);
-            Program.SendBitmap(ChessBoardToPicture(Board), message.Channel, $"<@{Board.PlayerWhite.UserID}>(White) " +
+            DiscordNETWrapper.SendBitmap(ChessBoardToPicture(Board), message.Channel, $"<@{Board.PlayerWhite.UserID}>(White) " +
                 $"vs. <@{Board.PlayerBlack.UserID}>(Black)\nCurrently its the {(Board.PlayerWhoHasTheMove() == Board.PlayerWhite ? "White" : "Black")} " +
                 $"players turn").Wait();
         }

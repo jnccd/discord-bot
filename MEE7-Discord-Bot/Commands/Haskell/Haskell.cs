@@ -35,7 +35,7 @@ namespace MEE7.Commands
                                 "windows", "TCP", "Socket", "socket", "Network.", "Process.", "Compiler.", "Debug.", "Distribution.",
                                 "Foreign.", "GHC.", "Trace.", "Type.", "Marshal", ":!" }) || word.Length > 1 && word[0] == ':' && char.IsLetter(word[1]))
                             {
-                                Program.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel).Wait();
+                                DiscordNETWrapper.SendText("Your code contains commands you don't have permission to use!\nAt: " + word + " in line " + i, message.Channel).Wait();
                                 return;
                             }
                     }
@@ -48,20 +48,20 @@ namespace MEE7.Commands
                     File.WriteAllText(inputPath, haskellInput);
 
                     $"runhaskell {inputPath}".RunAsConsoleCommand(3, () => {
-                        Program.SendText("Haskell timeout!", message.Channel).Wait();
+                        DiscordNETWrapper.SendText("Haskell timeout!", message.Channel).Wait();
                     }, (s, e) => {
                         string output = string.IsNullOrWhiteSpace(s) ? e : s;
                         output = output.Insert(0, "```haskell\n").Insert(output.Length + "```haskell\n".Length, "```");
                         
                         if (output.Length >= 2000)
-                            Program.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel).Wait();
+                            DiscordNETWrapper.SendText("That output was a little too long for Discords 2000 character limit.", message.Channel).Wait();
                         else if (output.Trim('`').Trim('\n') == "haskell")
-                            Program.SendText("Your code didn't create any output!", message.Channel).Wait();
+                            DiscordNETWrapper.SendText("Your code didn't create any output!", message.Channel).Wait();
                         else
-                            Program.SendText(output, message.Channel).Wait();
+                            DiscordNETWrapper.SendText(output, message.Channel).Wait();
                     });
                 }
-                catch (Exception e) { Program.ConsoleWriteLine(e, ConsoleColor.Red); }
+                catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e, ConsoleColor.Red); }
             }
 
             return;

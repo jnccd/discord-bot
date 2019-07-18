@@ -25,12 +25,12 @@ namespace MEE7.Commands
 
                     IAudioClient client = channel.ConnectAsync().Result;
                     using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(o as WaveStream))
-                            Program.SendAudioAsync(client, naudioStream).Wait();
+                            MultiMediaHelper.SendAudioAsync(client, naudioStream).Wait();
 
                     try { channel.DisconnectAsync().Wait(); } catch { }
                 }
                 else
-                    Program.SendText("You are not in an AudioChannel on this server!", m.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are not in an AudioChannel on this server!", m.Channel).Wait();
 
                 (o as WaveStream).Dispose();
                 return null;

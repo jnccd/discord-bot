@@ -24,7 +24,7 @@ namespace MEE7.Commands
             subCommands = new PlaceCommand[] {
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",
                 (string[] split, ISocketMessageChannel Channel) => { return true; },
-                (SocketMessage commandmessage, string filePath, string[] split) => { Program.SendFile(filePath, commandmessage.Channel).Wait(); }),
+                (SocketMessage commandmessage, string filePath, string[] split) => { DiscordNETWrapper.SendFile(filePath, commandmessage.Channel).Wait(); }),
             new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) + 
             ")\neg. " + Prefix + CommandLine + " drawPixel 10,45 Red",
                 (string[] split, ISocketMessageChannel Channel) => {
@@ -32,7 +32,7 @@ namespace MEE7.Commands
                     int X, Y;
                     if (split.Length != 4)
                     {
-                        Program.SendText("I need 3 arguments to draw!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I need 3 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -44,13 +44,13 @@ namespace MEE7.Commands
                     }
                     catch
                     {
-                        Program.SendText("I don't understand those coordinates, fam!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
                     if (X >= (placeSize / pixelSize) || Y >= (placeSize / pixelSize))
                     {
-                        Program.SendText("The picture is only " + (placeSize / pixelSize) + "x" + (placeSize / pixelSize) + " big!\nTry smaller coordinates.", Channel).Wait();
+                        DiscordNETWrapper.SendText("The picture is only " + (placeSize / pixelSize) + "x" + (placeSize / pixelSize) + " big!\nTry smaller coordinates.", Channel).Wait();
                         return false;
                     }
 
@@ -58,7 +58,7 @@ namespace MEE7.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Program.SendText("I dont think I know that color :thinking:", Channel).Wait();
+                        DiscordNETWrapper.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -84,7 +84,7 @@ namespace MEE7.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Program.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
+                    DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
                 }),
             new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
             ")\neg. " + Prefix + CommandLine + " drawCircle 100,450 Red 25",
@@ -93,7 +93,7 @@ namespace MEE7.Commands
                     int X, Y, S;
                     if (split.Length != 5)
                     {
-                        Program.SendText("I need 4 arguments to draw!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I need 4 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -105,13 +105,13 @@ namespace MEE7.Commands
                     }
                     catch
                     {
-                        Program.SendText("I don't understand those coordinates, fam!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
                     //if (X >= placeSize || Y >= placeSize)
                     //{
-                    //    Program.SendText("The picture is only " + placeSize + "x" + placeSize + " big!\nTry smaller coordinates.", Channel);
+                    //    DiscordNETWrapper.SendText("The picture is only " + placeSize + "x" + placeSize + " big!\nTry smaller coordinates.", Channel);
                     //    return false;
                     //}
 
@@ -119,7 +119,7 @@ namespace MEE7.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Program.SendText("I dont think I know that color :thinking:", Channel).Wait();
+                        DiscordNETWrapper.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -129,13 +129,13 @@ namespace MEE7.Commands
                     }
                     catch
                     {
-                        Program.SendText("I don't understand that size, fam!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I don't understand that size, fam!", Channel).Wait();
                         return false;
                     }
 
                     if (S > 100)
                     {
-                        Program.SendText("Thats a little big, don't ya think?", Channel).Wait();
+                        DiscordNETWrapper.SendText("Thats a little big, don't ya think?", Channel).Wait();
                         return false;
                     }
 
@@ -163,7 +163,7 @@ namespace MEE7.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Program.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
+                    DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }),
             new PlaceCommand("drawRekt", "Draws a rectangle in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
@@ -173,7 +173,7 @@ namespace MEE7.Commands
                     int X, Y, W, H;
                     if (split.Length < 5)
                     {
-                        Program.SendText("I need 4 arguments to draw!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I need 4 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -185,7 +185,7 @@ namespace MEE7.Commands
                     }
                     catch
                     {
-                        Program.SendText("I don't understand those coordinates, fam!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
@@ -197,13 +197,13 @@ namespace MEE7.Commands
                     }
                     catch
                     {
-                        Program.SendText("I don't understand that size, fam!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I don't understand that size, fam!", Channel).Wait();
                         return false;
                     }
 
                     if (W + H > 500)
                     {
-                        Program.SendText("Thats a little big, don't ya think?", Channel).Wait();
+                        DiscordNETWrapper.SendText("Thats a little big, don't ya think?", Channel).Wait();
                         return false;
                     }
 
@@ -211,7 +211,7 @@ namespace MEE7.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Program.SendText("I dont think I know that color :thinking:", Channel).Wait();
+                        DiscordNETWrapper.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -240,7 +240,7 @@ namespace MEE7.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Program.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
+                    DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }),
             new PlaceCommand("drawString", "Draws a string in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
@@ -250,7 +250,7 @@ namespace MEE7.Commands
                     int X, Y;
                     if (split.Length < 5)
                     {
-                        Program.SendText("I need 4 arguments to draw!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I need 4 arguments to draw!", Channel).Wait();
                         return false;
                     }
 
@@ -262,13 +262,13 @@ namespace MEE7.Commands
                     }
                     catch
                     {
-                        Program.SendText("I don't understand those coordinates, fam!", Channel).Wait();
+                        DiscordNETWrapper.SendText("I don't understand those coordinates, fam!", Channel).Wait();
                         return false;
                     }
 
                     //if (X >= placeSize || Y >= placeSize)
                     //{
-                    //    Program.SendText("The picture is only " + placeSize + "x" + placeSize + " big!\nTry smaller coordinates.", Channel);
+                    //    DiscordNETWrapper.SendText("The picture is only " + placeSize + "x" + placeSize + " big!\nTry smaller coordinates.", Channel);
                     //    return false;
                     //}
 
@@ -276,7 +276,7 @@ namespace MEE7.Commands
 
                     if (brushColor.R == 0 && brushColor.G == 0 && brushColor.B == 0 && split[3].ToLower() != "black")
                     {
-                        Program.SendText("I dont think I know that color :thinking:", Channel).Wait();
+                        DiscordNETWrapper.SendText("I dont think I know that color :thinking:", Channel).Wait();
                         return false;
                     }
 
@@ -302,7 +302,7 @@ namespace MEE7.Commands
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
                         temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 
-                    Program.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
+                    DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
                 }) };
         }
@@ -336,9 +336,9 @@ namespace MEE7.Commands
                     Embed.AddFieldDirectly(Prefix + CommandLine + " " + Pcommand.command, Pcommand.desc);
                 }
                 Embed.WithDescription("Place Commands:");
-                Program.SendEmbed(Embed, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(Embed, message.Channel).Wait();
 
-                Program.SendFile(filePath, message.Channel).Wait();
+                DiscordNETWrapper.SendFile(filePath, message.Channel).Wait();
             }
             else
             {

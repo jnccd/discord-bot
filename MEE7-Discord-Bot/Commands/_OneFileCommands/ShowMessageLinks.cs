@@ -33,7 +33,7 @@ namespace MEE7.Commands
                                 GetMessageAsync(Convert.ToUInt64(linkSplit[6])).Result;
                             EmbedBuilder Embed = m.ToEmbed();
                             //Embed.AddFieldDirectly("Preview for: ", s);
-                            Program.SendEmbed(Embed, message.Channel).Wait();
+                            DiscordNETWrapper.SendEmbed(Embed, message.Channel).Wait();
                         } catch { }
                     }
             }
@@ -49,17 +49,17 @@ namespace MEE7.Commands
                     if (Config.Data.MessagePreviewServers.Contains(guild.Id))
                     {
                         Config.Data.MessagePreviewServers.Remove(guild.Id);
-                        Program.SendText("This server wont get linked message previews anymore!", message.Channel).Wait();
+                        DiscordNETWrapper.SendText("This server wont get linked message previews anymore!", message.Channel).Wait();
                     }
                     else
                     {
                         Config.Data.MessagePreviewServers.Add(guild.Id);
-                        Program.SendText("This Server will now get linked message previews!", message.Channel).Wait();
+                        DiscordNETWrapper.SendText("This Server will now get linked message previews!", message.Channel).Wait();
                     }
                 }
                 else
                 {
-                    Program.SendText("Only the server/bot owner is authorized to use this command!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("Only the server/bot owner is authorized to use this command!", message.Channel).Wait();
                 }
             }
         }

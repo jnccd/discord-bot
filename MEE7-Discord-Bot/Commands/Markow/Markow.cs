@@ -73,7 +73,7 @@ namespace MEE7.Commands
             MarkovHelper.AddToDict(input);
 
             loadedDict = true;
-            Program.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
+            ConsoleWrapper.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
         public void OnNonCommandMessageRecieved(IMessage message)
         {
@@ -96,11 +96,11 @@ namespace MEE7.Commands
             try
             {
                 string output = MarkovHelper.GetString(split.Length > 1 ? split.Skip(1).Aggregate((x, y) => { return x + " " + y; }) : "", 5, 2000);
-                Program.SendText(output, message.Channel).Wait();
+                DiscordNETWrapper.SendText(output, message.Channel).Wait();
             }
             catch (NoEmptyElementException)
             {
-                Program.SendText("Markow isn't ready yet!", message.Channel).Wait();
+                DiscordNETWrapper.SendText("Markow isn't ready yet!", message.Channel).Wait();
             }
         }
     }

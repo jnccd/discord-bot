@@ -95,7 +95,7 @@ namespace MEE7.Commands
             lock (this)
             {
                 Game newgame = new Game();
-                newgame.Message = Program.SendText(newgame.TextRenderImage(), message.Channel).Result.First();
+                newgame.Message = DiscordNETWrapper.SendText(newgame.TextRenderImage(), message.Channel).Result.First();
                 newgame.Message.AddReactionsAsync(new IEmote[] { left, up, down, right }).Wait();
                 games.Add(newgame);
             }

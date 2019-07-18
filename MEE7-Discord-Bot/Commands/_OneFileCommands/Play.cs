@@ -25,7 +25,7 @@ namespace MEE7
         {
             if (!message.Content.Contains(" "))
             {
-                Program.SendEmbed(HelpMenu, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
                 return;
             }
 
@@ -35,7 +35,7 @@ namespace MEE7
             string videoURL = message.Content.Split(' ')[1];
             if (!videoURL.StartsWith("https://www.youtube.com/watch?"))
             {
-                Program.SendText("That doesn't look like a youtube video link :thinking:", message.Channel).Wait();
+                DiscordNETWrapper.SendText("That doesn't look like a youtube video link :thinking:", message.Channel).Wait();
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace MEE7
                 try { channel.DisconnectAsync().Wait(); } catch { }
 
                 IAudioClient client = await channel.ConnectAsync();
-                using (Process P = Program.GetAudioStreamFromYouTubeVideo(videoURL, "mp3"))
+                using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(videoURL, "mp3"))
                 using (MemoryStream mem = new MemoryStream())
                 {
                     while (true)
@@ -55,14 +55,14 @@ namespace MEE7
                     }
                     P.StandardOutput.BaseStream.CopyTo(mem);
                     using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem)))
-                        Program.SendAudioAsync(client, naudioStream).Wait();
+                        MultiMediaHelper.SendAudioAsync(client, naudioStream).Wait();
                 }
 
                 try { channel.DisconnectAsync().Wait(); } catch { }
             }
             else
             {
-                Program.SendText("You are not in an AudioChannel on this server!", message.Channel).Wait();
+                DiscordNETWrapper.SendText("You are not in an AudioChannel on this server!", message.Channel).Wait();
                 return;
             }
         }

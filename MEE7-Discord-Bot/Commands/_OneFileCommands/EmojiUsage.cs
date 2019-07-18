@@ -48,7 +48,7 @@ namespace MEE7.Commands
         {
             DiscordServer server = Config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
             if (server == null)
-                Program.SendText("Impossible maybe the archives are incomplete!\nThis Server is not in my database yet.", message.Channel).Wait();
+                DiscordNETWrapper.SendText("Impossible maybe the archives are incomplete!\nThis Server is not in my database yet.", message.Channel).Wait();
             else
             {
                 EmbedBuilder embed = new EmbedBuilder();
@@ -58,7 +58,7 @@ namespace MEE7.Commands
                         Value = "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!" });
                 }
                 embed.WithColor(0, 128, 255);
-                Program.SendEmbed(embed, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();
             }
         }
     }

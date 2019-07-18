@@ -67,14 +67,14 @@ namespace MEE7.Commands
             {
                 if (PlayerID != TurnPlayerID())
                 {
-                    Program.SendText("It's not your turn :thinking:", channel).Wait();
+                    DiscordNETWrapper.SendText("It's not your turn :thinking:", channel).Wait();
                     return;
                 }
                 UnoCard newCard = UnoCards.FirstOrDefault(x => (HasColor(t) ? x.Color == c : x.Color == UnoColor.none) && x.Type == t);
                 Tuple<SocketUser, List<UnoCard>> player = Players.Find(x => x.Item1.Id == PlayerID);
                 if (!player.Item2.Exists(x => x.Type == t && x.Color == c))
                 {
-                    Program.SendText("You don't even have that card :thinking:", channel).Wait();
+                    DiscordNETWrapper.SendText("You don't even have that card :thinking:", channel).Wait();
                     return;
                 }
 
@@ -97,9 +97,9 @@ namespace MEE7.Commands
                             DrawCards(4, Players[curPlayerIndex]);
                     }
                     else
-                        Program.SendText("You can't put that card on top of the stack :thinking:", channel).Wait();
+                        DiscordNETWrapper.SendText("You can't put that card on top of the stack :thinking:", channel).Wait();
                 else
-                    Program.SendText("Oi that card doesn't exist!", channel).Wait();
+                    DiscordNETWrapper.SendText("Oi that card doesn't exist!", channel).Wait();
             }
             private void DrawCardOnStack(UnoCard newCard)
             {
@@ -169,13 +169,13 @@ namespace MEE7.Commands
 
             public void Send(ISocketMessageChannel Channel)
             {
-                Program.SendBitmap(curStack, Channel, $"Players in this game: " +
+                DiscordNETWrapper.SendBitmap(curStack, Channel, $"Players in this game: " +
                     $"{Players.Select(x => $"`{x.Item1.Username}`[{x.Item2.Count}]").Aggregate((x, y) => x + " " + y)}\n" +
                     $"It's {Players[curPlayerIndex].Item1.Mention}'s turn and the current color is `{CurColor.ToString()}`").Wait();
             }
             public void SendDeck(Tuple<SocketUser, List<UnoCard>> player)
             {
-                Program.SendBitmap(RenderDeck(player.Item2), player.Item1.GetOrCreateDMChannelAsync().Result).Wait();
+                DiscordNETWrapper.SendBitmap(RenderDeck(player.Item2), player.Item1.GetOrCreateDMChannelAsync().Result).Wait();
             }
         }
         class UnoCard
@@ -326,17 +326,17 @@ namespace MEE7.Commands
                 UnoGame newGame = new UnoGame(message.MentionedUsers.Distinct().Append(message.Author).ToList());
                 if (newGame.Players.Count < 2)
                 {
-                    Program.SendText("You need more players to play Uno!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You need more players to play Uno!", message.Channel).Wait();
                     return;
                 }
                 if (newGame.Players.Exists(x => x.Item1.IsBot))
                 {
-                    Program.SendText("Bots can't play Uno!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("Bots can't play Uno!", message.Channel).Wait();
                     return;
                 }
                 if (UnoGames.Exists(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id)))
                 {
-                    Program.SendText("You are already in a uno game!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are already in a uno game!", message.Channel).Wait();
                     return;
                 }
                 UnoGames.Add(newGame);
@@ -346,35 +346,35 @@ namespace MEE7.Commands
             }
             else if (split.Contains("print_cards") && message.Author.Id == Program.Master.Id) // Size = {Width = 434 Height = 621}
                 foreach (UnoCard c in UnoCards)
-                    Program.SendBitmap(c.Picture, message.Channel, c.Type.ToString() + " " + c.Color.ToString()).Wait();
+                    DiscordNETWrapper.SendBitmap(c.Picture, message.Channel, c.Type.ToString() + " " + c.Color.ToString()).Wait();
             else if (split.Contains("print"))
             {
                 UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
                 if (game != null)
                     game.Send(message.Channel);
                 else
-                    Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are not in a game :thinking:", message.Channel).Wait();
             }
             else if (split.Length >= 2 && split[1] == "draw")
             {
                 UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
                 if (game.TurnPlayerID() != message.Author.Id)
                 {
-                    Program.SendText("It's not your turn :thinking:", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("It's not your turn :thinking:", message.Channel).Wait();
                     return;
                 }
                 if (game != null)
                     game.DrawCards(1, message.Author.Id);
                 else
                 {
-                    Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are not in a game :thinking:", message.Channel).Wait();
                     return;
                 }
             }
             else if (split.Length >= 2 && split[1] == "cancel")
             {
                 UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
-                Program.SendText($"`{message.Author.Username}` canceled the match! :cold_sweat: :scream: :dizzy_face: :skull_crossbones: ", message.Channel).Wait();
+                DiscordNETWrapper.SendText($"`{message.Author.Username}` canceled the match! :cold_sweat: :scream: :dizzy_face: :skull_crossbones: ", message.Channel).Wait();
                 UnoGames.Remove(game);
             }
             else if (split.Length >= 4 && split[1] == "move")
@@ -382,7 +382,7 @@ namespace MEE7.Commands
                 UnoGame game = UnoGames.FirstOrDefault(x => x.Players.Exists(y => y.Item1.Id == message.Author.Id));
                 if (game == null)
                 {
-                    Program.SendText("You are not in a game :thinking:", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are not in a game :thinking:", message.Channel).Wait();
                     return;
                 }
                 
@@ -398,12 +398,12 @@ namespace MEE7.Commands
                 Tuple<SocketUser, List<UnoCard>> winner = game.Players.FirstOrDefault(x => x.Item2.Count == 0);
                 if (winner != null)
                 {
-                    Program.SendText($"`{winner.Item1.Username}` won! :trophy: :tada: ", message.Channel).Wait();
+                    DiscordNETWrapper.SendText($"`{winner.Item1.Username}` won! :trophy: :tada: ", message.Channel).Wait();
                     UnoGames.Remove(game);
                 }
             }
             else
-                Program.SendEmbed(HelpMenu, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             return;
         }
     }
