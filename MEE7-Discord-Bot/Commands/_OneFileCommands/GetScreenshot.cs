@@ -29,7 +29,7 @@ namespace MEE7.Commands
                     using (Graphics graphics = Graphics.FromImage(bmp))
                         graphics.CopyFromScreen(AllScreenBounds.X, AllScreenBounds.Y, 0, 0, new Size(AllScreenBounds.Width, AllScreenBounds.Height), CopyPixelOperation.SourceCopy);
 
-                    Program.SendBitmap(bmp, message.Channel).Wait();
+                    DiscordNETWrapper.SendBitmap(bmp, message.Channel).Wait();
                 }
             }
         }

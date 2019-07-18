@@ -86,7 +86,7 @@ namespace MEE7.Commands
 
             if (IsVideo)
             {
-                await Program.SendText("Sending video post. Please wait...", Channel);
+                await DiscordNETWrapper.SendText("Sending video post. Please wait...", Channel);
 
                 // downlaod video
                 string videofile = "Downloads\\RedditVideo.mp4";
@@ -98,13 +98,13 @@ namespace MEE7.Commands
 
                 if (new FileInfo(videofile).Length > 8 * 1024 * 1024)
                 {
-                    await Program.SendText("That video is too big for discords puny 8MB limit!", Channel);
+                    await DiscordNETWrapper.SendText("That video is too big for discords puny 8MB limit!", Channel);
                 }
                 else
                 {
                     // send post
-                    await Program.SendFile(videofile, Channel, ResultTitle);
-                    await Program.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
+                    await DiscordNETWrapper.SendFile(videofile, Channel, ResultTitle);
+                    await DiscordNETWrapper.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
                 }
                 
                 // delete "Sending video post. Please wait..." message
@@ -135,7 +135,7 @@ namespace MEE7.Commands
                 }
                 Embed.WithFooter(ResultPoints + (ResultPoints == "1" ? " fake internet point on " : " fake internet points on ") + subUrl.Remove(0, "https://www.reddit.com".Length));
 
-                await Program.SendEmbed(Embed, Channel);
+                await DiscordNETWrapper.SendEmbed(Embed, Channel);
             }
         }
 

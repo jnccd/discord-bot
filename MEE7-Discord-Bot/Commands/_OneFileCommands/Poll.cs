@@ -28,20 +28,20 @@ namespace MEE7.Commands
             string[] split = message.Content.Split('\n');
             if (split.Length < 2)
             {
-                Program.SendText($"Duuude no I need more Information, or different Information\nHave a look into my HelpMenu ({Prefix}help {CommandLine})", 
+                DiscordNETWrapper.SendText($"Duuude no I need more Information, or different Information\nHave a look into my HelpMenu ({Prefix}help {CommandLine})", 
                     message.Channel).Wait();
                 return;
             }
             string[] pollOptions = split[1].Split(',');
             if (pollOptions.Length > 9)
             {
-                Program.SendText("Duuude thats too many answer possibilities, 9 should be enough\nIf you want more ask the Discord Devs for a 10 Emoji", 
+                DiscordNETWrapper.SendText("Duuude thats too many answer possibilities, 9 should be enough\nIf you want more ask the Discord Devs for a 10 Emoji", 
                     message.Channel).Wait();
                 return;
             }
 
             int i = 0;
-            IUserMessage pollMessage = Program.SendEmbed(Program.CreateEmbedBuilder($":bar_chart: **{split[0].Remove(0, PrefixAndCommand.Length + 1)}**", 
+            IUserMessage pollMessage = DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder($":bar_chart: **{split[0].Remove(0, PrefixAndCommand.Length + 1)}**", 
                 pollOptions.Select(x => emotes[i++].Name + " " + x).Aggregate((x, y) => x + "\n" + y)),
                 message.Channel).Result.First();
             pollMessage.AddReactionsAsync(emotes.Take(pollOptions.Length).ToArray()).Wait();

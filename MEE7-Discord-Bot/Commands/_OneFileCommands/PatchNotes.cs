@@ -58,9 +58,9 @@ namespace MEE7.Commands
                 Embed.WithThumbnailUrl("https://community.canvaslms.com/community/image/2043/2.png?a=1646");
                 Embed.WithDescription(PatchNotes.Aggregate((x, y) => x + "\n" + y));
                 foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
-                    Program.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
+                    DiscordNETWrapper.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                Program.ConsoleWriteLine("Patch Notes:" + PatchNotes.Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
+                ConsoleWrapper.ConsoleWriteLine("Patch Notes:" + PatchNotes.Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
 #endif
             }
         }
@@ -78,22 +78,22 @@ namespace MEE7.Commands
                     if (Config.Data.PatchNoteSubscribedChannels.Contains(commandmessage.Channel.Id))
                     {
                         Config.Data.PatchNoteSubscribedChannels.Remove(commandmessage.Channel.Id);
-                        Program.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel).Wait();
+                        DiscordNETWrapper.SendText("Canceled Patch Note subscription for this channel!", commandmessage.Channel).Wait();
                     }
                     else
                     {
                         Config.Data.PatchNoteSubscribedChannels.Add(commandmessage.Channel.Id);
-                        Program.SendText("Subscribed to Patch Notes!", commandmessage.Channel).Wait();
+                        DiscordNETWrapper.SendText("Subscribed to Patch Notes!", commandmessage.Channel).Wait();
                     }
                 }
                 else
                 {
-                    Program.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("Only the server/bot owner is authorized to use this command!", commandmessage.Channel).Wait();
                 }
             }
             else
             {
-                Program.SendText("You can't use this in DMs", commandmessage.Channel).Wait();
+                DiscordNETWrapper.SendText("You can't use this in DMs", commandmessage.Channel).Wait();
             }
         }
     }

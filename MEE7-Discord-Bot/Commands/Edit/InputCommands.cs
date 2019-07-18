@@ -76,7 +76,7 @@ namespace MEE7.Commands
             new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
                 (SocketMessage m, string a, object o) => {
                     MemoryStream mem = new MemoryStream();
-                    using (Process P = Program.GetAudioStreamFromYouTubeVideo(a, "mp3"))
+                    using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(a, "mp3"))
                     {
                         while (true)
                         {

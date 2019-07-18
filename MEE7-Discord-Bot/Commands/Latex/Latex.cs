@@ -46,7 +46,7 @@ namespace MEE7.Commands
 
                 if (outputFilePaths.Length == 0)
                 {
-                    Program.SendText("That didn't work.", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("That didn't work.", message.Channel).Wait();
                     return;
                 }
 
@@ -62,7 +62,7 @@ namespace MEE7.Commands
                             graphics.DrawImage(latexOutput, new Point(0, 0));
                         }
                     }
-                    Program.SendBitmap(output, message.Channel).Wait();
+                    DiscordNETWrapper.SendBitmap(output, message.Channel).Wait();
                     output.Dispose();
                 }
 

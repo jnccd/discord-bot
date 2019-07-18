@@ -54,7 +54,7 @@ namespace MEE7.Commands
             {
                 Embed.AddFieldDirectly("Error!", "The bot hasn't made a profile of you yet.");
             }
-            Program.SendEmbed(Embed, commandmessage.Channel).Wait();
+            DiscordNETWrapper.SendEmbed(Embed, commandmessage.Channel).Wait();
         }
     }
 }

@@ -25,10 +25,10 @@ namespace MEE7.Backend
             {
                 Thread.CurrentThread.Name = "TestThread";
                 index = index == -1 ? CurrentlyActiveTestIndex : index;
-                Program.ConsoleWriteLine($"Running test {index}");
+                ConsoleWrapper.ConsoleWriteLine($"Running test {index}");
                 try { TestFunctions[index].Invoke(); }
-                catch (Exception e) { Program.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                Program.ConsoleWrite("$");
+                catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                ConsoleWrapper.ConsoleWrite("$");
             });
         }
 
@@ -36,14 +36,14 @@ namespace MEE7.Backend
         private static readonly Action[] TestFunctions = new Action[] {
             // 0 - Hello World
             () => {
-                Program.ConsoleWriteLine("Hello world!");
+                ConsoleWrapper.ConsoleWriteLine("Hello world!");
             },
             // 1 - Video Playing
             () => {
-                string videoPath = Directory.GetCurrentDirectory() + "\\" + Program.DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
+                string videoPath = Directory.GetCurrentDirectory() + "\\" + MultiMediaHelper.DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
                 ISocketAudioChannel channel = Program.GetChannelFromID(479951814217826305) as ISocketAudioChannel;
                 IAudioClient client = channel.ConnectAsync().Result;
-                Program.SendAudioAsync(client, videoPath).Wait();
+                MultiMediaHelper.SendAudioAsync(client, videoPath).Wait();
                 channel.DisconnectAsync().Wait();
             },
             // 2 - Uni Module Crawler
@@ -65,20 +65,20 @@ namespace MEE7.Backend
             () => {
                 var client = new TwitchClient();
                 client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
-                client.OnLog += (object o, OnLogArgs arg) => { Program.ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
+                client.OnLog += (object o, OnLogArgs arg) => { ConsoleWrapper.ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
                 client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => {
-                    Program.ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta);
+                    ConsoleWrapper.ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta);
                     if (e.ChatMessage.Message.StartsWith("hi"))
                         client.SendMessage(e.ChatMessage.Channel, "Hello there");
                 };
-                client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { Program.ConsoleWriteLine($"Exception: {e.Exception}\n{e.Exception.Details}", ConsoleColor.Magenta); };
-                client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { Program.ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
-                client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { Program.ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
+                client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWrapper.ConsoleWriteLine($"Exception: {e.Exception}\n{e.Exception.Details}", ConsoleColor.Magenta); };
+                client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { ConsoleWrapper.ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
+                client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { ConsoleWrapper.ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
                 client.Connect();
 
                 client.JoinChannel(Config.Data.TwtichChannelName);
 
-                Task.Factory.StartNew(() => { Thread.Sleep(15000); client.Disconnect(); Program.ConsoleWriteLine("Disconnected Twitch"); });
+                Task.Factory.StartNew(() => { Thread.Sleep(15000); client.Disconnect(); ConsoleWrapper.ConsoleWriteLine("Disconnected Twitch"); });
 
                 var api = new TwitchAPI();
                 api.Settings.ClientId = Config.Data.TwitchAPIClientID;
@@ -88,16 +88,16 @@ namespace MEE7.Backend
             // 4 - Events
             () => {
                 OnTest += () => {
-                    Program.ConsoleWriteLine("lul1");
+                    ConsoleWrapper.ConsoleWriteLine("lul1");
                 };
                 OnTest += () => {
                     throw new Exception();
                 };
                 OnTest += () => {
-                    Program.ConsoleWriteLine("lul2");
+                    ConsoleWrapper.ConsoleWriteLine("lul2");
                 };
                 OnTest += () => {
-                    Program.ConsoleWriteLine("lul3");
+                    ConsoleWrapper.ConsoleWriteLine("lul3");
                 };
                 OnTest += () => {
                     throw new Exception();
@@ -106,7 +106,7 @@ namespace MEE7.Backend
             },
             // 5 - Floating Numbers
             () => {
-                Program.ConsoleWriteLine(1 / 6f);
+                ConsoleWrapper.ConsoleWriteLine(1 / 6f);
             }
         };
     }

@@ -30,42 +30,42 @@ namespace MEE7.Commands
                     "no spaces allowed eg. " + Prefix + CommandLine + " set 2,3\nWarning for Computer Science people: coordinates start at 1!");
                 Embed.AddFieldDirectly(Prefix + CommandLine + " game", "Prints the game you are currently in");
                 Embed.WithDescription("TicTacToe Commands:");
-                Program.SendEmbed(Embed, commandmessage.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(Embed, commandmessage.Channel).Wait();
             }
             else if (commandmessage.Content.Split(new char[] { ' ', '\n' })[1] == "newGame")
             {
                 if (commandmessage.MentionedUsers.Count < 1 || commandmessage.MentionedUsers.Count > 1)
                 {
-                    Program.SendText("You need exactly one player to play against!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("You need exactly one player to play against!", commandmessage.Channel).Wait();
                 }
                 else
                 {
                     if (Games.Exists(x => x.Player1 == commandmessage.MentionedUsers.ElementAt(0)) || Games.Exists(x => x.Player2 == commandmessage.MentionedUsers.ElementAt(0)))
                     {
-                        Program.SendText(commandmessage.MentionedUsers.ElementAt(0).Mention + " is already in a game.", commandmessage.Channel).Wait();
+                        DiscordNETWrapper.SendText(commandmessage.MentionedUsers.ElementAt(0).Mention + " is already in a game.", commandmessage.Channel).Wait();
                     }
                     else if (Games.Exists(x => x.Player1 == commandmessage.Author) || Games.Exists(x => x.Player2 == commandmessage.Author))
                     {
-                        Program.SendText("You are already in a game.", commandmessage.Channel).Wait();
+                        DiscordNETWrapper.SendText("You are already in a game.", commandmessage.Channel).Wait();
                     }
                     else
                     {
                         if (commandmessage.MentionedUsers.ElementAt(0).IsBot)
                         {
                             if (commandmessage.MentionedUsers.ElementAt(0).Id == Program.GetSelf().Id)
-                                Program.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText("You will be able to play against me once my master teaches me the game!", commandmessage.Channel).Wait();
                             else
-                                Program.SendText("You cant play with a bot!", commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText("You cant play with a bot!", commandmessage.Channel).Wait();
                         }
                         else
                         {
                             if (commandmessage.MentionedUsers.ElementAt(0).Id == commandmessage.Author.Id)
-                                Program.SendText("You can't play against yourself!", commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText("You can't play against yourself!", commandmessage.Channel).Wait();
                             else
                             {
                                 Games.Add(new TicTacToeGame(commandmessage.MentionedUsers.ElementAt(0), commandmessage.Author));
-                                Program.SendText("Created new game against " + commandmessage.MentionedUsers.ElementAt(0) + " successfully!", commandmessage.Channel).Wait();
-                                Program.SendText(Games.Last().ToString(), commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText("Created new game against " + commandmessage.MentionedUsers.ElementAt(0) + " successfully!", commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText(Games.Last().ToString(), commandmessage.Channel).Wait();
                             }
                         }
                     }
@@ -82,19 +82,19 @@ namespace MEE7.Commands
 
                 if (Game == null)
                 {
-                    Program.SendText("You are not in a game!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are not in a game!", commandmessage.Channel).Wait();
                 }
                 else
                 {
                     if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length < 3)
                     {
-                        Program.SendText("Where are the coordinates?!", commandmessage.Channel).Wait();
+                        DiscordNETWrapper.SendText("Where are the coordinates?!", commandmessage.Channel).Wait();
                     }
                     else
                     {
                         if (commandmessage.Author == Game.Player1 && !Game.Player1sTurn || commandmessage.Author == Game.Player2 && Game.Player1sTurn)
                         {
-                            Program.SendText("Its not your turn!", commandmessage.Channel).Wait();
+                            DiscordNETWrapper.SendText("Its not your turn!", commandmessage.Channel).Wait();
                         }
                         else
                         {
@@ -108,7 +108,7 @@ namespace MEE7.Commands
 
                                 if (x == 0 || y == 0)
                                 {
-                                    Program.SendText("You cant put your symbol there!\nRemember Coordinates start at 1, not 0.", commandmessage.Channel).Wait();
+                                    DiscordNETWrapper.SendText("You cant put your symbol there!\nRemember Coordinates start at 1, not 0.", commandmessage.Channel).Wait();
                                     return;
                                 }
 
@@ -117,7 +117,7 @@ namespace MEE7.Commands
                             }
                             catch
                             {
-                                Program.SendText("The coordinates Mason what do they mean?!", commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText("The coordinates Mason what do they mean?!", commandmessage.Channel).Wait();
                             }
 
                             if (Game.Field[x, y] == 0 && x < 3 && y < 3)
@@ -128,29 +128,29 @@ namespace MEE7.Commands
                                 else
                                     Game.Field[x, y] = 2;
 
-                                Program.SendText(Game.ToString(), commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText(Game.ToString(), commandmessage.Channel).Wait();
 
                                 if (Game.Draw())
                                 {
-                                    Program.SendText("Draw between " + Game.Player1.Mention + " and " + Game.Player2.Mention + "!", commandmessage.Channel).Wait();
+                                    DiscordNETWrapper.SendText("Draw between " + Game.Player1.Mention + " and " + Game.Player2.Mention + "!", commandmessage.Channel).Wait();
                                     Games.Remove(Game);
                                 }
 
                                 SocketUser Won = Game.PlayerWon();
                                 if (Won == Game.Player1)
                                 {
-                                    Program.SendText("The meatbag called " + Game.Player1.Mention + " won!", commandmessage.Channel).Wait();
+                                    DiscordNETWrapper.SendText("The meatbag called " + Game.Player1.Mention + " won!", commandmessage.Channel).Wait();
                                     Games.Remove(Game);
                                 }
                                 else if (Won == Game.Player2)
                                 {
-                                    Program.SendText("The meatbag called " + Game.Player2.Mention + " won!", commandmessage.Channel).Wait();
+                                    DiscordNETWrapper.SendText("The meatbag called " + Game.Player2.Mention + " won!", commandmessage.Channel).Wait();
                                     Games.Remove(Game);
                                 }
                             }
                             else
                             {
-                                Program.SendText("You cant put your symbol there!", commandmessage.Channel).Wait();
+                                DiscordNETWrapper.SendText("You cant put your symbol there!", commandmessage.Channel).Wait();
                             }
                         }
                     }
@@ -166,9 +166,9 @@ namespace MEE7.Commands
                 catch { }
 
                 if (Game == null)
-                    Program.SendText("You are in no game!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("You are in no game!", commandmessage.Channel).Wait();
                 else
-                    Program.SendText(Game.ToString(), commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText(Game.ToString(), commandmessage.Channel).Wait();
             }
         }
     }

@@ -71,7 +71,7 @@ namespace MEE7.Commands
                                 pc++;
                                 if (pc >= message.Content.Length)
                                 {
-                                    Program.SendText("Check the [] Brackets!", message.Channel).Wait();
+                                    DiscordNETWrapper.SendText("Check the [] Brackets!", message.Channel).Wait();
                                     return;
                                 }
                                 if (message.Content[pc] == '[')
@@ -91,7 +91,7 @@ namespace MEE7.Commands
                                 pc--;
                                 if (pc < 0)
                                 {
-                                    Program.SendText("Check the [] Brackets!", message.Channel).Wait();
+                                    DiscordNETWrapper.SendText("Check the [] Brackets!", message.Channel).Wait();
                                     return;
                                 }
                                 if (message.Content[pc] == ']')
@@ -105,7 +105,7 @@ namespace MEE7.Commands
 
                 if (steps > 5000)
                 {
-                    Program.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel).Wait();
+                    DiscordNETWrapper.SendText("The execution eceeded the instruction limit!\nThe output so far was:\n" + output, message.Channel).Wait();
                     return;
                 }
 
@@ -113,7 +113,7 @@ namespace MEE7.Commands
                 steps++;
             }
 
-            Program.SendText($"```ruby\n {output}```", message.Channel).Wait();
+            DiscordNETWrapper.SendText($"```ruby\n {output}```", message.Channel).Wait();
         }
     }
 }

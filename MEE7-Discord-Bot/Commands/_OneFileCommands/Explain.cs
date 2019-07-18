@@ -18,7 +18,7 @@ namespace MEE7.Commands._OneFileCommands
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length <= 1)
             {
-                Program.SendText("I need something to search!", message.Channel).Wait();
+                DiscordNETWrapper.SendText("I need something to search!", message.Channel).Wait();
                 return;
             }
 
@@ -59,7 +59,7 @@ namespace MEE7.Commands._OneFileCommands
                 b.AddFieldDirectly("Wikipedia:", wikiParse);
             if (!string.IsNullOrWhiteSpace(urbanParse))
                 b.AddFieldDirectly("Urban Dictionary:", urbanParse);
-            Program.SendEmbed(b, message.Channel).Wait();
+            DiscordNETWrapper.SendEmbed(b, message.Channel).Wait();
         }
     }
 }

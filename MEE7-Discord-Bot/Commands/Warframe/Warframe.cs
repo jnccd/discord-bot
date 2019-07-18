@@ -39,21 +39,21 @@ namespace MEE7.Commands
             DiscordUser user = Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
-                Program.SendEmbed(HelpMenu, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             else if(split[1] == "filters")
             {
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.AddFieldDirectly("Your Filters: ", (user.WarframeFilters.Count == 0 ?
                     "Well that looks pretty empty" :
                     user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
-                Program.SendEmbed(embed, message.Channel).Wait();
+                DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();
             }
             else if (split[1] == "state")
             {
                 List<EmbedBuilder> es = GetStateEmbeds();
                 if (es == null)
                 {
-                    Program.SendText($"Couldn't get information. {WarframeHandler.WebSite} is probably down.", message.Channel).Wait();
+                    DiscordNETWrapper.SendText($"Couldn't get information. {WarframeHandler.WebSite} is probably down.", message.Channel).Wait();
                     return;
                 }
 
@@ -61,13 +61,13 @@ namespace MEE7.Commands
                 {
                     EmbedBuilder e = es.FirstOrDefault(x => x.Title.ToLower().Contains(split[2].ToLower()));
                     if (e == null)
-                        Program.SendText($"Could not find \"{split[2]}\"", message.Channel).Wait();
+                        DiscordNETWrapper.SendText($"Could not find \"{split[2]}\"", message.Channel).Wait();
                     else
-                        Program.SendEmbed(e, message.Channel).Wait();
+                        DiscordNETWrapper.SendEmbed(e, message.Channel).Wait();
                 }
                 else
                     foreach (EmbedBuilder e in es)
-                        Program.SendEmbed(e, message.Channel).Wait();
+                        DiscordNETWrapper.SendEmbed(e, message.Channel).Wait();
             }
             else
             {
@@ -109,10 +109,10 @@ namespace MEE7.Commands
                         embed.AddFieldDirectly("Your Filters are now: ", (user.WarframeFilters.Count == 0 ?
                             "\n\nWell that looks pretty empty" :
                             user.WarframeFilters.Aggregate((x, y) => x + "\n" + y)));
-                        Program.SendEmbed(embed, message.Channel).Wait();
+                        DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();
                     }
                     else
-                        Program.SendEmbed(HelpMenu, message.Channel).Wait();
+                        DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
                 }
             }
             return;
@@ -285,7 +285,7 @@ namespace MEE7.Commands
                 {
                     SocketChannel channel = Program.GetChannelFromID(id);
                     if (channel is ISocketMessageChannel)
-                        Program.SendEmbed(GetStateEmbeds().FirstOrDefault(x => x.Title.StartsWith("Baro")), (ISocketMessageChannel)channel).Wait();
+                        DiscordNETWrapper.SendEmbed(GetStateEmbeds().FirstOrDefault(x => x.Title.StartsWith("Baro")), (ISocketMessageChannel)channel).Wait();
                 }
 #endif
             }
