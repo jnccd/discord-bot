@@ -11,6 +11,8 @@ using BumpKit;
 using System.Reflection;
 using System.Linq.Expressions;
 using AnimatedGif;
+using MEE7.Backend.HelperFunctions.Extensions;
+using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {

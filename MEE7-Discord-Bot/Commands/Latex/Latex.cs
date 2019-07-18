@@ -1,5 +1,7 @@
 ﻿using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Backend.HelperFunctions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

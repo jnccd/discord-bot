@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Backend.HelperFunctions.Extensions;
 
 namespace MEE7.Commands._OneFileCommands
 {

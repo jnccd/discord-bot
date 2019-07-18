@@ -2,6 +2,7 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

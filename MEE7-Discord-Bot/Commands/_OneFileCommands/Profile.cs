@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using MEE7.Configuration;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions.Extensions;
+using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {
