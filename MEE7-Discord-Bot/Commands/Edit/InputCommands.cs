@@ -75,6 +75,9 @@ namespace MEE7.Commands
             new EditCommand("serverPicture", "Gets the server picture from a server id", (SocketMessage m, string a, object o) => {
                 return Program.GetGuildFromID(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
             }, null, typeof(Bitmap)),
+            new EditCommand("emote", "Gets the picture of the emote", (SocketMessage m, string a, object o) => {
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a)).Url.GetBitmapFromURL();
+            }, null, typeof(Bitmap)),
             new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
                 (SocketMessage m, string a, object o) => {
                     MemoryStream mem = new MemoryStream();
