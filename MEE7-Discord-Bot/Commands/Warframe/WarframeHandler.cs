@@ -9,7 +9,6 @@ using WarframeNET;
 
 namespace Warframe_Alerts
 {
-    [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
     public static class WarframeHandler
     {
         public static WorldState worldState;
