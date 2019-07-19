@@ -39,20 +39,9 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 Task.Run(() => { try { d.DynamicInvoke(args); }
                                  catch { } });
         }
-        /// <summary>
-        /// For the given type, returns its representation in C# code.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="genericArgs">Used internally, ignore.</param>
-        /// <param name="arrayBrackets">Used internally, ignore.</param>
-        /// <returns>The representation of the type in C# code.</returns>
         public static string ToReadableString(this Type type)
         {
-            return type.ToString().
-                Replace("`System.Object`System.Linq.Enumerable+RepeatIterator`1[System.Char]", "string").
-                Replace("`System.Object`System.Linq.Enumerable+RepeatIterator`1[", "").
-                Replace("]", "[]").
-                Split('.').Last().Replace("`", "'").Replace("´", "'");
+            return "`" + type.ToString().Split('.').Last() + "`";
         }
         public static byte[] ToArray(this Stream stream)
         {
