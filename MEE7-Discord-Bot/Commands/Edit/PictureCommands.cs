@@ -297,31 +297,31 @@ namespace MEE7.Commands
 
                 return output;
             }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sobelEdges", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
-                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                               {  0,  0,  0 },
-                                                               { -1, -2, -1 } }, 1, true);
-                }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sobelEdgesColor", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
-                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                               {  0,  0,  0 },
-                                                               { -1, -2, -1 } });
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
-                return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
-                                                               { -1,  5, -1 },
-                                                               {  0, -1,  0 } });
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
-                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
-                                                               {  1,  1,  1 },
-                                                               {  1,  1,  1 } }, 1/9f);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
-                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                                   {  2,  4,  2 },
-                                                                   {  1,  2,  1 } }, 1/16f);
-                }, typeof(Bitmap), typeof(Bitmap)),
+            //new EditCommand("sobelEdges", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+            //        return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+            //                                                       {  0,  0,  0 },
+            //                                                       { -1, -2, -1 } }, 1, true);
+            //}, typeof(Bitmap), typeof(Bitmap)),
+            //new EditCommand("sobelEdgesColor", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+            //    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+            //                                                   {  0,  0,  0 },
+            //                                                   { -1, -2, -1 } });
+            //}, typeof(Bitmap), typeof(Bitmap)),
+            //new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
+            //    return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
+            //                                                   { -1,  5, -1 },
+            //                                                   {  0, -1,  0 } });
+            //}, typeof(Bitmap), typeof(Bitmap)),
+            //new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
+            //    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
+            //                                                   {  1,  1,  1 },
+            //                                                   {  1,  1,  1 } }, 1/9f);
+            //}, typeof(Bitmap), typeof(Bitmap)),
+            //new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
+            //        return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+            //                                                       {  2,  4,  2 },
+            //                                                       {  1,  2,  1 } }, 1/16f);
+            //}, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("jkrowling", "Gay rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, o as Bitmap);
             }, typeof(Bitmap), typeof(Bitmap)),
@@ -412,14 +412,14 @@ namespace MEE7.Commands
             if (grayscale)
             {
                 using (UnsafeBitmapContext c = new UnsafeBitmapContext(output))
+                using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
                     for (int x = 0; x < output.Width; x++)
                         for (int y = 0; y < output.Height; y++)
                         {
                             int activation = 0;
-                            using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
-                                for (int xk = x; xk < x + kernelW; xk++)
-                                    for (int yk = y; yk < y + kernelH; yk++)
-                                        activation += kernel[xk - x, yk - y] * cb.GetPixel(xk, yk).GetGrayScale();
+                            for (int xk = x; xk < x + kernelW; xk++)
+                                for (int yk = y; yk < y + kernelH; yk++)
+                                    activation += kernel[xk - x, yk - y] * cb.GetPixel(xk, yk).GetGrayScale();
                             activation = (int)(activation * factor);
                             activation += 255 / 2;
                             if (activation > 255)
@@ -432,18 +432,18 @@ namespace MEE7.Commands
             else
             {
                 using (UnsafeBitmapContext c = new UnsafeBitmapContext(output))
+                using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
                     for (int x = 0; x < output.Width; x++)
                         for (int y = 0; y < output.Height; y++)
                         {
                             int[] activation = new int[3] { 0, 0, 0 };
                             for (int i = 0; i < activation.Length; i++)
                             {
-                                using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
-                                    for (int xk = x; xk < x + kernelW; xk++)
-                                        for (int yk = y; yk < y + kernelH; yk++)
-                                            activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
-                                                cb.GetPixel(xk, yk).R : (i == 1 ?
-                                                cb.GetPixel(xk, yk).G : cb.GetPixel(xk, yk).B));
+                                for (int xk = x; xk < x + kernelW; xk++)
+                                    for (int yk = y; yk < y + kernelH; yk++)
+                                        activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
+                                            cb.GetPixel(xk, yk).R : (i == 1 ?
+                                            cb.GetPixel(xk, yk).G : cb.GetPixel(xk, yk).B));
                                 activation[i] = (int)(activation[i] * factor);
                                 activation[i] += 255 / 2;
                                 if (activation[i] > 255)
@@ -472,16 +472,12 @@ namespace MEE7.Commands
             using (UnsafeBitmapContext c = new UnsafeBitmapContext(P))
                 for (int x = 0; x < P.Width; x++)
                     for (int y = 0; y < P.Height; y++)
-                    {
-                        Color col = P.GetPixel(x, y);
-                        if (ShouldBeRecolored(col))
+                        if (ShouldBeRecolored(c.GetPixel(x, y)))
                             if (Horz)
                                 c.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
                             else
                                 c.SetPixel(x, y, Cs[y * Cs.Length / P.Height]);
-                    }
             return P;
         }
-
     }
 }
