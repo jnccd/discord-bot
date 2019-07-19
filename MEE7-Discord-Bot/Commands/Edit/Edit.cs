@@ -18,19 +18,8 @@ namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
-        //public EditCommand InputC_Test1234 = new EditCommand("profilePicture", "Gets a profile picture", InputC_Test1234_Func, null, typeof(Bitmap));
-        //static object InputC_Test1234_Func(SocketMessage m, string a, object o)
-        //{
-        //    return Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).GetAvatarUrl(ImageFormat.Png, 512).GetBitmapFromURL();
-        //}
-
         public Edit() : base("edit", "Edit stuff using various functions")
         {
-            //var mem = this.GetType().GetMembers();
-            //var fef = this.GetType().GetFields();
-            //var prop = this.GetType().GetProperties();
-            //var test = this.GetType().GetFields().Where(x => x.FieldType == typeof(EditCommand)).Select(x => x.GetValue(this)).ToArray();
-            
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
 
             HelpMenu = new EmbedBuilder();
@@ -117,38 +106,22 @@ namespace MEE7.Commands
         }
         void PrintResult(object currentData, SocketMessage message)
         {
-            if (currentData is EmbedBuilder)
-                DiscordNETWrapper.SendEmbed(currentData as EmbedBuilder, message.Channel).Wait();
-            else if (currentData is Tuple<string, EmbedBuilder>)
-            {
-                var t = currentData as Tuple<string, EmbedBuilder>;
-                DiscordNETWrapper.SendEmbed(t.Item2, message.Channel).Wait();
-                DiscordNETWrapper.SendText(t.Item1, message.Channel).Wait();
-            }
-            else if (currentData is Bitmap)
-            {
-                var b = currentData as Bitmap;
-                DiscordNETWrapper.SendBitmap(b, message.Channel).Wait();
-                b.Dispose();
-            }
-            else if (currentData is Bitmap[])
-            {
-                using (MemoryStream s = new MemoryStream())
-                {
-                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
-                        foreach (Bitmap b in currentData as Bitmap[])
-                            c.AddFrame(b, -1, GifQuality.Bit8);
-
-                    DiscordNETWrapper.SendFile(s, message.Channel, "gif").Wait();
-
-                    foreach (Bitmap b in currentData as Bitmap[])
-                        b.Dispose();
-                }
-            }
-            else if (currentData != null)
-                DiscordNETWrapper.SendText(currentData.ToString(), message.Channel).Wait();
+            foreach (PrintMethod m in PrintMethods)
+                if (m.Type == currentData.GetType())
+                    m.Function(message, currentData);
         }
 
+        public class PrintMethod
+        {
+            public Type Type;
+            public Action<SocketMessage, object> Function;
+
+            public PrintMethod(Type Type, Action<SocketMessage, object> Function)
+            {
+                this.Function = Function;
+                this.Type = Type;
+            }
+        }
         public class EditCommand
         {
             public string Command, Desc;
