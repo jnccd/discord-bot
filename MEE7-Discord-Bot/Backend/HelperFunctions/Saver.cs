@@ -3,6 +3,7 @@ using MEE7.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -20,10 +21,20 @@ namespace MEE7.Backend.HelperFunctions
                 Config.Save();
             }
         }
-        public static void SaveUser(ulong UserID)
+        public static void SaveServer(ulong ServerID)
         {
-            if (!Config.Data.UserList.Exists(x => x.UserID == UserID))
-                Config.Data.UserList.Add(new DiscordUser(UserID));
+            if (!Config.Data.ServerList.Exists(x => x.ServerID == ServerID))
+                Config.Data.ServerList.Add(new DiscordServer(ServerID));
+        }
+        public static DiscordUser SaveUser(ulong UserID)
+        {
+            DiscordUser user = Config.Data.UserList.FirstOrDefault(x => x.UserID == UserID);
+            if (user == null)
+            {
+                user = new DiscordUser(UserID);
+                Config.Data.UserList.Add(user);
+            }
+            return user;
         }
         public static void SaveToLog(string message)
         {

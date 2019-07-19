@@ -36,6 +36,7 @@ namespace MEE7
         static int ConcurrentCommandExecutions = 0;
         static readonly string commandExecutionLock = "";
         static ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
+        static List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
         
         public delegate void NonCommandMessageRecievedHandler(SocketMessage message);
         public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
@@ -180,13 +181,10 @@ namespace MEE7
         }
         private static void ParallelMessageReceived(SocketMessage message)
         {
-            // Add server
             if (message.Channel is SocketGuildChannel)
-            {
-                ulong serverID = message.GetServerID();
-                if (!Config.Data.ServerList.Exists(x => x.ServerID == serverID))
-                    Config.Data.ServerList.Add(new DiscordServer(serverID));
-            }
+                Saver.SaveServer(message.GetServerID());
+            DiscordUser user = Saver.SaveUser(message.Author.Id);
+            user.TotalCommandsUsed++;
 
             if (message.Content.StartsWith(prefix + "help"))
             {
@@ -206,41 +204,46 @@ namespace MEE7
             }
             else
             {
-                // Find command
-                string[] split = message.Content.Split(new char[] { ' ', '\n' });
-                Command called = commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == split[0].ToLower());
-                if (called != null)
+                if (!usersWithRunningCommands.Contains(user))
                 {
-                    ExecuteCommand(called, message);
+                    usersWithRunningCommands.Add(user);
+
+                    // Find command
+                    string[] split = message.Content.Split(new char[] { ' ', '\n' });
+                    Command called = commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == split[0].ToLower());
+                    if (called != null)
+                    {
+                        ExecuteCommand(called, message);
+                    }
+                    else
+                    {
+                        // No command found
+                        float[] distances = new float[commands.Length];
+                        for (int i = 0; i < commands.Length; i++)
+                            if (commands[i].CommandLine != "" && !commands[i].IsHidden)
+                                distances[i] = Extensions.ModifiedLevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
+                            else
+                                distances[i] = int.MaxValue;
+                        int minIndex = 0;
+                        float min = float.MaxValue;
+                        for (int i = 0; i < commands.Length; i++)
+                            if (distances[i] < min)
+                            {
+                                minIndex = i;
+                                min = distances[i];
+                            }
+                        if (min < Math.Min(4, split[0].Length - 1))
+                        {
+                            DiscordNETWrapper.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel).Wait();
+                            ExecuteCommand(commands[minIndex], message);
+                        }
+                    }
+
+                    usersWithRunningCommands.RemoveAll(x => x.UserID == user.UserID);
                 }
                 else
-                {
-                    // No command found
-                    float[] distances = new float[commands.Length];
-                    for (int i = 0; i < commands.Length; i++)
-                        if (commands[i].CommandLine != "" && !commands[i].IsHidden)
-                            distances[i] = Extensions.ModifiedLevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
-                        else
-                            distances[i] = int.MaxValue;
-                    int minIndex = 0;
-                    float min = float.MaxValue;
-                    for (int i = 0; i < commands.Length; i++)
-                        if (distances[i] < min)
-                        {
-                            minIndex = i;
-                            min = distances[i];
-                        }
-                    if (min < Math.Min(4, split[0].Length - 1))
-                    {
-                        DiscordNETWrapper.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + " is pretty close:", message.Channel).Wait();
-                        ExecuteCommand(commands[minIndex], message);
-                    }
-                }
+                    DiscordNETWrapper.SendText("You are already executing a command, wait for the current one to finish.", message.Channel).Wait();
             }
-
-            DiscordUser user = Config.Data.UserList.FirstOrDefault(x => x.UserID == message.Author.Id);
-            if (user != null)
-                user.TotalCommandsUsed++;
         }
         private static void ExecuteCommand(Command command, SocketMessage message)
         {
