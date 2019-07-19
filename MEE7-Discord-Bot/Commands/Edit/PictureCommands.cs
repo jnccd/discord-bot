@@ -459,24 +459,23 @@ namespace MEE7.Commands
         }
         static Bitmap FlagColor(Color[] Cs, Bitmap P, bool Horz = false)
         {
-            bool ShouldBeRecolored(Color C) =>
-                new Color[] { P.GetPixel(0, 0),
-                    P.GetPixel(0, P.Height - 1), P.GetPixel(P.Width - 1, 0),
-                    P.GetPixel(P.Width - 1, P.Height - 1) }.
-                    Select(c => Math.Abs(c.GetColorDiff(C)) > 70).
-                    Aggregate((x, y) => x && y) && C.A > 5;
-            return FlagColor(ShouldBeRecolored, Cs, P, Horz);
-        }
-        static Bitmap FlagColor(Func<Color, bool> ShouldBeRecolored, Color[] Cs, Bitmap P, bool Horz = false)
-        {
             using (UnsafeBitmapContext c = new UnsafeBitmapContext(P))
+            {
+                Color[] edges = new Color[] { c.GetPixel(0, 0),
+                    c.GetPixel(0, c.Height - 1), c.GetPixel(c.Width - 1, 0),
+                    c.GetPixel(c.Width - 1, c.Height - 1) };
+
                 for (int x = 0; x < P.Width; x++)
                     for (int y = 0; y < P.Height; y++)
-                        if (ShouldBeRecolored(c.GetPixel(x, y)))
+                    {
+                        Color C = c.GetPixel(x, y);
+                        if (C.A > 5 && edges.All(a => Math.Abs(a.GetColorDiff(C)) > 70))
                             if (Horz)
                                 c.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
                             else
                                 c.SetPixel(x, y, Cs[y * Cs.Length / P.Height]);
+                    }
+            }
             return P;
         }
     }
