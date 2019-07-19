@@ -117,8 +117,7 @@ namespace MEE7.Commands
         }
         List<Tuple<string, EditCommand>> CheckPipe(List<Tuple<string, EditCommand>> pipe, ISocketMessageChannel channel)
         {
-            if (pipe == null)
-                return null;
+            if (pipe == null) return null;
             if (pipe.Count > 50)
             {
                 DiscordNETWrapper.SendText($"Only 50 instructions are allowed per pipe", channel).Wait();
@@ -136,12 +135,18 @@ namespace MEE7.Commands
                         $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} from {pipe[i - 1].Item2.Command}", channel).Wait();
                     return null;
                 }
+
+            if (PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
+            {
+                DiscordNETWrapper.SendText($"Unprintable Output Error: I wasn't taught how to print {pipe.Last().Item2.OutputType.ToReadableString()}", channel).Wait();
+                return null;
+            }
+
             return pipe;
         }
         object RunPipe(List<Tuple<string, EditCommand>> pipe, SocketMessage message)
         {
-            if (pipe == null)
-                return null;
+            if (pipe == null) return null;
 
             object currentData = null;
 
@@ -169,12 +174,7 @@ namespace MEE7.Commands
         void PrintPipeOutput(object output, SocketMessage message)
         {
             if (output == null) return;
-            Type outType = output.GetType();
-            PrintMethod m = PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(outType));
-            if (m == null)
-                DiscordNETWrapper.SendText($"Unprintable Output Error: I wasn't taught how to print {outType.ToReadableString()}", message.Channel).Wait();
-            else
-                m.Function(message, output);
+            PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }
 }
