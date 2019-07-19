@@ -297,31 +297,31 @@ namespace MEE7.Commands
 
                 return output;
             }, typeof(Bitmap), typeof(Bitmap)),
-            //new EditCommand("sobelEdges", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
-            //        return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-            //                                                       {  0,  0,  0 },
-            //                                                       { -1, -2, -1 } }, 1, true);
-            //}, typeof(Bitmap), typeof(Bitmap)),
-            //new EditCommand("sobelEdgesColor", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
-            //    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-            //                                                   {  0,  0,  0 },
-            //                                                   { -1, -2, -1 } });
-            //}, typeof(Bitmap), typeof(Bitmap)),
-            //new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
-            //    return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
-            //                                                   { -1,  5, -1 },
-            //                                                   {  0, -1,  0 } });
-            //}, typeof(Bitmap), typeof(Bitmap)),
-            //new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
-            //    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
-            //                                                   {  1,  1,  1 },
-            //                                                   {  1,  1,  1 } }, 1/9f);
-            //}, typeof(Bitmap), typeof(Bitmap)),
-            //new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
-            //        return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-            //                                                       {  2,  4,  2 },
-            //                                                       {  1,  2,  1 } }, 1/16f);
-            //}, typeof(Bitmap), typeof(Bitmap)),
+            new EditCommand("sobelEdges", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                                   {  0,  0,  0 },
+                                                                   { -1, -2, -1 } }, 1, true);
+            }, typeof(Bitmap), typeof(Bitmap)),
+            new EditCommand("sobelEdgesColor", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                               {  0,  0,  0 },
+                                                               { -1, -2, -1 } });
+            }, typeof(Bitmap), typeof(Bitmap)),
+            new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
+                return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
+                                                               { -1,  5, -1 },
+                                                               {  0, -1,  0 } });
+            }, typeof(Bitmap), typeof(Bitmap)),
+            new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
+                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
+                                                               {  1,  1,  1 },
+                                                               {  1,  1,  1 } }, 1/9f);
+            }, typeof(Bitmap), typeof(Bitmap)),
+            new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
+                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+                                                                   {  2,  4,  2 },
+                                                                   {  1,  2,  1 } }, 1/16f);
+            }, typeof(Bitmap), typeof(Bitmap)),
             new EditCommand("jkrowling", "Gay rights", (SocketMessage m, string a, object o) => {
                 return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, o as Bitmap);
             }, typeof(Bitmap), typeof(Bitmap)),
