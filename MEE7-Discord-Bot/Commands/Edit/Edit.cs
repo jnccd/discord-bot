@@ -13,11 +13,44 @@ using System.Linq.Expressions;
 using AnimatedGif;
 using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
+        readonly IEnumerable<EditCommand> Commands;
+        class PrintMethod
+        {
+            public Type Type;
+            public Action<SocketMessage, object> Function;
+
+            public PrintMethod(Type Type, Action<SocketMessage, object> Function)
+            {
+                this.Function = Function;
+                this.Type = Type;
+            }
+        }
+        class EditCommand
+        {
+            public string Command, Desc;
+            public Type InputType, OutputType;
+            public Func<SocketMessage, string, object, object> Function;
+
+            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType, Type OutputType)
+            {
+                if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
+                    throw new IllegalCommandException("Illegal Symbol!");
+
+                this.Command = Command;
+                this.Desc = Desc;
+                this.Function = Function;
+                this.InputType = InputType;
+                this.OutputType = OutputType;
+            }
+        }
+
         public Edit() : base("edit", "Edit stuff using various functions")
         {
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
@@ -54,19 +87,16 @@ namespace MEE7.Commands
             if (message.Content.Length <= PrefixAndCommand.Length + 1)
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             else
-                PrintResult(RunCommands(message), message);
+                PrintPipeOutput(RunPipe(CheckPipe(GetExecutionPipe(message), message.Channel), message), message);
         }
-        object RunCommands(SocketMessage message)
+        List<Tuple<string, EditCommand>> GetExecutionPipe(SocketMessage message)
         {
-            string input = message.Content.Remove(0, PrefixAndCommand.Length + 1);
-            IEnumerable<string> commands = input.Split('|').First().Split(" > ").Select(x => x.Trim(' '));
-            object currentData = null;
+            List<Tuple<string, EditCommand>> re = new List<Tuple<string, EditCommand>>();
 
-            if (commands.Count() > 50)
-            {
-                DiscordNETWrapper.SendText($"That's too many commands for one message.", message.Channel).Wait();
-                return null;
-            }
+            string input = message.Content.Remove(0, PrefixAndCommand.Length + 1);
+            IEnumerable<string> commands = input.
+                Split(" > ").
+                Select(x => x.Trim(' '));
 
             foreach (string c in commands)
             {
@@ -80,66 +110,71 @@ namespace MEE7.Commands
                     return null;
                 }
 
-                if (command.InputType != null && (currentData == null || !command.InputType.IsAssignableFrom(currentData.GetType())))
+                re.Add(new Tuple<string, EditCommand>(args, command));
+            }
+
+            return re;
+        }
+        List<Tuple<string, EditCommand>> CheckPipe(List<Tuple<string, EditCommand>> pipe, ISocketMessageChannel channel)
+        {
+            if (pipe == null)
+                return null;
+            if (pipe.Count > 50)
+            {
+                DiscordNETWrapper.SendText($"Only 50 instructions are allowed per pipe", channel).Wait();
+                return null;
+            }
+            if (pipe.First().Item2.InputType != null)
+            {
+                DiscordNETWrapper.SendText($"The first function has to be a input function", channel).Wait();
+                return null;
+            }
+            for (int i = 1; i < pipe.Count; i++)
+                if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType))
                 {
-                    DiscordNETWrapper.SendText($"Wrong Input Data Type Error in {c}\nExpected: {command.InputType}\nGot: {currentData.GetType()}", message.Channel).Wait();
+                    DiscordNETWrapper.SendText($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
+                        $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} from {pipe[i - 1].Item2.Command}", channel).Wait();
                     return null;
                 }
+            return pipe;
+        }
+        object RunPipe(List<Tuple<string, EditCommand>> pipe, SocketMessage message)
+        {
+            if (pipe == null)
+                return null;
 
-                try { currentData = command.Function(message, args, currentData); }
+            object currentData = null;
+
+            foreach (Tuple<string, EditCommand> p in pipe)
+            {
+                try { currentData = p.Item2.Function(message, p.Item1, currentData); }
                 catch (Exception e)
                 {
-                    DiscordNETWrapper.SendText($"[{c}] {e.Message} " + 
+                    DiscordNETWrapper.SendText($"[{p.Item2.Command}] {e.Message} " + 
                         $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}",
                         message.Channel).Wait();
                     return null;
                 }
 
-                if (command.OutputType != null && (currentData == null || !command.OutputType.IsAssignableFrom(currentData.GetType())))
+                if (p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType())))
                 {
-                    DiscordNETWrapper.SendText($"Wrong Output Data Type Error in {c}\nExpected: {command.OutputType}\nReturned: {currentData.GetType()}", message.Channel).Wait();
+                    DiscordNETWrapper.SendText($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
+                        $"{p.Item2.OutputType} but actually gave me a {currentData.GetType().ToReadableString()}", message.Channel).Wait();
                     return null;
                 }
             }
 
             return currentData;
         }
-        void PrintResult(object currentData, SocketMessage message)
+        void PrintPipeOutput(object output, SocketMessage message)
         {
-            foreach (PrintMethod m in PrintMethods)
-                if (m.Type == currentData.GetType())
-                    m.Function(message, currentData);
+            if (output == null) return;
+            Type outType = output.GetType();
+            PrintMethod m = PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(outType));
+            if (m == null)
+                DiscordNETWrapper.SendText($"Unprintable Output Error: I wasn't taught how to print {outType.ToReadableString()}", message.Channel).Wait();
+            else
+                m.Function(message, output);
         }
-
-        public class PrintMethod
-        {
-            public Type Type;
-            public Action<SocketMessage, object> Function;
-
-            public PrintMethod(Type Type, Action<SocketMessage, object> Function)
-            {
-                this.Function = Function;
-                this.Type = Type;
-            }
-        }
-        public class EditCommand
-        {
-            public string Command, Desc;
-            public Type InputType, OutputType;
-            public Func<SocketMessage, string, object, object> Function;
-
-            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType, Type OutputType)
-            {
-                if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
-                    throw new IllegalCommandException("Illegal Symbol!");
-
-                this.Command = Command;
-                this.Desc = Desc;
-                this.Function = Function;
-                this.InputType = InputType;
-                this.OutputType = OutputType;
-            }
-        }
-        readonly IEnumerable<EditCommand> Commands;
     }
 }
