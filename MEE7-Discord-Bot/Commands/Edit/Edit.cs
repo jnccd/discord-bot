@@ -32,22 +32,53 @@ namespace MEE7.Commands
                 this.Type = Type;
             }
         }
+        class ArgumentParseMethod
+        {
+            public Type Type;
+            public Func<string, object> Function;
+
+            public ArgumentParseMethod(Type Type, Func<string, object> Function)
+            {
+                this.Function = Function;
+                this.Type = Type;
+            }
+        }
+        struct Argument
+        {
+            public string Name;
+            public Type Type;
+            public object StandardValue;
+
+            public Argument(string Name, Type Type, object StandardValue)
+            {
+                this.Name = Name;
+                this.Type = Type;
+                this.StandardValue = StandardValue;
+            }
+        }
         class EditCommand
         {
             public string Command, Desc;
             public Type InputType, OutputType;
-            public Func<SocketMessage, string, object, object> Function;
+            public Argument[] Arguments;
+            public Func<SocketMessage, object[], object, object> Function;
 
-            public EditCommand(string Command, string Desc, Func<SocketMessage, string, object, object> Function, Type InputType, Type OutputType)
+            public EditCommand(string Command, string Desc, Type InputType, Type OutputType, Argument[] Arguments, 
+                Func<SocketMessage, object[], object, object> Function)
             {
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
-                    throw new IllegalCommandException("Illegal Symbol!");
+                    throw new IllegalCommandException("Illegal Symbol in the name!");
+
+                foreach (Argument arg in Arguments)
+                    if (ArgumentParseMethods.FirstOrDefault(x => x.Type == arg.Type) == null)
+                        throw new IllegalCommandException($"Argument {arg.Name} doesn't have a corresponding Parse Method! {arg.Type.ToReadableString()}");
 
                 this.Command = Command;
                 this.Desc = Desc;
                 this.Function = Function;
                 this.InputType = InputType;
                 this.OutputType = OutputType;
+                this.Arguments = Arguments;
             }
         }
 
@@ -58,7 +89,7 @@ namespace MEE7.Commands
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("Operators:\n" +
                 "> Concatinates functions\n" +
-                "() Let you add additional arguments for the command (optional)\n" +
+                "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
                $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
             AddToHelpmenu("Input Commands", InputCommands);
@@ -68,7 +99,8 @@ namespace MEE7.Commands
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
-            string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**: " +
+            string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**" +
+                  $"({c.Arguments.Select(x => $"{x.Name} : {x.Type.ToReadableString()}").Combine(", ")}): " +
                   $"`{(c.InputType == null ? "_" : c.InputType.ToReadableString())}` -> " +
                   $"`{(c.OutputType == null ? "_" : c.OutputType.ToReadableString())}`" +
                 $"";
@@ -89,9 +121,9 @@ namespace MEE7.Commands
             else
                 PrintPipeOutput(RunPipe(CheckPipe(GetExecutionPipe(message), message.Channel), message), message);
         }
-        List<Tuple<string, EditCommand>> GetExecutionPipe(SocketMessage message)
+        List<Tuple<object[], EditCommand>> GetExecutionPipe(SocketMessage message)
         {
-            List<Tuple<string, EditCommand>> re = new List<Tuple<string, EditCommand>>();
+            List<Tuple<object[], EditCommand>> re = new List<Tuple<object[], EditCommand>>();
 
             string input = message.Content.Remove(0, PrefixAndCommand.Length + 1);
             IEnumerable<string> commands = input.
@@ -101,7 +133,7 @@ namespace MEE7.Commands
             foreach (string c in commands)
             {
                 string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray());
-                string args = c.GetEverythingBetween("(", ")");
+                string arg = c.GetEverythingBetween("(", ")");
 
                 EditCommand command = Commands.FirstOrDefault(x => x.Command.ToLower() == cwoargs.ToLower());
                 if (command == null)
@@ -110,12 +142,25 @@ namespace MEE7.Commands
                     return null;
                 }
 
-                re.Add(new Tuple<string, EditCommand>(args, command));
+                string[] args = arg.Split(',').Select(x => x.Trim(' ')).ToArray();
+                object[] parsedArgs = new object[command.Arguments.Length];
+                for (int i = 0; i < command.Arguments.Length; i++)
+                    if (i < args.Length)
+                        parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]);
+                    else if (command.Arguments[i].StandardValue == null)
+                    {
+                        DiscordNETWrapper.SendText($"[{cwoargs}] {command.Arguments[i].Name} requires a value!", message.Channel).Wait();
+                        return null;
+                    }
+                    else
+                        parsedArgs[i] = command.Arguments[i].StandardValue;
+
+                re.Add(new Tuple<object[], EditCommand>(parsedArgs, command));
             }
 
             return re;
         }
-        List<Tuple<string, EditCommand>> CheckPipe(List<Tuple<string, EditCommand>> pipe, ISocketMessageChannel channel)
+        List<Tuple<object[], EditCommand>> CheckPipe(List<Tuple<object[], EditCommand>> pipe, ISocketMessageChannel channel)
         {
             if (pipe == null) return null;
             if (pipe.Count > 50)
@@ -144,13 +189,13 @@ namespace MEE7.Commands
 
             return pipe;
         }
-        object RunPipe(List<Tuple<string, EditCommand>> pipe, SocketMessage message)
+        object RunPipe(List<Tuple<object[], EditCommand>> pipe, SocketMessage message)
         {
             if (pipe == null) return null;
 
             object currentData = null;
 
-            foreach (Tuple<string, EditCommand> p in pipe)
+            foreach (Tuple<object[], EditCommand> p in pipe)
             {
                 try { currentData = p.Item2.Function(message, p.Item1, currentData); }
                 catch (Exception e)
