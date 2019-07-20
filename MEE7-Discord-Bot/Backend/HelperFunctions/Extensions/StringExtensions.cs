@@ -231,7 +231,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
         }
         public static string Combine(this IEnumerable<string> s, string combinator = "")
         {
-            return s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
+            return s.Count() == 0 ? "" : s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
         public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent,
             Action<StreamWriter> RunEvent = null)

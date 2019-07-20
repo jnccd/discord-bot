@@ -19,7 +19,9 @@ namespace MEE7.Commands
         static readonly object memifyLock = new object();
 
         readonly EditCommand[] PictureCommands = new EditCommand[] {
-            new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", (SocketMessage m, string a, object o) => {
+            new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0], 
+                (SocketMessage m, object[] a, object o) => {
+
                 Bitmap bmp = (o as Bitmap);
 
                 using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
@@ -32,8 +34,10 @@ namespace MEE7.Commands
                         }
                 
                 return bmp;
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("invert", "Invert the color of each pixel", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("invert", "Invert the color of each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0],
+                (SocketMessage m, object[] a, object o) => {
+
                 Bitmap bmp = (o as Bitmap);
 
                 using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
@@ -46,16 +50,19 @@ namespace MEE7.Commands
                         }
                 
                 return bmp;
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("Rekt", "Finds colored rectangles in pictures", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("Rekt", "Finds colored rectangles in pictures", typeof(Bitmap), typeof(Bitmap), 
+                new Argument[] { new Argument("Color", typeof(string), "") },
+                (SocketMessage m, object[] a, object o) => {
+
                 Bitmap bmp = (o as Bitmap);
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
                 Color c;
-                if (string.IsNullOrWhiteSpace(a))
+                if (string.IsNullOrWhiteSpace(a[0] as string))
                     c = Color.FromArgb(254, 34, 34);
                 else
-                    c = Color.FromName(a);
+                    c = Color.FromName(a[0] as string);
                 Rectangle redRekt = FindRectangle(bmp, c, 20);
 
                 if (redRekt.Width == 0)
@@ -70,22 +77,23 @@ namespace MEE7.Commands
 
                     return output;
                 }
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list",
-                (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list", typeof(Bitmap), typeof(Bitmap),
+                new Argument[] { new Argument("Meme", typeof(string), "") },
+                (SocketMessage m, object[] a, object o) => {
+
                 lock (memifyLock)
                 {
                     string[] files = Directory.GetFiles("Commands\\MemeTemplates");
-                    string[] split = a.Split(' ');
 
                     string memeTemplateDesign = "";
-                    if (a == "-list")
+                    if (a[0] as string == "-list")
                         throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
                                                                         Where(x => x.EndsWith("design")).
                                                                         Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
                                                                         Aggregate((x, y) => x + "\n" + y));
-                    else if (!string.IsNullOrWhiteSpace(a))
-                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(a) &&
+                    else if (!string.IsNullOrWhiteSpace(a[0] as string))
+                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(a[0] as string) &&
                                                               Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
                     else
                         memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
@@ -129,43 +137,34 @@ namespace MEE7.Commands
                     else
                         throw new Exception("Something went wrong :thinking:");
                 }
-            }, typeof(Bitmap), typeof(Bitmap)),
+            }),
             new EditCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
-                "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", (SocketMessage m, string a, object o) => {
-                string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
-                List<string> split = a.Split(' ').ToList();
+                "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", typeof(string), typeof(Bitmap),
+                new Argument[] {
+                    new Argument("Meme", typeof(string), ""),
+                    new Argument("Font", typeof(string), "Arial"),
+                    new Argument("FontSize", typeof(float), 1)
+                },
+                (SocketMessage m, object[] a, object o) => {
 
-                if (split.Contains("-list"))
+                string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
+                string memeName = a[0] as string;
+
+                if (memeName.Contains("-list"))
                     throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
                                                                 Where(x => x.EndsWith("-design")).
                                                                 Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
                                                                 Aggregate((x, y) => x + "\n" + y));
-
-                string font = "Arial";
-                float fontSize = 1;
-                int index = split.FindIndex(x => x == "-f");
-                if (index != -1)
-                {
-                    font = split[index + 1];
-                    split.RemoveRange(index, 2);
-                }
-                index = split.FindIndex(x => x == "-r");
-                if (index != -1)
-                {
-                    fontSize = (float)split[index + 1].ConvertToDouble();
-                    split.RemoveRange(index, 2);
-                }
-                index = split.FindIndex(x => x == "-m");
+                
                 string memeTemplate = "";
                 string memeDesign = "";
-                if (index != -1)
+                if (memeName != "")
                 {
-                    memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(split[index + 1]) &&
+                    memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(memeName) &&
                         Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
                     if (memeDesign == null)
                         throw new Exception("Error, couldn't find that meme design!");
                     memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
-                    split.RemoveRange(index, 2);
                 }
                 else
                 {
@@ -186,20 +185,25 @@ namespace MEE7.Commands
                     Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
                     if (redRekt.Width == 0)
                         throw new Exception("Error, couldn't find a rectangle to write in!");
-                    fontSize = redRekt.Height / 5f / fontSize;
+                    float fontSize = redRekt.Height / 5f / (float)a[2];
                     using (Graphics graphics = Graphics.FromImage(template))
-                        graphics.DrawString(o as string, new Font(font, fontSize), Brushes.Black, redRekt);
+                        graphics.DrawString(o as string, new Font(a[1] as string, fontSize), Brushes.Black, redRekt);
 
                     return template;
                 }
                 else
                     throw new Exception("uwu");
-            }, typeof(string), typeof(Bitmap)),
+            }),
             new EditCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\n" +
                 "Without any arguments it will automatically call \"expand 0.5,0.5 1\"" +
                 "\nThe argument syntax is: [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the picture] " +
-                "[strength, eg. 0.7, for 70% transformation strength]",
-                (SocketMessage m, string a, object o) => {
+                "[strength, eg. 0.7, for 70% transformation strength]", typeof(Bitmap), typeof(Bitmap),
+                new Argument[] {
+                    new Argument("TransformMode", typeof(string), ""),
+                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
+                    new Argument("Strength", typeof(float), 1),
+                },
+                (SocketMessage m, object[] a, object o) => {
 
                 Vector2 Transform(Vector2 point, Vector2 centerT, Bitmap within, float strength, TransformMode modeT)
                 {
@@ -263,28 +267,11 @@ namespace MEE7.Commands
 
                 Bitmap bmp = o as Bitmap;
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-                Vector2 center = new Vector2(bmp.Width / 2, bmp.Height / 2);
-                float Strength = 1;
-                string[] split = a.Split(new char[] { ' ', '\n' });
-
-                TransformMode mode = TransformMode.Expand;
-                try
-                {
-                    Enum.TryParse(split[0].ToCapital(), out mode);
-                } catch { }
-
-                try
-                {
-                    string cen = split[1];
-                    string[] cent = cen.Split(',');
-                    center.X = (float)cent[0].ConvertToDouble() * bmp.Width;
-                    center.Y = (float)cent[1].ConvertToDouble() * bmp.Height;
-                } catch { }
-
-                try
-                {
-                    Strength = (float)split[2].ConvertToDouble();
-                } catch { }
+                
+                TransformMode mode = a[0] == "" ? TransformMode.Expand : (TransformMode)Enum.Parse(typeof(TransformMode), a[0] as string);
+                Vector2 position = (Vector2)a[1];
+                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+                float Strength = (float)a[2];
 
                 using (UnsafeBitmapContext ocon = new UnsafeBitmapContext(output))
                 using (UnsafeBitmapContext bcon = new UnsafeBitmapContext(bmp))
@@ -296,42 +283,42 @@ namespace MEE7.Commands
                         }
 
                 return output;
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sobelEdges", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("sobelEdges", "Highlights horizontal edges", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                    {  0,  0,  0 },
                                                                    { -1, -2, -1 } }, 1, true);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sobelEdgesColor", "Highlights horizontal edges", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("sobelEdgesColor", "Highlights horizontal edges", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                {  0,  0,  0 },
                                                                { -1, -2, -1 } });
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("sharpen", "well guess what it does", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("sharpen", "well guess what it does", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
                                                                { -1,  5, -1 },
-                                                               {  0, -1,  0 } });
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("boxBlur", "blur owo", (SocketMessage m, string a, object o) => {
+                                                               {  0, -1,  0 } }, 1/5f);
+            }),
+            new EditCommand("boxBlur", "blur owo", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
                                                                {  1,  1,  1 },
                                                                {  1,  1,  1 } }, 1/9f);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("gaussianBlur", "more blur owo", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("gaussianBlur", "more blur owo", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
                                                                    {  2,  4,  2 },
                                                                    {  1,  2,  1 } }, 1/16f);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("jkrowling", "Gay rights", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("jkrowling", "Gay rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, o as Bitmap);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("merkel", "German rights", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("merkel", "German rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, o as Bitmap);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("transRights", "The input image says trans rights", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("transRights", "The input image says trans rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, o as Bitmap);
-            }, typeof(Bitmap), typeof(Bitmap)),
-            new EditCommand("rainbow", "I'll try spinning colors that's a good trick!", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("rainbow", "I'll try spinning colors that's a good trick!", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 Bitmap b = o as Bitmap;
                 Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
                 int[,] Alphas = new int[b.Width, b.Height];
@@ -363,8 +350,8 @@ namespace MEE7.Commands
                 }
 
                 return re;
-            }, typeof(Bitmap), typeof(Bitmap[])),
-            new EditCommand("spinToWin", "I'll try spinning that's a good trick!", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("spinToWin", "I'll try spinning that's a good trick!", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 Bitmap b = o as Bitmap;
                 Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
 
@@ -375,7 +362,7 @@ namespace MEE7.Commands
                     re[i] = b.RotateImage(-stepWidth * i, middle);
 
                 return re;
-            }, typeof(Bitmap), typeof(Bitmap[])),
+            }),
         };
 
         static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)

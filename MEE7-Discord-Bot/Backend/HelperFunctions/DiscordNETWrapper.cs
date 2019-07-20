@@ -1,23 +1,10 @@
 ﻿using Discord;
-using Discord.Audio;
-using Discord.Rest;
 using Discord.WebSocket;
-using MEE7.Backend;
 using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Commands;
-using MEE7.Configuration;
-using NAudio.Wave;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MEE7.Backend.HelperFunctions
@@ -75,8 +62,33 @@ namespace MEE7.Backend.HelperFunctions
                 Embed.Color = Program.GetGuildFromChannel(Channel).GetUser(Program.GetSelf().Id).GetDisplayColor();
 
             List<IUserMessage> sendMessages = new List<IUserMessage>();
-            if (Embed.Fields == null || Embed.Fields.Count < 25)
+            if ((Embed.Fields == null || Embed.Fields.Count < 25) && Embed.Length < 6000)
                 sendMessages.Add(await Channel.SendMessageAsync(text, false, Embed.Build()));
+            else if (Embed.Length >= 6000)
+            {
+                List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields);
+                while (Fields.Count > 0)
+                {
+                    EmbedBuilder eb = new EmbedBuilder
+                    {
+                        Color = Embed.Color,
+                        Description = Embed.Description,
+                        Author = Embed.Author,
+                        Footer = Embed.Footer,
+                        ImageUrl = Embed.ImageUrl,
+                        ThumbnailUrl = Embed.ThumbnailUrl,
+                        Timestamp = Embed.Timestamp,
+                        Title = Embed.Title,
+                        Url = Embed.Url
+                    };
+                    for (int i = 0; i < 6 && Fields.Count > 0; i++)
+                    {
+                        eb.Fields.Add(Fields[0]);
+                        Fields.RemoveAt(0);
+                    }
+                    sendMessages.Add(await Channel.SendMessageAsync(text, false, eb.Build()));
+                }
+            }
             else
             {
                 List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields);

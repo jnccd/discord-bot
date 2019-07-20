@@ -17,7 +17,7 @@ namespace MEE7.Commands
     public partial class Edit : Command
     {
         readonly EditCommand[] AudioCommands = new EditCommand[] {
-            new EditCommand("playAudio", "Plays audio in voicechat", (SocketMessage m, string a, object o) => {
+            new EditCommand("playAudio", "Plays audio in voicechat", typeof(WaveStream), null, new Argument[0], (SocketMessage m, object[] args, object o) => {
                 SocketGuild g = Program.GetGuildFromChannel(m.Channel);
                 ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
                 if (channel != null)
@@ -35,8 +35,8 @@ namespace MEE7.Commands
 
                 (o as WaveStream).Dispose();
                 return null;
-            }, typeof(WaveStream), null),
-            new EditCommand("drawAudio", "Draw the samples", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("drawAudio", "Draw the samples", typeof(WaveStream), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] args, object o) => {
 
                 WaveStream w = o as WaveStream;
                 var c = new WaveChannel32(w);
@@ -76,7 +76,7 @@ namespace MEE7.Commands
                 w.Dispose();
                 return output;
 
-            }, typeof(WaveStream), typeof(Bitmap)),
+            }),
         };
     }
 }

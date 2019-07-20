@@ -17,10 +17,10 @@ namespace MEE7.Commands
     public partial class Edit : Command
     {
         readonly EditCommand[] InputCommands = new EditCommand[] {
-            new EditCommand("lastT", "Gets the last messages text", (SocketMessage m, string a, object o) => {
+            new EditCommand("lastT", "Gets the last messages text", null, typeof(string), new Argument[0], (SocketMessage m, object[] args, object o) => {
                 return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
-            }, null, typeof(string)),
-            new EditCommand("lastP", "Gets the last messages picture", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("lastP", "Gets the last messages picture", null, typeof(Bitmap), new Argument[0], (SocketMessage m, object[] args, object o) => {
                 IMessage lm = m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last();
                 string pic = null;
                 if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
@@ -34,17 +34,26 @@ namespace MEE7.Commands
                 if (string.IsNullOrWhiteSpace(pic) && picLink != null)
                     pic = picLink;
                 return pic.GetBitmapFromURL();
-            }, null, typeof(Bitmap)),
-            new EditCommand("thisT", "Outputs the given arguments", (SocketMessage m, string a, object o) => {
-                return a;
-            }, null, typeof(string)),
-            new EditCommand("thisP", "Gets this messages picture / picture link in the arguments", (SocketMessage m, string a, object o) => {
-                return GetPictureLinkFromMessage(m, a).GetBitmapFromURL();
-            }, null, typeof(Bitmap)),
-            new EditCommand("thisG", "Gets this messages gif / gif link in the arguments", (SocketMessage m, string a, object o) => {
-                return GetPictureLinkFromMessage(m, a).GetBitmapsFromGIFURL();
-            }, null, typeof(Bitmap[])),
-            new EditCommand("thisA", "Gets mp3 or wav audio files attached to this message", (SocketMessage m, string a, object o) => {
+            }),
+            new EditCommand("thisT", "Outputs the given text", null, typeof(string), new Argument[] { new Argument("Text", typeof(string), null) }, 
+                (SocketMessage m, object[] args, object o) => {
+
+                return args[0];
+            }),
+            new EditCommand("thisP", "Gets this messages picture / picture from url argument", null, typeof(Bitmap), 
+                new Argument[] { new Argument("Picture URL", typeof(string), null) }, 
+                (SocketMessage m, object[] args, object o) => {
+                
+                return GetPictureLinkFromMessage(m, (string)args[0]).GetBitmapFromURL();
+            }),
+            new EditCommand("thisG", "Gets this messages gif / gif from url argument", null, typeof(Bitmap[]),
+                new Argument[] { new Argument("Gif URL", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+
+                return GetPictureLinkFromMessage(m, (string)args[0]).GetBitmapsFromGIFURL();
+            }),
+            new EditCommand("thisA", "Gets mp3 or wav audio files attached to this message", null, typeof(WaveStream), new Argument[0],
+                (SocketMessage m, object[] args, object o) => {
                 string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
                 if (!string.IsNullOrWhiteSpace(url))
                     return url.Getmp3AudioFromURL();
@@ -58,29 +67,43 @@ namespace MEE7.Commands
                     return url.GetoggAudioFromURL();
 
                 throw new Exception("No audio file found!");
-            }, null, typeof(WaveStream)),
-            new EditCommand("profilePicture", "Gets a profile picture", (SocketMessage m, string a, object o) => {
-                SocketUser luser = Program.GetUserFromId(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' })));
+            }),
+            new EditCommand("profilePicture", "Gets a profile picture", null, typeof(Bitmap),
+                new Argument[] { new Argument("User ID / User Mention", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+
+                SocketUser luser = Program.GetUserFromId(Convert.ToUInt64((args[0] as string).Trim(new char[] { ' ', '<', '>', '@', '!' })));
                 string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
                 return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
-            }, null, typeof(Bitmap)),
-            new EditCommand("serverPicture", "Gets the server picture from a server id", (SocketMessage m, string a, object o) => {
-                return Program.GetGuildFromID(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
-            }, null, typeof(Bitmap)),
-            new EditCommand("emote", "Gets the picture of the emote", (SocketMessage m, string a, object o) => {
-                Emote.TryParse(a.Trim(' '), out Emote res);
+            }),
+            new EditCommand("serverPicture", "Gets the server picture from a server id", null, typeof(Bitmap),
+                new Argument[] { new Argument("Server ID", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+                    
+                return Program.GetGuildFromID(Convert.ToUInt64((args[0] as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
+            }),
+            new EditCommand("emote", "Gets the picture of the emote", null, typeof(Bitmap),
+                new Argument[] { new Argument("Emote", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+
+                Emote.TryParse((args[0] as string).Trim(' '), out Emote res);
                 if (res != null) return res.Url.GetBitmapFromURL();
-                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a.Trim(' ', ':'))).Url.GetBitmapFromURL();
-            }, null, typeof(Bitmap)),
-            new EditCommand("gifEmote", "Gets the pictures of the emote", (SocketMessage m, string a, object o) => {
-                Emote.TryParse(a.Trim(' '), out Emote res);
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':'))).Url.GetBitmapFromURL();
+            }),
+            new EditCommand("gifEmote", "Gets the pictures of the emote", null, typeof(Bitmap[]),
+                new Argument[] { new Argument("Emote", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+
+                Emote.TryParse((args[0] as string).Trim(' '), out Emote res);
                 if (res != null) return res.Url.GetBitmapsFromGIFURL();
-                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a.Trim(' ', ':')) && x.Animated).Url.GetBitmapsFromGIFURL();
-            }, null, typeof(Bitmap[])),
-            new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
-                (SocketMessage m, string a, object o) => {
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':')) && x.Animated).Url.GetBitmapsFromGIFURL();
+            }),
+            new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", null, typeof(WaveStream),
+                new Argument[] { new Argument("YouTube Video URL", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+
                     MemoryStream mem = new MemoryStream();
-                    using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(a, "mp3"))
+                    using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo((args[0] as string), "mp3"))
                     {
                         while (true)
                         {
@@ -91,7 +114,7 @@ namespace MEE7.Commands
                         P.StandardOutput.BaseStream.CopyTo(mem);
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
                     }
-            }, null, typeof(WaveStream)),
+            }),
         };
 
         private static string GetPictureLinkFromMessage(SocketMessage m, string arguments)
