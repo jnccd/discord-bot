@@ -68,10 +68,10 @@ namespace MEE7.Commands
                 return Program.GetGuildFromID(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
             }, null, typeof(Bitmap)),
             new EditCommand("emote", "Gets the picture of the emote", (SocketMessage m, string a, object o) => {
-                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a) && !x.Animated).Url.GetBitmapFromURL();
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a.Trim(' ', ':')) && !x.Animated).Url.GetBitmapFromURL();
             }, null, typeof(Bitmap)),
             new EditCommand("gifEmote", "Gets the pictures of the emote", (SocketMessage m, string a, object o) => {
-                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a) && x.Animated).Url.GetBitmapsFromGIFURL();
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a.Trim(' ', ':')) && x.Animated).Url.GetBitmapsFromGIFURL();
             }, null, typeof(Bitmap[])),
             new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
                 (SocketMessage m, string a, object o) => {
