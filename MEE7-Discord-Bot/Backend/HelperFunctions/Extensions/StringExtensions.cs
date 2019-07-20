@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -110,7 +111,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                     return s;
             return null;
         }
-        public static string GetPictureLink(this string str)
+        public static string GetPictureLinkInMessage(this string str)
         {
             string[] split = str.Split(' ');
             foreach (string s in split)
@@ -144,6 +145,17 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             return o;
         }
         public static Bitmap GetBitmapFromURL(this string url) => new Bitmap(WebRequest.Create(url).GetResponse().GetResponseStream());
+        public static Bitmap[] GetBitmapsFromGIFURL(this string url)
+        {
+            Image gif = Image.FromStream(WebRequest.Create(url).GetResponse().GetResponseStream());
+            FrameDimension dimension = new FrameDimension(gif.FrameDimensionsList[0]);
+            return Enumerable.Range(0, gif.GetFrameCount(dimension)).
+                Select(x => {
+                    gif.SelectActiveFrame(dimension, x);
+                    return new Bitmap(gif);
+                }).
+                ToArray();
+        }
         public static Mp3FileReader Getmp3AudioFromURL(this string url)
         {
             Stream ms = new MemoryStream();
