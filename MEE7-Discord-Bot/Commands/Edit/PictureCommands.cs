@@ -138,8 +138,8 @@ namespace MEE7.Commands
                         throw new Exception("Something went wrong :thinking:");
                 }
             }),
-            new EditCommand("textMemify", "Turn the last Picture into a meme, get a list of available templates with the argument -list, " +
-                "additional arguments are -f for the font, -r for the number of text lines and of course -m for the meme", typeof(string), typeof(Bitmap),
+            new EditCommand("textMemify", "Put text into a meme template, input -list as Meme and get a list templates\n" +
+                "The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox", typeof(string), typeof(Bitmap),
                 new Argument[] {
                     new Argument("Meme", typeof(string), ""),
                     new Argument("Font", typeof(string), "Arial"),
@@ -194,10 +194,10 @@ namespace MEE7.Commands
                 else
                     throw new Exception("uwu");
             }),
-            new EditCommand("liq", "Liquidify the picture with either expand, collapse, stir or fall.\n" +
-                "Without any arguments it will automatically call \"expand 0.5,0.5 1\"" +
-                "\nThe argument syntax is: [mode] [position, eg. 0.5,1 to center the transformation at the middle of the bottom of the picture] " +
-                "[strength, eg. 0.7, for 70% transformation strength]", typeof(Bitmap), typeof(Bitmap),
+            new EditCommand("liq", "Liquidify the picture with the mode expand, collapse, stir or fall.\n" +
+                "The Position argument requires 2 numbers seperated by a , like: 0.4,0.6\n" +
+                "0,0 is the Top Left of the picture and 1,1 is the Bottom Right\n" +
+                "The default Strength is 1", typeof(Bitmap), typeof(Bitmap),
                 new Argument[] {
                     new Argument("TransformMode", typeof(string), ""),
                     new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
