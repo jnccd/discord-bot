@@ -30,7 +30,7 @@ namespace MEE7.Commands
                     else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
                         pic = lm.Attachments.ElementAt(0).Url;
                 }
-                string picLink = lm.Content.GetPictureLink();
+                string picLink = lm.Content.GetPictureLinkInMessage();
                 if (string.IsNullOrWhiteSpace(pic) && picLink != null)
                     pic = picLink;
                 return pic.GetBitmapFromURL();
@@ -39,19 +39,11 @@ namespace MEE7.Commands
                 return a;
             }, null, typeof(string)),
             new EditCommand("thisP", "Gets this messages picture / picture link in the arguments", (SocketMessage m, string a, object o) => {
-                string pic = null;
-                if (m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
-                {
-                    if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                        pic = m.Attachments.ElementAt(0).Url;
-                    else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                        pic = m.Attachments.ElementAt(0).Url;
-                }
-                string picLink = a.GetPictureLink();
-                if (string.IsNullOrWhiteSpace(pic) && picLink != null)
-                    pic = picLink;
-                return pic.GetBitmapFromURL();
+                return GetPictureLinkFromMessage(m, a).GetBitmapFromURL();
             }, null, typeof(Bitmap)),
+            new EditCommand("thisG", "Gets this messages gif / gif link in the arguments", (SocketMessage m, string a, object o) => {
+                return GetPictureLinkFromMessage(m, a).GetBitmapsFromGIFURL();
+            }, null, typeof(Bitmap[])),
             new EditCommand("thisA", "Gets mp3 or wav audio files attached to this message", (SocketMessage m, string a, object o) => {
                 string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
                 if (!string.IsNullOrWhiteSpace(url))
@@ -76,8 +68,11 @@ namespace MEE7.Commands
                 return Program.GetGuildFromID(Convert.ToUInt64((a as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
             }, null, typeof(Bitmap)),
             new EditCommand("emote", "Gets the picture of the emote", (SocketMessage m, string a, object o) => {
-                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a)).Url.GetBitmapFromURL();
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a) && !x.Animated).Url.GetBitmapFromURL();
             }, null, typeof(Bitmap)),
+            new EditCommand("gifEmote", "Gets the pictures of the emote", (SocketMessage m, string a, object o) => {
+                return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains(a) && x.Animated).Url.GetBitmapsFromGIFURL();
+            }, null, typeof(Bitmap[])),
             new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", 
                 (SocketMessage m, string a, object o) => {
                     MemoryStream mem = new MemoryStream();
@@ -94,5 +89,23 @@ namespace MEE7.Commands
                     }
             }, null, typeof(WaveStream)),
         };
+
+        private static string GetPictureLinkFromMessage(SocketMessage m, string arguments)
+        {
+            string pic = null;
+            if (m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
+            {
+                if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
+                    pic = m.Attachments.ElementAt(0).Url;
+                else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
+                    pic = m.Attachments.ElementAt(0).Url;
+                else if (m.Attachments.ElementAt(0).Filename.EndsWith(".gif"))
+                    pic = m.Attachments.ElementAt(0).Url;
+            }
+            string picLink = arguments.GetPictureLinkInMessage();
+            if (string.IsNullOrWhiteSpace(pic) && picLink != null)
+                pic = picLink;
+            return pic;
+        }
     }
 }
