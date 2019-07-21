@@ -52,7 +52,9 @@ namespace MEE7.Commands
 
             }),
             new PrintMethod(typeof(WaveStream), (SocketMessage m, object o) => {
-                DiscordNETWrapper.SendFile(o as WaveStream, m.Channel, ".mp3").Wait();
+                Stream s = new MemoryStream();
+                WaveFileWriter.WriteWavFileToStream(s, o as WaveStream);
+                DiscordNETWrapper.SendFile(s, m.Channel, ".mp3").Wait();
 
             }),
         };
