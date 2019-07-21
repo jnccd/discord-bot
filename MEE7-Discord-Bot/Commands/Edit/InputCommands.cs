@@ -98,7 +98,7 @@ namespace MEE7.Commands
                 if (res != null) return res.Url.GetBitmapsFromGIFURL();
                 return Program.GetGuildFromChannel(m.Channel).Emotes.FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':')) && x.Animated).Url.GetBitmapsFromGIFURL();
             }),
-            new EditCommand("mp3FromYT", "Gets the mp3 of an youtube video, takes the video url as argument", null, typeof(WaveStream),
+            new EditCommand("AudioFromYT", "Gets the mp3 of an youtube video", null, typeof(WaveStream),
                 new Argument[] { new Argument("YouTube Video URL", typeof(string), null) },
                 (SocketMessage m, object[] args, object o) => {
 
