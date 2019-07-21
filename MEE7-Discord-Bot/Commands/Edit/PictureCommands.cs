@@ -268,7 +268,7 @@ namespace MEE7.Commands
                 Bitmap bmp = o as Bitmap;
                 Bitmap output = new Bitmap(bmp.Width, bmp.Height);
                 
-                TransformMode mode = a[0] == "" ? TransformMode.Expand : (TransformMode)Enum.Parse(typeof(TransformMode), a[0] as string);
+                TransformMode mode = a[0] as string == "" ? TransformMode.Expand : (TransformMode)Enum.Parse(typeof(TransformMode), a[0] as string);
                 Vector2 position = (Vector2)a[1];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
                 float Strength = (float)a[2];

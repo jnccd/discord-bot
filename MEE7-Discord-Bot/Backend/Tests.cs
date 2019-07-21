@@ -9,10 +9,6 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using TwitchLib.Api;
-using TwitchLib.Client;
-using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
 
 namespace MEE7.Backend
 {
@@ -63,31 +59,7 @@ namespace MEE7.Backend
                         Program.GetGuildFromID(479950092938248193).CreateTextChannelAsync(s, (TextChannelProperties t) => { t.CategoryId = 562233500963438603; }).Wait();
                 }
             },
-            // 3 - Twtich
-            () => {
-                var client = new TwitchClient();
-                client.Initialize(new ConnectionCredentials(Config.Data.TwtichBotUsername, Config.Data.TwtichAccessToken));
-                client.OnLog += (object o, OnLogArgs arg) => { ConsoleWrapper.ConsoleWriteLine($"{arg.BotUsername} - {arg.DateTime}: {arg.Data}", ConsoleColor.Magenta); };
-                client.OnMessageReceived += (object sender, OnMessageReceivedArgs e) => {
-                    ConsoleWrapper.ConsoleWriteLine($"Message: {e.ChatMessage}", ConsoleColor.Magenta);
-                    if (e.ChatMessage.Message.StartsWith("hi"))
-                        client.SendMessage(e.ChatMessage.Channel, "Hello there");
-                };
-                client.OnFailureToReceiveJoinConfirmation += (object sender, OnFailureToReceiveJoinConfirmationArgs e) => { ConsoleWrapper.ConsoleWriteLine($"Exception: {e.Exception}\n{e.Exception.Details}", ConsoleColor.Magenta); };
-                client.OnJoinedChannel += (object sender, OnJoinedChannelArgs e) => { ConsoleWrapper.ConsoleWriteLine($"{e.BotUsername} - joined {e.Channel}", ConsoleColor.Magenta); };
-                client.OnConnectionError += (object sender, OnConnectionErrorArgs e) => { ConsoleWrapper.ConsoleWriteLine($"Error: {e.Error}", ConsoleColor.Magenta); };
-                client.Connect();
-
-                client.JoinChannel(Config.Data.TwtichChannelName);
-
-                Task.Factory.StartNew(() => { Thread.Sleep(15000); client.Disconnect(); ConsoleWrapper.ConsoleWriteLine("Disconnected Twitch"); });
-
-                var api = new TwitchAPI();
-                api.Settings.ClientId = Config.Data.TwitchAPIClientID;
-                api.Settings.AccessToken = Config.Data.TwitchAPIAccessToken;
-                var res = api.Helix.Users.GetUsersFollowsAsync("42111676").Result;
-            },
-            // 4 - Events
+            // 3 - Events
             () => {
                 OnTest += () => {
                     ConsoleWrapper.ConsoleWriteLine("lul1");
@@ -106,7 +78,7 @@ namespace MEE7.Backend
                 };
                 OnTest.InvokeParallel();
             },
-            // 5 - Floating Numbers
+            // 4 - Floating Numbers
             () => {
                 ConsoleWrapper.ConsoleWriteLine(1 / 6f);
             }
