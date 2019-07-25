@@ -89,7 +89,7 @@ namespace MEE7.Commands
 
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("Operators:\n" +
-                "> Concatinates functions\n" +
+                "\> Concatinates functions\n" +
                 "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
                $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
