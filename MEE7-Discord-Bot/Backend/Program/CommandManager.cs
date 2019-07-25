@@ -25,17 +25,17 @@ namespace MEE7
 {
     public static partial class Program
     {
-        public const string prefix = "$";
+        public const string Prefix = "$";
         static Command[] commands;
-        static EmbedBuilder HelpMenu = new EmbedBuilder();
+        static EmbedBuilder helpMenu = new EmbedBuilder();
         static Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                       from assemblyType in domainAssembly.GetTypes()
                                       where assemblyType.IsSubclassOf(typeof(Command))
                                       select assemblyType).ToArray();
 
-        static int ConcurrentCommandExecutions = 0;
+        static int concurrentCommandExecutions = 0;
         static readonly string commandExecutionLock = "";
-        static ulong[] ExperimentalChannels = new ulong[] { 473991188974927884 };
+        static ulong[] experimentalChannels = new ulong[] { 473991188974927884 };
         static List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
         
         public delegate void NonCommandMessageRecievedHandler(SocketMessage message);
@@ -47,26 +47,26 @@ namespace MEE7
         public delegate void EmojiReactionUpdatedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
         public static event EmojiReactionUpdatedHandler OnEmojiReactionUpdated;
 
-        static List<Tuple<RestUserMessage, Exception>> CachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
-        static readonly string ErrorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
+        static List<Tuple<RestUserMessage, Exception>> cachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
+        static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
-        static readonly Emoji ErrorEmoji = new Emoji("🤔");
+        static readonly Emoji errorEmoji = new Emoji("🤔");
         
         static void UpdateWorkState()
         {
-            if (ConcurrentCommandExecutions > 1)
+            if (concurrentCommandExecutions > 1)
                 Program.SetStatus(UserStatus.DoNotDisturb);
-            else if (ConcurrentCommandExecutions > 0)
+            else if (concurrentCommandExecutions > 0)
                 Program.SetStatus(UserStatus.AFK);
             else
                 Program.SetStatus(UserStatus.Online);
         }
         public static void DisposeErrorMessages()
         {
-            foreach (Tuple<RestUserMessage, Exception> err in CachedErrorMessages)
+            foreach (Tuple<RestUserMessage, Exception> err in cachedErrorMessages)
             {
                 err.Item1.RemoveAllReactionsAsync().Wait();
-                err.Item1.ModifyAsync(m => m.Content = ErrorMessage).Wait();
+                err.Item1.ModifyAsync(m => m.Content = errorMessage).Wait();
             }
         }
 
@@ -113,16 +113,16 @@ namespace MEE7
         {
             Task.Run(async () =>
             {
-                Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                Tuple<RestUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
                     var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
-                    reacts.TryGetValue(ErrorEmoji, out var react);
+                    reacts.TryGetValue(errorEmoji, out var react);
                     if (react.ReactionCount > 1)
-                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage + "\n\n```" + error.Item2 + "```");
+                        await error.Item1.ModifyAsync(m => m.Content = errorMessage + "\n\n```" + error.Item2 + "```");
                     else
-                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage);
+                        await error.Item1.ModifyAsync(m => m.Content = errorMessage);
                 }
             });
             if (arg3.UserId != OwnID)
@@ -142,16 +142,16 @@ namespace MEE7
         {
             Task.Run(async () =>
             {
-                Tuple<RestUserMessage, Exception> error = CachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                Tuple<RestUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
                     var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
-                    reacts.TryGetValue(ErrorEmoji, out var react);
+                    reacts.TryGetValue(errorEmoji, out var react);
                     if (react.ReactionCount > 1)
-                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage + "\n\n```" + error.Item2 + "```");
+                        await error.Item1.ModifyAsync(m => m.Content = errorMessage + "\n\n```" + error.Item2 + "```");
                     else
-                        await error.Item1.ModifyAsync(m => m.Content = ErrorMessage);
+                        await error.Item1.ModifyAsync(m => m.Content = errorMessage);
                 }
             });
             if (arg3.UserId != OwnID)
@@ -169,7 +169,7 @@ namespace MEE7
         }
         private static Task MessageReceived(SocketMessage message)
         {
-            if (!message.Author.IsBot && message.Content.StartsWith(prefix))
+            if (!message.Author.IsBot && message.Content.StartsWith(Prefix))
                 Task.Run(() => ParallelMessageReceived(message));
             if (message.Content.Length > 0 && (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':'))
                 Task.Run(() =>
@@ -186,11 +186,11 @@ namespace MEE7
             DiscordUser user = Saver.SaveUser(message.Author.Id);
             user.TotalCommandsUsed++;
 
-            if (message.Content.StartsWith(prefix + "help"))
+            if (message.Content.StartsWith(Prefix + "help"))
             {
                 string[] split = message.Content.Split(' ');
                 if (split.Length < 2)
-                    DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
+                    DiscordNETWrapper.SendEmbed(helpMenu, message.Channel).Wait();
                 else
                 {
                     foreach (Command c in commands)
@@ -247,9 +247,9 @@ namespace MEE7
         }
         private static void ExecuteCommand(Command command, SocketMessage message)
         {
-            if (command.GetType() == typeof(Template) && !ExperimentalChannels.Contains(message.Channel.Id))
+            if (command.GetType() == typeof(Template) && !experimentalChannels.Contains(message.Channel.Id))
                 return;
-            if (command.IsExperimental && !ExperimentalChannels.Contains(message.Channel.Id))
+            if (command.IsExperimental && !experimentalChannels.Contains(message.Channel.Id))
             {
                 DiscordNETWrapper.SendText("Experimental commands cant be used here!", message.Channel).Wait();
                 return;
@@ -261,7 +261,7 @@ namespace MEE7
                 typingState = message.Channel.EnterTypingState();
                 lock (commandExecutionLock)
                 {
-                    ConcurrentCommandExecutions++;
+                    concurrentCommandExecutions++;
                     UpdateWorkState();
                 }
 
@@ -279,10 +279,10 @@ namespace MEE7
             {
                 try // Try in case I dont have the permissions to write at all
                 {
-                    RestUserMessage m = message.Channel.SendMessageAsync(ErrorMessage).Result;
+                    RestUserMessage m = message.Channel.SendMessageAsync(errorMessage).Result;
 
-                    m.AddReactionAsync(ErrorEmoji).Wait();
-                    CachedErrorMessages.Add(new Tuple<RestUserMessage, Exception>(m, e));
+                    m.AddReactionAsync(errorEmoji).Wait();
+                    cachedErrorMessages.Add(new Tuple<RestUserMessage, Exception>(m, e));
                 }
                 catch { }
 
@@ -295,7 +295,7 @@ namespace MEE7
                 typingState.Dispose();
                 lock (commandExecutionLock)
                 {
-                    ConcurrentCommandExecutions--;
+                    concurrentCommandExecutions--;
                     UpdateWorkState();
                 }
             }
