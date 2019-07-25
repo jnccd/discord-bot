@@ -46,7 +46,7 @@ namespace MEE7.Commands
                             {
                                 IEnumerable<IMessage> messages = ((ISocketMessageChannel)channel).GetMessagesAsync().FlattenAsync().Result;
                                 foreach (IMessage m in messages)
-                                    if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.prefix) && m.Content[0] != '!')
+                                    if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.Prefix) && m.Content[0] != '!')
                                         input += m.Content + "\n";
                             }
             }

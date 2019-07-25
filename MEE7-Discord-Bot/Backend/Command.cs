@@ -20,7 +20,7 @@ namespace MEE7.Backend
         {
             get
             {
-                return Program.prefix;
+                return Program.Prefix;
             }
         }
         public string PrefixAndCommand

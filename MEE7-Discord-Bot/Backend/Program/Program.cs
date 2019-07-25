@@ -47,14 +47,14 @@ namespace MEE7
         
         static readonly string exitlock = "";
 
-        private static SocketUser Pmaster;
+        private static SocketUser pmaster;
         public static SocketUser Master
         {
-            get { return Pmaster; }
+            get { return pmaster; }
             set
             {
-                if (Pmaster == null)
-                    Pmaster = value;
+                if (pmaster == null)
+                    pmaster = value;
                 else
                     throw new FieldAccessException("The Master may only be set once!");
             }
@@ -188,32 +188,32 @@ namespace MEE7
         static void SetState()
         {
             if (runConfig == "Debug")
-                client.SetGameAsync($"{prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
+                client.SetGameAsync($"{Prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
             else
-                client.SetGameAsync($"{prefix}help", "", ActivityType.Listening).Wait();
+                client.SetGameAsync($"{Prefix}help", "", ActivityType.Listening).Wait();
         }
         static void BuildHelpMenu()
         {
-            HelpMenu.WithColor(0, 128, 255);
-            HelpMenu.AddFieldDirectly($"{prefix}help", $"Prints the HelpMenu for a Command" +
+            helpMenu.WithColor(0, 128, 255);
+            helpMenu.AddFieldDirectly($"{Prefix}help", $"Prints the HelpMenu for a Command" +
                 (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ?
-                $", eg. {prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") +
+                $", eg. {Prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") +
                 "\nCommands with a HelpMenu are marked with a (h)");
             for (int i = 0; i < commands.Length; i++)
             {
                 if (commands[i].CommandLine != "" && !commands[i].IsHidden)
                 {
                     string desc = ((commands[i].Desc == null ? "" : commands[i].Desc + "   ")).Trim(' ');
-                    HelpMenu.AddFieldDirectly(commands[i].Prefix + commands[i].CommandLine +
+                    helpMenu.AddFieldDirectly(commands[i].Prefix + commands[i].CommandLine +
                         (commands[i].IsExperimental ? " [EXPERIMENTAL]" : "") + (commands[i].HelpMenu == null ? "" : " (h)"),
                         string.IsNullOrWhiteSpace(desc) ? "-" : desc, true);
                 }
             }
-            HelpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code " +
+            helpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code " +
                 $"[here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
-            HelpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
+            helpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
-            HelpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
+            helpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
         }
         static void PrintConsoleStartup()
         {
@@ -491,17 +491,17 @@ namespace MEE7
         }
 
         // Client Getters / Wrappers
-        public static SocketUser GetUserFromId(ulong UserId)
+        public static SocketUser GetUserFromId(ulong userId)
         {
-            return client.GetUser(UserId);
+            return client.GetUser(userId);
         }
-        public static SocketChannel GetChannelFromID(ulong ChannelID)
+        public static SocketChannel GetChannelFromID(ulong channelID)
         {
-            return client.GetChannel(ChannelID);
+            return client.GetChannel(channelID);
         }
-        public static SocketGuild GetGuildFromChannel(IChannel Channel)
+        public static SocketGuild GetGuildFromChannel(IChannel channel)
         {
-            return ((SocketGuildChannel)Channel).Guild;
+            return ((SocketGuildChannel)channel).Guild;
         }
         public static SocketSelfUser GetSelf()
         {
@@ -511,9 +511,9 @@ namespace MEE7
         {
             return client.Guilds.ToArray();
         }
-        public static SocketGuild GetGuildFromID(ulong GuildID)
+        public static SocketGuild GetGuildFromID(ulong guildID)
         {
-            return client.GetGuild(GuildID);
+            return client.GetGuild(guildID);
         }
         public static void SetStatus(UserStatus usa)
         {
