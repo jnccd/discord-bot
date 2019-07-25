@@ -89,7 +89,7 @@ namespace MEE7.Commands
 
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("Operators:\n" +
-                "\> Concatinates functions\n" +
+                "\\> Concatinates functions\n" +
                 "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
                $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
@@ -126,10 +126,23 @@ namespace MEE7.Commands
         {
             List<Tuple<object[], EditCommand>> re = new List<Tuple<object[], EditCommand>>();
 
-            string input = message.Content.Remove(0, PrefixAndCommand.Length + 1);
-            IEnumerable<string> commands = input.
+            string input = message.Content.Remove(0, PrefixAndCommand.Length + 1).Trim(' ');
+            string[] commands = input.
                 Split(" > ").
-                Select(x => x.Trim(' '));
+                Select(x => x.Trim(' ')).ToArray();
+
+            if (input[0] == '"')
+            {
+                string pipeInput = input.GetEverythingBetween("\"", "\"");
+                if (message.Attachments.Count > 0 && (message.Attachments.First().Url.EndsWith(".mp3") || message.Attachments.First().Url.EndsWith(".wav")))
+                    commands[0] = $"thisA";
+                else if (pipeInput.EndsWith(".gif") || message.Attachments.Count > 0 && message.Attachments.First().Url.EndsWith(".gif"))
+                    commands[0] = $"thisG";
+                else if (pipeInput.EndsWith(".png") || pipeInput.EndsWith(".jpg"))
+                    commands[0] = $"thisP({pipeInput})";
+                else
+                    commands[0] = $"thisT({pipeInput})";
+            }
 
             foreach (string c in commands)
             {
