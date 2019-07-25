@@ -91,7 +91,8 @@ namespace MEE7.Commands
             HelpMenu.WithDescription("Operators:\n" +
                 "\\> Concatinates functions\n" +
                 "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
-               $"\neg. {PrefixAndCommand} thisT(omegaLUL) > swedish > Aestheticify\n" +
+                "\"\" Automatically choose a input function for your input\n" +
+               $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
             AddToHelpmenu("Input Commands", InputCommands);
             AddToHelpmenu("Text Commands", TextCommands);
