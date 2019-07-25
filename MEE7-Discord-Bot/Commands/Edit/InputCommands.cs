@@ -105,12 +105,6 @@ namespace MEE7.Commands
                     MemoryStream mem = new MemoryStream();
                     using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo((args[0] as string), "mp3"))
                     {
-                        while (true)
-                        {
-                            Task.Delay(1001).Wait();
-                            if (string.IsNullOrWhiteSpace(P.StandardError.ReadLine()))
-                                break;
-                        }
                         P.StandardOutput.BaseStream.CopyTo(mem);
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
                     }
