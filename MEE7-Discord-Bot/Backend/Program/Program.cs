@@ -183,7 +183,12 @@ namespace MEE7
                 if (commands[i].CommandLine.Contains(" ") || commands[i].Prefix.Contains(" "))
                     throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" + commands[i].Prefix + commands[i].CommandLine + "\" in " + commands[i]);
             }
-            commands = commands.OrderBy(x => x.CommandLine).ToArray();
+            commands = commands.OrderBy(x => {
+                if (x.CommandLine == "edit")
+                    return "00000";
+                else
+                    return x.CommandLine;
+            }).ToArray();
         }
         static void SetState()
         {
