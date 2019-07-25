@@ -82,7 +82,8 @@ namespace MEE7.Commands
             }
         }
 
-        public Edit() : base("edit", "Edit stuff using various functions")
+        public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
+            "\nFor more information just type $edit.")
         {
             Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
 
