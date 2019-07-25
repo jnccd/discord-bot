@@ -202,7 +202,7 @@ namespace MEE7
             helpMenu.WithColor(0, 128, 255);
             helpMenu.AddFieldDirectly($"{Prefix}help", $"Prints the HelpMenu for a Command" +
                 (commands.Where(x => x.HelpMenu != null).ToList().Count != 0 ?
-                $", eg. {Prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}" : "") +
+                $", eg. **{Prefix}help {commands.First(x => x.HelpMenu != null).CommandLine}**" : "") +
                 "\nCommands with a HelpMenu are marked with a (h)");
             for (int i = 0; i < commands.Length; i++)
             {
