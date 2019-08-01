@@ -20,7 +20,7 @@ namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
-        readonly IEnumerable<EditCommand> Commands;
+        IEnumerable<EditCommand> Commands;
         class PrintMethod
         {
             public Type Type;
@@ -85,7 +85,18 @@ namespace MEE7.Commands
         public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
             "\nFor more information just type **$edit**.")
         {
-            Commands = InputCommands.Union(TextCommands.Union(PictureCommands.Union(AudioCommands)));
+            Commands = new List<EditCommand>();
+            FieldInfo[] CommandLists = GetType().GetRuntimeFields().
+                Where(x => x.Name.EndsWith("Commands") && x.Name != "Commands" && x.FieldType == typeof(EditCommand[])).
+                OrderBy(x => {
+                    if (x.Name.StartsWith("Input"))
+                        return "0000";
+                    else
+                        return x.Name;
+                }).
+                ToArray();
+            foreach (FieldInfo f in CommandLists)
+                Commands = Commands.Union((EditCommand[])f.GetValue(this));
 
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithDescription("Operators:\n" +
@@ -94,10 +105,8 @@ namespace MEE7.Commands
                 "\"\" Automatically choose a input function for your input\n" +
                $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
-            AddToHelpmenu("Input Commands", InputCommands);
-            AddToHelpmenu("Text Commands", TextCommands);
-            AddToHelpmenu("Picture Commands", PictureCommands);
-            AddToHelpmenu("Audio Commands", AudioCommands);
+            foreach (FieldInfo f in CommandLists)
+                AddToHelpmenu(f.Name, (EditCommand[])f.GetValue(this));
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
