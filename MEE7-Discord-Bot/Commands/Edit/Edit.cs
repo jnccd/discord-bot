@@ -167,6 +167,7 @@ namespace MEE7.Commands
                 }
 
                 string[] args = arg.Split(',').Select(x => x.Trim(' ')).ToArray();
+                if (args.Length == 1 && args[0] == "") args = new string[0];
                 object[] parsedArgs = new object[command.Arguments.Length];
                 for (int i = 0; i < command.Arguments.Length; i++)
                     if (i < args.Length)
