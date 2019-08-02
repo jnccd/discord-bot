@@ -122,6 +122,7 @@ namespace MEE7.Commands
                 new Argument[] {
                     new Argument("Num States", typeof(int), 6),
                     new Argument("Num Symbols", typeof(int), 3),
+                    new Argument("Draw Machine?", typeof(bool), false),
                 },
                 (SocketMessage m, object[] args, object o) => {
 
@@ -135,9 +136,9 @@ namespace MEE7.Commands
                                 i,
                                 TuringColors[j % TuringColors.Length],
                                 Program.RDM.NextDouble() < 0.2 ? Program.RDM.Next(states) : i + 1 % states - 1,
-                                TuringColors[Program.RDM.Next(Math.Min(symbols, TuringColors.Length))], 
-                                Program.RDM.Next(5) - 2, 
-                                Program.RDM.Next(5) - 2));
+                                TuringColors[Program.RDM.Next(Math.Min(symbols, TuringColors.Length))],
+                                Program.RDM.NextDouble() < 0.5 ? -1 : 1,
+                                Program.RDM.NextDouble() < 0.5 ? -1 : 1));
 
                     int curState = 0;
                     Bitmap[] re = new Bitmap[120];
@@ -163,8 +164,6 @@ namespace MEE7.Commands
                         for (int k = 0; k < 50; k++)
                         {
                             var trans = transitions.FirstOrDefault(x => x.Item1 == curState && x.Item2.ToArgb() == curC.ToArgb());
-                            if (trans.Item3 >= states)
-                                ;
                             curState = trans.Item3;
                             curC = trans.Item4;
                             curX += trans.Item5;
