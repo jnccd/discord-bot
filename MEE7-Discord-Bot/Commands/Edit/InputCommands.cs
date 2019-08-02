@@ -13,6 +13,8 @@ using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
 using Color = System.Drawing.Color;
 using BumpKit;
+using QuickGraph;
+using QuickGraph.Graphviz;
 
 namespace MEE7.Commands
 {
@@ -139,6 +141,18 @@ namespace MEE7.Commands
                                 TuringColors[Program.RDM.Next(Math.Min(symbols, TuringColors.Length))],
                                 Program.RDM.NextDouble() < 0.5 ? -1 : 1,
                                 Program.RDM.NextDouble() < 0.5 ? -1 : 1));
+
+                    if ((bool)args[3])
+                    {
+                        Bitmap b = new Bitmap(1000, 1000);
+                        AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
+                        for (int i = 0; i < states; i++)
+                            a.AddVertex(i);
+                        foreach (var trans in transitions)
+                            a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
+                        GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
+                        v.Generate();
+                    }
 
                     int curState = 0;
                     Bitmap[] re = new Bitmap[120];
