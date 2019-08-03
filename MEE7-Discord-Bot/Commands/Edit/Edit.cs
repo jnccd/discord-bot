@@ -171,7 +171,14 @@ namespace MEE7.Commands
                 object[] parsedArgs = new object[command.Arguments.Length];
                 for (int i = 0; i < command.Arguments.Length; i++)
                     if (i < args.Length)
-                        parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]);
+                    {
+                        try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]); }
+                        catch
+                        {
+                            DiscordNETWrapper.SendText($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}", message.Channel).Wait();
+                            return null;
+                        }
+                    }
                     else if (command.Arguments[i].StandardValue == null)
                     {
                         DiscordNETWrapper.SendText($"[{cwoargs}] {command.Arguments[i].Name} requires a value!", message.Channel).Wait();
