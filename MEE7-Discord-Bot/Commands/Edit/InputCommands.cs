@@ -154,7 +154,7 @@ namespace MEE7.Commands
                     //    v.Generate();
                     //}
 
-                    Bitmap[] re = new Bitmap[120];
+                    Bitmap[] re = new Bitmap[100];
 
                     int curState = 0;
                     int curSymbol = 0;
@@ -195,6 +195,7 @@ namespace MEE7.Commands
         
         enum Direction { Up, Down, Left, Right }
         static Color[] TuringColors = new Color[] { Color.Black, Color.White, Color.Red, Color.Green, Color.Yellow, Color.Purple, Color.Blue, Color.Brown, Color.Gold, Color.Gray };
+
         private static string GetPictureLinkFromMessage(SocketMessage m, string arguments)
         {
             string pic = null;
