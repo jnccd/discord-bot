@@ -130,71 +130,70 @@ namespace MEE7.Commands
 
                     int states = (int)args[0];
                     int symbols = (int)args[1];
-                    List<Tuple<int, Color, int, Color, int, int>> transitions = new List<Tuple<int, Color, int, Color, int, int>>();
+
+                    int sizeX = 600, sizeY = sizeX;
+
+                    Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
 
                     for (int i = 0; i < states; i++)
                         for (int j = 0; j < symbols; j++)
-                            transitions.Add(new Tuple<int, Color, int, Color, int, int>(
-                                i,
-                                TuringColors[j % TuringColors.Length],
-                                Program.RDM.NextDouble() < 0.2 ? Program.RDM.Next(states) : i + 1 % states - 1,
-                                TuringColors[Program.RDM.Next(Math.Min(symbols, TuringColors.Length))],
-                                Program.RDM.NextDouble() < 0.5 ? -1 : 1,
-                                Program.RDM.NextDouble() < 0.5 ? -1 : 1));
+                            transitions[i, j] = new Tuple<int, int, Direction>(
+                                Program.RDM.Next(states),
+                                Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
+                                (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
 
-                    if ((bool)args[3])
-                    {
-                        Bitmap b = new Bitmap(1000, 1000);
-                        AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
-                        for (int i = 0; i < states; i++)
-                            a.AddVertex(i);
-                        foreach (var trans in transitions)
-                            a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
-                        GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
-                        v.Generate();
-                    }
+                    //if ((bool)args[3])
+                    //{
+                    //    Bitmap b = new Bitmap(1000, 1000);
+                    //    AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
+                    //    for (int i = 0; i < states; i++)
+                    //        a.AddVertex(i);
+                    //    foreach (var trans in transitions)
+                    //        a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
+                    //    GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
+                    //    v.Generate();
+                    //}
 
-                    int curState = 0;
                     Bitmap[] re = new Bitmap[120];
 
-                    int curX;
-                    int curY;
-                    Color curC;
-                    re[0] = new Bitmap(100, 100);
-                    using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[0]))
-                    {
-                        curX = re[0].Width / 2;
-                        curY = re[0].Height / 2;
-                        for (int x = 0; x < re[0].Width; x++)
-                            for (int y = 0; y < re[0].Height; y++)
-                                c.SetPixel(x, y, Color.White);
-                        curC = c.GetPixel(curX, curY);
-                    }
+                    int curState = 0;
+                    int curSymbol = 0;
+                    int[,] curTape = new int[sizeX, sizeY];
+                    int curX = sizeX / 2;
+                    int curY = sizeY / 2;
                     
-                    for (int i = 1; i < re.Length; i++)
+                    for (int i = 0; i < re.Length; i++)
                     {
-                        re[i] = (Bitmap)re[i - 1].Clone();
-
-                        for (int k = 0; k < 50; k++)
+                        for (int k = 0; k < 500; k++)
                         {
-                            var trans = transitions.FirstOrDefault(x => x.Item1 == curState && x.Item2.ToArgb() == curC.ToArgb());
-                            curState = trans.Item3;
-                            curC = trans.Item4;
-                            curX += trans.Item5;
-                            curY += trans.Item6;
-                            if (curX >= re[i].Width) curX = 0;
-                            if (curY >= re[i].Height) curY = 0;
-                            if (curX < 0) curX = re[i].Width - 1;
-                            if (curY < 0) curY = re[i].Height - 1;
-                            using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
-                                c.SetPixel(curX, curY, curC);
+                            var trans = transitions[curState, curSymbol];
+                            curState = trans.Item1;
+                            curSymbol = trans.Item2;
+                            curTape[curX,curY] = curSymbol;
+                            
+                            if (trans.Item3 == Direction.Down) curY++;
+                            else if (trans.Item3 == Direction.Up) curY--;
+                            else if (trans.Item3 == Direction.Left) curX--;
+                            else if (trans.Item3 == Direction.Right) curX++;
+
+                            if (curX >= sizeX) curX = 0;
+                            if (curY >= sizeY) curY = 0;
+                            if (curX < 0) curX = sizeX - 1;
+                            if (curY < 0) curY = sizeY - 1;
                         }
+
+                        re[i] = new Bitmap(sizeX, sizeY);
+                        using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
+                        for (int x = 0; x < sizeX; x++)
+                            for (int y = 0; y < sizeY; y++)
+                                c.SetPixel(x,y,TuringColors[curTape[x,y]]);
                     }
 
-                    return re.ToArray();
+                    return re;
             }),
         };
         
+        enum Direction { Up, Down, Left, Right }
         static Color[] TuringColors = new Color[] { Color.Black, Color.White, Color.Red, Color.Green, Color.Yellow, Color.Purple, Color.Blue, Color.Brown, Color.Gold, Color.Gray };
         private static string GetPictureLinkFromMessage(SocketMessage m, string arguments)
         {
