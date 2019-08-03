@@ -16,7 +16,7 @@ namespace MEE7.Backend.HelperFunctions
             Saver.SaveChannel(Channel);
             return await Channel.SendFileAsync(path, text);
         }
-        public static async Task<IUserMessage> SendFile(Stream stream, IMessageChannel Channel, string fileEnd, string fileName = "", string text = "-")
+        public static async Task<IUserMessage> SendFile(Stream stream, IMessageChannel Channel, string fileEnd, string fileName = "", string text = "")
         {
             Saver.SaveChannel(Channel);
             if (fileName == "")
