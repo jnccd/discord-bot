@@ -31,7 +31,7 @@ namespace MEE7.Commands
 
             }),
             new PrintMethod(typeof(Bitmap), (SocketMessage m, object o) => {
-                 var b = o as Bitmap;
+                var b = o as Bitmap;
                 DiscordNETWrapper.SendBitmap(b, m.Channel).Wait();
                 b.Dispose();
 

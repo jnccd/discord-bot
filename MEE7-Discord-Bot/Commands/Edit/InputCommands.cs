@@ -131,7 +131,7 @@ namespace MEE7.Commands
                     int states = (int)args[0];
                     int symbols = (int)args[1];
 
-                    int sizeX = 600, sizeY = sizeX;
+                    int sizeX = 300, sizeY = sizeX;
 
                     Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
 
@@ -142,17 +142,25 @@ namespace MEE7.Commands
                                 Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
                                 (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
 
-                    //if ((bool)args[3])
-                    //{
-                    //    Bitmap b = new Bitmap(1000, 1000);
-                    //    AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
-                    //    for (int i = 0; i < states; i++)
-                    //        a.AddVertex(i);
-                    //    foreach (var trans in transitions)
-                    //        a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
-                    //    GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
-                    //    v.Generate();
-                    //}
+                    if ((bool)args[2])
+                    {
+                        string machine = $"States: {Enumerable.Range(0,states).Select(x => x.ToString()).Combine()}" +
+                            $"Symbols: {Enumerable.Range(0,Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
+                            $"Transitions: ";
+                        for (int i = 0; i < states; i++)
+                            for (int j = 0; j < symbols; j++)
+                                machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
+                        DiscordNETWrapper.SendText(machine, m.Channel).Wait();
+
+                        //Bitmap b = new Bitmap(1000, 1000);
+                        //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
+                        //for (int i = 0; i < states; i++)
+                        //    a.AddVertex(i);
+                        //foreach (var trans in transitions)
+                        //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
+                        //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
+                        //v.Generate();
+                    }
 
                     Bitmap[] re = new Bitmap[100];
 
