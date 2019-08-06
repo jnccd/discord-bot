@@ -28,7 +28,7 @@ namespace MEE7.Commands
                     for (int x = 0; x < bmp.Width; x++)
                         for (int y = 0; y < bmp.Height; y++)
                         {
-                            Color c = bmp.GetPixel(x, y);
+                            Color c = con.GetPixel(x, y);
                             c = Color.FromArgb(c.B, c.R, c.G);
                             con.SetPixel(x, y, c);
                         }
@@ -44,7 +44,7 @@ namespace MEE7.Commands
                     for (int x = 0; x < bmp.Width; x++)
                         for (int y = 0; y < bmp.Height; y++)
                         {
-                            Color c = bmp.GetPixel(x, y);
+                            Color c = con.GetPixel(x, y);
                             c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
                             con.SetPixel(x, y, c);
                         }
@@ -362,6 +362,24 @@ namespace MEE7.Commands
                     re[i] = b.RotateImage(-stepWidth * i, middle);
 
                 return re;
+            }),
+            new EditCommand("chromaticAbberation", "Shifts the color spaces", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Intensity", typeof(int), 4) },
+                (SocketMessage m, object[] a, object o) => {
+
+                    Bitmap bmp = (o as Bitmap);
+                    int intesity = (int)a[0];
+
+                    using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                        for (int x = 0; x < bmp.Width; x++)
+                            for (int y = 0; y < bmp.Height; y++)
+                            {
+                                Color r = con.GetPixel(x + intesity > bmp.Width - 1 ? bmp.Width - 1 : x + intesity, y);
+                                Color g = con.GetPixel(x, y);
+                                Color b = con.GetPixel(x - intesity < 0 ? 0 : x - intesity, y);
+                                con.SetPixel(x, y, Color.FromArgb(r.R, g.G, b.B));
+                            }
+
+                    return bmp;
             }),
         };
 
