@@ -17,20 +17,29 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
 {
     public class SPLatexCD : Command
     {
+        bool run = true;
         readonly static string 
             gitdir = $"{Program.ExePath}Commands\\SoftwareProjektLatexCD\\", 
             batchPath = gitdir + "run.bat",
-            latexOutDir = gitdir + "SoSe19_HRS3_105b\\pflichten\\LaTeX\\output.pdf";
+            latexOutDir = gitdir + "SoSe19_HRS3_105b\\pflichten\\LaTeX\\";
+        IMessageChannel channel;
 
-        public SPLatexCD() : base("", "", false, true)
+        public SPLatexCD() : base("SPLatexCD", "", false, true)
         {
+            Program.OnConnected += OnConnected;
+            
             Task.Run(() => {
-                while (true)
+                while (run)
                 {
                     PullBuildSend();
-                    Thread.Sleep(15 * 60 * 1000);
+                    Thread.Sleep(1 * 60 * 1000);
                 }
             });
+        }
+
+        public void OnConnected()
+        {
+            channel = (IMessageChannel)Program.GetChannelFromID(500759857205346304);
         }
 
         public void PullBuildSend()
@@ -38,7 +47,7 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
             lock (this)
             {
                 string gitput; bool error = false;
-                IMessageChannel channel = (IMessageChannel)Program.GetChannelFromID(500759857205346304);
+                
 
                 if (string.IsNullOrWhiteSpace(Config.Data.ExtraStuff))
                     return;
@@ -60,14 +69,30 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
                     return;
                 }
 
-                Process.Start(new ProcessStartInfo() { FileName = batchPath, UseShellExecute = false, CreateNoWindow = true });
+                P = Process.Start(new ProcessStartInfo() { FileName = batchPath, UseShellExecute = false, CreateNoWindow = true });
+                P.WaitForExit();
 
-                DiscordNETWrapper.SendFile(latexOutDir, channel).Wait();
+                DiscordNETWrapper.SendFile(latexOutDir + "output.pdf", channel).Wait();
+
+                File.Delete(latexOutDir + "output.pdf");
+                File.Delete(latexOutDir + "output.out");
+                File.Delete(latexOutDir + "output.aux");
+                File.Delete(latexOutDir + "output.toc");
+                File.Delete(latexOutDir + "output.log");
             }
         }
 
         public override void Execute(SocketMessage message)
         {
+            string[] input = message.Content.Split(new char[] { ' ', '\n' });
+            if (input.Length > 1)
+            {
+                if (input[1] == "-stop" && message.Author.Id == Program.Master.Id)
+                {
+                    run = false;
+                }
+            }
+
             PullBuildSend();
         }
     }
