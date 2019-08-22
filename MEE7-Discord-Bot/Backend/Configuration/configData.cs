@@ -28,6 +28,7 @@ namespace MEE7.Configuration
         public string TwtichClientID;
         public string TwitchAPIClientID;
         public string TwitchAPIAccessToken;
+        public string ExtraStuff;
 
         public ConfigData()
         {
