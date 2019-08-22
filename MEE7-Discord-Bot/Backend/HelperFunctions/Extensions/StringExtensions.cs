@@ -233,7 +233,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             return s.Count() == 0 ? "" : s.Foldl("", (x, y) => x + combinator + y).Remove(0, combinator.Length);
         }
         public static void RunAsConsoleCommand(this string command, int TimeLimitInSeconds, Action TimeoutEvent, Action<string, string> ExecutedEvent,
-            Action<StreamWriter> RunEvent = null)
+            Action<StreamWriter> RunEvent = null, string WorkingDir = "", Process compiler = null)
         {
             bool exited = false;
             string[] split = command.Split(' ');
@@ -241,14 +241,17 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             if (split.Length == 0)
                 return;
 
-            Process compiler = new Process();
+            if (compiler == null)
+                compiler = new Process();
             compiler.StartInfo.FileName = split.First();
-            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y);
+            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y).Trim(' ');
             compiler.StartInfo.CreateNoWindow = true;
             compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             compiler.StartInfo.RedirectStandardInput = true;
             compiler.StartInfo.RedirectStandardOutput = true;
             compiler.StartInfo.RedirectStandardError = true;
+            if (!string.IsNullOrWhiteSpace(WorkingDir))
+                compiler.StartInfo.WorkingDirectory = WorkingDir;
             compiler.Start();
 
             Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
@@ -259,8 +262,11 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
                 compiler.WaitForExit();
 
-                string o = compiler.StandardOutput.ReadToEnd();
-                string e = compiler.StandardError.ReadToEnd();
+                string o = "";
+                string e = "";
+
+                try { o = compiler.StandardOutput.ReadToEnd(); } catch { }
+                try { e = compiler.StandardError.ReadToEnd(); } catch { }
 
                 exited = true;
                 ExecutedEvent(o, e);
