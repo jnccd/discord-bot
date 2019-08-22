@@ -32,14 +32,14 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
                 while (run)
                 {
                     PullBuildSend();
-                    Thread.Sleep(1 * 60 * 1000);
+                    Thread.Sleep(15 * 60 * 1000);
                 }
             });
         }
 
         public void OnConnected()
         {
-            channel = (IMessageChannel)Program.GetChannelFromID(500759857205346304);
+            channel = (IMessageChannel)Program.GetChannelFromID(614191561009397798);
         }
 
         public void PullBuildSend()
@@ -90,6 +90,7 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
                 if (input[1] == "-stop" && message.Author.Id == Program.Master.Id)
                 {
                     run = false;
+                    return;
                 }
             }
 
