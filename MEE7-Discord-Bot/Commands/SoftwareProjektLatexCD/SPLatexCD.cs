@@ -28,13 +28,13 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
         {
             Program.OnConnected += OnConnected;
             
-            Task.Run(() => {
-                while (run)
-                {
-                    PullBuildSend();
-                    Thread.Sleep(15 * 60 * 1000);
-                }
-            });
+            //Task.Run(() => {
+            //    while (run)
+            //    {
+            //        PullBuildSend();
+            //        Thread.Sleep(15 * 60 * 1000);
+            //    }
+            //});
         }
 
         public void OnConnected()
@@ -72,13 +72,24 @@ namespace MEE7.Commands.SoftwareProjektLatexCD
                 P = Process.Start(new ProcessStartInfo() { FileName = batchPath, UseShellExecute = false, CreateNoWindow = true });
                 P.WaitForExit();
 
-                DiscordNETWrapper.SendFile(latexOutDir + "output.pdf", channel).Wait();
+                try
+                {
+                    DiscordNETWrapper.SendFile(latexOutDir + "output.pdf", channel).Wait();
+                }
+                catch
+                {
+                    DiscordNETWrapper.SendText("Building the latex project didn't result in a output file!", channel).Wait();
+                }
 
-                File.Delete(latexOutDir + "output.pdf");
-                File.Delete(latexOutDir + "output.out");
-                File.Delete(latexOutDir + "output.aux");
-                File.Delete(latexOutDir + "output.toc");
-                File.Delete(latexOutDir + "output.log");
+                try
+                {
+                    File.Delete(latexOutDir + "output.pdf");
+                    File.Delete(latexOutDir + "output.out");
+                    File.Delete(latexOutDir + "output.aux");
+                    File.Delete(latexOutDir + "output.toc");
+                    File.Delete(latexOutDir + "output.log");
+                }
+                catch { }
             }
         }
 
