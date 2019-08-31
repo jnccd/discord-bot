@@ -59,10 +59,5 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             v.Y = v.Y / l;
             return v;
         }
-
-        internal static float ModifiedLevenshteinDistance(string v1, string v2)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
