@@ -221,7 +221,7 @@ namespace MEE7
                         float[] distances = new float[commands.Length];
                         for (int i = 0; i < commands.Length; i++)
                             if (commands[i].CommandLine != "" && !commands[i].IsHidden)
-                                distances[i] = Extensions.ModifiedLevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
+                                distances[i] = StringExtensions.ModifiedLevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
                             else
                                 distances[i] = int.MaxValue;
                         int minIndex = 0;
