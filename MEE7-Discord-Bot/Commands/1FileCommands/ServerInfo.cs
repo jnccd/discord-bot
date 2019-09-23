@@ -54,6 +54,12 @@ namespace MEE7.Commands
             info.AddFieldDirectly("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles", true);
             info.AddFieldDirectly("User with the longest name:", g.Users.MaxElement(x => x.GetDisplayName().Length), true);
             
+            info.AddFieldDirectly("Played Games: ", (from user in g.Users
+                                                     where user.Activity != null && user.Activity.Type == ActivityType.Playing
+                                                     group user by user.Activity.Name into x
+                                                     select $"[{x.Count()}]{x.Key}").
+                                                    Aggregate((x, y) => x + "\n" + y), true);
+            
             DiscordNETWrapper.SendEmbed(info, message.Channel).Wait();
 
             return;
