@@ -81,7 +81,13 @@ namespace MEE7.Backend
             // 4 - Floating Numbers
             () => {
                 ConsoleWrapper.ConsoleWriteLine(1 / 6f);
-            }
+            },
+            // 5 - Give everyone Likes Spam
+            () => {
+                var uniServer = Program.GetGuildFromID(479950092938248193);
+                foreach (var user in uniServer.Users)
+                    try {user.AddRoleAsync(uniServer.GetRole(552459506895028225)).Wait();} catch{}
+            },
         };
     }
 }

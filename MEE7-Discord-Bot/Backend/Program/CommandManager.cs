@@ -46,6 +46,8 @@ namespace MEE7
         public static event EmojiReactionRemovedHandler OnEmojiReactionRemoved;
         public delegate void EmojiReactionUpdatedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
         public static event EmojiReactionUpdatedHandler OnEmojiReactionUpdated;
+        public delegate void UserJoinedHandler(SocketGuildUser arg);
+        public static event UserJoinedHandler OnUserJoined;
 
         static List<Tuple<RestUserMessage, Exception>> cachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
         static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
@@ -165,6 +167,11 @@ namespace MEE7
                     catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
+            return Task.FromResult(default(object));
+        }
+        private static Task Client_UserJoined(SocketGuildUser arg)
+        {
+            OnUserJoined?.InvokeParallel(arg);
             return Task.FromResult(default(object));
         }
         private static Task MessageReceived(SocketMessage message)
