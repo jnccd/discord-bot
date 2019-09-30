@@ -149,6 +149,7 @@ namespace MEE7
             client.MessageReceived += MessageReceived;
             client.ReactionAdded += Client_ReactionAdded;
             client.ReactionRemoved += Client_ReactionRemoved;
+            client.UserJoined += Client_UserJoined;
         }
         static void Login()
         {
