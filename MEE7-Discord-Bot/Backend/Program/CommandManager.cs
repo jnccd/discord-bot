@@ -119,12 +119,8 @@ namespace MEE7
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-                    var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
-                    reacts.TryGetValue(errorEmoji, out var react);
-                    if (react.ReactionCount > 1)
+                    if (arg3.User.GetValueOrDefault().Id == Master.Id)
                         await error.Item1.ModifyAsync(m => m.Content = errorMessage + "\n\n```" + error.Item2 + "```");
-                    else
-                        await error.Item1.ModifyAsync(m => m.Content = errorMessage);
                 }
             });
             if (arg3.UserId != OwnID)
@@ -148,11 +144,7 @@ namespace MEE7
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-                    var reacts = (await arg1.GetOrDownloadAsync()).Reactions;
-                    reacts.TryGetValue(errorEmoji, out var react);
-                    if (react.ReactionCount > 1)
-                        await error.Item1.ModifyAsync(m => m.Content = errorMessage + "\n\n```" + error.Item2 + "```");
-                    else
+                    if (arg3.User.GetValueOrDefault().Id == Master.Id)
                         await error.Item1.ModifyAsync(m => m.Content = errorMessage);
                 }
             });
