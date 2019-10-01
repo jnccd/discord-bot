@@ -20,6 +20,16 @@
     <EmbeddedResource Remove="Commands\HelperClasses\**" />
     <None Remove="Commands\HelperClasses\**" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Commands\Haskell\Haskell.cs" />
+    <Compile Remove="Commands\Latex\Latex.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Commands\Haskell\Haskell.cs" />
+    <None Include="Commands\Latex\Latex.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="AnimatedGif" Version="1.0.5" />
