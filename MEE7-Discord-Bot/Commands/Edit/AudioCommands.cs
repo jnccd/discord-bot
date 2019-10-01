@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using NAudio.Wave.SampleProviders;
 
 namespace MEE7.Commands
 {
@@ -77,6 +78,19 @@ namespace MEE7.Commands
                 return output;
 
             }),
+            //new EditCommand("pitch", "Adds a Pitch to the sound", typeof(WaveStream), typeof(IWaveProvider), new Argument[] { new Argument("PitchFactor", typeof(float), null) }, 
+            //        (SocketMessage m, object[] args, object o) => {
+
+            //            SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider((o as WaveStream).ToSampleProvider()) 
+            //            { 
+            //                PitchFactor = (float)args[0] 
+            //            };
+            //            return pitch.ToWaveProvider();
+
+            //            Stream s = new MemoryStream();
+            //            WaveFileWriter.WriteWavFileToStream(s, pitch.ToWaveProvider());
+            //            return new RawSourceWaveStream(s, new WaveFormat());
+            //}),
         };
     }
 }

@@ -251,6 +251,7 @@ namespace MEE7.Commands
         void PrintPipeOutput(object output, SocketMessage message)
         {
             if (output == null) return;
+            
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }
