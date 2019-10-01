@@ -318,7 +318,7 @@ namespace MEE7.Commands
             new EditCommand("transRights", "The input image says trans rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, o as Bitmap);
             }),
-            new EditCommand("rainbow", "I'll try spinning colors that's a good trick!", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
+            new EditCommand("rainbow", "I'll try spinning colors that's a good trick!", typeof(Bitmap), typeof(Bitmap[]), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 Bitmap b = o as Bitmap;
                 Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
                 int[,] Alphas = new int[b.Width, b.Height];
@@ -351,7 +351,7 @@ namespace MEE7.Commands
 
                 return re;
             }),
-            new EditCommand("spinToWin", "I'll try spinning that's a good trick!", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
+            new EditCommand("spinToWin", "I'll try spinning that's a good trick!", typeof(Bitmap), typeof(Bitmap[]), new Argument[0], (SocketMessage m, object[] a, object o) => {
                 Bitmap b = o as Bitmap;
                 Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
 
