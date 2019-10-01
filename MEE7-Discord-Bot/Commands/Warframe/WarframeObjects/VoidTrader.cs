@@ -57,12 +57,12 @@ namespace WarframeNET
         /// <summary>
         /// Cost in ducats.
         /// </summary>
-        public int Ducats { get; set; }
+        public int? Ducats { get; set; }
 
         /// <summary>
         /// Cost in credit.
         /// </summary>
-        public int Credits { get; set; }
+        public int? Credits { get; set; }
 
         internal VoidTraderItem() { }
     }

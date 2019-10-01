@@ -6,14 +6,14 @@ namespace WarframeNET
     {
         public string Id { get; set; }
         public DateTime Expiry { get; set; }
-        public bool IsDay { get; set; }
+        public bool? IsDay { get; set; }
         public string TimeLeft { get; set; }
-        public bool IsCetus { get; set; }
+        public bool? IsCetus { get; set; }
         public string ShortString { get; set; }
 
         public string TimeOfDay()
         {
-            return IsDay ? "Day" : "Night";
+            return IsDay.Value ? "Day" : "Night";
         }
     }
 }

@@ -22,22 +22,22 @@ namespace WarframeNET
         /// <summary>
         /// Original price of the item.
         /// </summary>
-        public int OriginalPrice { get; set; }
+        public int? OriginalPrice { get; set; }
 
         /// <summary>
         /// Sale price of the item.
         /// </summary>
-        public int SalePrice { get; set; }
+        public int? SalePrice { get; set; }
 
         /// <summary>
         /// Quantity of available items.
         /// </summary>
-        public int Total { get; set; }
+        public int? Total { get; set; }
 
         /// <summary>
         /// Amount of sold items.
         /// </summary>
-        public int Sold { get; set; }
+        public int? Sold { get; set; }
 
         /// <summary>
         /// End time of the deal.

@@ -8,7 +8,7 @@
         /// <summary>
         /// Count of the resource.
         /// </summary>
-        public int Count { get; set; }
+        public int? Count { get; set; }
 
         /// <summary>
         /// Type of the resource.

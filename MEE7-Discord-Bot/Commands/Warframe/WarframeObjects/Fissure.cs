@@ -38,7 +38,7 @@ namespace WarframeNET
         /// Tier number of the fissure.
         /// </summary>
         [JsonProperty("tierNum")]
-        public int TierNumber { get; set; }
+        public int? TierNumber { get; set; }
 
         /// <summary>
         /// Fissure start time.

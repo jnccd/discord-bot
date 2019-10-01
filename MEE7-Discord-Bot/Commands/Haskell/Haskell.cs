@@ -17,10 +17,7 @@ namespace MEE7.Commands
     {
         readonly string inputPath = "Commands\\Haskell\\input.hs";
 
-        public Haskell() : base("ghc", "Haskell Interpreter", false)
-        {
-
-        }
+        public Haskell() : base("ghc", "Haskell Interpreter", false) { }
 
         public override void Execute(SocketMessage message)
         {
@@ -65,8 +62,6 @@ namespace MEE7.Commands
                 }
                 catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e, ConsoleColor.Red); }
             }
-
-            return;
         }
     }
 }

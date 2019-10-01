@@ -37,7 +37,7 @@ namespace WarframeNET
         /// Maximum enemy level.
         /// </summary>
         [JsonProperty("maxEnemyLevel")]
-        public int EnemyMaxLevel { get; set; }
+        public int? EnemyMaxLevel { get; set; }
 
         /// <summary>
         /// Is the mission a nightmare?
@@ -55,7 +55,7 @@ namespace WarframeNET
         /// Maximum number of waves.
         /// </summary>
         [JsonProperty("maxWaveNum")]
-        public int WaveMaxNumber { get; set; }
+        public int? WaveMaxNumber { get; set; }
 
         internal Mission() { }
     }

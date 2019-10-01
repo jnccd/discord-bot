@@ -20,7 +20,7 @@ namespace WarframeNET
         /// <summary>
         /// Rank of the enemy.
         /// </summary>
-        public int Rank { get; set; }
+        public int? Rank { get; set; }
 
         /// <summary>
         /// Region of the enemy.
@@ -35,17 +35,17 @@ namespace WarframeNET
         /// <summary>
         /// Current HP.
         /// </summary>
-        public float HealthPercent { get; set; }
+        public float? HealthPercent { get; set; }
 
         /// <summary>
         /// Has the enemy been discovered?
         /// </summary>
-        public bool IsDiscovered { get; set; }
+        public bool? IsDiscovered { get; set; }
 
         /// <summary>
         /// Is the enemy using ticketing?
         /// </summary>
-        public bool IsUsingTicketing { get; set; }
+        public bool? IsUsingTicketing { get; set; }
 
         /// <summary>
         /// Last location of the enemy if discovered.

@@ -74,7 +74,7 @@ namespace WarframeNET
         /// <summary>
         /// Maximum score yet.
         /// </summary>
-        public int MaximumScore { get; set; }
+        public int? MaximumScore { get; set; }
 
         internal Event() { }
     }

@@ -28,7 +28,7 @@ namespace WarframeNET
         /// Is the invasion versus infected?
         /// </summary>
         [JsonProperty("vsInfestation")]
-        public bool IsVsInfestation { get; set; }
+        public bool? IsVsInfestation { get; set; }
 
         /// <summary>
         /// Attacking faction of the invasion.
@@ -59,23 +59,23 @@ namespace WarframeNET
         /// <summary>
         /// Count of invasions.
         /// </summary>
-        public int Count { get; set; }
+        public int? Count { get; set; }
 
         /// <summary>
         /// Required runs for the invasion.
         /// </summary>
-        public int RequiredRuns { get; set; }
+        public int? RequiredRuns { get; set; }
 
         /// <summary>
         /// Current completion of the invasion.
         /// </summary>
-        public float Completion { get; set; }
+        public float? Completion { get; set; }
 
         /// <summary>
         /// Is the invasion completed?
         /// </summary>
         [JsonProperty("completed")]
-        public bool IsCompleted { get; set; }
+        public bool? IsCompleted { get; set; }
 
         internal Invasion() { }
     }

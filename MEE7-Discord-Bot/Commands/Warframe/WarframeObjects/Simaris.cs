@@ -17,7 +17,7 @@ namespace WarframeNET
         /// Is the target still active?
         /// </summary>
         [Obsolete("This property is deprecated.")]
-        public bool IsTargetActive { get; set; }
+        public bool? IsTargetActive { get; set; }
 
         internal Simaris() { }
     }

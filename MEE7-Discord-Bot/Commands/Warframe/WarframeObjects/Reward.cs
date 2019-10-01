@@ -20,7 +20,7 @@ namespace WarframeNET
         /// <summary>
         /// Credits rewarded.
         /// </summary>
-        public int Credits { get; set; }
+        public int? Credits { get; set; }
 
         internal Reward() { }
     }
