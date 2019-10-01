@@ -532,8 +532,9 @@ namespace MEE7
                 return GetSelf().Id;
             }
         }
-        
+
         // Execute BeforeClose before closing
+        static ConsoleEventDelegate handler;
         static bool ConsoleEventCallback(int eventType)
         {
             if (eventType == 2 && !exitedNormally)
@@ -544,7 +545,6 @@ namespace MEE7
             Thread.Sleep(250);
             return false;
         }
-        static ConsoleEventDelegate handler;   // Keeps it from getting garbage collected
         private delegate bool ConsoleEventDelegate(int eventType);
         
         // Imports

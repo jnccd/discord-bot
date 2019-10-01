@@ -21,7 +21,7 @@ namespace WarframeNET
         /// <summary>
         /// Discount on the price.
         /// </summary>
-        public int Discount { get; set; }
+        public int? Discount { get; set; }
 
         /// <summary>
         /// End time of the flash sale.
@@ -32,17 +32,17 @@ namespace WarframeNET
         /// <summary>
         /// Override for premium.
         /// </summary>
-        public int PremiumOverride { get; set; }
+        public int? PremiumOverride { get; set; }
 
         /// <summary>
         /// Is the item featured?
         /// </summary>
-        public bool IsFeatured { get; set; }
+        public bool? IsFeatured { get; set; }
 
         /// <summary>
         /// Is the item popular?
         /// </summary>
-        public bool IsPopular { get; set; }
+        public bool? IsPopular { get; set; }
 
         internal FlashSale() { }
     }

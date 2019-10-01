@@ -22,7 +22,7 @@ namespace WarframeNET
         /// <summary>
         /// Is controlled by an alliance?
         /// </summary>
-        public bool IsAlliance { get; set; }
+        public bool? IsAlliance { get; set; }
 
         /// <summary>
         /// Name of the deployer.
@@ -43,62 +43,6 @@ namespace WarframeNET
         /// MOTD of the defender.
         /// </summary>
         public string DefenderMOTD { get; set; }
-
-        /// <summary>
-        /// Number of defenders remaining.
-        /// </summary>
-        public int DefenderPoolRemaining { get; set; }
-
-        /// <summary>
-        /// Defender's max amount of defenders.
-        /// </summary>
-        public int DefenderMaxPool { get; set; }
-
-        /// <summary>
-        /// Current health of the defender's rail.
-        /// </summary>
-        [Obsolete("This property has been disabled due to incompatibility.")]
-        [JsonIgnore]
-        public double DefenderRailHealReserve { get; set; }
-
-
-        /// <summary>
-        /// Start time of the defender's deployement.
-        /// </summary>
-        //[JsonProperty("defenderDeployemntActivation")]
-        [Obsolete("This property has been disabled due to incompatibility.")]
-        [JsonIgnore]
-        public DateTime DefenderStartTime { get; set; }
-
-        /// <summary>
-        /// Credit tax rate.
-        /// </summary>
-        public int CreditTaxRate { get; set; }
-
-        /// <summary>
-        /// Items tax rate.
-        /// </summary>
-        public int ItemsTaxRate { get; set; }
-
-        /// <summary>
-        /// Clan member's items tax rate.
-        /// </summary>
-        public int MemberItemsTaxRate { get; set; }
-
-        /// <summary>
-        /// Damage per mission.
-        /// </summary>
-        public int DamagePerMission { get; set; }
-
-        /// <summary>
-        /// Battle pay reserve.
-        /// </summary>
-        public int BattlePayReserve { get; set; }
-
-        /// <summary>
-        /// Per mission battle pay.
-        /// </summary>
-        public int PerMissionBattlePay { get; set; }
 
         /// <summary>
         /// Who set the battle pay.
@@ -147,7 +91,7 @@ namespace WarframeNET
         /// Were the defenders an alliance?
         /// </summary>
         [JsonProperty("defenderIsAlliance")]
-        public bool IsDefenderAlliance { get; set; }
+        public bool? IsDefenderAlliance { get; set; }
 
         /// <summary>
         /// Who attacked.
@@ -158,7 +102,7 @@ namespace WarframeNET
         /// Were the attackers an alliance.
         /// </summary>
         [JsonProperty("attackerIsAlliance")]
-        public bool IsAttackerAlliance { get; set; }
+        public bool? IsAttackerAlliance { get; set; }
 
         /// <summary>
         /// Who won the battle

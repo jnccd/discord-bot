@@ -143,7 +143,7 @@ namespace MEE7.Commands
                     EmbedBuilder invasions = new EmbedBuilder();
                     invasions.WithColor(0, 128, 255);
                     invasions.WithTitle("Invasions:");
-                    foreach (Invasion inv in WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted))
+                    foreach (Invasion inv in WarframeHandler.worldState.WS_Invasions.Where(x => !x.IsCompleted ?? false))
                         invasions.AddFieldDirectly($"{inv.AttackingFaction}({ToTitle(inv.AttackerReward)}) vs. {inv.DefendingFaction}({ToTitle(inv.DefenderReward)})",
                             $"{inv.Node} - {inv.Description} - {inv.Completion}%");
                     re.Add(invasions);
@@ -185,7 +185,7 @@ namespace MEE7.Commands
                     nightwave.WithDescription($"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
                         $"{WarframeHandler.worldState.WS_NightWave.Phase}");
                     foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
-                        nightwave.AddFieldDirectly($"{(x.IsDaily ? "[Daily] " : "")}{(x.IsElite ? "[Elite] " : "")}{x.Title} - {x.Desc}", 
+                        nightwave.AddFieldDirectly($"{(x.IsDaily ?? false ? "[Daily] " : "")}{(x.IsElite ?? false ? "[Elite] " : "")}{x.Title} - {x.Desc}", 
                             $"{x.Reputation} :arrow_up: until {x.Expiry}");
                     re.Add(nightwave);
                 }
@@ -316,7 +316,7 @@ namespace MEE7.Commands
                     notifications.Add(ToTitle(a) + " - Expires at " + a.EndTime.ToLocalTime().ToLongTimeString() + ", so in " + (int)(a.EndTime.ToLocalTime() - DateTime.Now).TotalMinutes + " minutes");
                 }
             foreach (Invasion i in WarframeHandler.worldState.WS_Invasions)
-                if (!Config.Data.WarframeIDList.Contains(i.Id) && !i.IsCompleted)
+                if (!Config.Data.WarframeIDList.Contains(i.Id) && (!i.IsCompleted ?? false))
                 {
                     Config.Data.WarframeIDList.Add(i.Id);
                     notifications.Add(ToTitle(i));

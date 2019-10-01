@@ -32,7 +32,7 @@ namespace WarframeNET
         /// <summary>
         /// Is this article important?
         /// </summary>
-        public bool Priority { get; set; }
+        public bool? Priority { get; set; }
 
         /// <summary>
         /// Date of the article.

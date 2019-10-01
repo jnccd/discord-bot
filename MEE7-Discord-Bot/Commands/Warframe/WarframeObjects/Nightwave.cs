@@ -12,10 +12,10 @@ namespace WarframeNET
         public DateTime Activation;
         public string startString;
         public DateTime Expiry;
-        public bool Active;
-        public int Season;
+        public bool? Active;
+        public int? Season;
         public string Tag;
-        public int Phase;
+        public int? Phase;
         public List<NightwaveChallenge> ActiveChallenges;
     }
 }
