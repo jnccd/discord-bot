@@ -13,8 +13,6 @@ using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
 using Color = System.Drawing.Color;
 using BumpKit;
-using QuickGraph;
-using QuickGraph.Graphviz;
 
 namespace MEE7.Commands
 {
