@@ -130,13 +130,19 @@ namespace MEE7.Commands
             if (message.Content.Length <= PrefixAndCommand.Length + 1)
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             else
-                PrintPipeOutput(RunPipe(CheckPipe(GetExecutionPipe(message), message.Channel), message), message);
+                PrintPipeOutput(
+                    RunPipe(
+                        CheckPipe(
+                            GetExecutionPipe(message, message.Content), 
+                            message.Channel), 
+                        message), 
+                    message);
         }
-        List<Tuple<object[], EditCommand>> GetExecutionPipe(SocketMessage message)
+        List<Tuple<object[], EditCommand>> GetExecutionPipe(SocketMessage message, string rawPipe)
         {
             List<Tuple<object[], EditCommand>> re = new List<Tuple<object[], EditCommand>>();
 
-            string input = message.Content.Remove(0, PrefixAndCommand.Length + 1).Trim(' ');
+            string input = rawPipe.Remove(0, PrefixAndCommand.Length + 1).Trim(' ');
             string[] commands = input.
                 Split(" > ").
                 Select(x => x.Trim(' ')).ToArray();
@@ -221,11 +227,11 @@ namespace MEE7.Commands
 
             return pipe;
         }
-        object RunPipe(List<Tuple<object[], EditCommand>> pipe, SocketMessage message)
+        object RunPipe(List<Tuple<object[], EditCommand>> pipe, SocketMessage message, object initialData = null)
         {
             if (pipe == null) return null;
 
-            object currentData = null;
+            object currentData = initialData;
 
             foreach (Tuple<object[], EditCommand> p in pipe)
             {
