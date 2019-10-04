@@ -305,6 +305,7 @@ namespace MEE7.Commands
                 }
 
             foreach (ForCommand f in pipe.Select(x => x.Item2).Where(x => x is ForCommand).Select(x => x as ForCommand))
+            {
                 if (f.StepWidth == 0 || f.Steps() < 0)
                 {
                     DiscordNETWrapper.SendText($"Man you must have accidentaly dropped a infinite for loop into me.\n" +
@@ -312,6 +313,13 @@ namespace MEE7.Commands
                         $"But don't worry I was programmed to ignore something like this.", channel).Wait();
                     return null;
                 }
+                if (!f.RawCommands.Contains("%" + f.VarName))
+                {
+                    DiscordNETWrapper.SendText($"Why use a for loop if you dont even use any variables in the subpipe?\n" +
+                        $"All the results would be the same D:", channel).Wait();
+                    return null;
+                }
+            }
 
             if (pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
             {

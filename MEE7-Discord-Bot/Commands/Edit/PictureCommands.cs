@@ -15,7 +15,7 @@ namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
-        enum TransformMode { Expand, Collapse, Stir, Fall }
+        enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
         static readonly object memifyLock = new object();
 
         readonly EditCommand[] PictureCommands = new EditCommand[] {
@@ -194,7 +194,8 @@ namespace MEE7.Commands
                 else
                     throw new Exception("uwu");
             }),
-            new EditCommand("liq", "Liquidify the picture with the mode expand, collapse, stir or fall.\n" +
+            new EditCommand("liq", $"Liquidify the picture with the modes " +
+                $"[{((TransformMode[])Enum.GetValues(typeof(TransformMode))).Select(x => x.ToString()).Aggregate((x,y) => x + ", " + y)}].\n" +
                 "The Position argument requires 2 numbers seperated by a : like: 0.4:0.6\n" +
                 "0:0 is the Top Left of the picture and 1:1 is the Bottom Right\n" +
                 "The default Strength is 1", typeof(Bitmap), typeof(Bitmap),
@@ -216,22 +217,17 @@ namespace MEE7.Commands
                     float rotationAngle = 0;
                     double cos = 0;
                     double sin = 0;
-                    float div = ((within.Width + within.Height) / 7);
-                    float maxDistance = (float)(centerT / div).LengthSquared();
+                    float div = within.Width + within.Height;
+                    float maxDistance = (centerT / div).LengthSquared();
                     switch (modeT)
                     {
                         case TransformMode.Expand:
-                            transformedLength = (float)(diff / div).LengthSquared() * strength;
+                            transformedLength = (float)(diff / div).LengthSquared() * (1 / strength / 10);
                             target = point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
                             break;
 
-                        case TransformMode.Collapse:
-                            transformedLength = (float)(diff / div).LengthSquared() * strength;
-                            target = point + diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
-                            break;
-
                         case TransformMode.Stir:
-                            transformedLength = (float)(diff / div).LengthSquared();
+                            transformedLength = (diff / div * 7).LengthSquared();
                             rotationAngle = (float)Math.Pow(2, - transformedLength * transformedLength) * strength;
                             cos = Math.Cos(rotationAngle);
                             sin = Math.Sin(rotationAngle);
@@ -240,12 +236,25 @@ namespace MEE7.Commands
                             break;
 
                         case TransformMode.Fall:
-                            transformedLength = (float)(diff / div).LengthSquared();
-                            rotationAngle = transformedLength / 3 * strength;
+                            transformedLength = (diff / div * 7).LengthSquared();
+                            rotationAngle = -transformedLength / 3 * strength;
                             cos = Math.Cos(rotationAngle);
                             sin = Math.Sin(rotationAngle);
                             target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
                                                  (float)(sin * (point.X - centerT.X) + cos * (point.Y - centerT.Y) + centerT.Y));
+                            break;
+
+                        case TransformMode.Wubble:
+                            transformedLength = (diff / div * 7).LengthSquared();
+                            target = point - diff * (1 / (1 + transformedLength * -strength));
+                            break;
+                        case TransformMode.Cya:
+                            transformedLength = (diff / div * 7).Length();
+                            target = point - diff * (float)(-Math.Pow(2, -transformedLength * strength) + 1);
+                            break;
+                        case TransformMode.Inpand:
+                            transformedLength = (float)(diff / div * 7).LengthSquared();
+                            target = point - diff * (1 / (1 + transformedLength) * strength / 4);
                             break;
                     }
 
