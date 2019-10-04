@@ -195,8 +195,8 @@ namespace MEE7.Commands
                     throw new Exception("uwu");
             }),
             new EditCommand("liq", "Liquidify the picture with the mode expand, collapse, stir or fall.\n" +
-                "The Position argument requires 2 numbers seperated by a , like: 0.4,0.6\n" +
-                "0,0 is the Top Left of the picture and 1,1 is the Bottom Right\n" +
+                "The Position argument requires 2 numbers seperated by a : like: 0.4:0.6\n" +
+                "0:0 is the Top Left of the picture and 1:1 is the Bottom Right\n" +
                 "The default Strength is 1", typeof(Bitmap), typeof(Bitmap),
                 new Argument[] {
                     new Argument("TransformMode", typeof(string), ""),
@@ -231,8 +231,8 @@ namespace MEE7.Commands
                             break;
 
                         case TransformMode.Stir:
-                            transformedLength = (float)(diff / div).LengthSquared() * strength;
-                            rotationAngle = (float)Math.Pow((maxDistance - transformedLength), 5) / 3000;
+                            transformedLength = (float)(diff / div).LengthSquared();
+                            rotationAngle = (float)Math.Pow(2, - transformedLength * transformedLength) * strength;
                             cos = Math.Cos(rotationAngle);
                             sin = Math.Sin(rotationAngle);
                             target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
@@ -240,8 +240,8 @@ namespace MEE7.Commands
                             break;
 
                         case TransformMode.Fall:
-                            transformedLength = (float)(diff / div).LengthSquared() * strength;
-                            rotationAngle = transformedLength / 3;
+                            transformedLength = (float)(diff / div).LengthSquared();
+                            rotationAngle = transformedLength / 3 * strength;
                             cos = Math.Cos(rotationAngle);
                             sin = Math.Sin(rotationAngle);
                             target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
