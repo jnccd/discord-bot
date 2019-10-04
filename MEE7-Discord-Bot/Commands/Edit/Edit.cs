@@ -284,7 +284,7 @@ namespace MEE7.Commands
             if (pipe == null) return null;
             if (pipe.Select(x => {
                 if (x.Item2 is ForCommand)
-                    return (x.Item2 as ForCommand).RawCommands.AllIndexesOf(">").Count + 1;
+                    return ((x.Item2 as ForCommand).RawCommands.AllIndexesOf(">").Count + 1) * (x.Item2 as ForCommand).Steps();
                 return 1;
             }).Aggregate((x,y) => x+y) >= 50) // TODO: Improve performance limit check
             {
@@ -324,8 +324,6 @@ namespace MEE7.Commands
         object RunPipe(List<Tuple<object[], SubCommand>> pipe, SocketMessage message, object initialData = null)
         {
             if (pipe == null) return null;
-
-            List<object> trashCompactor = new List<object> { initialData };
             object currentData = initialData;
 
             foreach (Tuple<object[], SubCommand> p in pipe)
@@ -338,18 +336,28 @@ namespace MEE7.Commands
                     {
                         ForCommand forLoop = p.Item2 as ForCommand;
                         object[] array = (object[])Activator.CreateInstance(forLoop.OutputType, forLoop.Steps());
+                        object oldData = currentData;
 
                         for (int i = 0; i < forLoop.Steps(); i++)
                         {
+                            object usableData;
+                            if (currentData is ICloneable)
+                                usableData = (currentData as ICloneable).Clone();
+                            else
+                                usableData = currentData;
+
                             string rawCommandThisLoop = forLoop.RawCommands.Replace($"%{forLoop.VarName}", (forLoop.Start + i * forLoop.StepWidth).ToString());
                             forLoop.Commands = CheckPipe(GetExecutionPipe(message, rawCommandThisLoop),
                                     message.Channel, subPipe: true);
                             if (forLoop.Commands == null) return null;
-                            array[i] = RunPipe(forLoop.Commands, message, currentData);
+
+                            array[i] = RunPipe(forLoop.Commands, message, usableData);
                             if (array[i] == null) return null;
                         }
 
                         currentData = array;
+                        if (oldData is IDisposable)
+                            (oldData as IDisposable).Dispose();
                     }
                 }
                 catch (Exception e)
@@ -360,8 +368,6 @@ namespace MEE7.Commands
                     return null;
                 }
 
-                trashCompactor.Add(currentData);
-
                 if (p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType())))
                 {
                     DiscordNETWrapper.SendText($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
@@ -369,11 +375,6 @@ namespace MEE7.Commands
                     return null;
                 }
             }
-
-            if (initialData == null)
-                foreach (object o in trashCompactor.Where(x => x != currentData))
-                    if (o is IDisposable)
-                        (o as IDisposable).Dispose();
 
             return currentData;
         }
