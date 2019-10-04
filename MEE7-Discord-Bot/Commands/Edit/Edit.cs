@@ -346,7 +346,7 @@ namespace MEE7.Commands
                             else
                                 usableData = currentData;
 
-                            string rawCommandThisLoop = forLoop.RawCommands.Replace($"%{forLoop.VarName}", (forLoop.Start + i * forLoop.StepWidth).ToString());
+                            string rawCommandThisLoop = forLoop.RawCommands.Replace($"%{forLoop.VarName}", (forLoop.Start + i * forLoop.StepWidth).ToString().Replace(",", "."));
                             forLoop.Commands = CheckPipe(GetExecutionPipe(message, rawCommandThisLoop),
                                     message.Channel, subPipe: true);
                             if (forLoop.Commands == null) return null;
