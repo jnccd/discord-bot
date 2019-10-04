@@ -366,7 +366,7 @@ namespace MEE7.Commands
             new EditCommand("chromaticAbberation", "Shifts the color spaces", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Intensity", typeof(int), 4) },
                 (SocketMessage m, object[] a, object o) => {
 
-                    Bitmap bmp = (o as Bitmap);
+                    Bitmap bmp = (o as Bitmap).Clone() as Bitmap;
                     int intesity = (int)a[0];
 
                     using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
