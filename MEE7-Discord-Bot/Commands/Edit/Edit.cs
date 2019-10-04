@@ -20,29 +20,6 @@ namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
-        IEnumerable<EditCommand> Commands;
-        class PrintMethod
-        {
-            public Type Type;
-            public Action<SocketMessage, object> Function;
-
-            public PrintMethod(Type Type, Action<SocketMessage, object> Function)
-            {
-                this.Function = Function;
-                this.Type = Type;
-            }
-        }
-        class ArgumentParseMethod
-        {
-            public Type Type;
-            public Func<string, object> Function;
-
-            public ArgumentParseMethod(Type Type, Func<string, object> Function)
-            {
-                this.Function = Function;
-                this.Type = Type;
-            }
-        }
         struct Argument
         {
             public string Name;
@@ -56,14 +33,59 @@ namespace MEE7.Commands
                 this.StandardValue = StandardValue;
             }
         }
-        class EditCommand
+        class ArgumentParseMethod
+        {
+            public Type Type;
+            public Func<string, object> Function;
+
+            public ArgumentParseMethod(Type Type, Func<string, object> Function)
+            {
+                this.Function = Function;
+                this.Type = Type;
+            }
+        }
+        class PrintMethod
+        {
+            public Type Type;
+            public Action<SocketMessage, object> Function;
+
+            public PrintMethod(Type Type, Action<SocketMessage, object> Function)
+            {
+                this.Function = Function;
+                this.Type = Type;
+            }
+        }
+        class SubCommand 
         {
             public string Command, Desc;
             public Type InputType, OutputType;
+        }
+        class ForCommand: SubCommand
+        {
+            public string VarName, RawCommands;
+            public double Start, End, StepWidth;
+            public List<Tuple<object[], SubCommand>> Commands;
+
+            public ForCommand(string varName, string rawCommands, double start, double end, double stepWidth)
+            {
+                Command = "For Loop";
+                Desc = "For Loop";
+
+                VarName = varName;
+                RawCommands = rawCommands;
+                Start = start;
+                End = end;
+                StepWidth = stepWidth;
+            }
+
+            public int Steps() => (int)((End - Start) / StepWidth);
+        }
+        class EditCommand: SubCommand
+        {
             public Argument[] Arguments;
             public Func<SocketMessage, object[], object, object> Function;
 
-            public EditCommand(string Command, string Desc, Type InputType, Type OutputType, Argument[] Arguments, 
+            public EditCommand(string Command, string Desc, Type InputType, Type OutputType, Argument[] Arguments,
                 Func<SocketMessage, object[], object, object> Function)
             {
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
@@ -81,13 +103,14 @@ namespace MEE7.Commands
                 this.Arguments = Arguments;
             }
         }
+        private readonly IEnumerable<EditCommand> Commands;
 
         public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
             "\nFor more information just type **$edit**.")
         {
             Commands = new List<EditCommand>();
             FieldInfo[] CommandLists = GetType().GetRuntimeFields().
-                Where(x => x.Name.EndsWith("Commands") && x.Name != "Commands" && x.FieldType == typeof(EditCommand[])).
+                Where(x => x.Name.EndsWith("Commands") && x.Name != "Commands" && x.Name != "for" && x.FieldType == typeof(EditCommand[])).
                 OrderBy(x => {
                     if (x.Name.StartsWith("Input"))
                         return "0000";
@@ -133,19 +156,40 @@ namespace MEE7.Commands
                 PrintPipeOutput(
                     RunPipe(
                         CheckPipe(
-                            GetExecutionPipe(message, message.Content), 
+                            GetExecutionPipe(message, message.Content.Remove(0, PrefixAndCommand.Length + 1)), 
                             message.Channel), 
                         message), 
                     message);
         }
-        List<Tuple<object[], EditCommand>> GetExecutionPipe(SocketMessage message, string rawPipe)
+        List<Tuple<object[], SubCommand>> GetExecutionPipe(SocketMessage message, string rawPipe, bool argumentParsing = true)
         {
-            List<Tuple<object[], EditCommand>> re = new List<Tuple<object[], EditCommand>>();
+            List<Tuple<object[], SubCommand>> re = new List<Tuple<object[], SubCommand>>();
 
-            string input = rawPipe.Remove(0, PrefixAndCommand.Length + 1).Trim(' ');
-            string[] commands = input.
-                Split(" > ").
-                Select(x => x.Trim(' ')).ToArray();
+            if (rawPipe.Contains(""))
+            {
+                DiscordNETWrapper.SendText($"Edit commands can't contain  symbols!", message.Channel).Wait();
+                return null;
+            }
+
+            string input = rawPipe.Trim(' ');
+            int k = 0, j = 0;
+            string[] commands = new string(input.Select(x => {
+                if (x == '(')
+                    k++;
+                if (x == '{')
+                    j++;
+                if (x == ')')
+                    k--;
+                if (x == '}')
+                    j--;
+                if (k == 0 && j == 0 && x == '>')
+                    x = '';
+                return x;
+            }).
+            ToArray()).
+            Split('').
+            Select(x => x.Trim(' ')).
+            ToArray();
 
             if (input[0] == '"')
             {
@@ -165,48 +209,89 @@ namespace MEE7.Commands
                 string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray());
                 string arg = c.GetEverythingBetween("(", ")");
 
-                EditCommand command = Commands.FirstOrDefault(x => x.Command.ToLower() == cwoargs.ToLower());
-                if (command == null)
-                {
-                    DiscordNETWrapper.SendText($"I don't know a command called {cwoargs}", message.Channel).Wait();
-                    return null;
-                }
+                object[] parsedArgs = new object[0];
+                SubCommand reCommand;
 
-                string[] args = arg.Split(',').Select(x => x.Trim(' ')).ToArray();
-                if (args.Length == 1 && args[0] == "") args = new string[0];
-                object[] parsedArgs = new object[command.Arguments.Length];
-                for (int i = 0; i < command.Arguments.Length; i++)
-                    if (i < args.Length)
+                if (cwoargs == "for")
+                {
+                    string[] args = arg.Split(':');
+
+                    if (args.Length != 4)
                     {
-                        try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]); }
-                        catch
-                        {
-                            DiscordNETWrapper.SendText($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}", message.Channel).Wait();
-                            return null;
-                        }
-                    }
-                    else if (command.Arguments[i].StandardValue == null)
-                    {
-                        DiscordNETWrapper.SendText($"[{cwoargs}] {command.Arguments[i].Name} requires a value!", message.Channel).Wait();
+                        DiscordNETWrapper.SendText($"A for loop needs 4 parameters!", message.Channel).Wait();
                         return null;
                     }
-                    else
-                        parsedArgs[i] = command.Arguments[i].StandardValue;
 
-                re.Add(new Tuple<object[], EditCommand>(parsedArgs, command));
+                    ForCommand forCommand = new ForCommand(varName: args[0], rawCommands: c.GetEverythingBetween("{", "}").Trim(' '), 
+                        start: args[1].ConvertToDouble(), end: args[2].ConvertToDouble(), stepWidth: args[3].ConvertToDouble());
+                    forCommand.Commands = GetExecutionPipe(message, forCommand.RawCommands, false);
+                    if (forCommand.Commands == null) return null;
+
+                    if (forCommand.Commands.Count < 1)
+                    {
+                        DiscordNETWrapper.SendText($"A for loops sub pipe needs to be not empty!", message.Channel).Wait();
+                        return null;
+                    }
+                    forCommand.InputType = forCommand.Commands.First().Item2.InputType;
+                    forCommand.OutputType = forCommand.Commands.Last().Item2.OutputType.MakeArrayType();
+
+                    reCommand = forCommand;
+                }
+                else
+                {
+                    EditCommand command = Commands.FirstOrDefault(x => x.Command.ToLower() == cwoargs.ToLower());
+
+                    if (command == null)
+                    {
+                        DiscordNETWrapper.SendText($"I don't know a command called {cwoargs}", message.Channel).Wait();
+                        return null;
+                    }
+
+                    if (argumentParsing)
+                    {
+                        string[] args = arg.Split(',').Select(x => x.Trim(' ')).ToArray();
+                        if (args.Length == 1 && args[0] == "") args = new string[0];
+                        parsedArgs = new object[command.Arguments.Length];
+                        for (int i = 0; i < command.Arguments.Length; i++)
+                            if (i < args.Length)
+                            {
+                                try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]); }
+                                catch
+                                {
+                                    DiscordNETWrapper.SendText($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}", message.Channel).Wait();
+                                    return null;
+                                }
+                            }
+                            else if (command.Arguments[i].StandardValue == null)
+                            {
+                                DiscordNETWrapper.SendText($"[{cwoargs}] {command.Arguments[i].Name} requires a value!", message.Channel).Wait();
+                                return null;
+                            }
+                            else
+                                parsedArgs[i] = command.Arguments[i].StandardValue;
+                    }
+                    
+                    reCommand = command;
+                }
+
+                re.Add(new Tuple<object[], SubCommand>(parsedArgs, reCommand));
             }
 
             return re;
         }
-        List<Tuple<object[], EditCommand>> CheckPipe(List<Tuple<object[], EditCommand>> pipe, ISocketMessageChannel channel)
+        List<Tuple<object[], SubCommand>> CheckPipe(List<Tuple<object[], SubCommand>> pipe, ISocketMessageChannel channel, bool subPipe = false)
         {
             if (pipe == null) return null;
-            if (pipe.Count > 50)
+            if (pipe.Select(x => {
+                if (x.Item2 is ForCommand)
+                    return (x.Item2 as ForCommand).RawCommands.AllIndexesOf(">").Count + 1;
+                return 1;
+            }).Aggregate((x,y) => x+y) >= 50) // TODO: Improve performance limit check
             {
                 DiscordNETWrapper.SendText($"Only 50 instructions are allowed per pipe", channel).Wait();
                 return null;
             }
-            if (pipe.First().Item2.InputType != null)
+            if (pipe.First().Item2.InputType != null && !subPipe)
             {
                 DiscordNETWrapper.SendText($"The first function has to be a input function", channel).Wait();
                 return null;
@@ -219,6 +304,15 @@ namespace MEE7.Commands
                     return null;
                 }
 
+            foreach (ForCommand f in pipe.Select(x => x.Item2).Where(x => x is ForCommand).Select(x => x as ForCommand))
+                if (f.StepWidth == 0 || f.Steps() < 0)
+                {
+                    DiscordNETWrapper.SendText($"Man you must have accidentaly dropped a infinite for loop into me.\n" +
+                        $"No one would do this on purpose, that would be evil.\n" +
+                        $"But don't worry I was programmed to ignore something like this.", channel).Wait();
+                    return null;
+                }
+
             if (pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
             {
                 DiscordNETWrapper.SendText($"Unprintable Output Error: I wasn't taught how to print {pipe.Last().Item2.OutputType.ToReadableString()}", channel).Wait();
@@ -227,15 +321,37 @@ namespace MEE7.Commands
 
             return pipe;
         }
-        object RunPipe(List<Tuple<object[], EditCommand>> pipe, SocketMessage message, object initialData = null)
+        object RunPipe(List<Tuple<object[], SubCommand>> pipe, SocketMessage message, object initialData = null)
         {
             if (pipe == null) return null;
 
+            List<object> trashCompactor = new List<object> { initialData };
             object currentData = initialData;
 
-            foreach (Tuple<object[], EditCommand> p in pipe)
+            foreach (Tuple<object[], SubCommand> p in pipe)
             {
-                try { currentData = p.Item2.Function(message, p.Item1, currentData); }
+                try 
+                {
+                    if (p.Item2 is EditCommand)
+                        currentData = (p.Item2 as EditCommand).Function(message, p.Item1, currentData);
+                    else if (p.Item2 is ForCommand)
+                    {
+                        ForCommand forLoop = p.Item2 as ForCommand;
+                        object[] array = (object[])Activator.CreateInstance(forLoop.OutputType, forLoop.Steps());
+
+                        for (int i = 0; i < forLoop.Steps(); i++)
+                        {
+                            string rawCommandThisLoop = forLoop.RawCommands.Replace($"%{forLoop.VarName}", (forLoop.Start + i * forLoop.StepWidth).ToString());
+                            forLoop.Commands = CheckPipe(GetExecutionPipe(message, rawCommandThisLoop),
+                                    message.Channel, subPipe: true);
+                            if (forLoop.Commands == null) return null;
+                            array[i] = RunPipe(forLoop.Commands, message, currentData);
+                            if (array[i] == null) return null;
+                        }
+
+                        currentData = array;
+                    }
+                }
                 catch (Exception e)
                 {
                     DiscordNETWrapper.SendText($"[{p.Item2.Command}] {e.Message} " + 
@@ -244,6 +360,8 @@ namespace MEE7.Commands
                     return null;
                 }
 
+                trashCompactor.Add(currentData);
+
                 if (p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType())))
                 {
                     DiscordNETWrapper.SendText($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
@@ -251,6 +369,11 @@ namespace MEE7.Commands
                     return null;
                 }
             }
+
+            if (initialData == null)
+                foreach (object o in trashCompactor.Where(x => x != currentData))
+                    if (o is IDisposable)
+                        (o as IDisposable).Dispose();
 
             return currentData;
         }
