@@ -201,7 +201,7 @@ namespace MEE7.Commands
                 new Argument[] {
                     new Argument("TransformMode", typeof(string), ""),
                     new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1),
+                    new Argument("Strength", typeof(float), 1f),
                 },
                 (SocketMessage m, object[] a, object o) => {
 

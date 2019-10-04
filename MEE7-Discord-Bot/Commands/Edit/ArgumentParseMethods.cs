@@ -21,8 +21,14 @@ namespace MEE7.Commands
             new ArgumentParseMethod(typeof(ulong), (string s) => Convert.ToUInt64(s)),
             new ArgumentParseMethod(typeof(float), (string s) => (float)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(double), (string s) => s.ConvertToDouble()),
-            new ArgumentParseMethod(typeof(PointF), (string s) => new PointF((float)s.ConvertToDouble(), (float)s.ConvertToDouble())),
-            new ArgumentParseMethod(typeof(Vector2), (string s) => new Vector2((float)s.ConvertToDouble(), (float)s.ConvertToDouble())),
+            new ArgumentParseMethod(typeof(PointF), (string s) => {
+                string[] sp = s.Split(':');
+                return new PointF((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
+            }),
+            new ArgumentParseMethod(typeof(Vector2), (string s) => {
+                string[] sp = s.Split(':');
+                return new Vector2((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
+            }),
         };
     }
 }

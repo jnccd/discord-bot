@@ -206,7 +206,7 @@ namespace MEE7.Commands
 
             foreach (string c in commands)
             {
-                string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray());
+                string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray()).Trim(' ');
                 string arg = c.GetEverythingBetween("(", ")");
 
                 object[] parsedArgs = new object[0];
@@ -286,9 +286,9 @@ namespace MEE7.Commands
                 if (x.Item2 is ForCommand)
                     return ((x.Item2 as ForCommand).RawCommands.AllIndexesOf(">").Count + 1) * (x.Item2 as ForCommand).Steps();
                 return 1;
-            }).Aggregate((x,y) => x+y) >= 50) // TODO: Improve performance limit check
+            }).Aggregate((x,y) => x+y) >= 100) // TODO: Improve performance limit check
             {
-                DiscordNETWrapper.SendText($"Only 50 instructions are allowed per pipe", channel).Wait();
+                DiscordNETWrapper.SendText($"Only 100 instructions are allowed per pipe.", channel).Wait();
                 return null;
             }
             if (pipe.First().Item2.InputType != null && !subPipe)
@@ -381,7 +381,12 @@ namespace MEE7.Commands
         void PrintPipeOutput(object output, SocketMessage message)
         {
             if (output == null) return;
-            
+            if (output is Bitmap[] && (output as Bitmap[]).Length > 50)
+            {
+                DiscordNETWrapper.SendText($"My Internet is too slow to upload gifs this long", message.Channel).Wait();
+                return;
+            }
+
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }
