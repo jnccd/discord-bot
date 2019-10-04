@@ -366,7 +366,7 @@ namespace MEE7.Commands
             new EditCommand("chromaticAbberation", "Shifts the color spaces", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Intensity", typeof(int), 4) },
                 (SocketMessage m, object[] a, object o) => {
 
-                    Bitmap bmp = (o as Bitmap).Clone() as Bitmap;
+                    Bitmap bmp = (o as Bitmap);
                     int intesity = (int)a[0];
 
                     using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
@@ -380,6 +380,27 @@ namespace MEE7.Commands
                             }
 
                     return bmp;
+            }),
+            new EditCommand("rotate", "Rotate the image", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Angle in degrees", typeof(float), 0) }, 
+                (SocketMessage m, object[] a, object o) => {
+                    Bitmap b = o as Bitmap;
+                    Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
+                    return b.RotateImage((float)a[0], middle);
+            }),
+            new EditCommand("rotateColors", "Rotate the color spaces of each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Angle in degrees", typeof(float), 0) },
+                (SocketMessage m, object[] a, object o) => {
+                    Bitmap b = o as Bitmap;
+
+                    using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
+                        for (int x = 0; x < b.Width; x++)
+                            for (int y = 0; y < b.Height; y++)
+                            {
+                                Color col = c.GetPixel(x, y);
+                                c.SetPixel(x, y, Color.FromArgb(col.A, 
+                                    new Vector3(col.GetHue() + (float)a[0], col.GetSaturation(), col.GetValue()).HsvToRgb()));
+                            }
+
+                    return b;
             }),
         };
 
