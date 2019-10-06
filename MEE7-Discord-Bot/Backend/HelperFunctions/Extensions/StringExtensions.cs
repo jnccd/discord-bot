@@ -243,46 +243,50 @@ namespace MEE7.Backend.HelperFunctions.Extensions
 
             if (compiler == null)
                 compiler = new Process();
-            compiler.StartInfo.FileName = split.First();
-            compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y).Trim(' ');
-            compiler.StartInfo.CreateNoWindow = true;
-            compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            compiler.StartInfo.RedirectStandardInput = true;
-            compiler.StartInfo.RedirectStandardOutput = true;
-            compiler.StartInfo.RedirectStandardError = true;
-            if (!string.IsNullOrWhiteSpace(WorkingDir))
-                compiler.StartInfo.WorkingDirectory = WorkingDir;
-            compiler.Start();
 
-            Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
-
-            DateTime start = DateTime.Now;
-
-            Task.Run(() => {
-                Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
-                compiler.WaitForExit();
-
-                string o = "";
-                string e = "";
-
-                try { o = compiler.StandardOutput.ReadToEnd(); } catch { }
-                try { e = compiler.StandardError.ReadToEnd(); } catch { }
-
-                exited = true;
-                ExecutedEvent(o, e);
-            });
-
-            while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
-                Thread.Sleep(100);
-            if (!exited)
+            using (compiler)
             {
-                exited = true;
-                try
+                compiler.StartInfo.FileName = split.First();
+                compiler.StartInfo.Arguments = split.Skip(1).Foldl("", (x, y) => x + " " + y).Trim(' ');
+                compiler.StartInfo.CreateNoWindow = true;
+                compiler.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                compiler.StartInfo.RedirectStandardInput = true;
+                compiler.StartInfo.RedirectStandardOutput = true;
+                compiler.StartInfo.RedirectStandardError = true;
+                if (!string.IsNullOrWhiteSpace(WorkingDir))
+                    compiler.StartInfo.WorkingDirectory = WorkingDir;
+                compiler.Start();
+
+                Task.Run(() => { RunEvent?.Invoke(compiler.StandardInput); });
+
+                DateTime start = DateTime.Now;
+
+                Task.Run(() => {
+                    Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
+                    compiler.WaitForExit();
+
+                    string o = "";
+                    string e = "";
+
+                    try { o = compiler.StandardOutput.ReadToEnd(); } catch { }
+                    try { e = compiler.StandardError.ReadToEnd(); } catch { }
+
+                    exited = true;
+                    ExecutedEvent(o, e);
+                });
+
+                while (!exited && (DateTime.Now - start).TotalSeconds < TimeLimitInSeconds)
+                    Thread.Sleep(100);
+                if (!exited)
                 {
-                    compiler.Close();
+                    exited = true;
+                    try
+                    {
+                        compiler.Close();
+                    }
+                    catch { }
+                    TimeoutEvent();
                 }
-                catch { }
-                TimeoutEvent();
             }
         }
         public static string GetHTMLfromURL(this string URL)
