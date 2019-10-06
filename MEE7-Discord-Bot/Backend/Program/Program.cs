@@ -66,7 +66,7 @@ namespace MEE7
         public static event ExitHandler OnExit;
 
         // --- Main ---------------------------------------------------------------------------------------------------------
-        static void Main(string[] args)
+        static void Main()
         {
             try
             {

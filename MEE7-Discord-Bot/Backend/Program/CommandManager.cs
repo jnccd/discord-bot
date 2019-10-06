@@ -27,16 +27,16 @@ namespace MEE7
     {
         public const string Prefix = "$";
         static Command[] commands;
-        static EmbedBuilder helpMenu = new EmbedBuilder();
-        static Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+        static readonly EmbedBuilder helpMenu = new EmbedBuilder();
+        static readonly Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                       from assemblyType in domainAssembly.GetTypes()
                                       where assemblyType.IsSubclassOf(typeof(Command))
                                       select assemblyType).ToArray();
 
         static int concurrentCommandExecutions = 0;
         static readonly string commandExecutionLock = "";
-        static ulong[] experimentalChannels = new ulong[] { 473991188974927884 };
-        static List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
+        static readonly ulong[] experimentalChannels = new ulong[] { 473991188974927884 };
+        static readonly List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
         
         public delegate void NonCommandMessageRecievedHandler(SocketMessage message);
         public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
@@ -49,7 +49,7 @@ namespace MEE7
         public delegate void UserJoinedHandler(SocketGuildUser arg);
         public static event UserJoinedHandler OnUserJoined;
 
-        static List<Tuple<RestUserMessage, Exception>> cachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
+        static readonly List<Tuple<RestUserMessage, Exception>> cachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
         static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
         static readonly Emoji errorEmoji = new Emoji("🤔");

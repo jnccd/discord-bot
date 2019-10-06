@@ -55,33 +55,76 @@ namespace MEE7.Commands
                 this.Type = Type;
             }
         }
-        class SubCommand 
+        abstract class SubCommand 
         {
-            public string Command, Desc;
+            public string Command;
             public Type InputType, OutputType;
+
+            public int FunctionCalls() => 1;
         }
-        class ForCommand: SubCommand
+        abstract class SubPipeCommand: SubCommand
         {
-            public string VarName, RawCommands;
+            public static string Command;
+            public string[] RawCommands;
+            public List<Tuple<object[], SubCommand>>[] Pipes;
+        }
+        class ForCommand: SubPipeCommand
+        {
+            public static new string Command { get => "for"; set { } }
+            public string VarName;
             public double Start, End, StepWidth;
-            public List<Tuple<object[], SubCommand>> Commands;
 
-            public ForCommand(string varName, string rawCommands, double start, double end, double stepWidth)
+            public ForCommand(string varName, double start, double end, double stepWidth, string[] rawCommands, List<Tuple<object[], SubCommand>>[] pipes)
             {
-                Command = "For Loop";
-                Desc = "For Loop";
-
                 VarName = varName;
-                RawCommands = rawCommands;
                 Start = start;
                 End = end;
                 StepWidth = stepWidth;
+                RawCommands = rawCommands;
+                Pipes = pipes;
+
+                InputType = Pipes[0].First().Item2.InputType;
+                OutputType = Pipes[0].Last().Item2.OutputType.MakeArrayType();
+
+                if (Pipes == null || Pipes.Length != 1 || Pipes.Any(x => x == null))
+                    throw new Exception($"Something went wrong during parsing :/");
+
+                if (Pipes[0].Count < 1)
+                    throw new Exception($"A for loops sub pipe needs to be not empty!");
             }
 
             public int Steps() => (int)((End - Start) / StepWidth);
+            public new int FunctionCalls() => Steps() * Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x,y) => x + y);
+        }
+        class ForeachCommand : SubPipeCommand
+        {
+            public static new string Command { get => "foreach"; set { } }
+            public string VarName;
+            public double Start, End;
+
+            public ForeachCommand(string varName, double start, double end, string[] rawCommands, List<Tuple<object[], SubCommand>>[] pipes)
+            {
+                VarName = varName;
+                Start = start;
+                End = end;
+                RawCommands = rawCommands;
+                Pipes = pipes;
+
+                InputType = Pipes[0].First().Item2.InputType.MakeArrayType();
+                OutputType = Pipes[0].Last().Item2.OutputType.MakeArrayType();
+
+                if (Pipes == null || Pipes.Length != 1 || Pipes.Any(x => x == null))
+                    throw new Exception($"Something went wrong during parsing :/");
+
+                if (Pipes[0].Count < 1)
+                    throw new Exception($"A for loops sub pipe needs to be not empty!");
+            }
+
+            public new int FunctionCalls() => Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x, y) => x + y);
         }
         class EditCommand: SubCommand
         {
+            public string Desc;
             public Argument[] Arguments;
             public Func<SocketMessage, object[], object, object> Function;
 
@@ -153,13 +196,24 @@ namespace MEE7.Commands
             if (message.Content.Length <= PrefixAndCommand.Length + 1)
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             else
-                PrintPipeOutput(
-                    RunPipe(
-                        CheckPipe(
-                            GetExecutionPipe(message, message.Content.Remove(0, PrefixAndCommand.Length + 1)), 
-                            message.Channel), 
-                        message), 
+            {
+                try
+                {
+                    PrintPipeOutput(
+                        RunPipe(
+                            CheckPipe(
+                                GetExecutionPipe(message, message.Content.Remove(0, PrefixAndCommand.Length + 1))),
+                            message),
                     message);
+                }
+                catch (Exception e)
+                {
+                    DiscordNETWrapper.SendText($"{e.Message} " +
+                        $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}", 
+                        message.Channel).Wait();
+                    return;
+                }
+            }
         }
         List<Tuple<object[], SubCommand>> GetExecutionPipe(SocketMessage message, string rawPipe, bool argumentParsing = true)
         {
@@ -210,42 +264,37 @@ namespace MEE7.Commands
                 string arg = c.GetEverythingBetween("(", ")");
 
                 object[] parsedArgs = new object[0];
-                SubCommand reCommand;
+                SubCommand reCommand = null;
 
-                if (cwoargs == "for")
+                string[] rawPipes = c.GetEverythingBetweenAll("{", "}").Select(x => x.Trim(' ')).ToArray();
+                if (rawPipes.Length > 0)
                 {
-                    string[] args = arg.Split(':');
+                    string[] args = arg.Split(':', ';');
 
-                    if (args.Length != 4)
+                    if (cwoargs == ForCommand.Command)
                     {
-                        DiscordNETWrapper.SendText($"A for loop needs 4 parameters!", message.Channel).Wait();
-                        return null;
+                        if (args.Length != 4)
+                            throw new Exception($"A for loop needs 4 parameters!");
+
+                        reCommand = new ForCommand(varName: args[0], start: args[1].ConvertToDouble(), 
+                            end: args[2].ConvertToDouble(), stepWidth: args[3].ConvertToDouble(),
+                            rawCommands: rawPipes, rawPipes.Select(x => GetExecutionPipe(message, x, false)).ToArray());
                     }
-
-                    ForCommand forCommand = new ForCommand(varName: args[0], rawCommands: c.GetEverythingBetween("{", "}").Trim(' '), 
-                        start: args[1].ConvertToDouble(), end: args[2].ConvertToDouble(), stepWidth: args[3].ConvertToDouble());
-                    forCommand.Commands = GetExecutionPipe(message, forCommand.RawCommands, false);
-                    if (forCommand.Commands == null) return null;
-
-                    if (forCommand.Commands.Count < 1)
+                    else if (cwoargs == ForeachCommand.Command)
                     {
-                        DiscordNETWrapper.SendText($"A for loops sub pipe needs to be not empty!", message.Channel).Wait();
-                        return null;
-                    }
-                    forCommand.InputType = forCommand.Commands.First().Item2.InputType;
-                    forCommand.OutputType = forCommand.Commands.Last().Item2.OutputType.MakeArrayType();
+                        if (args.Length != 3)
+                            throw new Exception($"A foreach loop needs 3 parameters!");
 
-                    reCommand = forCommand;
+                        reCommand = new ForeachCommand(varName: args[0], start: args[1].ConvertToDouble(),
+                            end: args[2].ConvertToDouble(), rawCommands: rawPipes, rawPipes.Select(x => GetExecutionPipe(message, x, false)).ToArray());
+                    }
                 }
                 else
                 {
                     EditCommand command = Commands.FirstOrDefault(x => x.Command.ToLower() == cwoargs.ToLower());
 
                     if (command == null)
-                    {
-                        DiscordNETWrapper.SendText($"I don't know a command called {cwoargs}", message.Channel).Wait();
-                        return null;
-                    }
+                        throw new Exception($"I don't know a command called {cwoargs}");
 
                     if (argumentParsing)
                     {
@@ -256,17 +305,10 @@ namespace MEE7.Commands
                             if (i < args.Length)
                             {
                                 try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]); }
-                                catch
-                                {
-                                    DiscordNETWrapper.SendText($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}", message.Channel).Wait();
-                                    return null;
-                                }
+                                catch { throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}"); }
                             }
                             else if (command.Arguments[i].StandardValue == null)
-                            {
-                                DiscordNETWrapper.SendText($"[{cwoargs}] {command.Arguments[i].Name} requires a value!", message.Channel).Wait();
-                                return null;
-                            }
+                                throw new Exception($"[{cwoargs}] {command.Arguments[i].Name} requires a value!");
                             else
                                 parsedArgs[i] = command.Arguments[i].StandardValue;
                     }
@@ -274,64 +316,45 @@ namespace MEE7.Commands
                     reCommand = command;
                 }
 
+                if (reCommand == null) throw new Exception($"I can't read :/");
+
                 re.Add(new Tuple<object[], SubCommand>(parsedArgs, reCommand));
             }
 
             return re;
         }
-        List<Tuple<object[], SubCommand>> CheckPipe(List<Tuple<object[], SubCommand>> pipe, ISocketMessageChannel channel, bool subPipe = false)
+        List<Tuple<object[], SubCommand>> CheckPipe(List<Tuple<object[], SubCommand>> pipe, bool subPipe = false)
         {
-            if (pipe == null) return null;
-            if (pipe.Select(x => {
-                if (x.Item2 is ForCommand)
-                    return ((x.Item2 as ForCommand).RawCommands.AllIndexesOf(">").Count + 1) * (x.Item2 as ForCommand).Steps();
-                return 1;
-            }).Aggregate((x,y) => x+y) >= 100) // TODO: Improve performance limit check
-            {
-                DiscordNETWrapper.SendText($"Only 100 instructions are allowed per pipe.", channel).Wait();
-                return null;
-            }
+            if (pipe.Select(x => x.Item2.FunctionCalls()).Sum() >= 100) // TODO: Improve performance limit check
+                throw new Exception($"Only 100 instructions are allowed per pipe.");
+
             if (pipe.First().Item2.InputType != null && !subPipe)
-            {
-                DiscordNETWrapper.SendText($"The first function has to be a input function", channel).Wait();
-                return null;
-            }
+                throw new Exception($"The first function has to be a input function");
+
             for (int i = 1; i < pipe.Count; i++)
                 if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType))
-                {
-                    DiscordNETWrapper.SendText($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
-                        $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} from {pipe[i - 1].Item2.Command}", channel).Wait();
-                    return null;
-                }
+                    throw new Exception($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
+                        $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} from {pipe[i - 1].Item2.Command}");
 
             foreach (ForCommand f in pipe.Select(x => x.Item2).Where(x => x is ForCommand).Select(x => x as ForCommand))
             {
                 if (f.StepWidth == 0 || f.Steps() < 0)
-                {
-                    DiscordNETWrapper.SendText($"Man you must have accidentaly dropped a infinite for loop into me.\n" +
+                    throw new Exception($"Man you must have accidentaly dropped a infinite for loop into me.\n" +
                         $"No one would do this on purpose, that would be evil.\n" +
-                        $"But don't worry I was programmed to ignore something like this.", channel).Wait();
-                    return null;
-                }
-                if (!f.RawCommands.Contains("%" + f.VarName))
-                {
-                    DiscordNETWrapper.SendText($"Why use a for loop if you dont even use any variables in the subpipe?\n" +
-                        $"All the results would be the same D:", channel).Wait();
-                    return null;
-                }
+                        $"But don't worry I was programmed to ignore something like this.");
+
+                if (!f.RawCommands[0].Contains("%" + f.VarName))
+                    throw new Exception($"Why use a for loop if you dont even use any variables in the subpipe?\n" +
+                        $"All the results would be the same D:");
             }
 
-            if (pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
-            {
-                DiscordNETWrapper.SendText($"Unprintable Output Error: I wasn't taught how to print {pipe.Last().Item2.OutputType.ToReadableString()}", channel).Wait();
-                return null;
-            }
+            if (!subPipe && pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
+                throw new Exception($"Unprintable Output Error: I wasn't taught how to print {pipe.Last().Item2.OutputType.ToReadableString()}");
 
             return pipe;
         }
         object RunPipe(List<Tuple<object[], SubCommand>> pipe, SocketMessage message, object initialData = null)
         {
-            if (pipe == null) return null;
             object currentData = initialData;
 
             foreach (Tuple<object[], SubCommand> p in pipe)
@@ -342,11 +365,11 @@ namespace MEE7.Commands
                         currentData = (p.Item2 as EditCommand).Function(message, p.Item1, currentData);
                     else if (p.Item2 is ForCommand)
                     {
-                        ForCommand forLoop = p.Item2 as ForCommand;
-                        object[] array = (object[])Activator.CreateInstance(forLoop.OutputType, forLoop.Steps());
+                        ForCommand forCommand = p.Item2 as ForCommand;
+                        object[] array = (object[])Activator.CreateInstance(forCommand.OutputType, forCommand.Steps());
                         object oldData = currentData;
 
-                        for (int i = 0; i < forLoop.Steps(); i++)
+                        for (int i = 0; i < forCommand.Steps(); i++)
                         {
                             object usableData;
                             if (currentData is ICloneable)
@@ -354,46 +377,55 @@ namespace MEE7.Commands
                             else
                                 usableData = currentData;
 
-                            string rawCommandThisLoop = forLoop.RawCommands.Replace($"%{forLoop.VarName}", (forLoop.Start + i * forLoop.StepWidth).ToString().Replace(",", "."));
-                            forLoop.Commands = CheckPipe(GetExecutionPipe(message, rawCommandThisLoop),
-                                    message.Channel, subPipe: true);
-                            if (forLoop.Commands == null) return null;
+                            string rawCommandThisLoop = forCommand.RawCommands[0].Replace($"%{forCommand.VarName}", 
+                                (forCommand.Start + i * forCommand.StepWidth).ToString().Replace(",", "."));
+                            List<Tuple<object[], SubCommand>> parsedLoopedPipe = 
+                                CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
 
-                            array[i] = RunPipe(forLoop.Commands, message, usableData);
-                            if (array[i] == null) return null;
+                            array[i] = RunPipe(parsedLoopedPipe, message, usableData);
                         }
 
                         currentData = array;
                         if (oldData is IDisposable)
                             (oldData as IDisposable).Dispose();
                     }
+                    else if (p.Item2 is ForeachCommand)
+                    {
+                        object[] arraydCurrentData = currentData as object[];
+
+                        ForeachCommand foreachCommand = p.Item2 as ForeachCommand;
+                        object[] array = (object[])Activator.CreateInstance(foreachCommand.OutputType, arraydCurrentData.Length);
+
+                        for (int i = 0; i < arraydCurrentData.Length; i++)
+                        {
+                            double varValue = foreachCommand.Start + ((foreachCommand.End - foreachCommand.Start) * (i / (double)arraydCurrentData.Length));
+                            string rawCommandThisLoop = foreachCommand.RawCommands[0].Replace($"%{foreachCommand.VarName}", varValue.ToString().Replace(",", "."));
+                            List<Tuple<object[], SubCommand>> parsedLoopedPipe =
+                                CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
+
+                            array[i] = RunPipe(parsedLoopedPipe, message, arraydCurrentData[i]);
+                        }
+
+                        currentData = array;
+                    }
                 }
-                catch (Exception e)
-                {
-                    DiscordNETWrapper.SendText($"[{p.Item2.Command}] {e.Message} " + 
-                        $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}",
-                        message.Channel).Wait();
-                    return null;
-                }
+                catch (Exception e) { throw new Exception($"[{p.Item2.Command}] {e.Message} " + 
+                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}"); }
 
                 if (p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType())))
-                {
-                    DiscordNETWrapper.SendText($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
-                        $"{p.Item2.OutputType} but actually gave me a {currentData.GetType().ToReadableString()}", message.Channel).Wait();
-                    return null;
-                }
+                    throw new Exception($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
+                        $"{p.Item2.OutputType} but actually gave me a {currentData.GetType().ToReadableString()}");
             }
 
             return currentData;
         }
         void PrintPipeOutput(object output, SocketMessage message)
         {
-            if (output == null) return;
+            if (output == null)
+                throw new Exception("I can't print `null` :/");
+
             if (output is Bitmap[] && (output as Bitmap[]).Length > 50)
-            {
-                DiscordNETWrapper.SendText($"My Internet is too slow to upload gifs this long", message.Channel).Wait();
-                return;
-            }
+                throw new Exception($"My Internet is too slow to upload gifs this long");
 
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
