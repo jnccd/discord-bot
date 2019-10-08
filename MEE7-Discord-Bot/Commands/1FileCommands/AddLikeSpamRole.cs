@@ -26,7 +26,7 @@ namespace MEE7.Commands
 
         public override void Execute(SocketMessage message)
         {
-            return;
+            
         }
     }
 }
