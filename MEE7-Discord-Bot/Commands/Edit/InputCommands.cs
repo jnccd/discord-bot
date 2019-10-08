@@ -13,6 +13,8 @@ using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
 using Color = System.Drawing.Color;
 using BumpKit;
+using Discord.Audio;
+using System.Threading;
 
 namespace MEE7.Commands
 {
@@ -107,7 +109,7 @@ namespace MEE7.Commands
                         FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':')) && x.Animated).Url.
                         GetBitmapsFromGIFURL();
             }),
-            new EditCommand("AudioFromYT", "Gets the mp3 of an youtube video", null, typeof(WaveStream),
+            new EditCommand("audioFromYT", "Gets the mp3 of an youtube video", null, typeof(WaveStream),
                 new Argument[] { new Argument("YouTube Video URL", typeof(string), null) },
                 (SocketMessage m, object[] args, object o) => {
 
@@ -118,7 +120,49 @@ namespace MEE7.Commands
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
                     }
             }),
-            new EditCommand("TuringDrawing", "Creates a random turing machine which operates on looped 2D tape", null, typeof(Bitmap[]),
+            new EditCommand("audioFromVoice[WIP]", "Records audio from the voice chat you are currently in", null, typeof(WaveStream),
+                new Argument[] { new Argument("Recording Time in Seconds", typeof(int), 5) },
+                (SocketMessage m, object[] args, object o) => {
+
+                    int recordingTime = (args[0] as int?).Value * 1000;
+                    MemoryStream mem = new MemoryStream();
+
+                    SocketGuild g = Program.GetGuildFromChannel(m.Channel);
+                    ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
+                    if (channel != null)
+                    {
+                        try { channel.DisconnectAsync().Wait(); } catch { }
+
+                        bool doneListening = false;
+
+                        new Action(async () => {
+                            Console.WriteLine("Action was called");
+                            
+                            IAudioClient client = await channel.ConnectAsync();
+                            client.StreamCreated += async (ulong id, AudioInStream stream) => {
+                                Console.WriteLine("StreamCreated was called");
+                                await Task.Delay(recordingTime);
+                                await channel.DisconnectAsync();
+                                stream.CopyTo(mem);
+                                doneListening = true;
+                            };
+                            using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
+                                new StreamMediaFoundationReader(
+                                    new FileStream("Commands\\Edit\\StartListeningSoundEffect.mp3", FileMode.Open))))
+                                await MultiMediaHelper.SendAudioAsync(client, naudioStream);
+                        }).Invoke();
+
+                        while (!doneListening)
+                            Thread.Sleep(100);
+
+                        Console.WriteLine("Action call ended");
+                    }
+                    else
+                        throw new Exception("You are not in an AudioChannel on this server!");
+
+                    return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
+            }),
+            new EditCommand("turingDrawing", "Creates a random turing machine which operates on looped 2D tape", null, typeof(Bitmap[]),
                 new Argument[] {
                     new Argument("Num States", typeof(int), 6),
                     new Argument("Num Symbols", typeof(int), 3),

@@ -64,7 +64,7 @@ namespace MEE7.Commands
         }
         abstract class SubPipeCommand: SubCommand
         {
-            public static string Command;
+            public static new string Command;
             public string[] RawCommands;
             public List<Tuple<object[], SubCommand>>[] Pipes;
         }
