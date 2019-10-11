@@ -4,11 +4,11 @@ stages:
 
 before_script:
     - cd ./MEE7-Discord-Bot
-    - dotnet restore
 
 build:
     stage: build
     script:
+        - dotnet restore
         - dotnet build
     artifacts:
         paths:
