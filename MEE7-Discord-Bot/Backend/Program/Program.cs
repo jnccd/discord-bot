@@ -43,7 +43,6 @@ namespace MEE7
         // Client 
         static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
-        static bool gotWorkingToken = false;
         
         static readonly string exitlock = "";
 
@@ -82,10 +81,10 @@ namespace MEE7
         static void ExecuteBot()
         {
             StartUp();
+
             HandleConsoleCommandsLoop();
 
             BeforeClose();
-
             client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
             client.StopAsync().Wait();
             client.LogoutAsync().Wait();
@@ -153,26 +152,8 @@ namespace MEE7
         }
         static void Login()
         {
-            while (!gotWorkingToken)
-            {
-                try
-                {
-                    if (Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
-                    {
-                        ShowWindow(GetConsoleWindow(), 4);
-                        //SystemSounds.Exclamation.Play(); TODO: Support for SystemSounds is planned for .Net Core 3.0
-                        ConsoleWrapper.ConsoleWrite("Give me a Bot Token: ");
-                        Config.Data.BotToken = Console.ReadLine();
-                        Config.Save();
-                    }
-
-                    client.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
-                    client.StartAsync().Wait();
-
-                    gotWorkingToken = true;
-                }
-                catch { Config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
-            }
+            client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BotToken")).Wait();
+            client.StartAsync().Wait();
         }
         static void CreateCommandInstances()
         {
