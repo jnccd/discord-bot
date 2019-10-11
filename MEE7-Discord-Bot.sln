@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MEE7-Discord-Bot", "MEE7-Discord-Bot\MEE7-Discord-Bot.csproj", "{C2694F5E-7DB8-41B3-8920-0A1688EAE09B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows-Launcher", "Windows-Launcher\Windows-Launcher.csproj", "{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoppy-Fields-Test", "Hoppy-Fields\Hoppy-Fields-Test.csproj", "{CC8C2DDC-EBF5-4CC0-9555-5B5D5A4332BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CC8C2DDC-EBF5-4CC0-9555-5B5D5A4332BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC8C2DDC-EBF5-4CC0-9555-5B5D5A4332BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC8C2DDC-EBF5-4CC0-9555-5B5D5A4332BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC8C2DDC-EBF5-4CC0-9555-5B5D5A4332BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
