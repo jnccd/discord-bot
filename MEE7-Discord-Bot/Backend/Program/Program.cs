@@ -186,10 +186,18 @@ namespace MEE7
             commands = new Command[commandTypes.Length];
             for (int i = 0; i < commands.Length; i++)
             {
-                object test = Activator.CreateInstance(commandTypes[i]);
-                commands[i] = (Command)test;
-                if (commands[i].CommandLine.Contains(" ") || commands[i].Prefix.Contains(" "))
-                    throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" + commands[i].Prefix + commands[i].CommandLine + "\" in " + commands[i]);
+                try
+                {
+                    object test = Activator.CreateInstance(commandTypes[i]);
+                    commands[i] = (Command)test;
+                    if (commands[i].CommandLine.Contains(" ") || commands[i].Prefix.Contains(" "))
+                        throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" +
+                            commands[i].Prefix + commands[i].CommandLine + "\" in " + commands[i]);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Error on instance creation of command: {commands[i].Prefix}{commands[i].CommandLine}", e);
+                }
             }
             commands = commands.OrderBy(x => {
                 if (x.CommandLine == "edit")
