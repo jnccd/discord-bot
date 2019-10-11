@@ -137,7 +137,7 @@ namespace MEE7.Commands
 
                         new Action(async () => {
                             Console.WriteLine("Action was called");
-                            
+
                             IAudioClient client = await channel.ConnectAsync();
                             client.StreamCreated += async (ulong id, AudioInStream stream) => {
                                 Console.WriteLine("StreamCreated was called");
