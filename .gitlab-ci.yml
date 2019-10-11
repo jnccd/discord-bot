@@ -1,22 +1,20 @@
-﻿image: microsoft/dotnet:2.2-sdk
-
-job:
-    script: echo 'test'
-
 stages:
     - build
     - deploy
 
 before_script:
     - cd \MEE7-Discord-Bot
-    - "dotnet restore"
+    - dotnet restore
 
 build:
     stage: build
     script:
-        - "dotnet build"
+        - dotnet build
+    artifacts:
+        paths:
+            - ./
 
 deploy:
     stage: deploy
     script: 
-        - "dotnet run"
+        - dotnet run
