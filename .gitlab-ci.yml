@@ -12,7 +12,7 @@ build:
         - dotnet build
     artifacts:
         paths:
-            - ./
+            - ./MEE7-Discord-Bot/bin/
 
 deploy:
     stage: deploy
