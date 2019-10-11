@@ -196,7 +196,7 @@ namespace MEE7
                 } 
                 catch (Exception e) 
                 {
-                    throw new Exception($"Error on instance creation of command: {commandTypes[i].Name}", e);
+                    throw new Exception($"Error on instance creation of the {i}th command: {commandTypes[i].Name}", e);
                 }
             }
             commands = commands.OrderBy(x => {
