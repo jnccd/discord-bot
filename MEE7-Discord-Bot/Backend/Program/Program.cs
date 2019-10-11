@@ -152,8 +152,24 @@ namespace MEE7
         }
         static void Login()
         {
-            client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BotToken")).Wait();
-            client.StartAsync().Wait();
+            try
+            {
+                client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BotToken")).Wait();
+                client.StartAsync().Wait();
+            }
+            catch (Exception e1)
+            {
+                try
+                {
+                    client.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
+                    client.StartAsync().Wait();
+                }
+                catch (Exception e2)
+                {
+                    Console.WriteLine($"Wrong Bot Tokens!\n\n{e1}\n{e2}");
+                    Environment.Exit(0);
+                }
+            }
         }
         static void CreateCommandInstances()
         {

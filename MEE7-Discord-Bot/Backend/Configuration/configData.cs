@@ -8,6 +8,7 @@ namespace MEE7.Configuration
 {
     public class ConfigData
     {
+        public string BotToken;
         public List<ulong> ChannelsWrittenOn;
         public List<DiscordUser> UserList;
         public List<DiscordServer> ServerList;
@@ -31,6 +32,7 @@ namespace MEE7.Configuration
 
         public ConfigData()
         {
+            BotToken = "<INSERT BOT TOKEN HERE>";
             ChannelsWrittenOn = new List<ulong>();
             UserList = new List<DiscordUser>();
             ServerList = new List<DiscordServer>();

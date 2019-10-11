@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Media;
+using System.Runtime.InteropServices;
 
 namespace Starter
 {
@@ -13,27 +16,14 @@ namespace Starter
     {
         static void Main(string[] args)
         {
-            while (true)
+            if (Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
             {
-                try
-                {
-                    if (Config.Data.BotToken == "<INSERT BOT TOKEN HERE>")
-                    {
-                        ShowWindow(GetConsoleWindow(), 4);
-                        //SystemSounds.Exclamation.Play(); TODO: Support for SystemSounds is planned for .Net Core 3.0
-                        ConsoleWrapper.ConsoleWrite("Give me a Bot Token: ");
-                        Config.Data.BotToken = Console.ReadLine();
-                        Config.Save();
-                    }
-
-                    client.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
-                    client.StartAsync().Wait();
-
-                    gotWorkingToken = true;
-                }
-                catch { Config.Data.BotToken = "<INSERT BOT TOKEN HERE>"; }
+                ShowWindow(GetConsoleWindow(), 4);
+                SystemSounds.Exclamation.Play();
+                Console.Write("Give me a Bot Token: ");
+                Config.Data.BotToken = Console.ReadLine();
+                Config.Save();
             }
-
 
             for (int i = 0; i < 3; i++)
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(Directory.GetCurrentDirectory()));
@@ -45,16 +35,20 @@ namespace Starter
             string runConfig = "Release";
 #endif
 
-            var envVars = new StringDictionary();
-            envVars.Add("BotToken", Config.Data.BotToken);
-            Process.Start(new ProcessStartInfo()
+            var startInfo = new ProcessStartInfo()
             {
                 FileName = "dotnet",
                 Arguments = "run -c " + runConfig,
                 UseShellExecute = false,
                 RedirectStandardInput = false,
-                EnvironmentVariables = envVars,
-            });
+            };
+            startInfo.EnvironmentVariables.Add("BotToken", Config.Data.BotToken);
+            Process.Start(startInfo);
         }
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }
