@@ -7,7 +7,7 @@
     <AssemblyName>MEE7</AssemblyName>
     <StartupObject>MEE7.Program</StartupObject>
     <LangVersion>7.2</LangVersion>
-    <ApplicationIcon>imageres_25.ico</ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
@@ -205,9 +205,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="imageres_25.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="libsodium.dll">
