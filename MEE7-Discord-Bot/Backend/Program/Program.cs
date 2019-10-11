@@ -228,7 +228,8 @@ namespace MEE7
         }
         static void PrintConsoleStartup()
         {
-            Console.CursorLeft = 0;
+            if (!RunningOnCI)
+                Console.CursorLeft = 0;
             ConsoleWrapper.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.White);
             try
             {
@@ -245,7 +246,8 @@ namespace MEE7
             ConsoleWrapper.ConsoleWrite(" on ");
             ConsoleWrapper.ConsoleWriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
             ConsoleWrapper.ConsoleWriteLine("Awaiting your commands: ");
-            clearYcoords = Console.CursorTop;
+            if (!RunningOnCI)
+                clearYcoords = Console.CursorTop;
         }
         static void CallOnConnected()
         {
@@ -275,7 +277,11 @@ namespace MEE7
         {
             while (true)
             {
-                string input = Console.ReadLine();
+                string input = "";
+                if (RunningOnCI)
+                    while (true) { Thread.Sleep(60000); }
+                else
+                    input = Console.ReadLine();
 
                 if (input == "exit")
                     break;
