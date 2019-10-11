@@ -113,7 +113,8 @@ namespace MEE7
 
             LoadBuildDate();
 
-            "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string e) => { ConsoleWrapper.ConsoleWrite(o + e); });
+            if (!RunningOnCI)
+                "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string e) => { ConsoleWrapper.ConsoleWrite(o + e); });
 
             client = new DiscordSocketClient();
             SetClientEvents();
