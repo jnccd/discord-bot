@@ -39,6 +39,7 @@ namespace MEE7
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static Random RDM { get; private set; } = new Random();
         public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\";
+        public static bool RunningOnCI { get; private set; }
         
         // Client 
         static DiscordSocketClient client;
@@ -92,15 +93,22 @@ namespace MEE7
 
         static void StartUp()
         {
-            Console.Title = "MEE7";
-            ShowWindow(GetConsoleWindow(), 2);
-            Thread.CurrentThread.Name = "Main";
-            Console.ForegroundColor = ConsoleColor.White;
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+            RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
 
-            handler = new ConsoleEventDelegate(ConsoleEventCallback);
-            SetConsoleCtrlHandler(handler, true);
+            if (RunningOnCI)
+                ConsoleWrapper.ConsoleWriteLine("CI Environment detected!");
+            else
+            {
+                Console.Title = "MEE7";
+                ShowWindow(GetConsoleWindow(), 2);
+                Thread.CurrentThread.Name = "Main";
+                Console.ForegroundColor = ConsoleColor.White;
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+
+                handler = new ConsoleEventDelegate(ConsoleEventCallback);
+                SetConsoleCtrlHandler(handler, true);
+            }
 
             LoadBuildDate();
 
