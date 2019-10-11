@@ -11,7 +11,7 @@ namespace MEE7.Commands
 {
     public class Ball : Command
     {
-        string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball", "Uhm... I have no idea", "Possibly", "No u" };
+        readonly string[] answers = new string[] { "NO!", "YES!", "No", "Yes", "Maybe", "Ask my wife", "Ask 8ball", "Uhm... I have no idea", "Possibly", "No u" };
 
         public Ball() : base("9ball", "Decides your fate", false)
         {
