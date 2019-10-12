@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Environment = System.Environment;
 
 namespace MEE7
 {
