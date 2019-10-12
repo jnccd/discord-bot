@@ -95,6 +95,8 @@ namespace MEE7
         static void StartUp()
         {
             RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
+            ConsoleWrapper.ConsoleWriteLine($"Navigating to: {ExePath}");
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
 
             if (RunningOnCI)
                 ConsoleWrapper.ConsoleWriteLine("CI Environment detected!");
@@ -104,7 +106,6 @@ namespace MEE7
                 ShowWindow(GetConsoleWindow(), 2);
                 Thread.CurrentThread.Name = "Main";
                 Console.ForegroundColor = ConsoleColor.White;
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
                 Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 
                 handler = new ConsoleEventDelegate(ConsoleEventCallback);
@@ -238,8 +239,7 @@ namespace MEE7
         }
         static void PrintConsoleStartup()
         {
-            if (!RunningOnCI)
-                Console.CursorLeft = 0;
+            Console.CursorLeft = 0;
             ConsoleWrapper.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.White);
             try
             {
@@ -256,8 +256,7 @@ namespace MEE7
             ConsoleWrapper.ConsoleWrite(" on ");
             ConsoleWrapper.ConsoleWriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
             ConsoleWrapper.ConsoleWriteLine("Awaiting your commands: ");
-            if (!RunningOnCI)
-                clearYcoords = Console.CursorTop;
+            clearYcoords = Console.CursorTop;
         }
         static void CallOnConnected()
         {
