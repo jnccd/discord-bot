@@ -87,9 +87,6 @@ namespace MEE7
             HandleConsoleCommandsLoop();
 
             BeforeClose();
-            client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
-            client.StopAsync().Wait();
-            client.LogoutAsync().Wait();
         }
 
         static void StartUp()
@@ -501,13 +498,19 @@ namespace MEE7
         {
             lock (exitlock)
             {
-                ConsoleWrapper.ConsoleWriteLine("Closing... Files are being saved");
-                Config.Save();
                 ConsoleWrapper.ConsoleWriteLine("Closing... Command Exit events are being executed");
                 try { OnExit(); }
                 catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                ConsoleWrapper.ConsoleWriteLine("Closing... Files are being saved");
+                Config.Save();
                 ConsoleWrapper.ConsoleWriteLine("Closing... Removing Error Emojis");
                 DisposeErrorMessages();
+
+                ConsoleWrapper.ConsoleWriteLine("Closing... Logging out");
+                client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
+                client.StopAsync().Wait();
+                client.LogoutAsync().Wait();
+
                 exitedNormally = true;
             }
         }
@@ -538,6 +541,12 @@ namespace MEE7
             else
                 ConsoleWrapper.ConsoleWriteLine(msg.ToString(), color);
             return Task.FromResult(default(object));
+        }
+
+        public static void Exit(int exitCode)
+        {
+            BeforeClose();
+            Environment.Exit(exitCode);
         }
 
         // Client Getters / Wrappers
