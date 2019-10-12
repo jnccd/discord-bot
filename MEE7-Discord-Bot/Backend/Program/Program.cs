@@ -113,8 +113,7 @@ namespace MEE7
             }
 
             LoadBuildDate();
-
-            "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string e) => { ConsoleWrapper.ConsoleWrite(o + e); });
+            UpdateYTDL();
 
             client = new DiscordSocketClient();
             SetClientEvents();
@@ -148,6 +147,25 @@ namespace MEE7
                 if (buildDate == null)
                     buildDate = "Error: Couldn't read build date!";
             }
+        }
+        static void UpdateYTDL()
+        {
+            Process ytdlUpdater = new Process
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = "youtube-dl.exe",
+                    Arguments = "-U",
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                }
+            };
+            ytdlUpdater.Start();
+            ytdlUpdater.WaitForExit();
+            ytdlUpdater.Dispose();
         }
         static void SetClientEvents()
         {
