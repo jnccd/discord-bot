@@ -17,7 +17,7 @@ namespace MEE7.Commands
     public class Markow : Command
     {
         bool loadedDict;
-        readonly string saucePath = "Commands\\MarkowSources\\";
+        readonly string saucePath = $"Commands{Path.DirectorySeparatorChar}MarkowSources{Path.DirectorySeparatorChar}";
 
         public Markow() : base("markow", "Generates text", false)
         {

@@ -286,7 +286,7 @@ namespace MEE7
                 catch { }
 
                 ConsoleWrapper.ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
-                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}", ConsoleColor.Red);
+                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", ConsoleColor.Red);
                 Saver.SaveToLog(e.ToString());
             }
             finally

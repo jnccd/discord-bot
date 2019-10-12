@@ -17,9 +17,9 @@ namespace MEE7.Commands
 {
     public class Latex : Command
     {
-        readonly string inputPath = "Commands\\Latex\\input.tex";
-        readonly string batchPath = "Commands\\Latex\\latex.bat";
-        readonly string folderPath = "Commands\\Latex";
+        readonly string inputPath = $"Commands{Path.DirectorySeparatorChar}Latex{Path.DirectorySeparatorChar}input.tex";
+        readonly string batchPath = $"Commands{Path.DirectorySeparatorChar}Latex{Path.DirectorySeparatorChar}latex.bat";
+        readonly string folderPath = $"Commands{Path.DirectorySeparatorChar}Latex";
 
         public Latex() : base("latex", "Renders latex strings", false)
         {

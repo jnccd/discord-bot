@@ -148,7 +148,7 @@ namespace MEE7.Commands
                             };
                             using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
                                 new StreamMediaFoundationReader(
-                                    new FileStream("Commands\\Edit\\StartListeningSoundEffect.mp3", FileMode.Open))))
+                                    new FileStream($"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}StartListeningSoundEffect.mp3", FileMode.Open))))
                                 await MultiMediaHelper.SendAudioAsync(client, naudioStream);
                         }).Invoke();
 

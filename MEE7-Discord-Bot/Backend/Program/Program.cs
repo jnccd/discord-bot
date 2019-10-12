@@ -38,7 +38,7 @@ namespace MEE7
         static ISocketMessageChannel CurrentChannel;
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static Random RDM { get; private set; } = new Random();
-        public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\";
+        public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
         
         // Client 
@@ -95,8 +95,8 @@ namespace MEE7
         static void StartUp()
         {
             RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
-            ConsoleWrapper.ConsoleWriteLine($"Navigating to: {ExePath}");
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
+            ConsoleWrapper.ConsoleWriteLine($"Running in: {Directory.GetCurrentDirectory()}");
 
             if (RunningOnCI)
                 ConsoleWrapper.ConsoleWriteLine("CI Environment detected!");
@@ -114,8 +114,7 @@ namespace MEE7
 
             LoadBuildDate();
 
-            if (!RunningOnCI)
-                "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string e) => { ConsoleWrapper.ConsoleWrite(o + e); });
+            "youtube-dl -U".RunAsConsoleCommand(360, () => { }, (string o, string e) => { ConsoleWrapper.ConsoleWrite(o + e); });
 
             client = new DiscordSocketClient();
             SetClientEvents();

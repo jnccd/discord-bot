@@ -209,7 +209,7 @@ namespace MEE7.Commands
                 catch (Exception e)
                 {
                     DiscordNETWrapper.SendText($"{e.Message} " +
-                        $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}", 
+                        $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", 
                         message.Channel).Wait();
                     return;
                 }
@@ -410,7 +410,7 @@ namespace MEE7.Commands
                     }
                 }
                 catch (Exception e) { throw new Exception($"[{p.Item2.Command}] {e.Message} " + 
-                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split('\\').Last().Replace(":", ", ")}"); }
+                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}"); }
 
                 if (p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType())))
                     throw new Exception($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +

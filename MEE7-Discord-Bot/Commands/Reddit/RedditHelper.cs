@@ -91,7 +91,7 @@ namespace MEE7.Commands
                 await DiscordNETWrapper.SendText("Sending video post. Please wait...", Channel);
 
                 // downlaod video
-                string videofile = "Downloads\\RedditVideo.mp4";
+                string videofile = $"Downloads{Path.DirectorySeparatorChar}RedditVideo.mp4";
                 Directory.CreateDirectory(Path.GetDirectoryName(videofile));
                 if (File.Exists(videofile))
                     File.Delete(videofile);

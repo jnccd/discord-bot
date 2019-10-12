@@ -16,7 +16,7 @@ namespace MEE7.Commands
 {
     public class Place : Command
     {
-        readonly string filePath = "Commands\\Place\\place.png";
+        readonly string filePath = $"Commands{Path.DirectorySeparatorChar}Place{Path.DirectorySeparatorChar}place.png";
         const int placeSize = 500;
         const int pixelSize = 10;
         readonly PlaceCommand[] subCommands;

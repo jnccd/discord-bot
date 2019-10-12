@@ -15,7 +15,7 @@ namespace MEE7.Commands
 {
     public class Haskell : Command
     {
-        readonly string inputPath = "Commands\\Haskell\\input.hs";
+        readonly string inputPath = $"Commands{Path.DirectorySeparatorChar}Haskell{Path.DirectorySeparatorChar}input.hs";
 
         public Haskell() : base("ghc", "Haskell Interpreter", false) { }
 
