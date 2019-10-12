@@ -208,23 +208,23 @@ namespace MEE7
         }
         static void CreateCommandInstances()
         {
-            commands = new Command[commandTypes.Length];
-            for (int i = 0; i < commands.Length; i++)
+            List<Command> commandsList = new List<Command>();
+            for (int i = 0; i < commandTypes.Length; i++)
             {
                 try
                 {
-                    object test = Activator.CreateInstance(commandTypes[i]);
-                    commands[i] = (Command)test;
-                    if (commands[i].CommandLine.Contains(" ") || commands[i].Prefix.Contains(" "))
-                        throw new IllegalCommandException("Commands and Prefixes mustn't contain spaces!\nOn command: \"" +
-                            commands[i].Prefix + commands[i].CommandLine + "\" in " + commands[i]);
+                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]);
+                    if (commandInstance.CommandLine.Contains(" ") || commandInstance.Prefix.Contains(" "))
+                        throw new IllegalCommandException($"Commands and Prefixes mustn't contain spaces!\n" +
+                            $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
+                    commandsList.Add(commandInstance);
                 } 
                 catch (Exception e) 
                 {
-                    throw new Exception($"Error on instance creation of the {i}th command: {commandTypes[i].Name}", e);
+                    ConsoleWrapper.ConsoleWriteLine($"Error on instance creation of {commandTypes[i].Name}!", ConsoleColor.Red);
                 }
             }
-            commands = commands.OrderBy(x => {
+            commands = commandsList.OrderBy(x => {
                 if (x.CommandLine == "edit")
                     return "00000";
                 else
