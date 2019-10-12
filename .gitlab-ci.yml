@@ -8,8 +8,7 @@ before_script:
 build:
     stage: build
     script:
-        - dotnet restore
-        - dotnet build
+        - dotnet build -c Release
     artifacts:
         paths:
             - ./MEE7-Discord-Bot/bin/
@@ -17,4 +16,4 @@ build:
 deploy:
     stage: deploy
     script: 
-        - dotnet run
+        - dotnet run -c Release
