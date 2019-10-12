@@ -150,22 +150,29 @@ namespace MEE7
         }
         static void UpdateYTDL()
         {
-            Process ytdlUpdater = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo()
+                Process ytdlUpdater = new Process
                 {
-                    FileName = "youtube-dl.exe",
-                    Arguments = "-U",
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                }
-            };
-            ytdlUpdater.Start();
-            ytdlUpdater.WaitForExit();
-            ytdlUpdater.Dispose();
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        FileName = "youtube-dl.exe",
+                        Arguments = "-U",
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                    }
+                };
+                ytdlUpdater.Start();
+                ytdlUpdater.WaitForExit();
+                ytdlUpdater.Dispose();
+            }
+            catch
+            {
+                ConsoleWrapper.ConsoleWriteLine("Couldn't update youtube-dl :C", ConsoleColor.Red);
+            }
         }
         static void SetClientEvents()
         {
