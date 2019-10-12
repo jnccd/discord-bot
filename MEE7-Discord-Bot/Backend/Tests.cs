@@ -38,7 +38,7 @@ namespace MEE7.Backend
             },
             // 1 - Video Playing
             () => {
-                string videoPath = Directory.GetCurrentDirectory() + "\\" + MultiMediaHelper.DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
+                string videoPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + MultiMediaHelper.DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
                 ISocketAudioChannel channel = Program.GetChannelFromID(479951814217826305) as ISocketAudioChannel;
                 IAudioClient client = channel.ConnectAsync().Result;
                 MultiMediaHelper.SendAudioAsync(client, videoPath).Wait();

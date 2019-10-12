@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
+using System.IO;
 
 namespace MEE7.Commands
 {
@@ -196,7 +197,7 @@ namespace MEE7.Commands
         enum UnoColor { red, yellow, blue, green, none }
         enum UnoCardType { one, two, three, four, five, six, seven, eight, nine, skip, reverse, plus2, plus4, changecolor }
 
-        readonly static Bitmap CardsTexture = (Bitmap)Bitmap.FromFile("Commands\\Uno\\UNO-Front.png");
+        readonly static Bitmap CardsTexture = (Bitmap)Bitmap.FromFile($"Commands{Path.DirectorySeparatorChar}Uno{Path.DirectorySeparatorChar}UNO-Front.png");
         readonly static List<UnoCard> UnoCards = GetUnoCards();
         List<UnoGame> UnoGames = new List<UnoGame>();
 

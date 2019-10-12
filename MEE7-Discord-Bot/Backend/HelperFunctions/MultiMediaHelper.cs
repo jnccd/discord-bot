@@ -43,7 +43,7 @@ namespace MEE7.Backend.HelperFunctions
 
             lock (youtubeDownloadLock)
             {
-                string videofile = "Downloads\\YoutubeVideo.mp4";
+                string videofile = $"Downloads{Path.DirectorySeparatorChar}YoutubeVideo.mp4";
                 Directory.CreateDirectory(Path.GetDirectoryName(videofile));
                 if (File.Exists(videofile))
                 {
@@ -51,7 +51,7 @@ namespace MEE7.Backend.HelperFunctions
                     while (true)
                     {
                         if (File.Exists(videofile) && new FileInfo(videofile).IsFileLocked())
-                            videofile = $"Downloads\\YoutubeVideo{++i}.mp4";
+                            videofile = $"Downloads{Path.DirectorySeparatorChar}YoutubeVideo{++i}.mp4";
                         else
                         {
                             File.Delete(videofile);

@@ -84,7 +84,7 @@ namespace MEE7.Commands
 
                 lock (memifyLock)
                 {
-                    string[] files = Directory.GetFiles("Commands\\MemeTemplates");
+                    string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTemplates");
 
                     string memeTemplateDesign = "";
                     if (a[0] as string == "-list")
@@ -147,7 +147,7 @@ namespace MEE7.Commands
                 },
                 (SocketMessage m, object[] a, object o) => {
 
-                string[] files = Directory.GetFiles("Commands\\MemeTextTemplates");
+                string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTextTemplates");
                 string memeName = a[0] as string;
 
                 if (memeName.Contains("-list"))

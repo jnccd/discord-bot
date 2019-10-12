@@ -8,7 +8,7 @@ namespace Starter
     public static class Config
     {
         static readonly object lockject = new object();
-        static readonly string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\";
+        static readonly string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         static readonly string configPath = exePath + "config.json";
         static readonly string configBackupPath = exePath + "config_backup.json";
         public static bool UnsavedChanges = false;
