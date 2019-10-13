@@ -273,9 +273,9 @@ namespace MEE7
                 }
             }
             catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
-            ConsoleWrapper.ConsoleWrite("Default channel is: ");
+            ConsoleWrapper.Write("Default channel is: ");
             ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
-            ConsoleWrapper.ConsoleWrite(" on ");
+            ConsoleWrapper.Write(" on ");
             ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
             ConsoleWrapper.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
@@ -357,7 +357,7 @@ namespace MEE7
                         {
                             CurrentChannel = (ISocketMessageChannel)textChannel;
                             ConsoleWrapper.WriteLine("Succsessfully set new channel!", ConsoleColor.Green);
-                            ConsoleWrapper.ConsoleWrite("Current channel is: ");
+                            ConsoleWrapper.Write("Current channel is: ");
                             ConsoleWrapper.WriteLine(CurrentChannel, ConsoleColor.Magenta);
                         }
                         else
@@ -491,7 +491,7 @@ namespace MEE7
                 }
                 else
                     ConsoleWrapper.WriteLine("I dont know that command.", ConsoleColor.Red);
-                ConsoleWrapper.ConsoleWrite("$");
+                ConsoleWrapper.Write("$");
             }
         }
 
