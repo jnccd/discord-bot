@@ -209,8 +209,6 @@ namespace MEE7.Commands
 
                 Vector2 Transform(Vector2 point, Vector2 centerT, Bitmap within, float strength, TransformMode modeT)
                 {
-                        ConsoleWrapper.WriteLine($"Tranform was called with {point}", ConsoleColor.Cyan);
-
                     Vector2 diff = point - centerT;
                     Vector2 move = diff;
                     move.Normalize();
@@ -261,6 +259,9 @@ namespace MEE7.Commands
                             break;
                     }
 
+                        if (point.X == centerT.X)
+                            ConsoleWrapper.WriteLine($"Tranform was called with {point} results in {target}");
+
                     if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
                         target.X = point.X;
                     if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
@@ -273,6 +274,8 @@ namespace MEE7.Commands
                         target.Y = 0;
                     if (target.Y > within.Height - 1)
                         target.Y = within.Height - 1;
+
+                    ConsoleWrapper.WriteLine($"Tranform was called with {point}", ConsoleColor.Cyan);
 
                     return target;
                 }
@@ -291,7 +294,6 @@ namespace MEE7.Commands
                         for (int y = 0; y < bmp.Height; y++)
                         {
                             Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
-                                ConsoleWrapper.WriteLine($"Tranform result for {x} {y} is {target}", ConsoleColor.Cyan);
                             ocon.SetPixel(x, y, bcon.GetPixel((int)target.X, (int)target.Y));
                         }
 
