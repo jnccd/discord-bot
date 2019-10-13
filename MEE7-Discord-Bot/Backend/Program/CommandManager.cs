@@ -109,7 +109,7 @@ namespace MEE7
                     return;
                 }
             }
-            catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+            catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
         }
         private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
@@ -131,7 +131,7 @@ namespace MEE7
                         OnEmojiReactionAdded?.InvokeParallel(arg1, arg2, arg3);
                         OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
             return Task.FromResult(default(object));
@@ -156,7 +156,7 @@ namespace MEE7
                         OnEmojiReactionRemoved?.InvokeParallel(arg1, arg2, arg3);
                         OnEmojiReactionUpdated?.InvokeParallel(arg1, arg2, arg3);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
             return Task.FromResult(default(object));
@@ -174,7 +174,7 @@ namespace MEE7
                 Task.Run(() =>
                 {
                     try { OnNonCommandMessageRecieved.InvokeParallel(message); }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             return Task.FromResult(default(object));
         }
@@ -268,10 +268,10 @@ namespace MEE7
                 command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    ConsoleWrapper.ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                    ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                         $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
                 else
-                    ConsoleWrapper.ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                    ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                        $"DMs \tfor {message.Author.Username}", ConsoleColor.Green);
             }
             catch (Exception e)
@@ -285,7 +285,7 @@ namespace MEE7
                 }
                 catch { }
 
-                ConsoleWrapper.ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
+                ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
                     $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", ConsoleColor.Red);
                 Saver.SaveToLog(e.ToString());
             }

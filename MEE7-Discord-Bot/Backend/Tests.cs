@@ -23,9 +23,9 @@ namespace MEE7.Backend
             {
                 Thread.CurrentThread.Name = "TestThread";
                 index = index == -1 ? CurrentlyActiveTestIndex : index;
-                ConsoleWrapper.ConsoleWriteLine($"Running test {index}");
+                ConsoleWrapper.WriteLine($"Running test {index}");
                 try { TestFunctions[index].Invoke(); }
-                catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 ConsoleWrapper.ConsoleWrite("$");
             });
         }
@@ -34,7 +34,7 @@ namespace MEE7.Backend
         private static readonly Action[] TestFunctions = new Action[] {
             // 0 - Hello World
             () => {
-                ConsoleWrapper.ConsoleWriteLine("Hello world!");
+                ConsoleWrapper.WriteLine("Hello world!");
             },
             // 1 - Video Playing
             () => {
@@ -62,16 +62,16 @@ namespace MEE7.Backend
             // 3 - Events
             () => {
                 OnTest += () => {
-                    ConsoleWrapper.ConsoleWriteLine("lul1");
+                    ConsoleWrapper.WriteLine("lul1");
                 };
                 OnTest += () => {
                     throw new Exception();
                 };
                 OnTest += () => {
-                    ConsoleWrapper.ConsoleWriteLine("lul2");
+                    ConsoleWrapper.WriteLine("lul2");
                 };
                 OnTest += () => {
-                    ConsoleWrapper.ConsoleWriteLine("lul3");
+                    ConsoleWrapper.WriteLine("lul3");
                 };
                 OnTest += () => {
                     throw new Exception();
@@ -80,7 +80,7 @@ namespace MEE7.Backend
             },
             // 4 - Floating Numbers
             () => {
-                ConsoleWrapper.ConsoleWriteLine(1 / 6f);
+                ConsoleWrapper.WriteLine(1 / 6f);
             },
             // 5 - Give everyone Likes Spam
             () => {

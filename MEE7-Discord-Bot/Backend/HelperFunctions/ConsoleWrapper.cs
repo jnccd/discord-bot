@@ -8,7 +8,7 @@ namespace MEE7.Backend.HelperFunctions
     {
         private static readonly object lockject = new object();
 
-        public static void ConsoleWriteLine(object text, ConsoleColor Color)
+        public static void WriteLine(object text, ConsoleColor Color)
         {
             lock (lockject)
             {
@@ -25,7 +25,7 @@ namespace MEE7.Backend.HelperFunctions
                 }
             }
         }
-        public static void ConsoleWriteLine(object text)
+        public static void WriteLine(object text)
         {
             lock (lockject)
             {
@@ -40,7 +40,7 @@ namespace MEE7.Backend.HelperFunctions
                 }
             }
         }
-        public static void ConsoleWrite(object text, ConsoleColor Color)
+        public static void Write(object text, ConsoleColor Color)
         {
             lock (lockject)
             {
@@ -57,7 +57,7 @@ namespace MEE7.Backend.HelperFunctions
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
-        public static void ConsoleWrite(object text)
+        public static void Write(object text)
         {
             lock (lockject)
             {

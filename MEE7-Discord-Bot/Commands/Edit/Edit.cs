@@ -1,20 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Backend.HelperFunctions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.IO;
-using Color = System.Drawing.Color;
-using BumpKit;
+using System.Linq;
 using System.Reflection;
-using System.Linq.Expressions;
-using AnimatedGif;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.HelperFunctions;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace MEE7.Commands
 {

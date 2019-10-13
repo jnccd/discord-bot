@@ -74,7 +74,7 @@ namespace MEE7.Commands
             MarkovHelper.AddToDict(input);
 
             loadedDict = true;
-            ConsoleWrapper.ConsoleWriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
+            ConsoleWrapper.WriteLine("Loaded markow in " + (DateTime.Now - start).TotalSeconds + "s", ConsoleColor.Cyan);
         }
         public void OnNonCommandMessageRecieved(IMessage message)
         {

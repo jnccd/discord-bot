@@ -234,9 +234,9 @@ namespace MEE7.Commands
 
                         re[i] = new Bitmap(sizeX, sizeY);
                         using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
-                        for (int x = 0; x < sizeX; x++)
-                            for (int y = 0; y < sizeY; y++)
-                                c.SetPixel(x,y,TuringColors[curTape[x,y]]);
+                            for (int x = 0; x < sizeX; x++)
+                                for (int y = 0; y < sizeY; y++)
+                                    c.SetPixel(x,y,TuringColors[curTape[x,y]]);
                     }
 
                     return re;
