@@ -10,6 +10,7 @@ using System.Numerics;
 using MEE7.Backend;
 using Color = System.Drawing.Color;
 using MEE7.Backend.HelperFunctions.Extensions;
+using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {
@@ -208,6 +209,8 @@ namespace MEE7.Commands
 
                 Vector2 Transform(Vector2 point, Vector2 centerT, Bitmap within, float strength, TransformMode modeT)
                 {
+                        ConsoleWrapper.WriteLine($"Tranform was called with {point}", ConsoleColor.Cyan);
+
                     Vector2 diff = point - centerT;
                     Vector2 move = diff;
                     move.Normalize();
@@ -288,6 +291,7 @@ namespace MEE7.Commands
                         for (int y = 0; y < bmp.Height; y++)
                         {
                             Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
+                                ConsoleWrapper.WriteLine($"Tranform result for {x} {y} is {target}", ConsoleColor.Cyan);
                             ocon.SetPixel(x, y, bcon.GetPixel((int)target.X, (int)target.Y));
                         }
 

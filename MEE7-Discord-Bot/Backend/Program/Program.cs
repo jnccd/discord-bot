@@ -76,7 +76,7 @@ namespace MEE7
             catch (Exception ex)
             {
                 try { Config.Save(); } catch { }
-                ConsoleWrapper.ConsoleWriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
+                ConsoleWrapper.WriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
                 Saver.SaveToLog("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
             }
         }
@@ -94,10 +94,10 @@ namespace MEE7
         {
             RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
-            ConsoleWrapper.ConsoleWriteLine($"Running in: {Directory.GetCurrentDirectory()}");
+            ConsoleWrapper.WriteLine($"Running in: {Directory.GetCurrentDirectory()}");
 
             if (RunningOnCI)
-                ConsoleWrapper.ConsoleWriteLine("CI Environment detected!");
+                ConsoleWrapper.WriteLine("CI Environment detected!");
             else
             {
                 Console.Title = "MEE7";
@@ -169,7 +169,7 @@ namespace MEE7
             }
             catch
             {
-                ConsoleWrapper.ConsoleWriteLine("Couldn't update youtube-dl :C", ConsoleColor.Red);
+                ConsoleWrapper.WriteLine("Couldn't update youtube-dl :C", ConsoleColor.Red);
             }
         }
         static void SetClientEvents()
@@ -219,7 +219,7 @@ namespace MEE7
                 } 
                 catch (Exception e) 
                 {
-                    ConsoleWrapper.ConsoleWriteLine($"Error on instance creation of {commandTypes[i].Name}!", ConsoleColor.Red);
+                    ConsoleWrapper.WriteLine($"Error on instance creation of {commandTypes[i].Name}!", ConsoleColor.Red);
                 }
             }
             commands = commandsList.OrderBy(x => {
@@ -262,22 +262,22 @@ namespace MEE7
         static void PrintConsoleStartup()
         {
             Console.CursorLeft = 0;
-            ConsoleWrapper.ConsoleWriteLine("Active on the following Servers: ", ConsoleColor.White);
+            ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
             try
             {
                 foreach (SocketGuild g in client.Guilds)
                 {
-                    ConsoleWrapper.ConsoleWrite($"  {g.Name}", ConsoleColor.Magenta);
-                    ConsoleWrapper.ConsoleWriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
+                    ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
+                    ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
                         ConsoleColor.White);
                 }
             }
-            catch { ConsoleWrapper.ConsoleWriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
             ConsoleWrapper.ConsoleWrite("Default channel is: ");
-            ConsoleWrapper.ConsoleWrite(CurrentChannel, ConsoleColor.Magenta);
+            ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
             ConsoleWrapper.ConsoleWrite(" on ");
-            ConsoleWrapper.ConsoleWriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
-            ConsoleWrapper.ConsoleWriteLine("Awaiting your commands: ");
+            ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
+            ConsoleWrapper.WriteLine("Awaiting your commands: ");
             clearYcoords = Console.CursorTop;
         }
         static void CallOnConnected()
@@ -294,11 +294,11 @@ namespace MEE7
                     if (Config.UnsavedChanges)
                     {
                         Config.Save();
-                        ConsoleWrapper.ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved!", ConsoleColor.Cyan);
+                        ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved!", ConsoleColor.Cyan);
                     }
                     else
                     {
-                        ConsoleWrapper.ConsoleWriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved! [Nothing to save]", ConsoleColor.Cyan);
+                        ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Autosaved! [Nothing to save]", ConsoleColor.Cyan);
                     }
                 }
             });
@@ -320,7 +320,7 @@ namespace MEE7
                 if (!input.StartsWith("/"))
                 {
                     if (CurrentChannel == null)
-                        ConsoleWrapper.ConsoleWriteLine("No channel selected!");
+                        ConsoleWrapper.WriteLine("No channel selected!");
                     else if (!string.IsNullOrWhiteSpace(input))
                     {
                         try
@@ -329,14 +329,14 @@ namespace MEE7
                         }
                         catch (Exception e)
                         {
-                            ConsoleWrapper.ConsoleWriteLine(e, ConsoleColor.Red);
+                            ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
                         }
                     }
                 }
                 else if (input.StartsWith("/file "))
                 {
                     if (CurrentChannel == null)
-                        ConsoleWrapper.ConsoleWriteLine("No channel selected!");
+                        ConsoleWrapper.WriteLine("No channel selected!");
                     else
                     {
                         string[] splits = input.Split(' ');
@@ -356,16 +356,16 @@ namespace MEE7
                         if (textChannel != null)
                         {
                             CurrentChannel = (ISocketMessageChannel)textChannel;
-                            ConsoleWrapper.ConsoleWriteLine("Succsessfully set new channel!", ConsoleColor.Green);
+                            ConsoleWrapper.WriteLine("Succsessfully set new channel!", ConsoleColor.Green);
                             ConsoleWrapper.ConsoleWrite("Current channel is: ");
-                            ConsoleWrapper.ConsoleWriteLine(CurrentChannel, ConsoleColor.Magenta);
+                            ConsoleWrapper.WriteLine(CurrentChannel, ConsoleColor.Magenta);
                         }
                         else
-                            ConsoleWrapper.ConsoleWriteLine("Couldn't set new channel!", ConsoleColor.Red);
+                            ConsoleWrapper.WriteLine("Couldn't set new channel!", ConsoleColor.Red);
                     }
                     catch
                     {
-                        ConsoleWrapper.ConsoleWriteLine("Couldn't set new channel!", ConsoleColor.Red);
+                        ConsoleWrapper.WriteLine("Couldn't set new channel!", ConsoleColor.Red);
                     }
                     #endregion
                 }
@@ -396,7 +396,7 @@ namespace MEE7
                     }
                     catch (Exception e)
                     {
-                        ConsoleWrapper.ConsoleWriteLine(e, ConsoleColor.Red);
+                        ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
                     }
                     #endregion
                 }
@@ -445,19 +445,19 @@ namespace MEE7
                     string[] split = input.Split(' ');
                     try
                     {
-                        ConsoleWrapper.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
+                        ConsoleWrapper.WriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        ConsoleWrapper.ConsoleWriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
+                        ConsoleWrapper.WriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
                             Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
                 {
@@ -466,18 +466,18 @@ namespace MEE7
                     {
                         GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
                             AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3])).Wait();
-                        ConsoleWrapper.ConsoleWriteLine("That worked!", ConsoleColor.Cyan);
+                        ConsoleWrapper.WriteLine("That worked!", ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/channels")) // ChannelID
                 {
                     string[] split = input.Split(' ');
                     try
                     {
-                        ConsoleWrapper.ConsoleWriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        ConsoleWrapper.WriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else if (input.StartsWith("/read")) // ChannelID
                 {
@@ -485,12 +485,12 @@ namespace MEE7
                     try
                     {
                         var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
-                        ConsoleWrapper.ConsoleWriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                        ConsoleWrapper.WriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
                     }
-                    catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
+                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 }
                 else
-                    ConsoleWrapper.ConsoleWriteLine("I dont know that command.", ConsoleColor.Red);
+                    ConsoleWrapper.WriteLine("I dont know that command.", ConsoleColor.Red);
                 ConsoleWrapper.ConsoleWrite("$");
             }
         }
@@ -499,15 +499,15 @@ namespace MEE7
         {
             lock (exitlock)
             {
-                ConsoleWrapper.ConsoleWriteLine("Closing... Command Exit events are being executed");
+                ConsoleWrapper.WriteLine("Closing... Command Exit events are being executed");
                 try { OnExit(); }
-                catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e.ToString(), ConsoleColor.Red); }
-                ConsoleWrapper.ConsoleWriteLine("Closing... Files are being saved");
+                catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                ConsoleWrapper.WriteLine("Closing... Files are being saved");
                 Config.Save();
-                ConsoleWrapper.ConsoleWriteLine("Closing... Removing Error Emojis");
+                ConsoleWrapper.WriteLine("Closing... Removing Error Emojis");
                 DisposeErrorMessages();
 
-                ConsoleWrapper.ConsoleWriteLine("Closing... Logging out");
+                ConsoleWrapper.WriteLine("Closing... Logging out");
                 client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
                 client.StopAsync().Wait();
                 client.LogoutAsync().Wait();
@@ -537,10 +537,10 @@ namespace MEE7
             if (log.Length > Console.BufferWidth || log.Contains("\n"))
             {
                 Saver.SaveToLog(log.ToString());
-                ConsoleWrapper.ConsoleWriteLine(DateTime.Now.ToLongTimeString() + " Long log message has been saved to file.", color);
+                ConsoleWrapper.WriteLine(DateTime.Now.ToLongTimeString() + " Long log message has been saved to file.", color);
             }
             else
-                ConsoleWrapper.ConsoleWriteLine(msg.ToString(), color);
+                ConsoleWrapper.WriteLine(msg.ToString(), color);
             return Task.FromResult(default(object));
         }
 
