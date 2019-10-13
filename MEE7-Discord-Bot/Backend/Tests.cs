@@ -26,7 +26,7 @@ namespace MEE7.Backend
                 ConsoleWrapper.WriteLine($"Running test {index}");
                 try { TestFunctions[index].Invoke(); }
                 catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
-                ConsoleWrapper.ConsoleWrite("$");
+                ConsoleWrapper.Write("$");
             });
         }
 
