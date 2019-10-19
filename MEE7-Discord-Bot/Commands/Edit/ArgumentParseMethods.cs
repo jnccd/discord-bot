@@ -16,8 +16,8 @@ namespace MEE7.Commands
         {
             new ArgumentParseMethod(typeof(string), (string s) => s),
             new ArgumentParseMethod(typeof(bool), (string s) => { if (s == "true") return true; else return false; }),
-            new ArgumentParseMethod(typeof(int), (string s) => Convert.ToInt32(s)),
-            new ArgumentParseMethod(typeof(long), (string s) => Convert.ToInt64(s)),
+            new ArgumentParseMethod(typeof(int), (string s) => (int)s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(long), (string s) => (long)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(ulong), (string s) => Convert.ToUInt64(s)),
             new ArgumentParseMethod(typeof(float), (string s) => (float)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(double), (string s) => s.ConvertToDouble()),
