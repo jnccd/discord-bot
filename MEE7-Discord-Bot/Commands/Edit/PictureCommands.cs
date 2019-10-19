@@ -259,9 +259,6 @@ namespace MEE7.Commands
                             break;
                     }
 
-                        if (point.X == centerT.X)
-                            ConsoleWrapper.WriteLine($"Tranform was called on {point} and results in {target}");
-
                     if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
                         target.X = point.X;
                     if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))

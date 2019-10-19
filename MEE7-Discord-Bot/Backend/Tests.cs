@@ -88,6 +88,10 @@ namespace MEE7.Backend
                 foreach (var user in uniServer.Users)
                     try {user.AddRoleAsync(uniServer.GetRole(552459506895028225)).Wait();} catch{}
             },
+            // 6 - OwO
+            () => {
+                
+            },
         };
     }
 }
