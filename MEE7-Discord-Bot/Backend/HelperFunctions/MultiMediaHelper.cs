@@ -84,12 +84,12 @@ namespace MEE7.Backend.HelperFunctions
                 RedirectStandardError = true
             });
         }
-        public static Process CreateFfmpegOut()
+        public static Process CreateFfmpegOut(string filePath)
         {
             return Process.Start(new ProcessStartInfo
             {
                 FileName = "ffmpeg",
-                Arguments = $"-hide_banner -loglevel panic -ac 2 -f s16le -ar 48000 -i file.bin -acodec pcm_u8 -ar 22050 -f wav -",
+                Arguments = $"-hide_banner -loglevel panic -ac 2 -f s16le -ar 48000 -i {filePath} -acodec pcm_u8 -ar 22050 -f wav -",
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
                 RedirectStandardError = true
