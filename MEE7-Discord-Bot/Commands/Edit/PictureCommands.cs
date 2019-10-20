@@ -388,7 +388,7 @@ namespace MEE7.Commands
                                 Color r = con.GetPixel(x + intesity > bmp.Width - 1 ? bmp.Width - 1 : x + intesity, y);
                                 Color g = con.GetPixel(x, y);
                                 Color b = con.GetPixel(x - intesity < 0 ? 0 : x - intesity, y);
-                                con.SetPixel(x, y, Color.FromArgb(r.R, g.G, b.B));
+                                con.SetPixel(x, y, Color.FromArgb(g.A, r.R, g.G, b.B));
                             }
 
                     return bmp;
