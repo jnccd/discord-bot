@@ -15,7 +15,7 @@ namespace MEE7.Commands
         static readonly ArgumentParseMethod[] ArgumentParseMethods = new ArgumentParseMethod[]
         {
             new ArgumentParseMethod(typeof(string), (string s) => s),
-            new ArgumentParseMethod(typeof(bool), (string s) => { if (s == "true") return true; else return false; }),
+            new ArgumentParseMethod(typeof(bool), (string s) => { if (s.ToLower() == "true") return true; else return false; }),
             new ArgumentParseMethod(typeof(int), (string s) => (int)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(long), (string s) => (long)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(ulong), (string s) => Convert.ToUInt64(s)),
