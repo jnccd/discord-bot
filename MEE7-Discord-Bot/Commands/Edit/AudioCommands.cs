@@ -78,19 +78,22 @@ namespace MEE7.Commands
                 return output;
 
             }),
-            //new EditCommand("pitch", "Adds a Pitch to the sound", typeof(WaveStream), typeof(IWaveProvider), new Argument[] { new Argument("PitchFactor", typeof(float), null) }, 
-            //        (SocketMessage m, object[] args, object o) => {
+            new EditCommand("pitch", "Adds a Pitch to the sound", typeof(WaveStream), typeof(IWaveProvider), new Argument[] { new Argument("PitchFactor", typeof(float), null) },
+                    (SocketMessage m, object[] args, object o) => {
 
-            //            SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider((o as WaveStream).ToSampleProvider()) 
-            //            { 
-            //                PitchFactor = (float)args[0] 
-            //            };
-            //            return pitch.ToWaveProvider();
+                        SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider((o as WaveStream).ToSampleProvider())
+                        {
+                            PitchFactor = (float)args[0]
+                        };
 
-            //            Stream s = new MemoryStream();
-            //            WaveFileWriter.WriteWavFileToStream(s, pitch.ToWaveProvider());
-            //            return new RawSourceWaveStream(s, new WaveFormat());
-            //}),
+                        byte[] buffer = new byte[4096];
+                        MemoryStream ms = new MemoryStream();
+                        IWaveProvider prov = pitch.ToWaveProvider();
+                        while (prov.Read(buffer, 0, buffer.Length) > 0)
+                            ms.Write(buffer, 0, buffer.Length);
+                        ms.Position = 0;
+                        return new RawSourceWaveStream(ms, prov.WaveFormat);
+            }),
         };
     }
 }

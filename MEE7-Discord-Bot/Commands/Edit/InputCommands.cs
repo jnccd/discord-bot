@@ -125,9 +125,14 @@ namespace MEE7.Commands
                 new Argument[] { new Argument("User ID", typeof(ulong), 0), new Argument("Recording Time in Seconds", typeof(int), 5) },
                 (SocketMessage m, object[] args, object o) => {
 
+                    string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}audioFromVoice.bin";
+
                     ulong? userID = args[0] as ulong?;
-                    int recordingTime = (args[1] as int?).Value * 1000;
+                    int recordingTime = (args[1] as int?).Value;
                     MemoryStream memOut = new MemoryStream();
+
+                    if (recordingTime > 10)
+                        throw new Exception("Thats too long UwU");
 
                     using (MemoryStream mem = new MemoryStream()) {
 
@@ -144,6 +149,7 @@ namespace MEE7.Commands
                         new Action(async () => {
                             try
                             {
+                                Thread.CurrentThread.Name = "Fuck";
                                 IAudioClient client = await channel.ConnectAsync();
 
                                 using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
@@ -163,8 +169,16 @@ namespace MEE7.Commands
                                 while (await streamMeUpScotty.ReadAsync(buffer, 0, buffer.Length) > 0 && (DateTime.Now - startListeningTime).TotalSeconds < recordingTime)
                                     mem.Write(buffer, 0, buffer.Length);
 
-                                using (Process P = MultiMediaHelper.CreateFfmpegOut())
+                                try { channel.DisconnectAsync().Wait(); } catch { }
+
+                                mem.Position = 0;
+                                using (FileStream f = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                                    mem.CopyTo(f);
+
+                                using (Process P = MultiMediaHelper.CreateFfmpegOut(filePath))
                                     P.StandardOutput.BaseStream.CopyTo(memOut);
+
+                                File.Delete(filePath);
                             }
                             catch (Exception e)
                             {
