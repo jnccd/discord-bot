@@ -121,61 +121,67 @@ namespace MEE7.Commands
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
                     }
             }),
-            new EditCommand("audioFromVoice[WIP]", "Records audio from the voice chat you are currently in", null, typeof(WaveStream),
-                new Argument[] { new Argument("Recording Time in Seconds", typeof(int), 5) },
+            new EditCommand("audioFromVoice[WIP]?", "Records audio from the voice chat you are currently in", null, typeof(WaveStream),
+                new Argument[] { new Argument("User ID", typeof(ulong), 0), new Argument("Recording Time in Seconds", typeof(int), 5) },
                 (SocketMessage m, object[] args, object o) => {
 
-                    int recordingTime = (args[0] as int?).Value * 1000;
+                    ulong? userID = args[0] as ulong?;
+                    int recordingTime = (args[1] as int?).Value * 1000;
+                    MemoryStream memOut = new MemoryStream();
+
                     using (MemoryStream mem = new MemoryStream()) {
 
                         SocketGuild g = Program.GetGuildFromChannel(m.Channel);
                         ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
-                        if (channel != null)
-                        {
-                            try { channel.DisconnectAsync().Wait(); } catch { }
 
-                            bool doneListening = false;
-
-                            new Action(async () => {
-                                try
-                                {
-                                    IAudioClient client = await channel.ConnectAsync();
-
-                                    using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
-                                        new StreamMediaFoundationReader(
-                                            new FileStream($"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}StartListeningSoundEffect.mp3", FileMode.Open))))
-                                        await MultiMediaHelper.SendAudioAsync(client, naudioStream);
-
-                                    DateTime startListeningTime = DateTime.Now;
-
-                                    var u = (SocketGuildUser)(await channel.GetUsersAsync().FlattenAsync()).First(x => !x.IsBot);
-
-                                    var streamMeUpScotty = (InputStream)u.AudioStream;
-                                    var buffer = new byte[4096];
-                                    while (await streamMeUpScotty.ReadAsync(buffer, 0, buffer.Length) > 0 && mem.Position < 10000)
-                                    {
-                                        mem.Write(buffer, 0, buffer.Length);
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    ;
-                                }
-                                finally
-                                {
-                                    doneListening = true;
-                                }
-                            }).Invoke();
-
-                            while (!doneListening)
-                                Thread.Sleep(100);
-
-                            mem.Position = 0;
-                        }
-                        else
+                        if (channel == null)
                             throw new Exception("You are not in an AudioChannel on this server!");
 
-                        return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
+                        try { channel.DisconnectAsync().Wait(); } catch { }
+
+                        bool doneListening = false;
+
+                        new Action(async () => {
+                            try
+                            {
+                                IAudioClient client = await channel.ConnectAsync();
+
+                                using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
+                                    new StreamMediaFoundationReader(
+                                        new FileStream($"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}StartListeningSoundEffect.mp3", FileMode.Open))))
+                                    await MultiMediaHelper.SendAudioAsync(client, naudioStream);
+
+                                var u = (SocketGuildUser)(await channel.GetUsersAsync().FlattenAsync()).FirstOrDefault(x => userID == 0 ? !x.IsBot : !x.IsBot && x.Id == userID);
+
+                                if (u == null)
+                                    throw new Exception("I cant find that user!");
+
+                                var streamMeUpScotty = (InputStream)u.AudioStream;
+
+                                var buffer = new byte[4096];
+                                DateTime startListeningTime = DateTime.Now;
+                                while (await streamMeUpScotty.ReadAsync(buffer, 0, buffer.Length) > 0 && (DateTime.Now - startListeningTime).TotalSeconds < recordingTime)
+                                    mem.Write(buffer, 0, buffer.Length);
+
+                                using (Process P = MultiMediaHelper.CreateFfmpegOut())
+                                    P.StandardOutput.BaseStream.CopyTo(memOut);
+                            }
+                            catch (Exception e)
+                            {
+                                ;
+                            }
+                            finally
+                            {
+                                try { channel.DisconnectAsync().Wait(); } catch { }
+                                doneListening = true;
+                            }
+                        }).Invoke();
+
+                        while (!doneListening)
+                            Thread.Sleep(100);
+
+                        memOut.Position = 0;
+                        return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(memOut));
                     }
             }),
             new EditCommand("turingDrawing", "Creates a random turing machine which operates on looped 2D tape", null, typeof(Bitmap[]),
