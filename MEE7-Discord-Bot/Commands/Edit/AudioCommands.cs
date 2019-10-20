@@ -91,6 +91,19 @@ namespace MEE7.Commands
                         WaveFileWriter.CreateWaveFile16(filePath, pitch);
                         return new WaveFileReader(filePath);
             }),
+            new EditCommand("volume", "Adds Volume to the sound", typeof(WaveStream), typeof(WaveStream), new Argument[] { new Argument("VolumeFactor", typeof(float), null) },
+                    (SocketMessage m, object[] args, object o) => {
+
+                        string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}volume.bin";
+
+                        VolumeSampleProvider  pitch = new VolumeSampleProvider((o as WaveStream).ToSampleProvider())
+                        {
+                            Volume = (float)args[0]
+                        };
+
+                        WaveFileWriter.CreateWaveFile16(filePath, pitch);
+                        return new WaveFileReader(filePath);
+            }),
         };
     }
 }
