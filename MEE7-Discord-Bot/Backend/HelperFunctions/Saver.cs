@@ -10,6 +10,7 @@ namespace MEE7.Backend.HelperFunctions
     public static class Saver
     {
         readonly static string LogPath = "Log.txt";
+        private static readonly object LogFileLock = new object();
 
         public static void SaveChannel(IChannel Channel)
         {
@@ -38,13 +39,16 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void SaveToLog(string message)
         {
-            using (StreamWriter sw = File.AppendText(LogPath))
+            lock (LogFileLock)
             {
-                sw.WriteLine();
-                sw.WriteLine("==========================Logging========================");
-                sw.WriteLine("============Start=============" + DateTime.Now);
-                sw.WriteLine(message);
-                sw.WriteLine("=============End=============");
+                using (StreamWriter sw = File.AppendText(LogPath))
+                {
+                    sw.WriteLine();
+                    sw.WriteLine("==========================Logging========================");
+                    sw.WriteLine("============Start=============" + DateTime.Now);
+                    sw.WriteLine(message);
+                    sw.WriteLine("=============End=============");
+                }
             }
         }
     }

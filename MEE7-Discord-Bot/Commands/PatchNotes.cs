@@ -62,7 +62,7 @@ namespace MEE7.Commands
                 foreach (ulong id in Config.Data.PatchNoteSubscribedChannels)
                     DiscordNETWrapper.SendEmbed(Embed, (ISocketMessageChannel)Program.GetChannelFromID(id)).Wait();
 #else
-                ConsoleWrapper.ConsoleWriteLine("Patch Notes:" + PatchNotes.Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
+                ConsoleWrapper.WriteLine("Patch Notes:" + PatchNotes.Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
 #endif
             }
         }
