@@ -75,19 +75,25 @@ namespace MEE7.Backend.HelperFunctions
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
 
-            Process P = new Process
+            return Process.Start(new ProcessStartInfo()
             {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = "youtube-dl",
-                    Arguments = $"--audio-format {audioFormat} -o - {YoutubeURL}",
-                    RedirectStandardOutput = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardError = true
-                }
-            };
-            P.Start();
-            return P;
+                FileName = "youtube-dl",
+                Arguments = $"--audio-format {audioFormat} -o - {YoutubeURL}",
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true
+            });
+        }
+        public static Process CreateFfmpegOut()
+        {
+            return Process.Start(new ProcessStartInfo
+            {
+                FileName = "ffmpeg",
+                Arguments = $"-hide_banner -loglevel panic -ac 2 -f s16le -ar 48000 -i file.bin -acodec pcm_u8 -ar 22050 -f wav -",
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true
+            });
         }
         public static async Task SendAudioAsync(IAudioClient audioClient, Stream stream)
         {
