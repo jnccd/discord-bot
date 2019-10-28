@@ -6,6 +6,7 @@ using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Configuration;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,9 +89,10 @@ namespace MEE7.Backend
                 foreach (var user in uniServer.Users)
                     try {user.AddRoleAsync(uniServer.GetRole(552459506895028225)).Wait();} catch{}
             },
-            // 6 - OwO
+            // 6 - Long ass message
             () => {
-                
+                var doomedChannel = (IMessageChannel)Program.GetChannelFromID(630515207608729640);
+                DiscordNETWrapper.SendText(new string(Enumerable.Repeat('.', 1000).ToArray()) + new string(Enumerable.Repeat('\n', 1000).ToArray()), doomedChannel).Wait();
             },
         };
     }

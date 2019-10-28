@@ -10,7 +10,7 @@ namespace MEE7.Commands.CAUServerSpecific
     {
 
 
-        public ManageRolesByEmote() : base("sendRoleEmojiMessage", "", false, true)
+        public ManageRolesByEmote() : base("sendRoleEmojiMessage", "", isExperimental: false, isHidden: true)
         {
             
         }

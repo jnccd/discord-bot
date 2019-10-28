@@ -11,7 +11,7 @@ namespace MEE7.Commands
 {
     public class Template : Command
     {
-        public Template() : base("", "", true, true)
+        public Template() : base("", "", isExperimental: false, isHidden: true)
         {
 
         }
