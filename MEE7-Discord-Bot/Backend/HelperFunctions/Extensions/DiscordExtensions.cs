@@ -54,6 +54,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 for (i = 1; text.Length >= 1015; i++)
                 {
                     int cutIndex = text.AllIndexesOf("\n").Where(x => x <= 1020).Max();
+                    if (cutIndex <= 0) return;
                     e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text.Substring(0, cutIndex), IsInline = IsInline });
                     text = text.Remove(0, cutIndex);
                 }
