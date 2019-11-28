@@ -36,6 +36,22 @@ namespace MEE7.Commands
                 
                 return bmp;
             }),
+            new EditCommand("reddify", "Make it red af", typeof(Bitmap), typeof(Bitmap), new Argument[0],
+                (SocketMessage m, object[] a, object o) => {
+
+                Bitmap bmp = (o as Bitmap);
+
+                using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                    for (int x = 0; x < bmp.Width; x++)
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            Color c = con.GetPixel(x, y);
+                            c = Color.FromArgb(c.R, 0, 0, 255);
+                            con.SetPixel(x, y, c);
+                        }
+
+                return bmp;
+            }),
             new EditCommand("invert", "Invert the color of each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0],
                 (SocketMessage m, object[] a, object o) => {
 
