@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MEE7.Commands.CAUServerSpecific;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,7 @@ namespace MEE7.Configuration
         public string TwitchAPIClientID;
         public string TwitchAPIAccessToken;
         public string ExtraStuff;
+        public List<ManageRoleByEmoteMessage> manageRoleByEmoteMessages;
 
         public ConfigData()
         {
@@ -43,6 +45,7 @@ namespace MEE7.Configuration
             LoadedMarkovTextFiles = new List<string>();
             MessagePreviewServers = new List<ulong>();
             WarframeIDList = new List<string>();
+            manageRoleByEmoteMessages = new List<ManageRoleByEmoteMessage>();
         }
     }
 }
