@@ -288,8 +288,8 @@ namespace MEE7.Commands
                     if (target.Y > within.Height - 1)
                         target.Y = within.Height - 1;
 
-                    if (point.X == centerT.X)
-                        ConsoleWrapper.WriteLine($"Tranform was called with {point} and resulted in {target}", ConsoleColor.Cyan);
+                    // if (point.X == centerT.X)
+                    //     ConsoleWrapper.WriteLine($"Tranform was called with {point} and resulted in {target}", ConsoleColor.Cyan);
 
                     return target;
                 }

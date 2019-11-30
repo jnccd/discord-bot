@@ -41,6 +41,7 @@ namespace MEE7
         public static Random RDM { get; private set; } = new Random();
         public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
+        public static bool RunningOnLinux { get; private set; }
         
         // Client 
         static DiscordSocketClient client;
@@ -93,6 +94,8 @@ namespace MEE7
         static void StartUp()
         {
             RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
+            RunningOnLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
             ConsoleWrapper.WriteLine($"Running in: {Directory.GetCurrentDirectory()}");
 
@@ -101,13 +104,15 @@ namespace MEE7
             else
             {
                 Console.Title = "MEE7";
-                ShowWindow(GetConsoleWindow(), 2);
+                if (!RunningOnLinux)
+                    ShowWindow(GetConsoleWindow(), 2);
                 Thread.CurrentThread.Name = "Main";
                 Console.ForegroundColor = ConsoleColor.White;
                 Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 
                 handler = new ConsoleEventDelegate(ConsoleEventCallback);
-                SetConsoleCtrlHandler(handler, true);
+                if (!RunningOnLinux)
+                    SetConsoleCtrlHandler(handler, true);
             }
 
             LoadBuildDate();

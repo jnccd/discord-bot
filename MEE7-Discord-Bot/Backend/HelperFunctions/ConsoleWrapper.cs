@@ -16,8 +16,9 @@ namespace MEE7.Backend.HelperFunctions
                     Console.WriteLine(text);
                 else
                 {
-                    if (Console.CursorLeft == 1)
-                        Console.CursorLeft = 0;
+                    if (!Program.RunningOnLinux)
+                        if (Console.CursorLeft == 1)
+                            Console.CursorLeft = 0;
                     Console.ForegroundColor = Color;
                     Console.WriteLine(text);
                     Console.ForegroundColor = ConsoleColor.White;
