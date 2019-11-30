@@ -76,7 +76,7 @@ namespace MEE7
             }
             catch (Exception ex)
             {
-                try { Config.Save(); } catch { }
+                try { Config.Save(); } catch (Exception e) { Console.WriteLine("Config Save Error: " + e); }
                 ConsoleWrapper.WriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
                 Saver.SaveToLog("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
             }

@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using MEE7.Backend.Configuration;
+using System;
 using System.Linq;
 
 namespace MEE7.Backend.HelperFunctions.Extensions
@@ -72,6 +74,10 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 return (e as Emote).ToString();
             else
                 return e.Name;
+        }
+        public static string Print(this DiscordEmote e)
+        {
+            return e.ToIEmote().Print();
         }
     }
 }
