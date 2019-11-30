@@ -266,7 +266,7 @@ namespace MEE7
 
                 Saver.SaveUser(message.Author.Id);
                 command.Execute(message);
-
+                
                 if (message.Channel is SocketGuildChannel)
                     ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                         $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);

@@ -131,7 +131,10 @@ namespace MEE7.Backend.HelperFunctions.Extensions
         }
         public static double ConvertToDouble(this string s)
         {
-            return Convert.ToDouble(s.Replace('.', ','));
+            if (CultureInfo.CurrentCulture.Name == "de-DE")
+                return Convert.ToDouble(s.Replace('.', ','));
+            else
+                return Convert.ToDouble(s);
         }
         public static string ToCapital(this string s)
         {
