@@ -66,5 +66,12 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             m.Content = newContent;
             return m;
         }
+        public static string Print(this IEmote e)
+        {
+            if (e is Emote)
+                return (e as Emote).ToString();
+            else
+                return e.Name;
+        }
     }
 }
