@@ -8,9 +8,9 @@ before_script:
 build:
     stage: build
     script:
-        - docker build -t MEEIMAGE -f Dockerfile .
+        - docker build -t meesevenimage -f Dockerfile .
 
 deploy:
     stage: deploy
     script: 
-        - docker run -it --rm MEEIMAGE
+        - docker run -it --rm meesevenimage
