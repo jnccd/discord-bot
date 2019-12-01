@@ -1,16 +1,9 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2
 WORKDIR /app
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
-RUN dotnet restore
+RUN cd MEE7-Discord-Bot/ && dotnet restore
 
-# Copy everything else and build
-COPY . ./
+COPY app/bin/Release/netcoreapp2.2/publish/ app/
 RUN dotnet publish -c Release -o out
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
-WORKDIR /app
-COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "aspnetcoreapp.dll"]
+ENTRYPOINT ["dotnet", "app/MEE7.dll"]

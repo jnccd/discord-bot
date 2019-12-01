@@ -8,12 +8,9 @@ before_script:
 build:
     stage: build
     script:
-        - docker build -t aspnetcoreapp .
-    artifacts:
-        paths:
-            - ./MEE7-Discord-Bot/bin/
+        - docker build -t MEEIMAGE -f Dockerfile .
 
 deploy:
     stage: deploy
     script: 
-        - docker run -d -p 8080:80 --name myapp aspnetcoreapp
+        - docker run -it --rm MEEIMAGE
