@@ -10,13 +10,13 @@ using MEE7.Configuration;
 using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.Configuration;
 
-namespace MEE7.Commands.CAUServerSpecific
+namespace MEE7.Commands
 {
     public class ManageRoleByEmoteMessage
     {
         public ulong MessageID;
         public ulong ChannelID;
-
+ 
         public List<Tuple<
             DiscordEmote, // Emote by Name,EmoteID,GuildID
             ulong> // RoleID
