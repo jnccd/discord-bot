@@ -81,6 +81,14 @@ namespace MEE7.Commands
                     string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
                     return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
             }),
+            new EditCommand("profilePictureG", "Gets a profile picture gif", null, typeof(Bitmap[]),
+                new Argument[] { new Argument("User ID / User Mention", typeof(string), null) },
+                (SocketMessage m, object[] args, object o) => {
+
+                    SocketUser luser = Program.GetUserFromId(Convert.ToUInt64((args[0] as string).Trim(new char[] { ' ', '<', '>', '@', '!' })));
+                    string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
+                    return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsFromGIFURL();
+            }),
             new EditCommand("serverPicture", "Gets the server picture from a server id", null, typeof(Bitmap),
                 new Argument[] { new Argument("Server ID", typeof(string), null) },
                 (SocketMessage m, object[] args, object o) => {
