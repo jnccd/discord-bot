@@ -16,7 +16,7 @@ namespace MEE7.Commands.CAUServerSpecific
     {
         public ulong MessageID;
         public ulong ChannelID;
-
+ 
         public List<Tuple<
             DiscordEmote, // Emote by Name,EmoteID,GuildID
             ulong> // RoleID

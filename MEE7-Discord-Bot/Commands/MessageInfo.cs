@@ -12,7 +12,7 @@ namespace MEE7.Commands._1FileCommands
 {
     class MessageInfo : Command
     {
-        public MessageInfo() : base("messageInfo", "Posts message information, takes message ID as argument", false)
+        public MessageInfo() : base("messageInfo", "Posts message information, takes message ID as argument", isExperimental: false, isHidden: false)
         {
 
         }
@@ -39,6 +39,14 @@ namespace MEE7.Commands._1FileCommands
             embed.AddFieldDirectly("Source:", m.Source, true);
             embed.AddFieldDirectly("Tags:", m.Tags.Count, true);
             embed.AddFieldDirectly("Type:", m.Type, true);
+            try {
+                embed.AddFieldDirectly("Emotes:", m.Content.GetEverythingBetweenAll("<", ">").
+                Select(x => Emote.TryParse($"<{x}>", out Emote e) ? e : null).
+                Where(x => x != null).
+                Select(x => x.Url).
+                Combine("\n"));
+            } catch {}
+            
             DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();
         }
     }
