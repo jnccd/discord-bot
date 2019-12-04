@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2
 WORKDIR /app
 
-RUN cd MEE7-Discord-Bot/ && dotnet restore
+RUN dotnet restore
 
 COPY app/bin/Release/netcoreapp2.2/publish/ app/
 RUN dotnet publish -c Release -o out
