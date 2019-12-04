@@ -16,6 +16,7 @@ using BumpKit;
 using Discord.Audio;
 using System.Threading;
 using Discord.Audio.Streams;
+using System.Numerics;
 
 namespace MEE7.Commands
 {
@@ -108,7 +109,7 @@ namespace MEE7.Commands
                         FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':'))).Url.
                         GetBitmapFromURL();
             }),
-            new EditCommand("gifEmote", "Gets the pictures of the emote", null, typeof(Bitmap[]),
+            new EditCommand("emoteG", "Gets the pictures of the emote", null, typeof(Bitmap[]),
                 new Argument[] { new Argument("Emote", typeof(string), null) },
                 (SocketMessage m, object[] args, object o) => {
 
@@ -117,6 +118,129 @@ namespace MEE7.Commands
                     return Program.GetGuildFromChannel(m.Channel).Emotes.
                         FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':')) && x.Animated).Url.
                         GetBitmapsFromGIFURL();
+            }),
+            new EditCommand("mandelbrot", "Render a mandelbrot", null, typeof(Bitmap), 
+                new Argument[] { 
+                    new Argument("Zoom", typeof(double), 1),
+                    new Argument("Camera", typeof(Vector2), new Vector2(0, 0)),
+                    new Argument("Passes", typeof(int), 40),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                    Bitmap bmp = new Bitmap(500, 500);
+                    double zoom = (a[0] as double?).GetValueOrDefault();
+                    Vector2 cam = (a[1] as Vector2?).GetValueOrDefault();
+                    int passes = (a[2] as int?).GetValueOrDefault();
+
+                    if (passes > 200)
+                        throw new Exception("200 passes should be enough, everything else would be spam and you dont wanna spam");
+
+                    zoom = Math.Pow(2, -zoom);
+
+                    using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                        for (int x = 0; x < bmp.Width; x++)
+                            for (int y = 0; y < bmp.Height; y++)
+                            {
+                                double cre = (2 * ((x / (double)bmp.Width) - 0.5)) * zoom - cam.X;
+                                double cim = (2 * ((y / (double)bmp.Height) - 0.5)) * zoom - cam.Y;
+
+                                double x2 = 0, y2 = 0;
+                                int count = 0;
+
+                                for (int i = 0; i < passes; i++)
+	                            {
+		                            if (x2* x2 + y2* y2 < 1)
+                                         count++;
+
+                                    double xtemp = x2 * x2 - y2 * y2 + cre;
+                                    y2 = 2 * x2* y2 + cim;
+		                            x2 = xtemp;
+	                            }
+
+                                var float4 = HSVtoRGB((float)((Math.Atan2(y2, x2) + Math.PI) / (Math.PI * 2) * 360), 1, count * 10);
+                                con.SetPixel(x, y, Color.FromArgb((x2+y2 < 1000 ? 255 : 0), (int)(float4.X * 255), (int)(float4.Y * 255), (int)(float4.Z * 255)));
+                            }
+
+                    return bmp;
+            }),
+            new EditCommand("turingDrawing?", "Creates a random turing machine which operates on looped 2D tape", null, typeof(Bitmap[]),
+                new Argument[] {
+                    new Argument("Num States", typeof(int), 6),
+                    new Argument("Num Symbols", typeof(int), 3),
+                    new Argument("Draw Machine?", typeof(bool), false),
+                },
+                (SocketMessage m, object[] args, object o) => {
+
+                    int states = (int)args[0];
+                    int symbols = (int)args[1];
+
+                    int sizeX = 300, sizeY = sizeX;
+
+                    Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
+
+                    for (int i = 0; i < states; i++)
+                        for (int j = 0; j < symbols; j++)
+                            transitions[i, j] = new Tuple<int, int, Direction>(
+                                Program.RDM.Next(states),
+                                Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
+                                (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
+
+                    if ((bool)args[2])
+                    {
+                        string machine = $"States: {Enumerable.Range(0,states).Select(x => x.ToString()).Combine()}" +
+                            $"Symbols: {Enumerable.Range(0,Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
+                            $"Transitions: ";
+                        for (int i = 0; i < states; i++)
+                            for (int j = 0; j < symbols; j++)
+                                machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
+                        DiscordNETWrapper.SendText(machine, m.Channel).Wait();
+
+                        //Bitmap b = new Bitmap(1000, 1000);
+                        //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
+                        //for (int i = 0; i < states; i++)
+                        //    a.AddVertex(i);
+                        //foreach (var trans in transitions)
+                        //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
+                        //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
+                        //v.Generate();
+                    }
+
+                    Bitmap[] re = new Bitmap[100];
+
+                    int curState = 0;
+                    int curSymbol = 0;
+                    int[,] curTape = new int[sizeX, sizeY];
+                    int curX = sizeX / 2;
+                    int curY = sizeY / 2;
+
+                    for (int i = 0; i < re.Length; i++)
+                    {
+                        for (int k = 0; k < 500; k++)
+                        {
+                            var trans = transitions[curState, curSymbol];
+                            curState = trans.Item1;
+                            curSymbol = trans.Item2;
+                            curTape[curX,curY] = curSymbol;
+
+                            if (trans.Item3 == Direction.Down) curY++;
+                            else if (trans.Item3 == Direction.Up) curY--;
+                            else if (trans.Item3 == Direction.Left) curX--;
+                            else if (trans.Item3 == Direction.Right) curX++;
+
+                            if (curX >= sizeX) curX = 0;
+                            if (curY >= sizeY) curY = 0;
+                            if (curX < 0) curX = sizeX - 1;
+                            if (curY < 0) curY = sizeY - 1;
+                        }
+
+                        re[i] = new Bitmap(sizeX, sizeY);
+                        using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
+                            for (int x = 0; x < sizeX; x++)
+                                for (int y = 0; y < sizeY; y++)
+                                    c.SetPixel(x,y,TuringColors[curTape[x,y]]);
+                    }
+
+                    return re;
             }),
             new EditCommand("audioFromYT", "Gets the mp3 of an youtube video", null, typeof(WaveStream),
                 new Argument[] { new Argument("YouTube Video URL", typeof(string), null) },
@@ -206,90 +330,45 @@ namespace MEE7.Commands
                         return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(memOut));
                     }
             }),
-            new EditCommand("turingDrawing", "Creates a random turing machine which operates on looped 2D tape", null, typeof(Bitmap[]),
-                new Argument[] {
-                    new Argument("Num States", typeof(int), 6),
-                    new Argument("Num Symbols", typeof(int), 3),
-                    new Argument("Draw Machine?", typeof(bool), false),
-                },
-                (SocketMessage m, object[] args, object o) => {
-
-                    int states = (int)args[0];
-                    int symbols = (int)args[1];
-
-                    int sizeX = 300, sizeY = sizeX;
-
-                    Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
-
-                    for (int i = 0; i < states; i++)
-                        for (int j = 0; j < symbols; j++)
-                            transitions[i, j] = new Tuple<int, int, Direction>(
-                                Program.RDM.Next(states),
-                                Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
-                                (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
-
-                    if ((bool)args[2])
-                    {
-                        string machine = $"States: {Enumerable.Range(0,states).Select(x => x.ToString()).Combine()}" +
-                            $"Symbols: {Enumerable.Range(0,Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
-                            $"Transitions: ";
-                        for (int i = 0; i < states; i++)
-                            for (int j = 0; j < symbols; j++)
-                                machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
-                        DiscordNETWrapper.SendText(machine, m.Channel).Wait();
-
-                        //Bitmap b = new Bitmap(1000, 1000);
-                        //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
-                        //for (int i = 0; i < states; i++)
-                        //    a.AddVertex(i);
-                        //foreach (var trans in transitions)
-                        //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
-                        //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
-                        //v.Generate();
-                    }
-
-                    Bitmap[] re = new Bitmap[100];
-
-                    int curState = 0;
-                    int curSymbol = 0;
-                    int[,] curTape = new int[sizeX, sizeY];
-                    int curX = sizeX / 2;
-                    int curY = sizeY / 2;
-                    
-                    for (int i = 0; i < re.Length; i++)
-                    {
-                        for (int k = 0; k < 500; k++)
-                        {
-                            var trans = transitions[curState, curSymbol];
-                            curState = trans.Item1;
-                            curSymbol = trans.Item2;
-                            curTape[curX,curY] = curSymbol;
-                            
-                            if (trans.Item3 == Direction.Down) curY++;
-                            else if (trans.Item3 == Direction.Up) curY--;
-                            else if (trans.Item3 == Direction.Left) curX--;
-                            else if (trans.Item3 == Direction.Right) curX++;
-
-                            if (curX >= sizeX) curX = 0;
-                            if (curY >= sizeY) curY = 0;
-                            if (curX < 0) curX = sizeX - 1;
-                            if (curY < 0) curY = sizeY - 1;
-                        }
-
-                        re[i] = new Bitmap(sizeX, sizeY);
-                        using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
-                            for (int x = 0; x < sizeX; x++)
-                                for (int y = 0; y < sizeY; y++)
-                                    c.SetPixel(x,y,TuringColors[curTape[x,y]]);
-                    }
-
-                    return re;
-            }),
         };
         
         enum Direction { Up, Down, Left, Right }
         static Color[] TuringColors = new Color[] { Color.Black, Color.White, Color.Red, Color.Green, Color.Yellow, Color.Purple, Color.Blue, Color.Brown, Color.Gold, Color.Gray };
 
+        private static Vector4 HSVtoRGB(float H, float S, float V)
+        {
+            H %= 360;
+            if (S > 1)
+                S = 1;
+            if (S < 0)
+                S = 0;
+            if (V > 1)
+                V = 1;
+            if (V < 0)
+                V = 0;
+
+            //using wikipedia formulas https://de.wikipedia.org/wiki/HSV-Farbraum
+            int hi = (int)(H / 60);
+            float f = (H / 60 - hi);
+            float p = V * (1 - S);
+            float q = V * (1 - S * f);
+            float t = V * (1 - S * (1 - f));
+
+            if (hi == 0 || hi == 6)
+                return new Vector4(V, t, p, 1);
+            else if (hi == 1)
+                return new Vector4(q, V, p, 1);
+            else if (hi == 2)
+                return new Vector4(p, V, t, 1);
+            else if (hi == 3)
+                return new Vector4(p, q, V, 1);
+            else if (hi == 4)
+                return new Vector4(t, p, V, 1);
+            else if (hi == 5)
+                return new Vector4(V, p, q, 1);
+            else
+                return new Vector4(0, 0, 0, 0);
+        }
         private static string GetPictureLinkFromMessage(SocketMessage m, string arguments)
         {
             string pic = null;
