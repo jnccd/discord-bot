@@ -203,7 +203,7 @@ namespace MEE7
             }
             else
             {
-                if (!usersWithRunningCommands.Contains(user))
+                if (!usersWithRunningCommands.Contains(user) || user.UserID == Program.Master.Id)
                 {
                     usersWithRunningCommands.Add(user);
 
