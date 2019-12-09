@@ -1,16 +1,11 @@
 stages:
-    - build
     - deploy
 
-before_script:
-    - cd ./MEE7-Discord-Bot
-
-build:
-    stage: build
-    script:
-        - docker build -t meesevenimage -f Dockerfile .
-
 deploy:
+    image:
+        name: docker/compose:1.24.1
+        entrypoint: ["/bin/sh", "-c"]
     stage: deploy
     script: 
-        - docker run meesevenimage
+        - docker-compose build
+        - BotToken=$BOT_TOKEN docker-compose up -d
