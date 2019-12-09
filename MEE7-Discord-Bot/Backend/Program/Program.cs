@@ -86,7 +86,8 @@ namespace MEE7
         {
             StartUp();
 
-            HandleConsoleCommandsLoop();
+            try { HandleConsoleCommandsLoop(); }
+            catch (Exception e) { Limbo(); e.ToString(); }
 
             BeforeClose();
         }
