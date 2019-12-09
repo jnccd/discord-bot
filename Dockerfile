@@ -9,5 +9,6 @@ RUN apt-get update \
 
 RUN dotnet restore
 RUN dotnet build -c Release
+RUN ls -R
 
 CMD ["dotnet", "run", "-c", "Release"]
