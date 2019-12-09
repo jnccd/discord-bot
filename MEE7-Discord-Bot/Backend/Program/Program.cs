@@ -87,7 +87,7 @@ namespace MEE7
             StartUp();
 
             try { HandleConsoleCommandsLoop(); }
-            catch (Exception e) { Limbo(); e.ToString(); }
+            catch (Exception e) { CILimbo(); e.ToString(); }
 
             BeforeClose();
         }
@@ -320,10 +320,10 @@ namespace MEE7
             {
                 string input = "";
                 if (RunningOnCI)
-                    Limbo();
+                    CILimbo();
                 else
                     try { input = Console.ReadLine(); }
-                    catch (Exception e) { Limbo(); e.ToString(); }
+                    catch (Exception e) { CILimbo(); e.ToString(); }
 
                 if (input == "exit")
                     break;
@@ -505,8 +505,11 @@ namespace MEE7
                 ConsoleWrapper.Write("$");
             }
         }
-        static void Limbo() 
-        { 
+        static void CILimbo() 
+        {
+            if (!RunningOnCI)
+                ConsoleWrapper.WriteLine("Detected CI Environment [In Limbo]");
+            RunningOnCI = true;
             while (true) 
             { 
                 Thread.Sleep(int.MaxValue); 
