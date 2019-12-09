@@ -421,8 +421,8 @@ namespace MEE7.Commands
             if (output == null)
                 throw new Exception("I can't print `null` :/");
 
-            if (output is Bitmap[] && (output as Bitmap[]).Length > 50)
-                throw new Exception($"My Internet is too slow to upload gifs this long");
+            //if (output is Bitmap[] && (output as Bitmap[]).Length > 50)
+            //    throw new Exception($"My Internet is too slow to upload gifs this long");
 
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
