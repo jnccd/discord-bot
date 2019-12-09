@@ -96,8 +96,12 @@ namespace MEE7
             RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
             RunningOnLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
+            if (RunningOnCI)
+                ConsoleWrapper.WriteLine("Detected CI Environment");
+            if (RunningOnLinux)
+                ConsoleWrapper.WriteLine("Detected Linux Environment");
+
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
-            ConsoleWrapper.WriteLine($"Running in: {Directory.GetCurrentDirectory()}");
 
             if (RunningOnCI)
                 ConsoleWrapper.WriteLine("CI Environment detected!");
@@ -318,7 +322,7 @@ namespace MEE7
                     Limbo();
                 else
                     try { input = Console.ReadLine(); }
-                    catch { Limbo(); }
+                    catch (Exception e) { Limbo(); e.ToString(); }
 
                 if (input == "exit")
                     break;
