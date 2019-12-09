@@ -26,11 +26,11 @@ namespace MEE7
 {
     public partial class Program
     {
-        #if DEBUG
-            public static readonly string runConfig = "Debug";
-        #else
+#if DEBUG
+        public static readonly string runConfig = "Debug";
+#else
             public static readonly string runConfig = "Release";
-        #endif
+#endif
 
         static string buildDate;
         static int clearYcoords;
@@ -42,11 +42,11 @@ namespace MEE7
         public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
-        
+
         // Client 
         static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
-        
+
         static readonly string exitlock = "";
 
         private static SocketUser pmaster;
@@ -86,10 +86,7 @@ namespace MEE7
         {
             StartUp();
 
-            if (!RunningOnCI)
-                HandleConsoleCommandsLoop();
-            else
-                while (true) { Thread.Sleep(int.MaxValue); }
+            HandleConsoleCommandsLoop();
 
             BeforeClose();
         }
@@ -224,7 +221,7 @@ namespace MEE7
                         throw new IllegalCommandException($"Commands and Prefixes mustn't contain spaces!\n" +
                             $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
                     commandsList.Add(commandInstance);
-                } 
+                }
                 catch
                 {
                     ConsoleWrapper.WriteLine($"Error on instance creation of {commandTypes[i].Name}!", ConsoleColor.Red);
@@ -318,9 +315,10 @@ namespace MEE7
             {
                 string input = "";
                 if (RunningOnCI)
-                    while (true) { Thread.Sleep(60000); }
+                    Limbo();
                 else
-                    input = Console.ReadLine();
+                    try { input = Console.ReadLine(); }
+                    catch { Limbo(); }
 
                 if (input == "exit")
                     break;
@@ -501,6 +499,13 @@ namespace MEE7
                     ConsoleWrapper.WriteLine("I dont know that command.", ConsoleColor.Red);
                 ConsoleWrapper.Write("$");
             }
+        }
+        static void Limbo() 
+        { 
+            while (true) 
+            { 
+                Thread.Sleep(int.MaxValue); 
+            } 
         }
 
         static void BeforeClose()
