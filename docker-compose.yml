@@ -3,12 +3,7 @@ version: "3"
 services:
   mee7:
     build: .
-    volumes:
-      - config:/bin/Release/netcoreapp2.2
     environment:
       - BotToken
       - CI_SERVER
       
-volumes:
-  config:
-    external: true
