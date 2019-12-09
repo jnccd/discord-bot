@@ -86,8 +86,11 @@ namespace MEE7
         {
             StartUp();
 
-            try { HandleConsoleCommandsLoop(); }
-            catch (Exception e) { CILimbo(); e.ToString(); }
+            if (!RunningOnCI)
+                try { HandleConsoleCommandsLoop(); }
+                catch (Exception e) { CILimbo(); e.ToString(); }
+            else
+                CILimbo();
 
             BeforeClose();
         }
@@ -97,10 +100,8 @@ namespace MEE7
             RunningOnCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI_SERVER"));
             RunningOnLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-            if (RunningOnCI)
-                ConsoleWrapper.WriteLine("Detected CI Environment");
             if (RunningOnLinux)
-                ConsoleWrapper.WriteLine("Detected Linux Environment");
+                ConsoleWrapper.WriteLine("Linux Environment detected!");
 
             Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
 
@@ -138,7 +139,6 @@ namespace MEE7
             BuildHelpMenu();
 
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
-            PrintConsoleStartup();
 
             CallOnConnected();
 
@@ -269,27 +269,6 @@ namespace MEE7
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             helpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
         }
-        static void PrintConsoleStartup()
-        {
-            Console.CursorLeft = 0;
-            ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
-            try
-            {
-                foreach (SocketGuild g in client.Guilds)
-                {
-                    ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
-                    ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
-                        ConsoleColor.White);
-                }
-            }
-            catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
-            ConsoleWrapper.Write("Default channel is: ");
-            ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
-            ConsoleWrapper.Write(" on ");
-            ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
-            ConsoleWrapper.WriteLine("Awaiting your commands: ");
-            clearYcoords = Console.CursorTop;
-        }
         static void CallOnConnected()
         {
             OnConnected.InvokeParallel();
@@ -316,6 +295,8 @@ namespace MEE7
 
         static void HandleConsoleCommandsLoop()
         {
+            PrintConsoleStartup();
+
             while (true)
             {
                 string input = "";
@@ -505,11 +486,29 @@ namespace MEE7
                 ConsoleWrapper.Write("$");
             }
         }
+        static void PrintConsoleStartup()
+        {
+            Console.CursorLeft = 0;
+            ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
+            try
+            {
+                foreach (SocketGuild g in client.Guilds)
+                {
+                    ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
+                    ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
+                        ConsoleColor.White);
+                }
+            }
+            catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+            ConsoleWrapper.Write("Default channel is: ");
+            ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
+            ConsoleWrapper.Write(" on ");
+            ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
+            ConsoleWrapper.WriteLine("Awaiting your commands: ");
+            clearYcoords = Console.CursorTop;
+        }
         static void CILimbo() 
         {
-            if (!RunningOnCI)
-                ConsoleWrapper.WriteLine("Detected CI Environment [In Limbo]");
-            RunningOnCI = true;
             while (true) 
             { 
                 Thread.Sleep(int.MaxValue); 
