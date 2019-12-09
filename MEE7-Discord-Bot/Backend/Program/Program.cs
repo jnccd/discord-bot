@@ -86,7 +86,10 @@ namespace MEE7
         {
             StartUp();
 
-            HandleConsoleCommandsLoop();
+            if (!RunningOnCI)
+                HandleConsoleCommandsLoop();
+            else
+                while (true) { Thread.Sleep(int.MaxValue); }
 
             BeforeClose();
         }
@@ -222,7 +225,7 @@ namespace MEE7
                             $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
                     commandsList.Add(commandInstance);
                 } 
-                catch (Exception e) 
+                catch
                 {
                     ConsoleWrapper.WriteLine($"Error on instance creation of {commandTypes[i].Name}!", ConsoleColor.Red);
                 }

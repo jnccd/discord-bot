@@ -58,7 +58,10 @@ namespace MEE7.Commands
         }
         abstract class SubPipeCommand: SubCommand
         {
+#pragma warning disable CS0649
             public static new string Command;
+#pragma warning restore CS0649
+
             public string[] RawCommands;
             public List<Tuple<object[], SubCommand>>[] Pipes;
         }
