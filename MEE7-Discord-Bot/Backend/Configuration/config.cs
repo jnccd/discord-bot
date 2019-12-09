@@ -66,6 +66,13 @@ namespace MEE7.Configuration
                     Data = new ConfigData();
             }
         }
+        public static void LoadFrom(string JSON)
+        {
+            lock (lockject)
+            {
+                Data = JsonConvert.DeserializeObject<ConfigData>(JSON);
+            }
+        }
         public static new string ToString()
         {
             string output = "";
