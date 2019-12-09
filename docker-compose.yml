@@ -4,3 +4,5 @@ services:
   mee7:
     build: .
     restart: always
+    environment:
+      - BotToken
