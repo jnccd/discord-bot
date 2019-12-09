@@ -8,5 +8,4 @@ deploy:
     stage: deploy
     script: 
         - docker-compose build
-        - docker volume create --name=config
         - BotToken=$BotToken CI_SERVER=$CI_SERVER docker-compose up -d
