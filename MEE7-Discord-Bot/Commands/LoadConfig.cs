@@ -17,9 +17,12 @@ namespace MEE7.Commands
 
         public override void Execute(SocketMessage message)
         {
-            var url = message.Attachments.First().Url;
-            var json = url.GetHTMLfromURL();
-            Configuration.Config.LoadFrom(json);
+            if (message.Author.Id == Program.Master.Id)
+            {
+                var url = message.Attachments.First().Url;
+                var json = url.GetHTMLfromURL();
+                Configuration.Config.LoadFrom(json);
+            }
         }
     }
 }
