@@ -312,10 +312,7 @@ namespace MEE7.Commands
 
                                 File.Delete(filePath);
                             }
-                            catch (Exception e)
-                            {
-                                ;
-                            }
+                            catch { }
                             finally
                             {
                                 try { channel.DisconnectAsync().Wait(); } catch { }
