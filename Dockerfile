@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2
+
 WORKDIR /app
+COPY MEE7-Discord-Bot .
 
 RUN dotnet restore
+RUN dotnet build -c Release
 
-COPY app/bin/Release/netcoreapp2.2/publish/ app/
-RUN dotnet publish -c Release -o out
-
-ENTRYPOINT ["dotnet", "app/MEE7.dll"]
+CMD ["dotnet", "run", "-c", "Release"]
