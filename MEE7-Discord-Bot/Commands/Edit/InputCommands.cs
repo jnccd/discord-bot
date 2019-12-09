@@ -46,13 +46,13 @@ namespace MEE7.Commands
                 
                     return args[0];
             }),
-            new EditCommand("thisP", "Gets attatched picture / picture from url argument", null, typeof(Bitmap), 
+            new EditCommand("thisP", "Gets attached picture / picture from url argument", null, typeof(Bitmap), 
                 new Argument[] { new Argument("Picture URL", typeof(string), null) }, 
                 (SocketMessage m, object[] args, object o) => {
                 
                     return GetPictureLinkFromMessage(m, (string)args[0]).GetBitmapFromURL();
             }),
-            new EditCommand("thisG", "Gets attatched gif / gif from url argument", null, typeof(Bitmap[]),
+            new EditCommand("thisG", "Gets attached gif / gif from url argument", null, typeof(Bitmap[]),
                 new Argument[] { new Argument("Gif URL", typeof(string), null) },
                 (SocketMessage m, object[] args, object o) => {
 
