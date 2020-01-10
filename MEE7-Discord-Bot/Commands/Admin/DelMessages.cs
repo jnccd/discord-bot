@@ -9,7 +9,7 @@ namespace MEE7.Commands.Admin
 {
     public class DelMessages : Command
     {
-        public DelMessages() : base("delMessages", "Deletes n past messages", isExperimental: false, isHidden: true)
+        public DelMessages() : base("del", "Deletes n past messages", isExperimental: false, isHidden: true)
         {
 
         }

@@ -42,7 +42,11 @@ namespace MEE7
         public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
+
         public static readonly ulong logChannel = 665219921692852271;
+        public static readonly bool logToDiscord = true;
+        public static readonly string logStartupMessagePräfix = "new instance who dis?";
+        public static readonly string logStartupMessage = logStartupMessagePräfix + " I am here: " + Environment.CurrentDirectory;
 
         // Client 
         static DiscordSocketClient client;
@@ -142,6 +146,8 @@ namespace MEE7
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
 
             CallOnConnected();
+
+            DiscordNETWrapper.SendText(logStartupMessage, (IMessageChannel)GetChannelFromID(logChannel)).Wait();
 
             StartAutosaveLoop();
         }
@@ -562,6 +568,7 @@ namespace MEE7
             }
             else
                 ConsoleWrapper.WriteLine(msg.ToString(), color);
+
             return Task.FromResult(default(object));
         }
 

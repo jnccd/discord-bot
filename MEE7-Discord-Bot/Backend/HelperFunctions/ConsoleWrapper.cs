@@ -43,6 +43,45 @@ namespace MEE7.Backend.HelperFunctions
                 }
             }
         }
+        public static void WriteLineAndDiscordLog(object text)
+        {
+            lock (lockject)
+            {
+                if (Program.RunningOnCI)
+                    Console.WriteLine(text);
+                else
+                {
+                    if (Console.CursorLeft == 1)
+                        Console.CursorLeft = 0;
+                    Console.WriteLine(text);
+                    if (!Program.RunningOnLinux)
+                        Console.Write("$");
+                }
+            }
+
+            LogToDiscordIfEnabled(text);
+        }
+        public static void WriteLineAndDiscordLog(object text, ConsoleColor Color)
+        {
+            lock (lockject)
+            {
+                if (Program.RunningOnCI)
+                    Console.WriteLine(text);
+                else
+                {
+                    if (!Program.RunningOnLinux)
+                        if (Console.CursorLeft == 1)
+                            Console.CursorLeft = 0;
+                    Console.ForegroundColor = Color;
+                    Console.WriteLine(text);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    if (!Program.RunningOnLinux)
+                        Console.Write("$");
+                }
+            }
+
+            LogToDiscordIfEnabled(text);
+        }
         public static void Write(object text, ConsoleColor Color)
         {
             lock (lockject)
@@ -73,6 +112,16 @@ namespace MEE7.Backend.HelperFunctions
                     Console.Write(text);
                 }
             }
+        }
+
+        private static void LogToDiscordIfEnabled(object msg)
+        {
+            if (Program.logToDiscord)
+                try
+                {
+                    _ = DiscordNETWrapper.SendText(msg.ToString(), Program.logChannel);
+                }
+                catch { }
         }
     }
 }

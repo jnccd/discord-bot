@@ -169,8 +169,10 @@ namespace MEE7
         private static Task MessageReceived(SocketMessage message)
         {
             if (message.Channel.Id == logChannel)
-                Task.Run(() => { 
-
+                Task.Run(() => {
+                    if (message.Content.StartsWith(Program.logStartupMessagePräfix) &&
+                        message.Content != Program.logStartupMessage)
+                        Program.Exit(0);
                 });
             if (!message.Author.IsBot && message.Content.StartsWith(Prefix))
                 Task.Run(() => ParallelMessageReceived(message));
@@ -272,10 +274,10 @@ namespace MEE7
                 command.Execute(message);
                 
                 if (message.Channel is SocketGuildChannel)
-                    ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                    ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                         $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
                 else
-                    ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                    ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                        $"DMs \tfor {message.Author.Username}", ConsoleColor.Green);
             }
             catch (Exception e)
@@ -289,7 +291,7 @@ namespace MEE7
                 }
                 catch { }
 
-                ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
+                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
                     $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", ConsoleColor.Red);
                 Saver.SaveToLog(e.ToString());
             }
