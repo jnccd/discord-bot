@@ -4,7 +4,7 @@ services:
   mee7:
     build: .
     volumes:
-      - config:/bin/Release/netcoreapp2.2
+      - config:/bin/Release/netcoreapp3.1
     restart: always
     environment:
       - BotToken
