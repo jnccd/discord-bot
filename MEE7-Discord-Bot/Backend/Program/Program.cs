@@ -42,6 +42,7 @@ namespace MEE7
         public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
+        public static readonly ulong logChannel = 665219921692852271;
 
         // Client 
         static DiscordSocketClient client;
