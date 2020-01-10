@@ -4,6 +4,8 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using MEE7.Backend.HelperFunctions;
+using Discord;
+using System.Linq;
 
 namespace MEE7.Configuration
 {
@@ -13,6 +15,8 @@ namespace MEE7.Configuration
         static readonly string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
         static readonly string configPath = exePath + "config.json";
         static readonly string configBackupPath = exePath + "config_backup.json";
+        static readonly ulong DiscordConfigChannelID = Program.logChannel;
+        static readonly string DiscordConfigMessage = "autosave " + Program.runConfig;
         public static bool UnsavedChanges = false;
         public static ConfigData Data {
             get
@@ -55,7 +59,7 @@ namespace MEE7.Configuration
                     File.Copy(configPath, configBackupPath, true);
                 File.WriteAllText(configPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
 
-                DiscordNETWrapper.SendFile(configPath, Program.Master.GetOrCreateDMChannelAsync().Result, "autosave").Wait();
+                DiscordNETWrapper.SendFile(configPath, (IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID), DiscordConfigMessage).Wait();
 
                 UnsavedChanges = false;
             }
@@ -64,7 +68,18 @@ namespace MEE7.Configuration
         {
             lock (lockject)
             {
-                if (Exists())
+                string url = "", discordConfig = "";
+                try
+                {
+                    url = ((IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID)).GetMessagesAsync(20).FlattenAsync().Result.
+                        First(x => x.Content == DiscordConfigMessage && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
+                    using (var wc = new System.Net.WebClient())
+                        discordConfig = wc.DownloadString(url);
+                } catch { }
+
+                if (!string.IsNullOrWhiteSpace(discordConfig))
+                    Data = JsonConvert.DeserializeObject<ConfigData>(discordConfig);
+                else if (Exists())
                     Data = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(configPath));
                 else
                     Data = new ConfigData();

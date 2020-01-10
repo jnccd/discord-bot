@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MEE7-Discord-Bot": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "BotToken": "NTAzOTUxMzExMDQyMjQ4NzE1.D0W7Fw.S796SZej7dBGSW5-wwzM26FbcbU"
+      }
+    }
+  }
+}

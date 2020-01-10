@@ -168,6 +168,10 @@ namespace MEE7
         }
         private static Task MessageReceived(SocketMessage message)
         {
+            if (message.Channel.Id == logChannel)
+                Task.Run(() => { 
+
+                });
             if (!message.Author.IsBot && message.Content.StartsWith(Prefix))
                 Task.Run(() => ParallelMessageReceived(message));
             if (message.Content.Length > 0 && (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':'))

@@ -43,12 +43,14 @@ namespace MEE7.Commands
                     if (guild.Id != 473991188974927882)
                         foreach (SocketChannel channel in guild.Channels)
                             if (channel.GetType().GetInterfaces().Contains(typeof(ISocketMessageChannel)))
-                            {
-                                IEnumerable<IMessage> messages = ((ISocketMessageChannel)channel).GetMessagesAsync().FlattenAsync().Result;
-                                foreach (IMessage m in messages)
-                                    if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.Prefix) && m.Content[0] != '!')
-                                        input += m.Content + "\n";
-                            }
+                                try
+                                {
+                                    IEnumerable<IMessage> messages = ((ISocketMessageChannel)channel).GetMessagesAsync().FlattenAsync().Result;
+                                    foreach (IMessage m in messages)
+                                        if (!m.Author.IsBot && !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith(Program.Prefix) && m.Content[0] != '!')
+                                            input += m.Content + "\n";
+                                }
+                                catch { }
             }
 
             // Load from text Files
