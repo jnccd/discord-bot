@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.IO;
 using System.Reflection;
+using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Configuration
 {
@@ -53,6 +54,9 @@ namespace MEE7.Configuration
                 if (File.Exists(configPath))
                     File.Copy(configPath, configBackupPath, true);
                 File.WriteAllText(configPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
+
+                DiscordNETWrapper.SendFile(configPath, Program.Master.GetOrCreateDMChannelAsync().Result, "autosave").Wait();
+
                 UnsavedChanges = false;
             }
         }
