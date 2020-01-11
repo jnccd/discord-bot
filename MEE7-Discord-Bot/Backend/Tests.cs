@@ -94,6 +94,24 @@ namespace MEE7.Backend
                 var doomedChannel = (IMessageChannel)Program.GetChannelFromID(630515207608729640);
                 DiscordNETWrapper.SendText(new string(Enumerable.Repeat('.', 1000).ToArray()) + new string(Enumerable.Repeat('\n', 1000).ToArray()), doomedChannel).Wait();
             },
+            // 7 - Give weird line roles
+            () => {
+                var uniServer = Program.GetGuildFromID(479950092938248193);
+                var topLine = uniServer.GetRole(647144287485820928);
+                var bottomLine = uniServer.GetRole(665555692983156746);
+                foreach (var user in uniServer.Users)
+                {
+                    if (user.Roles.FirstOrDefault(x => x.Position > topLine.Position) != null)
+                        try { user.AddRoleAsync(topLine).Wait(); } catch{}
+                    else
+                        try { user.RemoveRoleAsync(topLine).Wait(); } catch{}
+
+                    if (user.Roles.FirstOrDefault(x => !x.IsEveryone && x.Position < bottomLine.Position) != null)
+                        try { user.AddRoleAsync(bottomLine).Wait(); } catch{}
+                    else
+                        try { user.RemoveRoleAsync(bottomLine).Wait(); } catch{}
+                }
+            },
         };
     }
 }
