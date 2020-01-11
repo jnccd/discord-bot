@@ -6,7 +6,7 @@ namespace MEE7.Backend.HelperFunctions
 {
     public static class ConsoleWrapper
     {
-        private static readonly object lockject = new object();
+        public static readonly object lockject = new object();
 
         public static void WriteLine(object text, ConsoleColor Color)
         {

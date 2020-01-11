@@ -59,7 +59,7 @@ namespace MEE7.Configuration
                     File.Copy(configPath, configBackupPath, true);
                 File.WriteAllText(configPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
 
-                if (Program.ClientReady)
+                if (Program.ClientReady && File.Exists(configPath))
                     DiscordNETWrapper.SendFile(configPath, (IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID), DiscordConfigMessage).Wait();
 
                 UnsavedChanges = false;
@@ -72,7 +72,7 @@ namespace MEE7.Configuration
                 string url = "", discordConfig = "";
                 try
                 {
-                    url = ((IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID)).GetMessagesAsync(20).FlattenAsync().Result.
+                    url = ((IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID)).GetMessagesAsync().FlattenAsync().Result.
                         First(x => x.Content == DiscordConfigMessage && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
                     using (var wc = new System.Net.WebClient())
                         discordConfig = wc.DownloadString(url);

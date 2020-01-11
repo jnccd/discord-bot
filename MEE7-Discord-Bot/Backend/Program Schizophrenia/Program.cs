@@ -45,9 +45,10 @@ namespace MEE7
 
         public static readonly ulong logChannel = 665219921692852271;
         public static readonly bool logToDiscord = true;
+        public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
         public static readonly string logStartupMessagePräfix = "new instance who dis?";
-        public static readonly string logStartupMessage = logStartupMessagePräfix + " I am here: " + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
-
+        public static readonly string logStartupMessage = logStartupMessagePräfix + " I am here: " + instanceIdentifier;
+        
         // Client 
         static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
@@ -147,11 +148,12 @@ namespace MEE7
 
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
 
-            CallOnConnected();
-
             DiscordNETWrapper.SendText(logStartupMessage, (IMessageChannel)GetChannelFromID(logChannel)).Wait();
+            Config.Load();
 
             StartAutosaveLoop();
+
+            CallOnConnected();
         }
         static void LoadBuildDate()
         {
@@ -497,24 +499,27 @@ namespace MEE7
         }
         static void PrintConsoleStartup()
         {
-            Console.CursorLeft = 0;
-            ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
-            try
+            lock (ConsoleWrapper.lockject) 
             {
-                foreach (SocketGuild g in client.Guilds)
+                Console.CursorLeft = 0;
+                ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
+                try
                 {
-                    ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
-                    ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
-                        ConsoleColor.White);
+                    foreach (SocketGuild g in client.Guilds)
+                    {
+                        ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
+                        ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
+                            ConsoleColor.White);
+                    }
                 }
+                catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
+                ConsoleWrapper.Write("Default channel is: ");
+                ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
+                ConsoleWrapper.Write(" on ");
+                ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
+                ConsoleWrapper.WriteLine("Awaiting your commands: ");
+                clearYcoords = Console.CursorTop;
             }
-            catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
-            ConsoleWrapper.Write("Default channel is: ");
-            ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
-            ConsoleWrapper.Write(" on ");
-            ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
-            ConsoleWrapper.WriteLine("Awaiting your commands: ");
-            clearYcoords = Console.CursorTop;
         }
         static void CILimbo() 
         {
