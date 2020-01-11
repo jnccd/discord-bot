@@ -59,7 +59,7 @@ namespace MEE7.Configuration
                     File.Copy(configPath, configBackupPath, true);
                 File.WriteAllText(configPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
 
-                if (Program.ClientReady && File.Exists(configPath))
+                if (Program.ClientReady && File.Exists(configPath) && data.ServerList.Count > 0)
                     DiscordNETWrapper.SendFile(configPath, (IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID), DiscordConfigMessage).Wait();
 
                 UnsavedChanges = false;
