@@ -5,7 +5,7 @@ services:
     build: .
     volumes:
       - config:/bin/Release/netcoreapp3.1
-    restart: always
+    restart: on-failure
     environment:
       - BotToken
       - CI_SERVER
