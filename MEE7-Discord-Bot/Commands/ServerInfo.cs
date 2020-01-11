@@ -51,9 +51,15 @@ namespace MEE7.Commands
             info.AddFieldDirectly("Verification Level", g.VerificationLevel, true);
             info.AddFieldDirectly("Voice Region Id", g.VoiceRegionId, true);
             
-            info.AddFieldDirectly("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles", true);
-            info.AddFieldDirectly("User with the longest name:", g.Users.MaxElement(x => x.GetDisplayName().Length), true);
-            
+            info.AddFieldDirectly("User with the most roles:", $"{g.Users.MaxElement(x => x.Roles.Count, out double max)} with {max} Roles" +
+                (g.Users.Where(x => x.Roles.Count == max).Count() > 1 ?
+                $"\nbut they share thier first place with: {g.Users.Where(x => x.Roles.Count == max).Skip(1).Select(x => x.GetDisplayName()).Combine(", ")}" :
+                ""), true);
+            info.AddFieldDirectly("User with the longest name:", $"{g.Users.MaxElement(x => x.GetDisplayName().Length, out max)}" +
+                (g.Users.Where(x => x.GetDisplayName().Length == max).Count() > 1 ? 
+                $"\nbut they share thier first place with: {g.Users.Where(x => x.GetDisplayName().Length == max).Skip(1).Select(x => x.ToString()).Combine(", ")}" : 
+                ""), true);
+
             info.AddFieldDirectly("Played Games: ", (from user in g.Users
                                                      where user.Activity != null && user.Activity.Type == ActivityType.Playing
                                                      group user by user.Activity.Name into x
