@@ -16,7 +16,7 @@ namespace MEE7.Configuration
         static readonly string configPath = exePath + "config.json";
         static readonly string configBackupPath = exePath + "config_backup.json";
         static readonly ulong DiscordConfigChannelID = Program.logChannel;
-        static readonly string DiscordConfigMessage = "autosave " + Program.runConfig;
+        static readonly string DiscordConfigMessage = "autosave";
         public static bool UnsavedChanges = false;
         public static ConfigData Data {
             get
@@ -73,7 +73,7 @@ namespace MEE7.Configuration
                 try
                 {
                     url = ((IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID)).GetMessagesAsync().FlattenAsync().Result.
-                        First(x => x.Content == DiscordConfigMessage && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
+                        First(x => x.Content.StartsWith(DiscordConfigMessage) && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
                     using (var wc = new System.Net.WebClient())
                         discordConfig = wc.DownloadString(url);
                 } catch { }
