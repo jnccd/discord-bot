@@ -9,7 +9,7 @@ namespace MEE7.Commands
 {
     public class Close : Command
     {
-        public Close() : base("close", "Closes the bot", true, true)
+        public Close() : base("close", "Closes the bot", false, true)
         {
 
         }
