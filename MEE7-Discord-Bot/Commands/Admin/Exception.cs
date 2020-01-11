@@ -18,7 +18,8 @@ namespace MEE7.Commands
 
         public override void Execute(SocketMessage message)
         {
-            throw new Exception();
+            if (message.Author.Id == Program.Master.Id)
+                throw new Exception();
         }
     }
 }
