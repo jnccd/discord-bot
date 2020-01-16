@@ -11,6 +11,7 @@ using MEE7.Backend;
 using Color = System.Drawing.Color;
 using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
+using System.Drawing.Imaging;
 
 namespace MEE7.Commands
 {
@@ -431,8 +432,42 @@ namespace MEE7.Commands
 
                     return b;
             }),
+            new EditCommand("compress", "JPEG Compress the image", typeof(Bitmap), typeof(Bitmap), new Argument[] { 
+                new Argument("Compression level as unsigned integer number", typeof(long), null) },
+                (SocketMessage m, object[] a, object o) => {
+                    Bitmap b = o as Bitmap;
+                    long compressLevel = (a[0] as long?).GetValueOrDefault();
+
+                    ImageCodecInfo jpgEncoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
+                    Encoder myEncoder = Encoder.Quality;
+                    EncoderParameters myEncoderParameters = new EncoderParameters(1);
+
+                    MemoryStream tmp = new MemoryStream();
+                    EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, compressLevel);
+                    myEncoderParameters.Param[0] = myEncoderParameter;
+                    b.Save(tmp, jpgEncoder, myEncoderParameters);
+
+                    Bitmap output = new Bitmap(System.Drawing.Image.FromStream(tmp));
+
+                    b.Dispose();
+                    tmp.Dispose();
+
+                    return output;
+            }),
         };
 
+        static ImageCodecInfo GetEncoder(System.Drawing.Imaging.ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+            return null;
+        }
         static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
         {
             bool IsSameColor(Color C1, Color C2)
