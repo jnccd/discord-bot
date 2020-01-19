@@ -534,7 +534,7 @@ namespace MEE7.Commands
                 typeof(Bitmap[]), typeof(Bitmap[]), new Argument[] { },
                 (SocketMessage m, object[] a, object o) => {
                     Bitmap[] bs = o as Bitmap[];
-                    return bs.Concat(bs.Skip(1).Reverse());
+                    return bs.Concat(bs.Skip(1).Reverse()).ToArray();
             }),
         };
 
