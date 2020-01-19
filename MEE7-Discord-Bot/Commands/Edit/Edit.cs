@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
@@ -363,24 +364,32 @@ namespace MEE7.Commands
                     else if (p.Item2 is ForCommand)
                     {
                         ForCommand forCommand = p.Item2 as ForCommand;
+                        List<Task> threads = new List<Task>();
                         object[] array = (object[])Activator.CreateInstance(forCommand.OutputType, forCommand.Steps());
                         object oldData = currentData;
 
                         for (int i = 0; i < forCommand.Steps(); i++)
                         {
-                            object usableData;
-                            if (currentData is ICloneable)
-                                usableData = (currentData as ICloneable).Clone();
-                            else
-                                usableData = currentData;
+                            int j = i;
+                            threads.Add(Task.Run(() => {
+                                object usableData;
+                                lock (currentData)
+                                {
+                                    if (currentData is ICloneable)
+                                        usableData = (currentData as ICloneable).Clone();
+                                    else
+                                        usableData = currentData;
+                                }
 
-                            string rawCommandThisLoop = forCommand.RawCommands[0].Replace($"%{forCommand.VarName}", 
-                                (forCommand.Start + i * forCommand.StepWidth).ToString().Replace(",", "."));
-                            List<Tuple<object[], SubCommand>> parsedLoopedPipe = 
-                                CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
+                                string rawCommandThisLoop = forCommand.RawCommands[0].Replace($"%{forCommand.VarName}",
+                                    (forCommand.Start + j * forCommand.StepWidth).ToString().Replace(",", "."));
+                                List<Tuple<object[], SubCommand>> parsedLoopedPipe =
+                                    CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
 
-                            array[i] = RunPipe(parsedLoopedPipe, message, usableData);
+                                array[j] = RunPipe(parsedLoopedPipe, message, usableData);
+                            }));
                         }
+                        threads.ForEach(x => x.Wait());
 
                         currentData = array;
                         if (oldData is IDisposable)
@@ -388,6 +397,7 @@ namespace MEE7.Commands
                     }
                     else if (p.Item2 is ForeachCommand)
                     {
+                        List<Task> threads = new List<Task>();
                         object[] arraydCurrentData = currentData as object[];
 
                         ForeachCommand foreachCommand = p.Item2 as ForeachCommand;
@@ -395,14 +405,18 @@ namespace MEE7.Commands
 
                         for (int i = 0; i < arraydCurrentData.Length; i++)
                         {
-                            double varValue = foreachCommand.Start + ((foreachCommand.End - foreachCommand.Start) * (i / (double)arraydCurrentData.Length));
-                            string rawCommandThisLoop = foreachCommand.RawCommands[0].Replace($"%{foreachCommand.VarName}", varValue.ToString().Replace(",", "."));
-                            List<Tuple<object[], SubCommand>> parsedLoopedPipe =
-                                CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
+                            int j = i;
+                            threads.Add(Task.Run(() => {
+                                double varValue = foreachCommand.Start + ((foreachCommand.End - foreachCommand.Start) * (j / (double)arraydCurrentData.Length));
+                                string rawCommandThisLoop = foreachCommand.RawCommands[0].Replace($"%{foreachCommand.VarName}", varValue.ToString().Replace(",", "."));
+                                List<Tuple<object[], SubCommand>> parsedLoopedPipe =
+                                    CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
 
-                            array[i] = RunPipe(parsedLoopedPipe, message, arraydCurrentData[i]);
+                                array[j] = RunPipe(parsedLoopedPipe, message, arraydCurrentData[j]);
+                            }));
                         }
 
+                        threads.ForEach(x => x.Wait());
                         currentData = array;
                     }
                 }
