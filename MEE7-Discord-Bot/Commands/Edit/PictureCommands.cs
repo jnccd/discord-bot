@@ -21,7 +21,7 @@ namespace MEE7.Commands
         static readonly object memifyLock = new object();
 
         readonly EditCommand[] PictureCommands = new EditCommand[] {
-            new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0], 
+            new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0],
                 (SocketMessage m, object[] a, object o) => {
 
                 Bitmap bmp = (o as Bitmap);
@@ -34,7 +34,7 @@ namespace MEE7.Commands
                             c = Color.FromArgb(c.B, c.R, c.G);
                             con.SetPixel(x, y, c);
                         }
-                
+
                 return bmp;
             }),
             new EditCommand("reddify", "Make it red af", typeof(Bitmap), typeof(Bitmap), new Argument[0],
@@ -66,10 +66,10 @@ namespace MEE7.Commands
                             c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
                             con.SetPixel(x, y, c);
                         }
-                
+
                 return bmp;
             }),
-            new EditCommand("Rekt", "Finds colored rectangles in pictures", typeof(Bitmap), typeof(Bitmap), 
+            new EditCommand("Rekt", "Finds colored rectangles in pictures", typeof(Bitmap), typeof(Bitmap),
                 new Argument[] { new Argument("Color", typeof(string), "") },
                 (SocketMessage m, object[] a, object o) => {
 
@@ -173,7 +173,7 @@ namespace MEE7.Commands
                                                                 Where(x => x.EndsWith("-design")).
                                                                 Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
                                                                 Aggregate((x, y) => x + "\n" + y));
-                
+
                 string memeTemplate = "";
                 string memeDesign = "";
                 if (memeName != "")
@@ -222,7 +222,7 @@ namespace MEE7.Commands
 
                 Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[2];
+                float strength = (float)a[1];
 
                 return ApplyTransformation(o as Bitmap,
                     (x, y) => {
@@ -245,7 +245,7 @@ namespace MEE7.Commands
 
                 Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[2];
+                float strength = (float)a[1];
 
                 return ApplyTransformation(o as Bitmap,
                     (x, y) => {
@@ -272,7 +272,7 @@ namespace MEE7.Commands
 
                 Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[2];
+                float strength = (float)a[1];
 
                 return ApplyTransformation(o as Bitmap,
                     (x, y) => {
@@ -280,7 +280,7 @@ namespace MEE7.Commands
                             Vector2 diff = point - center;
                             float div = bmp.Width + bmp.Height;
                             float maxDistance = (center / div).LengthSquared();
-                            
+
                             float transformedLength = (diff / div * 7).LengthSquared();
                             float rotationAngle = -transformedLength / 3 * strength;
                             double cos = Math.Cos(rotationAngle);
@@ -299,7 +299,7 @@ namespace MEE7.Commands
 
                 Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[2];
+                float strength = (float)a[1];
 
                 return ApplyTransformation(o as Bitmap,
                     (x, y) => {
@@ -321,7 +321,7 @@ namespace MEE7.Commands
 
                 Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[2];
+                float strength = (float)a[1];
 
                 return ApplyTransformation(o as Bitmap,
                     (x, y) => {
@@ -343,7 +343,7 @@ namespace MEE7.Commands
 
                 Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[2];
+                float strength = (float)a[1];
 
                 return ApplyTransformation(o as Bitmap,
                     (x, y) => {
@@ -368,8 +368,8 @@ namespace MEE7.Commands
                 int offsetX = (int)a[2];
                 int offsetY = (int)a[3];
 
-                return ApplyTransformation(o as Bitmap, 
-                    (x, y) => new Vector2(  x + (float)Math.Cos(x / frequenzy + offsetX) * strength, 
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => new Vector2(  x + (float)Math.Cos(x / frequenzy + offsetX) * strength,
                                             y + (float)Math.Sin(y / frequenzy + offsetY) * strength));
             }),
             new EditCommand("squiggle", "Squiggle the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
@@ -486,7 +486,7 @@ namespace MEE7.Commands
 
                     return bmp;
             }),
-            new EditCommand("rotate", "Rotate the image", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Angle in degrees", typeof(float), 0) }, 
+            new EditCommand("rotate", "Rotate the image", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Angle in degrees", typeof(float), 0) },
                 (SocketMessage m, object[] a, object o) => {
                     Bitmap b = o as Bitmap;
                     Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
@@ -501,13 +501,13 @@ namespace MEE7.Commands
                             for (int y = 0; y < b.Height; y++)
                             {
                                 Color col = c.GetPixel(x, y);
-                                c.SetPixel(x, y, Color.FromArgb(col.A, 
+                                c.SetPixel(x, y, Color.FromArgb(col.A,
                                     new Vector3(col.GetHue() + (float)a[0], col.GetSaturation(), col.GetValue()).HsvToRgb()));
                             }
 
                     return b;
             }),
-            new EditCommand("compress", "JPEG Compress the image", typeof(Bitmap), typeof(Bitmap), new Argument[] { 
+            new EditCommand("compress", "JPEG Compress the image", typeof(Bitmap), typeof(Bitmap), new Argument[] {
                 new Argument("Compression level as unsigned integer number", typeof(long), null) },
                 (SocketMessage m, object[] a, object o) => {
                     Bitmap b = o as Bitmap;
@@ -530,11 +530,36 @@ namespace MEE7.Commands
                     return output;
             }),
             new EditCommand("backAndForth", "Make the gif go backward after it went forward and " +
-                "then it goes forward again because it loops and its all very fancy n stuff", 
+                "then it goes forward again because it loops and its all very fancy n stuff",
                 typeof(Bitmap[]), typeof(Bitmap[]), new Argument[] { },
                 (SocketMessage m, object[] a, object o) => {
                     Bitmap[] bs = o as Bitmap[];
                     return bs.Concat(bs.Skip(1).Reverse()).ToArray();
+            }),
+            new EditCommand("transground", "Make the background transparent",
+                typeof(Bitmap), typeof(Bitmap), new Argument[] { 
+                    new Argument("Thereshold", typeof(int), 75) },
+                (SocketMessage m, object[] a, object o) => {
+                    Bitmap b = o as Bitmap;
+                    int Thereshold = (a[0] as int?).GetValueOrDefault();
+
+                    using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
+                    {
+                        Color[] edges = new Color[] { c.GetPixel(0, 0),
+                            c.GetPixel(0, c.Height - 1), c.GetPixel(c.Width - 1, 0),
+                            c.GetPixel(c.Width - 1, c.Height - 1) };
+
+                        for (int x = 0; x < b.Width; x++)
+                            for (int y = 0; y < b.Height; y++)
+                            {
+                                Color C = c.GetPixel(x, y);
+                                var dists = edges.Select(q => Math.Abs(q.GetColorDiff(C)));
+                                if (dists.Min() < Thereshold)
+                                    c.SetPixel(x,y, Color.FromArgb(dists.Min() > 255 ? 255 : dists.Min(), C.R, C.G, C.B));
+                            }
+                    }
+
+                    return b;
             }),
         };
 
