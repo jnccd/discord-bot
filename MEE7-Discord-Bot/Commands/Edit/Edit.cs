@@ -340,9 +340,9 @@ namespace MEE7.Commands
                         $"No one would do this on purpose, that would be evil.\n" +
                         $"But don't worry I was programmed to ignore something like this.");
 
-                if (!f.RawCommands[0].Contains("%" + f.VarName))
-                    throw new Exception($"Why use a for loop if you dont even use any variables in the subpipe?\n" +
-                        $"All the results would be the same D:");
+                //if (!f.RawCommands[0].Contains("%" + f.VarName))
+                //    throw new Exception($"Why use a for loop if you dont even use any variables in the subpipe?\n" +
+                //        $"All the results would be the same D:");
             }
 
             if (!subPipe && pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)

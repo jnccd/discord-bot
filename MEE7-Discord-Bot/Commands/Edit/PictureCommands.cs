@@ -212,107 +212,164 @@ namespace MEE7.Commands
                 else
                     throw new Exception("uwu");
             }),
-            new EditCommand("liq", $"Liquidify the picture with the modes " +
-                $"[{((TransformMode[])Enum.GetValues(typeof(TransformMode))).Select(x => x.ToString()).Aggregate((x,y) => x + ", " + y)}].\n" +
-                "The Position argument requires 2 numbers seperated by a : like: 0.4:0.6\n" +
-                "0:0 is the Top Left of the picture and 1:1 is the Bottom Right\n" +
-                "The default Strength is 1", typeof(Bitmap), typeof(Bitmap),
-                new Argument[] {
-                    new Argument("TransformMode", typeof(string), ""),
+            new EditCommand("expand", "Expand the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
                     new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
                     new Argument("Strength", typeof(float), 1f),
                 },
                 (SocketMessage m, object[] a, object o) => {
 
-                Vector2 Transform(Vector2 point, Vector2 centerT, Bitmap within, float strength, TransformMode modeT)
-                {
-                    Vector2 diff = point - centerT;
-                    Vector2 move = diff;
-                    move.Normalize();
-                    
-                    Vector2 target = Vector2.Zero;
-                    float transformedLength = 0;
-                    float rotationAngle = 0;
-                    double cos = 0;
-                    double sin = 0;
-                    float div = within.Width + within.Height;
-                    float maxDistance = (centerT / div).LengthSquared();
-                    switch (modeT)
-                    {
-                        case TransformMode.Expand:
-                            transformedLength = (float)(diff / div).LengthSquared() * (1 / strength / 10);
-                            target = point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
-                            break;
+                Bitmap bmp = o as Bitmap;
 
-                        case TransformMode.Stir:
-                            transformedLength = (diff / div * 7).LengthSquared();
-                            rotationAngle = (float)Math.Pow(2, - transformedLength * transformedLength) * strength;
-                            cos = Math.Cos(rotationAngle);
-                            sin = Math.Sin(rotationAngle);
-                            target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
-                                                 (float)(sin * (point.X - centerT.X) + cos * (point.Y - centerT.Y) + centerT.Y));
-                            break;
+                Vector2 position = (Vector2)a[0];
+                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+                float strength = (float)a[2];
 
-                        case TransformMode.Fall:
-                            transformedLength = (diff / div * 7).LengthSquared();
-                            rotationAngle = -transformedLength / 3 * strength;
-                            cos = Math.Cos(rotationAngle);
-                            sin = Math.Sin(rotationAngle);
-                            target = new Vector2((float)(cos * (point.X - centerT.X) - sin * (point.Y - centerT.Y) + centerT.X),
-                                                 (float)(sin * (point.X - centerT.X) + cos * (point.Y - centerT.Y) + centerT.Y));
-                            break;
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => {
+                        Vector2 point = new Vector2(x, y);
+                        Vector2 diff = point - center;
+                        float div = bmp.Width + bmp.Height;
+                        float maxDistance = (center / div).LengthSquared();
 
-                        case TransformMode.Wubble:
-                            transformedLength = (diff / div * 7).LengthSquared();
-                            target = point - diff * (1 / (1 + transformedLength * -strength));
-                            break;
-                        case TransformMode.Cya:
-                            transformedLength = (diff / div * 7).Length();
-                            target = point - diff * (float)(-Math.Pow(2, -transformedLength * strength) + 1);
-                            break;
-                        case TransformMode.Inpand:
-                            transformedLength = (float)(diff / div * 7).LengthSquared();
-                            target = point - diff * (1 / (1 + transformedLength) * strength / 4);
-                            break;
-                    }
-
-                    if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
-                        target.X = point.X;
-                    if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
-                        target.Y = point.Y;
-                    if (target.X < 0)
-                        target.X = 0;
-                    if (target.X > within.Width - 1)
-                        target.X = within.Width - 1;
-                    if (target.Y < 0)
-                        target.Y = 0;
-                    if (target.Y > within.Height - 1)
-                        target.Y = within.Height - 1;
-
-                    // if (point.X == centerT.X)
-                    //     ConsoleWrapper.WriteLine($"Tranform was called with {point} and resulted in {target}", ConsoleColor.Cyan);
-
-                    return target;
-                }
+                        float transformedLength = (diff / div).LengthSquared() * (1 / strength / 10);
+                        return point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
+                    });
+            }),
+            new EditCommand("stir", "Stir the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
+                    new Argument("Strength", typeof(float), 1f),
+                },
+                (SocketMessage m, object[] a, object o) => {
 
                 Bitmap bmp = o as Bitmap;
-                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-                
-                TransformMode mode = a[0] as string == "" ? TransformMode.Expand : (TransformMode)Enum.Parse(typeof(TransformMode), a[0] as string);
-                Vector2 position = (Vector2)a[1];
+
+                Vector2 position = (Vector2)a[0];
                 Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float Strength = (float)a[2];
+                float strength = (float)a[2];
 
-                using (UnsafeBitmapContext ocon = new UnsafeBitmapContext(output))
-                using (UnsafeBitmapContext bcon = new UnsafeBitmapContext(bmp))
-                    for (int x = 0; x < bmp.Width; x++)
-                        for (int y = 0; y < bmp.Height; y++)
-                        {
-                            Vector2 target = Transform(new Vector2(x, y), center, bmp, Strength, mode);
-                            ocon.SetPixel(x, y, bcon.GetPixel((int)target.X, (int)target.Y));
-                        }
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => {
+                            Vector2 point = new Vector2(x, y);
+                            Vector2 diff = point - center;
+                            float div = bmp.Width + bmp.Height;
+                            float maxDistance = (center / div).LengthSquared();
 
-                return output;
+                            float transformedLength = (diff / div * 7).LengthSquared();
+                            float rotationAngle = (float)Math.Pow(2, - transformedLength * transformedLength) * strength;
+                            double cos = Math.Cos(rotationAngle);
+                            double sin = Math.Sin(rotationAngle);
+                            return new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
+                                                 (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
+                    });
+            }),
+            new EditCommand("fall", "Fall the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
+                    new Argument("Strength", typeof(float), 1f),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                Bitmap bmp = o as Bitmap;
+
+                Vector2 position = (Vector2)a[0];
+                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+                float strength = (float)a[2];
+
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => {
+                            Vector2 point = new Vector2(x, y);
+                            Vector2 diff = point - center;
+                            float div = bmp.Width + bmp.Height;
+                            float maxDistance = (center / div).LengthSquared();
+                            
+                            float transformedLength = (diff / div * 7).LengthSquared();
+                            float rotationAngle = -transformedLength / 3 * strength;
+                            double cos = Math.Cos(rotationAngle);
+                            double sin = Math.Sin(rotationAngle);
+                            return new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
+                                                 (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
+                    });
+            }),
+            new EditCommand("wubble", "Wubble the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
+                    new Argument("Strength", typeof(float), 1f),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                Bitmap bmp = o as Bitmap;
+
+                Vector2 position = (Vector2)a[0];
+                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+                float strength = (float)a[2];
+
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => {
+                            Vector2 point = new Vector2(x, y);
+                            Vector2 diff = point - center;
+                            float div = bmp.Width + bmp.Height;
+
+                            float transformedLength = (diff / div * 7).LengthSquared();
+                            return point - diff * (1 / (1 + transformedLength * -strength));
+                    });
+            }),
+            new EditCommand("cya", "Cya the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
+                    new Argument("Strength", typeof(float), 1f),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                Bitmap bmp = o as Bitmap;
+
+                Vector2 position = (Vector2)a[0];
+                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+                float strength = (float)a[2];
+
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => {
+                            Vector2 point = new Vector2(x, y);
+                            Vector2 diff = point - center;
+                            float div = bmp.Width + bmp.Height;
+
+                            float transformedLength = (diff / div * 7).Length();
+                            return point - diff * (float)(-Math.Pow(2, -transformedLength * strength) + 1);
+                    });
+            }),
+            new EditCommand("inpand", "Inpand the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
+                    new Argument("Strength", typeof(float), 1f),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                Bitmap bmp = o as Bitmap;
+
+                Vector2 position = (Vector2)a[0];
+                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+                float strength = (float)a[2];
+
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => {
+                            Vector2 point = new Vector2(x, y);
+                            Vector2 diff = point - center;
+                            float div = bmp.Width + bmp.Height;
+
+                            float transformedLength = (float)(diff / div * 7).LengthSquared();
+                            return point - diff * (1 / (1 + transformedLength) * strength / 4);
+                    });
+            }),
+            new EditCommand("squiggle", "Squiggle the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Frequenzy", typeof(float), 1f),
+                    new Argument("Strength", typeof(float), 1f),
+                    new Argument("OffsetX", typeof(int), 1),
+                    new Argument("OffsetY", typeof(int), 1),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                float frequenzy = (float)a[0];
+                float strength = (float)a[1];
+                int offsetX = (int)a[2];
+                int offsetY = (int)a[3];
+
+                return ApplyTransformation(o as Bitmap, 
+                    (x, y) => new Vector2(x + (float)Math.Cos(x / frequenzy + offsetX) * strength, y + (float)Math.Sin(y / frequenzy + offsetY) * strength));
             }),
             new EditCommand("sobelEdges", "Highlights horizontal edges", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
@@ -456,6 +513,35 @@ namespace MEE7.Commands
             }),
         };
 
+        static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
+        {
+            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+
+            using (UnsafeBitmapContext ocon = new UnsafeBitmapContext(output))
+            using (UnsafeBitmapContext bcon = new UnsafeBitmapContext(bmp))
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Vector2 target = trans(x, y);
+
+                        if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
+                            target.X = x;
+                        if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
+                            target.Y = y;
+                        if (target.X < 0)
+                            target.X = 0;
+                        if (target.X > bmp.Width - 1)
+                            target.X = bmp.Width - 1;
+                        if (target.Y < 0)
+                            target.Y = 0;
+                        if (target.Y > bmp.Height - 1)
+                            target.Y = bmp.Height - 1;
+
+                        ocon.SetPixel(x, y, bcon.GetPixel((int)target.X, (int)target.Y));
+                    }
+
+            return output;
+        }
         static ImageCodecInfo GetEncoder(System.Drawing.Imaging.ImageFormat format)
         {
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
