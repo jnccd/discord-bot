@@ -12,6 +12,8 @@ using Color = System.Drawing.Color;
 using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
 using System.Drawing.Imaging;
+using System.Web;
+using System.Net;
 
 namespace MEE7.Commands
 {
@@ -561,6 +563,28 @@ namespace MEE7.Commands
 
                     return b;
             }),
+            //new EditCommand("caption", "Attempts to find a good caption for the image",
+            //    typeof(Bitmap), typeof(string), new Argument[] { },
+            //    (SocketMessage m, object[] a, object o) => {
+            //        Bitmap b = o as Bitmap;
+
+            //        var dumpChannel = Program.GetChannelFromID(667787680855359510);
+            //        var dumpedImage = DiscordNETWrapper.SendBitmap(b, (IMessageChannel)dumpChannel).Result;
+            //        string url = dumpedImage.Attachments.First().Url;
+
+            //        WebResponse imgSearchResponse = ("https://www.google.de/searchbyimage?image_url=" + 
+            //            HttpUtility.UrlEncode(url) + "&encoded_image=&image_content=&filename=&hl=de").
+            //            GetWebResponsefromURL();
+            //        string location = imgSearchResponse.ResponseUri.AbsoluteUri;
+
+            //        string resultHTML = location.GetHTMLfromURL();
+            //        string trimmedResult = resultHTML.GetEverythingBetween("<a class=\"fKDtNb\"", "</div>");
+
+            //        string href = "https://www.google.de" + trimmedResult.GetEverythingBetween("href=\"", "\"");
+            //        string caption = trimmedResult.GetEverythingBetween("style=\"font-style:italic\">", "</a>");
+
+            //        return caption;
+            //}),
         };
 
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
