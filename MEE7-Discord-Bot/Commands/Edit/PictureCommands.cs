@@ -529,6 +529,13 @@ namespace MEE7.Commands
 
                     return output;
             }),
+            new EditCommand("backAndForth", "Make the gif go backward after it went forward and " +
+                "then it goes forward again because it loops and its all very fancy n stuff", 
+                typeof(Bitmap[]), typeof(Bitmap[]), new Argument[] { },
+                (SocketMessage m, object[] a, object o) => {
+                    Bitmap[] bs = o as Bitmap[];
+                    return bs.Concat(bs.Skip(1).Reverse());
+            }),
         };
 
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
