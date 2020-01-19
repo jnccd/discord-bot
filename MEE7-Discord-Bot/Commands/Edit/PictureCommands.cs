@@ -355,7 +355,7 @@ namespace MEE7.Commands
                             return point - diff * (1 / (1 + transformedLength) * strength / 4);
                     });
             }),
-            new EditCommand("squiggle", "Squiggle the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+            new EditCommand("blockify", "Blockify the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
                     new Argument("Frequenzy", typeof(float), 1f),
                     new Argument("Strength", typeof(float), 1f),
                     new Argument("OffsetX", typeof(int), 1),
@@ -369,7 +369,25 @@ namespace MEE7.Commands
                 int offsetY = (int)a[3];
 
                 return ApplyTransformation(o as Bitmap, 
-                    (x, y) => new Vector2(x + (float)Math.Cos(x / frequenzy + offsetX) * strength, y + (float)Math.Sin(y / frequenzy + offsetY) * strength));
+                    (x, y) => new Vector2(  x + (float)Math.Cos(x / frequenzy + offsetX) * strength, 
+                                            y + (float)Math.Sin(y / frequenzy + offsetY) * strength));
+            }),
+            new EditCommand("squiggle", "Squiggle the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Percent", typeof(float), 1f),
+                    new Argument("Scale", typeof(float), 1f),
+                    new Argument("OffsetX", typeof(int), 1),
+                    new Argument("OffsetY", typeof(int), 1),
+                },
+                (SocketMessage m, object[] a, object o) => {
+
+                float percent = (float)a[0];
+                float scale = (float)a[1];
+                int offsetX = (int)a[2];
+                int offsetY = (int)a[3];
+
+                return ApplyTransformation(o as Bitmap,
+                    (x, y) => new Vector2(  x + percent * (float)Math.Sin((y + offsetY) / scale),
+                                            y + percent * (float)Math.Cos((x + offsetX) / scale)));
             }),
             new EditCommand("sobelEdges", "Highlights horizontal edges", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
                     return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
