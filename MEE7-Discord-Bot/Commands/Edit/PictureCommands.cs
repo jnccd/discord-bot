@@ -552,7 +552,7 @@ namespace MEE7.Commands
                     Bitmap b = o as Bitmap;
                     Vector2 coords = (a[0] as Vector2?).GetValueOrDefault();
                     int thereshold = (a[1] as int?).GetValueOrDefault();
-                    List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * b.Width), (int)(coords.Y * b.Height)) });
+                    List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
 
                     if (thereshold > byte.MaxValue - 1)
                         thereshold = byte.MaxValue - 1;
@@ -569,7 +569,7 @@ namespace MEE7.Commands
 
                     using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
                     {
-                        Color backColor = c.GetPixel((int)coords.X, (int)coords.Y);
+                        Color backColor = c.GetPixel(OpenList[0].X, OpenList[0].Y);
 
                         while (OpenList.Count > 0)
                         {
