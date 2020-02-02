@@ -538,27 +538,57 @@ namespace MEE7.Commands
                     Bitmap[] bs = o as Bitmap[];
                     return bs.Concat(bs.Skip(1).Reverse()).ToArray();
             }),
+            new EditCommand("get", "Get single picture from a gif",
+                typeof(Bitmap[]), typeof(Bitmap), new Argument[] { new Argument("Index", typeof(int), 0) },
+                (SocketMessage m, object[] a, object o) => {
+                    object[] bs = o as Bitmap[];
+                    return bs[(a[0] as int?).GetValueOrDefault()];
+            }),
             new EditCommand("transground", "Make the background transparent",
-                typeof(Bitmap), typeof(Bitmap), new Argument[] { 
-                    new Argument("Thereshold", typeof(int), 75) },
+                typeof(Bitmap), typeof(Bitmap), new Argument[] {
+                    new Argument("Background Coords", typeof(Vector2), new Vector2(0, 0)) ,
+                    new Argument("Thereshold", typeof(int), 10) },
                 (SocketMessage m, object[] a, object o) => {
                     Bitmap b = o as Bitmap;
-                    int Thereshold = (a[0] as int?).GetValueOrDefault();
+                    Vector2 coords = (a[0] as Vector2?).GetValueOrDefault();
+                    int thereshold = (a[1] as int?).GetValueOrDefault();
+                    List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * b.Width), (int)(coords.Y * b.Height)) });
+
+                    if (thereshold > byte.MaxValue - 1)
+                        thereshold = byte.MaxValue - 1;
+
+                    List<Point> getNeighbors(Point p)
+                    {
+                        List<Point> re = new List<Point>();
+                        if (p.X > 0) re.Add(new Point(p.X - 1, p.Y));
+                        if (p.X < b.Width - 1) re.Add(new Point(p.X + 1, p.Y));
+                        if (p.Y > 0) re.Add(new Point(p.X, p.Y - 1));
+                        if (p.Y < b.Height - 1) re.Add(new Point(p.X, p.Y + 1));
+                        return re;
+                    }
 
                     using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
                     {
-                        Color[] edges = new Color[] { c.GetPixel(0, 0),
-                            c.GetPixel(0, c.Height - 1), c.GetPixel(c.Width - 1, 0),
-                            c.GetPixel(c.Width - 1, c.Height - 1) };
+                        Color backColor = c.GetPixel((int)coords.X, (int)coords.Y);
 
-                        for (int x = 0; x < b.Width; x++)
-                            for (int y = 0; y < b.Height; y++)
+                        while (OpenList.Count > 0)
+                        {
+                            Point cur = OpenList[0];
+                            OpenList.RemoveAt(0);
+
+                            var debug = c.GetRawPixel(cur.X, cur.Y);
+
+                            int dist; Color C;
+                            foreach (Point p in getNeighbors(cur))
                             {
-                                Color C = c.GetPixel(x, y);
-                                var dists = edges.Select(q => Math.Abs(q.GetColorDiff(C)));
-                                if (dists.Min() < Thereshold)
-                                    c.SetPixel(x,y, Color.FromArgb(dists.Min() > 255 ? 255 : dists.Min(), C.R, C.G, C.B));
+                                if (c.GetRawPixel(p.X, p.Y).Alpha == byte.MaxValue &&
+                                   (dist = Math.Abs((C = c.GetPixel(p.X, p.Y)).GetColorDiff(backColor)) / 3) < thereshold)
+                                {
+                                    c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
+                                    OpenList.Add(p);
+                                }
                             }
+                        }
                     }
 
                     return b;

@@ -118,8 +118,8 @@ namespace MEE7
             else
             {
                 Console.Title = "MEE7";
-                if (!RunningOnLinux)
-                    ShowWindow(GetConsoleWindow(), 2);
+                //if (!RunningOnLinux)
+                //    ShowWindow(GetConsoleWindow(), 2);
                 Thread.CurrentThread.Name = "Main";
                 Console.ForegroundColor = ConsoleColor.White;
                 Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
