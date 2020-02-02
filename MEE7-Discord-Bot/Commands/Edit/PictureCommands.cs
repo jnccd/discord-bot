@@ -582,7 +582,7 @@ namespace MEE7.Commands
                             foreach (Point p in getNeighbors(cur))
                             {
                                 if (c.GetRawPixel(p.X, p.Y).Alpha == byte.MaxValue &&
-                                   (dist = Extensions.ReLU((C = c.GetPixel(p.X, p.Y)).GetColorDiff(backColor)) / 3) < thereshold)
+                                   (dist = Extensions.ReLU((C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor)) / 3) < thereshold)
                                 {
                                     c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
                                     OpenList.Add(p);
@@ -749,7 +749,7 @@ namespace MEE7.Commands
                     for (int y = 0; y < P.Height; y++)
                     {
                         Color C = c.GetPixel(x, y);
-                        if (C.A > 5 && edges.All(a => Math.Abs(a.GetColorDiff(C)) > 70))
+                        if (C.A > 5 && edges.All(a => a.GetColorDist(C) > 70))
                             if (Horz)
                                 c.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
                             else

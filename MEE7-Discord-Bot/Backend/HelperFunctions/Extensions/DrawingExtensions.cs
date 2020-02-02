@@ -22,7 +22,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             return bmp;
         }
         public static int GetGrayScale(this Color c) => (c.R + c.G + c.B) / 3;
-        public static int GetColorDiff(this Color c, Color C) => c.R - C.R + c.G - C.G + c.B - C.B;
+        public static int GetColorDist(this Color c, Color C) => Math.Abs(c.R - C.R) + Math.Abs(c.G - C.G) + Math.Abs(c.B - C.B);
         public static Color HsvToRgb(this Vector3 HSV) // from https://stackoverflow.com/questions/1335426/is-there-a-built-in-c-net-system-api-for-hsv-to-rgb
         {
             double h = HSV.X;
