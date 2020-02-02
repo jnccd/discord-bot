@@ -59,5 +59,9 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             v.Y = v.Y / l;
             return v;
         }
+        public static int ReLU(this int i)
+        {
+            return i < 0 ? 0 : i;
+        }
     }
 }
