@@ -576,13 +576,11 @@ namespace MEE7.Commands
                             Point cur = OpenList[0];
                             OpenList.RemoveAt(0);
 
-                            var debug = c.GetRawPixel(cur.X, cur.Y);
-
                             int dist; Color C;
                             foreach (Point p in getNeighbors(cur))
                             {
                                 if (c.GetRawPixel(p.X, p.Y).Alpha == byte.MaxValue &&
-                                   (dist = Extensions.ReLU((C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor)) / 3) < thereshold)
+                                   (dist = (C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor).ReLU() / 3) < thereshold)
                                 {
                                     c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
                                     OpenList.Add(p);
