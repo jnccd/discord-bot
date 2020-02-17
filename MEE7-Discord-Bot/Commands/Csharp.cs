@@ -9,12 +9,13 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.Scripting.Hosting;
 using System.Reflection;
 using System.Threading;
+using System.Diagnostics;
 
 namespace MEE7.Commands
 {
     public class Csharp : Command
     {
-        public Csharp() : base("csharp", "Run csharp code", isExperimental: false, isHidden: true)
+        public Csharp() : base("csharp", "Run csharp code", isExperimental: true, isHidden: true)
         {
 
         }
@@ -49,8 +50,8 @@ namespace MEE7.Commands
                 return;
             }
             code = code.Split(" ").Skip(1).Combine(" ").Trim('`', ' ');
-            string[] badWords = { "Console", "System.Runtime", "GC.", "System.Reflection", "System.IO", "Environment.Exit" };
-
+            string[] badWords = { "Console", "System.Runtime", "GC.", "System.Reflection", "System.IO", "Environment.Exit", "System.Threading" };
+            
             foreach (var badWord in badWords)
                 if (code.Contains(badWord))
                 {
@@ -66,15 +67,24 @@ namespace MEE7.Commands
                     re = RunCode("using System;using System.Linq;" + code, cancelCulture.Token); 
                 }
                 catch (Exception e) { re = e.Message; }
-                DiscordNETWrapper.SendText("```csharp\n" + re.ToString() + "```", message.Channel).Wait();
+                DiscordNETWrapper.SendText("```csharp\n" + (re == null ? "" : re.ToString()) + "```", message.Channel).Wait();
             });
+            runner.Priority = ThreadPriority.Lowest;
             runner.Start();
-            Thread.Sleep(5000);
+            for (int i = 0; i < 10; i++)
+            {
+                Thread.Sleep(500);
+                if (Process.GetCurrentProcess().PrivateMemorySize64 > 500L * 1024 * 1024)
+                {
+                    cancelCulture.Cancel();
+                    DiscordNETWrapper.SendText("```csharp\nCsharp Runner used up too much memory!```", message.Channel).Wait();
+                }
+            }
 
             if (runner.IsAlive)
             {
                 cancelCulture.Cancel();
-                DiscordNETWrapper.SendText("```csharp\nCsharp Runner timed out!```", message.Channel).Wait();
+                DiscordNETWrapper.SendText("```csharp\nCsharp Runner timed out!```", message.Channel).Wait(); 
             }
         }
     }
