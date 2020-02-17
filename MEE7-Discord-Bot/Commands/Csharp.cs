@@ -5,6 +5,9 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MEE7.Backend.HelperFunctions;
 using System.Linq;
 using MEE7.Backend.HelperFunctions.Extensions;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
+using System.Reflection;
 
 namespace MEE7.Commands
 {
@@ -15,9 +18,29 @@ namespace MEE7.Commands
 
         }
 
+        public object RunCode(string code)
+        {
+            using (var interactiveLoader = new InteractiveAssemblyLoader())
+            {
+                var mscorlib = typeof(object).GetTypeInfo().Assembly;
+                var systemCore = typeof(Enumerable).GetTypeInfo().Assembly;
+                var references = new[] { mscorlib, systemCore };
+                foreach (var reference in references)
+                    interactiveLoader.RegisterDependency(reference);
+                var scriptOptions = ScriptOptions.Default;
+                scriptOptions = scriptOptions.AddReferences(references);
+                scriptOptions = scriptOptions.AddImports("System");
+                scriptOptions = scriptOptions.AddImports("System.Linq");
+                scriptOptions = scriptOptions.AddImports("System.Collections.Generic");
+
+                var script = CSharpScript.Create(code, scriptOptions, null, interactiveLoader);
+                return script.RunAsync().Result.ReturnValue;
+            }
+        }
+
         public override void Execute(SocketMessage message)
         {
-            string code = message.Content.Split(" ").Skip(1).Combine(" ");
+            string code = message.Content.Split(" ").Skip(1).Combine(" ").Trim('`', ' ');
             string[] badWords = { "Console", "System.Runtime", "GC.", "System.Reflection", "System.IO" };
 
             foreach (var badWord in badWords)
@@ -29,10 +52,12 @@ namespace MEE7.Commands
 
             object re;
             try {
-                re = CSharpScript.EvaluateAsync(@"using System;using System.Linq;" + code).Result;
-            } catch (Exception e) { re = e; }
+                var imports = ScriptOptions.Default;
+                re = RunCode("using System;using System.Linq;" + code);
+            } 
+            catch (Exception e) { re = e; }
 
-            DiscordNETWrapper.SendText(re.ToString(), message.Channel).Wait();
+            DiscordNETWrapper.SendText("```csharp\n" + re.ToString() + "```", message.Channel).Wait();
         }
     }
 }
