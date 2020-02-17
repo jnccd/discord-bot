@@ -8,6 +8,7 @@ using MEE7.Backend.HelperFunctions.Extensions;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.Scripting.Hosting;
 using System.Reflection;
+using System.Threading;
 
 namespace MEE7.Commands
 {
@@ -18,7 +19,7 @@ namespace MEE7.Commands
 
         }
 
-        public object RunCode(string code)
+        public object RunCode(string code, CancellationToken cancelled)
         {
             using (var interactiveLoader = new InteractiveAssemblyLoader())
             {
@@ -34,14 +35,21 @@ namespace MEE7.Commands
                 scriptOptions = scriptOptions.AddImports("System.Collections.Generic");
 
                 var script = CSharpScript.Create(code, scriptOptions, null, interactiveLoader);
-                return script.RunAsync().Result.ReturnValue;
+                return script.RunAsync(null, null, cancelled).Result.ReturnValue;
             }
         }
 
         public override void Execute(SocketMessage message)
         {
-            string code = message.Content.Split(" ").Skip(1).Combine(" ").Trim('`', ' ');
-            string[] badWords = { "Console", "System.Runtime", "GC.", "System.Reflection", "System.IO" };
+            string code = message.Content;
+            code = code.Replace("\n", " ");
+            if (!code.Trim(' ').Contains(" "))
+            {
+                DiscordNETWrapper.SendText("I can't find the code D:", message.Channel).Wait();
+                return;
+            }
+            code = code.Split(" ").Skip(1).Combine(" ").Trim('`', ' ');
+            string[] badWords = { "Console", "System.Runtime", "GC.", "System.Reflection", "System.IO", "Environment.Exit" };
 
             foreach (var badWord in badWords)
                 if (code.Contains(badWord))
@@ -50,14 +58,24 @@ namespace MEE7.Commands
                     return;
                 }
 
-            object re;
-            try {
-                var imports = ScriptOptions.Default;
-                re = RunCode("using System;using System.Linq;" + code);
-            } 
-            catch (Exception e) { re = e; }
+            CancellationTokenSource cancelCulture = new CancellationTokenSource();
+            Thread runner = new Thread(() => {
+                object re = null;
+                try
+                { 
+                    re = RunCode("using System;using System.Linq;" + code, cancelCulture.Token); 
+                }
+                catch (Exception e) { re = e.Message; }
+                DiscordNETWrapper.SendText("```csharp\n" + re.ToString() + "```", message.Channel).Wait();
+            });
+            runner.Start();
+            Thread.Sleep(5000);
 
-            DiscordNETWrapper.SendText("```csharp\n" + re.ToString() + "```", message.Channel).Wait();
+            if (runner.IsAlive)
+            {
+                cancelCulture.Cancel();
+                DiscordNETWrapper.SendText("```csharp\nCsharp Runner timed out!```", message.Channel).Wait();
+            }
         }
     }
 }
