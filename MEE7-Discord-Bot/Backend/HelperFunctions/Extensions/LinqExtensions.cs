@@ -17,7 +17,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
         {
             return xs.Foldl(default, f);
         }
-        public static a MaxElement<a>(this IEnumerable<a> xs, Func<a, double> f) { return xs.MaxElement(f, out double max); }
+        public static a MaxElement<a>(this IEnumerable<a> xs, Func<a, double> f) { return xs.MaxElement(f, out double _); }
         public static a MaxElement<a>(this IEnumerable<a> xs, Func<a, double> f, out double max)
         {
             max = 0; a maxE = default;
@@ -32,7 +32,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             }
             return maxE;
         }
-        public static a MinElement<a>(this IEnumerable<a> xs, Func<a, double> f) { return xs.MinElement(f, out double min); }
+        public static a MinElement<a>(this IEnumerable<a> xs, Func<a, double> f) { return xs.MinElement(f, out double _); }
         public static a MinElement<a>(this IEnumerable<a> xs, Func<a, double> f, out double min)
         {
             min = 0; a minE = default;
