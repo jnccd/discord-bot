@@ -71,20 +71,22 @@ namespace MEE7.Commands
             });
             runner.Priority = ThreadPriority.Lowest;
             runner.Start();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 50; i++)
             {
-                Thread.Sleep(500);
+                Thread.Sleep(100);
                 if (Process.GetCurrentProcess().PrivateMemorySize64 > 500L * 1024 * 1024)
                 {
                     cancelCulture.Cancel();
                     DiscordNETWrapper.SendText("```csharp\nCsharp Runner used up too much memory!```", message.Channel).Wait();
+                    return;
                 }
             }
 
             if (runner.IsAlive)
             {
                 cancelCulture.Cancel();
-                DiscordNETWrapper.SendText("```csharp\nCsharp Runner timed out!```", message.Channel).Wait(); 
+                DiscordNETWrapper.SendText("```csharp\nCsharp Runner timed out!```", message.Channel).Wait();
+                return;
             }
         }
     }
