@@ -17,603 +17,537 @@ using System.Net;
 
 namespace MEE7.Commands
 {
-    public partial class Edit : Command
+    public class PictureCommands : EditCommandProvider
     {
-        enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
-        static readonly object memifyLock = new object();
+        public string colorChannelSwapDesc = "Swap the rgb color channels for each pixel";
+        public Bitmap colorChannelSwap(Bitmap bmp, SocketMessage m)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c = Color.FromArgb(c.B, c.R, c.G);
+                        con.SetPixel(x, y, c);
+                    }
 
-        readonly EditCommand[] PictureCommands = new EditCommand[] {
-            new EditCommand("colorChannelSwap", "Swap the rgb color channels for each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0],
-                (SocketMessage m, object[] a, object o) => {
+            return bmp;
+        }
 
-                Bitmap bmp = (o as Bitmap);
+        public string reddifyDesc = "Make it red af";
+        public Bitmap reddify(Bitmap bmp, SocketMessage m)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c = Color.FromArgb(c.R, 0, 0, 255);
+                        con.SetPixel(x, y, c);
+                    }
 
-                using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                    for (int x = 0; x < bmp.Width; x++)
-                        for (int y = 0; y < bmp.Height; y++)
-                        {
-                            Color c = con.GetPixel(x, y);
-                            c = Color.FromArgb(c.B, c.R, c.G);
-                            con.SetPixel(x, y, c);
-                        }
+            return bmp;
+        }
 
-                return bmp;
-            }),
-            new EditCommand("reddify", "Make it red af", typeof(Bitmap), typeof(Bitmap), new Argument[0],
-                (SocketMessage m, object[] a, object o) => {
+        public string invertDesc = "Invert the color of each pixel";
+        public Bitmap invert(Bitmap bmp, SocketMessage m)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
+                        con.SetPixel(x, y, c);
+                    }
 
-                Bitmap bmp = (o as Bitmap);
+            return bmp;
+        }
 
-                using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                    for (int x = 0; x < bmp.Width; x++)
-                        for (int y = 0; y < bmp.Height; y++)
-                        {
-                            Color c = con.GetPixel(x, y);
-                            c = Color.FromArgb(c.R, 0, 0, 255);
-                            con.SetPixel(x, y, c);
-                        }
+        public string RektDesc = "Finds colored rectangles in pictures";
+        public Bitmap Rekt(Bitmap bmp, SocketMessage m, string color)
+        {
+            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
 
-                return bmp;
-            }),
-            new EditCommand("invert", "Invert the color of each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[0],
-                (SocketMessage m, object[] a, object o) => {
+            Color c;
+            if (string.IsNullOrWhiteSpace(color))
+                c = Color.FromArgb(254, 34, 34);
+            else
+                c = Color.FromName(color);
+            Rectangle redRekt = FindRectangle(bmp, c, 20);
 
-                Bitmap bmp = (o as Bitmap);
-
-                using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                    for (int x = 0; x < bmp.Width; x++)
-                        for (int y = 0; y < bmp.Height; y++)
-                        {
-                            Color c = con.GetPixel(x, y);
-                            c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
-                            con.SetPixel(x, y, c);
-                        }
-
-                return bmp;
-            }),
-            new EditCommand("Rekt", "Finds colored rectangles in pictures", typeof(Bitmap), typeof(Bitmap),
-                new Argument[] { new Argument("Color", typeof(string), "") },
-                (SocketMessage m, object[] a, object o) => {
-
-                Bitmap bmp = (o as Bitmap);
-                Bitmap output = new Bitmap(bmp.Width, bmp.Height);
-
-                Color c;
-                if (string.IsNullOrWhiteSpace(a[0] as string))
-                    c = Color.FromArgb(254, 34, 34);
-                else
-                    c = Color.FromName(a[0] as string);
-                Rectangle redRekt = FindRectangle(bmp, c, 20);
-
-                if (redRekt.Width == 0)
-                    throw new Exception("No rekt!");
-                else
+            if (redRekt.Width == 0)
+                throw new Exception("No rekt!");
+            else
+            {
+                using (Graphics graphics = Graphics.FromImage(output))
                 {
+                    graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, bmp.Width, bmp.Height));
+                    graphics.DrawRectangle(Pens.Red, redRekt);
+                }
+
+                return output;
+            }
+        }
+
+        public string memifyDesc = "Turn a picture into a meme, get a list of available templates with the argument -list";
+        public Bitmap memify(Bitmap bmp, SocketMessage m, string Meme)
+        {
+            lock (memifyLock)
+            {
+                string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTemplates");
+
+                string memeTemplateDesign = "";
+                if (Meme == "-list")
+                    throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                                                                    Where(x => x.EndsWith("design")).
+                                                                    Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
+                                                                    Aggregate((x, y) => x + "\n" + y));
+                else if (!string.IsNullOrWhiteSpace(Meme))
+                    memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(Meme) &&
+                                                          Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
+                else
+                    memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
+
+                if (string.IsNullOrWhiteSpace(memeTemplateDesign))
+                    throw new Exception("I don't have that meme in my registry!");
+
+                string memeName = memeTemplateDesign.RemoveLastGroup('-');
+                string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
+                string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
+
+                if (File.Exists(memeTemplateOverlay))
+                {
+                    Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
+                    Bitmap overlay;
+                    using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
+                        overlay = (Bitmap)Bitmap.FromStream(stream);
+                    Bitmap output = new Bitmap(overlay.Width, overlay.Height);
                     using (Graphics graphics = Graphics.FromImage(output))
                     {
-                        graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, bmp.Width, bmp.Height));
-                        graphics.DrawRectangle(Pens.Red, redRekt);
+                        graphics.DrawImage(bmp, redRekt);
+                        graphics.DrawImage(overlay, new Point(0, 0));
                     }
 
                     return output;
                 }
-            }),
-            new EditCommand("memify", "Turn a picture into a meme, get a list of available templates with the argument -list", typeof(Bitmap), typeof(Bitmap),
-                new Argument[] { new Argument("Meme", typeof(string), "") },
-                (SocketMessage m, object[] a, object o) => {
-
-                lock (memifyLock)
+                else if (File.Exists(memeTemplate))
                 {
-                    string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTemplates");
-
-                    string memeTemplateDesign = "";
-                    if (a[0] as string == "-list")
-                        throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
-                                                                        Where(x => x.EndsWith("design")).
-                                                                        Select(x => x.RemoveLastGroup('-').RemoveLastGroup('-')).
-                                                                        Aggregate((x, y) => x + "\n" + y));
-                    else if (!string.IsNullOrWhiteSpace(a[0] as string))
-                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith(a[0] as string) &&
-                                                              Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().FirstOrDefault();
-                    else
-                        memeTemplateDesign = files.Where(x => Path.GetFileNameWithoutExtension(x).EndsWith("design")).ToArray().GetRandomValue();
-
-                    if (string.IsNullOrWhiteSpace(memeTemplateDesign))
-                        throw new Exception("I don't have that meme in my registry!");
-
-                    string memeName = memeTemplateDesign.RemoveLastGroup('-');
-                    string memeTemplate = files.FirstOrDefault(x => x.StartsWith(memeName) && !x.Contains("-design."));
-                    string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
-
-                    Bitmap bmp = o as Bitmap;
-                    if (File.Exists(memeTemplateOverlay))
-                    {
-                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
-                        Bitmap overlay;
-                        using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
-                            overlay = (Bitmap)Bitmap.FromStream(stream);
-                        Bitmap output = new Bitmap(overlay.Width, overlay.Height);
-                        using (Graphics graphics = Graphics.FromImage(output))
-                        {
-                           graphics.DrawImage(bmp, redRekt);
-                           graphics.DrawImage(overlay, new Point(0, 0));
-                        }
-
-                        return output;
-                    }
-                    else if (File.Exists(memeTemplate))
-                    {
-                        Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
-                        if (redRekt.Width == 0)
-                            redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(255, 0, 0), 20);
-                        Bitmap template;
-                        using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-                            template = (Bitmap)Bitmap.FromStream(stream);
-                        using (Graphics graphics = Graphics.FromImage(template))
-                            graphics.DrawImage(bmp, redRekt);
-
-                        return template;
-                    }
-                    else
-                        throw new Exception("Something went wrong :thinking:");
-                }
-            }),
-            new EditCommand("textMemify", "Put text into a meme template, input -list as Meme and get a list templates\n" +
-                "The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox", typeof(string), typeof(Bitmap),
-                new Argument[] {
-                    new Argument("Meme", typeof(string), ""),
-                    new Argument("Font", typeof(string), "Arial"),
-                    new Argument("FontSize", typeof(float), 1)
-                },
-                (SocketMessage m, object[] a, object o) => {
-
-                string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTextTemplates");
-                string memeName = a[0] as string;
-
-                if (memeName.Contains("-list"))
-                    throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
-                                                                Where(x => x.EndsWith("-design")).
-                                                                Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
-                                                                Aggregate((x, y) => x + "\n" + y));
-
-                string memeTemplate = "";
-                string memeDesign = "";
-                if (memeName != "")
-                {
-                    memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(memeName) &&
-                        Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
-                    if (memeDesign == null)
-                        throw new Exception("Error, couldn't find that meme design!");
-                    memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
-                }
-                else
-                {
-                    memeDesign = files.Where(x => x.Contains("-design")).GetRandomValue();
-                    memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
-                }
-
-                if (string.IsNullOrWhiteSpace(memeTemplate))
-                    throw new Exception("I don't have that meme in my registry!");
-
-                if (File.Exists(memeTemplate))
-                {
-                    Bitmap template, design;
+                    Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
+                    if (redRekt.Width == 0)
+                        redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(255, 0, 0), 20);
+                    Bitmap template;
                     using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
                         template = (Bitmap)Bitmap.FromStream(stream);
-                    using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
-                        design = (Bitmap)Bitmap.FromStream(stream);
-                    Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
-                    if (redRekt.Width == 0)
-                        throw new Exception("Error, couldn't find a rectangle to write in!");
-                    float fontSize = redRekt.Height / 5f / (float)a[2];
                     using (Graphics graphics = Graphics.FromImage(template))
-                        graphics.DrawString(o as string, new Font(a[1] as string, fontSize), Brushes.Black, redRekt);
+                        graphics.DrawImage(bmp, redRekt);
 
                     return template;
                 }
                 else
-                    throw new Exception("uwu");
-            }),
-            new EditCommand("expand", "Expand the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1f),
-                },
-                (SocketMessage m, object[] a, object o) => {
+                    throw new Exception("Something went wrong :thinking:");
+            }
+        }
 
-                Bitmap bmp = o as Bitmap;
+        public string textMemifyDesc = "Put text into a meme template, input -list as Meme and get a list templates\n" +
+                "The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox";
+        public Bitmap textMemify(string memeName, SocketMessage m, string Meme, string Font = "Arial", float FontSize = 1)
+        {
+            string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTextTemplates");
 
-                Vector2 position = (Vector2)a[0];
-                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[1];
+            if (memeName.Contains("-list"))
+                throw new Exception("Templates: \n\n" + files.Select(x => Path.GetFileNameWithoutExtension(x)).
+                                                            Where(x => x.EndsWith("-design")).
+                                                            Select(x => x.Remove(x.IndexOf("-design"), "-design".Length)).
+                                                            Aggregate((x, y) => x + "\n" + y));
 
-                return ApplyTransformation(o as Bitmap,
+            string memeTemplate = "";
+            string memeDesign = "";
+            if (memeName != "")
+            {
+                memeDesign = files.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).StartsWith(memeName) &&
+                    Path.GetFileNameWithoutExtension(x).EndsWith("-design"));
+                if (memeDesign == null)
+                    throw new Exception("Error, couldn't find that meme design!");
+                memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
+            }
+            else
+            {
+                memeDesign = files.Where(x => x.Contains("-design")).GetRandomValue();
+                memeTemplate = files.FirstOrDefault(x => memeDesign.Contains(Path.GetFileNameWithoutExtension(x)) && !x.Contains("design"));
+            }
+
+            if (string.IsNullOrWhiteSpace(memeTemplate))
+                throw new Exception("I don't have that meme in my registry!");
+
+            if (File.Exists(memeTemplate))
+            {
+                Bitmap template, design;
+                using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
+                    template = (Bitmap)Bitmap.FromStream(stream);
+                using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
+                    design = (Bitmap)Bitmap.FromStream(stream);
+                Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
+                if (redRekt.Width == 0)
+                    throw new Exception("Error, couldn't find a rectangle to write in!");
+                float fontSize = redRekt.Height / 5f / FontSize;
+                using (Graphics graphics = Graphics.FromImage(template))
+                    graphics.DrawString(memeName, new Font(Font, fontSize), Brushes.Black, redRekt);
+
+                return template;
+            }
+            else
+                throw new Exception("uwu");
+        }
+
+        public string expandDesc = "Expand the pixels";
+        public Bitmap expand(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        {
+            Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+
+            return ApplyTransformation(bmp,
+                (x, y) => {
+                    Vector2 point = new Vector2(x, y);
+                    Vector2 diff = point - center;
+                    float div = bmp.Width + bmp.Height;
+                    float maxDistance = (center / div).LengthSquared();
+
+                    float transformedLength = (diff / div).LengthSquared() * (1 / strength / 10);
+                    return point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
+                });
+        }
+
+        public string stirDesc = "Stir the pixels";
+        public Bitmap stir(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        {
+            Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+
+            return ApplyTransformation(bmp,
+                (x, y) => {
+                    Vector2 point = new Vector2(x, y);
+                    Vector2 diff = point - center;
+                    float div = bmp.Width + bmp.Height;
+                    float maxDistance = (center / div).LengthSquared();
+
+                    float transformedLength = (diff / div * 7).LengthSquared();
+                    float rotationAngle = (float)Math.Pow(2, -transformedLength * transformedLength) * strength;
+                    double cos = Math.Cos(rotationAngle);
+                    double sin = Math.Sin(rotationAngle);
+                    return new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
+                                             (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
+                });
+        }
+
+        public string fallDesc = "Fall the pixels";
+        public Bitmap fall(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        {
+            Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
+
+            return ApplyTransformation(bmp,
                     (x, y) => {
                         Vector2 point = new Vector2(x, y);
                         Vector2 diff = point - center;
                         float div = bmp.Width + bmp.Height;
                         float maxDistance = (center / div).LengthSquared();
 
-                        float transformedLength = (diff / div).LengthSquared() * (1 / strength / 10);
-                        return point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
+                        float transformedLength = (diff / div * 7).LengthSquared();
+                        float rotationAngle = -transformedLength / 3 * strength;
+                        double cos = Math.Cos(rotationAngle);
+                        double sin = Math.Sin(rotationAngle);
+                        return new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
+                                             (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
                     });
-            }),
-            new EditCommand("stir", "Stir the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1f),
-                },
-                (SocketMessage m, object[] a, object o) => {
+        }
 
-                Bitmap bmp = o as Bitmap;
+        public string wubbleDesc = "Wubble the pixels";
+        public Bitmap wubble(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        {
+            Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
-                Vector2 position = (Vector2)a[0];
-                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[1];
+            return ApplyTransformation(bmp,
+                   (x, y) => {
+                       Vector2 point = new Vector2(x, y);
+                       Vector2 diff = point - center;
+                       float div = bmp.Width + bmp.Height;
 
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => {
-                            Vector2 point = new Vector2(x, y);
-                            Vector2 diff = point - center;
-                            float div = bmp.Width + bmp.Height;
-                            float maxDistance = (center / div).LengthSquared();
+                       float transformedLength = (diff / div * 7).LengthSquared();
+                       return point - diff * (1 / (1 + transformedLength * -strength));
+                   });
+        }
 
-                            float transformedLength = (diff / div * 7).LengthSquared();
-                            float rotationAngle = (float)Math.Pow(2, - transformedLength * transformedLength) * strength;
-                            double cos = Math.Cos(rotationAngle);
-                            double sin = Math.Sin(rotationAngle);
-                            return new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
-                                                 (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
-                    });
-            }),
-            new EditCommand("fall", "Fall the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1f),
-                },
-                (SocketMessage m, object[] a, object o) => {
+        public string cyaDesc = "Cya the pixels";
+        public Bitmap cya(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        {
+            Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
-                Bitmap bmp = o as Bitmap;
+            return ApplyTransformation(bmp,
+                  (x, y) => {
+                      Vector2 point = new Vector2(x, y);
+                      Vector2 diff = point - center;
+                      float div = bmp.Width + bmp.Height;
 
-                Vector2 position = (Vector2)a[0];
-                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[1];
+                      float transformedLength = (diff / div * 7).Length();
+                      return point - diff * (float)(-Math.Pow(2, -transformedLength * strength) + 1);
+                  });
+        }
 
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => {
-                            Vector2 point = new Vector2(x, y);
-                            Vector2 diff = point - center;
-                            float div = bmp.Width + bmp.Height;
-                            float maxDistance = (center / div).LengthSquared();
+        public string inpandDesc = "Inpand the pixels";
+        public Bitmap inpand(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        {
+            Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
-                            float transformedLength = (diff / div * 7).LengthSquared();
-                            float rotationAngle = -transformedLength / 3 * strength;
-                            double cos = Math.Cos(rotationAngle);
-                            double sin = Math.Sin(rotationAngle);
-                            return new Vector2((float)(cos * (point.X - center.X) - sin * (point.Y - center.Y) + center.X),
-                                                 (float)(sin * (point.X - center.X) + cos * (point.Y - center.Y) + center.Y));
-                    });
-            }),
-            new EditCommand("wubble", "Wubble the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1f),
-                },
-                (SocketMessage m, object[] a, object o) => {
+            return ApplyTransformation(bmp,
+                 (x, y) => {
+                     Vector2 point = new Vector2(x, y);
+                     Vector2 diff = point - center;
+                     float div = bmp.Width + bmp.Height;
 
-                Bitmap bmp = o as Bitmap;
+                     float transformedLength = (float)(diff / div * 7).LengthSquared();
+                     return point - diff * (1 / (1 + transformedLength) * strength / 4);
+                 });
+        }
 
-                Vector2 position = (Vector2)a[0];
-                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[1];
-
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => {
-                            Vector2 point = new Vector2(x, y);
-                            Vector2 diff = point - center;
-                            float div = bmp.Width + bmp.Height;
-
-                            float transformedLength = (diff / div * 7).LengthSquared();
-                            return point - diff * (1 / (1 + transformedLength * -strength));
-                    });
-            }),
-            new EditCommand("cya", "Cya the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1f),
-                },
-                (SocketMessage m, object[] a, object o) => {
-
-                Bitmap bmp = o as Bitmap;
-
-                Vector2 position = (Vector2)a[0];
-                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[1];
-
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => {
-                            Vector2 point = new Vector2(x, y);
-                            Vector2 diff = point - center;
-                            float div = bmp.Width + bmp.Height;
-
-                            float transformedLength = (diff / div * 7).Length();
-                            return point - diff * (float)(-Math.Pow(2, -transformedLength * strength) + 1);
-                    });
-            }),
-            new EditCommand("inpand", "Inpand the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Position", typeof(Vector2), new Vector2(0.5f, 0.5f)),
-                    new Argument("Strength", typeof(float), 1f),
-                },
-                (SocketMessage m, object[] a, object o) => {
-
-                Bitmap bmp = o as Bitmap;
-
-                Vector2 position = (Vector2)a[0];
-                Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
-                float strength = (float)a[1];
-
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => {
-                            Vector2 point = new Vector2(x, y);
-                            Vector2 diff = point - center;
-                            float div = bmp.Width + bmp.Height;
-
-                            float transformedLength = (float)(diff / div * 7).LengthSquared();
-                            return point - diff * (1 / (1 + transformedLength) * strength / 4);
-                    });
-            }),
-            new EditCommand("blockify", "Blockify the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Frequenzy", typeof(float), 1f),
-                    new Argument("Strength", typeof(float), 1f),
-                    new Argument("OffsetX", typeof(int), 1),
-                    new Argument("OffsetY", typeof(int), 1),
-                },
-                (SocketMessage m, object[] a, object o) => {
-
-                float frequenzy = (float)a[0];
-                float strength = (float)a[1];
-                int offsetX = (int)a[2];
-                int offsetY = (int)a[3];
-
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => new Vector2(  x + (float)Math.Cos(x / frequenzy + offsetX) * strength,
+        public string blockifyDesc = "Blockify the pixels";
+        public Bitmap blockify(Bitmap bmp, SocketMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
+        {
+            return ApplyTransformation(bmp,
+                    (x, y) => new Vector2(x + (float)Math.Cos(x / frequenzy + offsetX) * strength,
                                             y + (float)Math.Sin(y / frequenzy + offsetY) * strength));
-            }),
-            new EditCommand("squiggle", "Squiggle the pixels", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Percent", typeof(float), 1f),
-                    new Argument("Scale", typeof(float), 1f),
-                    new Argument("OffsetX", typeof(int), 1),
-                    new Argument("OffsetY", typeof(int), 1),
-                },
-                (SocketMessage m, object[] a, object o) => {
+        }
 
-                float percent = (float)a[0];
-                float scale = (float)a[1];
-                int offsetX = (int)a[2];
-                int offsetY = (int)a[3];
-
-                return ApplyTransformation(o as Bitmap,
-                    (x, y) => new Vector2(  x + percent * (float)Math.Sin((y + offsetY) / scale),
+        public string SquiggleDesc = "Squiggle the pixels";
+        public Bitmap Squiggle(Bitmap bmp, SocketMessage m, float percent = 1, float scale = 1, int offsetX = 1, int offsetY = 1)
+        {
+            return ApplyTransformation(bmp,
+                    (x, y) => new Vector2(x + percent * (float)Math.Sin((y + offsetY) / scale),
                                             y + percent * (float)Math.Cos((x + offsetX) / scale)));
-            }),
-            new EditCommand("sobelEdges", "Highlights horizontal edges", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
+        }
+
+        public string sobelEdgesDesc = "Highlights horizontal edges";
+        public Bitmap sobelEdges(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                                    {  0,  0,  0 },
                                                                    { -1, -2, -1 } }, 1, true);
-            }),
-            new EditCommand("sobelEdgesColor", "Highlights horizontal edges", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                               {  0,  0,  0 },
-                                                               { -1, -2, -1 } });
-            }),
-            new EditCommand("sharpen", "well guess what it does", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return ApplyKernel(o as Bitmap, new int[3,3] { {  0, -1,  0 },
-                                                               { -1,  5, -1 },
-                                                               {  0, -1,  0 } }, 1/5f);
-            }),
-            new EditCommand("boxBlur", "blur owo", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  1,  1 },
-                                                               {  1,  1,  1 },
-                                                               {  1,  1,  1 } }, 1/9f);
-            }),
-            new EditCommand("gaussianBlur", "more blur owo", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                    return ApplyKernel(o as Bitmap, new int[3,3] { {  1,  2,  1 },
-                                                                   {  2,  4,  2 },
-                                                                   {  1,  2,  1 } }, 1/16f);
-            }),
-            new EditCommand("jkrowling", "Gay rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, o as Bitmap);
-            }),
-            new EditCommand("merkel", "German rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, o as Bitmap);
-            }),
-            new EditCommand("transRights", "The input image says trans rights", typeof(Bitmap), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, o as Bitmap);
-            }),
-            new EditCommand("rainbow", "I'll try spinning colors that's a good trick!", typeof(Bitmap), typeof(Bitmap[]), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                Bitmap b = o as Bitmap;
-                Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
-                int[,] Alphas = new int[b.Width, b.Height];
+        }
 
-                using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
+        public string sobelEdgesColorDesc = "Highlights horizontal edges";
+        public Bitmap sobelEdgesColor(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
+                                                                   {  0,  0,  0 },
+                                                                   { -1, -2, -1 } }, 1, true);
+        }
+
+        public string sharpenDesc = "well guess what it does";
+        public Bitmap sharpen(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  0, -1,  0 },
+                                                               { -1,  5, -1 },
+                                                               {  0, -1,  0 } }, 1 / 5f);
+        }
+
+        public string boxBlurDesc = "blur owo";
+        public Bitmap boxBlur(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
+                                                               {  1,  1,  1 },
+                                                               {  1,  1,  1 } }, 1 / 9f);
+        }
+
+        public string gaussianBlurDesc = "more blur owo";
+        public Bitmap gaussianBlur(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
+                                                                   {  2,  4,  2 },
+                                                                   {  1,  2,  1 } }, 1 / 16f);
+        }
+
+        public string jkrowlingDesc = "Gay rights";
+        public Bitmap jkrowling(Bitmap bmp, SocketMessage m)
+        {
+            return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
+        }
+
+        public string merkelDesc = "German rights";
+        public Bitmap merkel(Bitmap bmp, SocketMessage m)
+        {
+            return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
+        }
+
+        public string transRightsDesc = "The input image says trans rights";
+        public Bitmap transRights(Bitmap bmp, SocketMessage m)
+        {
+            return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, bmp);
+        }
+
+        public string rainbowDesc = "I'll try spinning colors that's a good trick";
+        public Bitmap[] rainbow(Bitmap b, SocketMessage m)
+        {
+            Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
+            int[,] Alphas = new int[b.Width, b.Height];
+
+            using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color col = c.GetPixel(x, y);
+                        Alphas[x, y] = col.A;
+                        HSVimage[x, y] = new Vector3(col.GetHue(), col.GetSaturation(), col.GetValue());
+                    }
+
+            int steps = 20;
+            int stepWidth = 360 / steps;
+            Bitmap[] re = new Bitmap[steps];
+            for (int i = 0; i < steps; i++)
+            {
+                re[i] = new Bitmap(b.Width, b.Height);
+                using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(re[i]))
                     for (int x = 0; x < b.Width; x++)
                         for (int y = 0; y < b.Height; y++)
                         {
-                            Color col = c.GetPixel(x, y);
-                            Alphas[x, y] = col.A;
-                            HSVimage[x, y] = new Vector3(col.GetHue(), col.GetSaturation(), col.GetValue());
+                            c.SetPixel(x, y, Color.FromArgb(Alphas[x, y], HSVimage[x, y].HsvToRgb()));
+                            HSVimage[x, y].X += stepWidth;
+                            while (HSVimage[x, y].X > 360)
+                                HSVimage[x, y].X -= 360;
                         }
+            }
 
-                int steps = 20;
-                int stepWidth = 360 / steps;
-                Bitmap[] re = new Bitmap[steps];
-                for (int i = 0; i < steps; i++)
+            return re;
+        }
+
+        public string spinToWinDesc = "I'll try spinning that's a good trick";
+        public Bitmap[] spinToWin(Bitmap b, SocketMessage m)
+        {
+            Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
+
+            int steps = 20;
+            int stepWidth = 360 / steps;
+            Bitmap[] re = new Bitmap[steps];
+            for (int i = 0; i < steps; i++)
+                re[i] = b.RotateImage(-stepWidth * i, middle);
+
+            return re;
+        }
+
+        public string chromaticAbberationDesc = "Shifts the color spaces";
+        public Bitmap chromaticAbberation(Bitmap bmp, SocketMessage m, int intensity = 4)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
+                    {
+                        Color r = con.GetPixel(x + intensity > bmp.Width - 1 ? bmp.Width - 1 : x + intensity, y);
+                        Color g = con.GetPixel(x, y);
+                        Color b = con.GetPixel(x - intensity < 0 ? 0 : x - intensity, y);
+                        con.SetPixel(x, y, Color.FromArgb(g.A, r.R, g.G, b.B));
+                    }
+
+            return bmp;
+        }
+
+        public string rotateDesc = "Rotate the image";
+        public Bitmap rotate(Bitmap b, SocketMessage m, float AngleInDegrees = 0)
+        {
+            Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
+            return b.RotateImage(AngleInDegrees, middle);
+        }
+
+        public string rotateColorsDesc = "Rotate the color spaces of each pixel";
+        public Bitmap rotateColors(Bitmap b, SocketMessage m, float AngleInDegrees = 0)
+        {
+            using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color col = c.GetPixel(x, y);
+                        c.SetPixel(x, y, Color.FromArgb(col.A,
+                            new Vector3(col.GetHue() + AngleInDegrees, col.GetSaturation(), col.GetValue()).HsvToRgb()));
+                    }
+
+            return b;
+        }
+
+        public string compressDesc = "JPEG Compress the image";
+        public Bitmap compress(Bitmap b, SocketMessage m, long compressionLevel)
+        {
+            ImageCodecInfo jpgEncoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
+            Encoder myEncoder = Encoder.Quality;
+            EncoderParameters myEncoderParameters = new EncoderParameters(1);
+
+            MemoryStream tmp = new MemoryStream();
+            EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, compressionLevel);
+            myEncoderParameters.Param[0] = myEncoderParameter;
+            b.Save(tmp, jpgEncoder, myEncoderParameters);
+
+            Bitmap output = new Bitmap(System.Drawing.Image.FromStream(tmp));
+
+            b.Dispose();
+            tmp.Dispose();
+
+            return output;
+        }
+
+        public string backAndForthDesc = "Make the gif go backward after it went forward and " +
+                "then it goes forward again because it loops and its all very fancy n stuff";
+        public Bitmap[] backAndForth(Bitmap[] bs, SocketMessage m)
+        {
+            return bs.Concat(bs.Skip(1).Reverse()).ToArray();
+        }
+
+        public string getDesc = "Get single picture from a gif";
+        public Bitmap get(Bitmap[] bs, SocketMessage m, int index = 0)
+        {
+            return bs[index];
+        }
+
+        public string transgroundDesc = "Make the background transparent";
+        public Bitmap transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
+        {
+            Vector2 coords = BackgroundCoords;
+            List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
+
+            if (thereshold > byte.MaxValue - 1)
+                thereshold = byte.MaxValue - 1;
+
+            List<Point> getNeighbors(Point p)
+            {
+                List<Point> re = new List<Point>();
+                if (p.X > 0) re.Add(new Point(p.X - 1, p.Y));
+                if (p.X < b.Width - 1) re.Add(new Point(p.X + 1, p.Y));
+                if (p.Y > 0) re.Add(new Point(p.X, p.Y - 1));
+                if (p.Y < b.Height - 1) re.Add(new Point(p.X, p.Y + 1));
+                return re;
+            }
+
+            using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
+            {
+                Color backColor = c.GetPixel(OpenList[0].X, OpenList[0].Y);
+
+                while (OpenList.Count > 0)
                 {
-                    re[i] = new Bitmap(b.Width, b.Height);
-                    using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(re[i]))
-                        for (int x = 0; x < b.Width; x++)
-                            for (int y = 0; y < b.Height; y++)
-                            {
-                                c.SetPixel(x, y, Color.FromArgb(Alphas[x, y], HSVimage[x, y].HsvToRgb()));
-                                HSVimage[x, y].X += stepWidth;
-                                while (HSVimage[x, y].X > 360)
-                                    HSVimage[x, y].X -= 360;
-                            }
-                }
+                    Point cur = OpenList[0];
+                    OpenList.RemoveAt(0);
 
-                return re;
-            }),
-            new EditCommand("spinToWin", "I'll try spinning that's a good trick!", typeof(Bitmap), typeof(Bitmap[]), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                Bitmap b = o as Bitmap;
-                Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
-
-                int steps = 20;
-                int stepWidth = 360 / steps;
-                Bitmap[] re = new Bitmap[steps];
-                for (int i = 0; i < steps; i++)
-                    re[i] = b.RotateImage(-stepWidth * i, middle);
-
-                return re;
-            }),
-            new EditCommand("chromaticAbberation", "Shifts the color spaces", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Intensity", typeof(int), 4) },
-                (SocketMessage m, object[] a, object o) => {
-
-                    Bitmap bmp = (o as Bitmap);
-                    int intesity = (int)a[0];
-
-                    using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                        for (int x = 0; x < bmp.Width; x++)
-                            for (int y = 0; y < bmp.Height; y++)
-                            {
-                                Color r = con.GetPixel(x + intesity > bmp.Width - 1 ? bmp.Width - 1 : x + intesity, y);
-                                Color g = con.GetPixel(x, y);
-                                Color b = con.GetPixel(x - intesity < 0 ? 0 : x - intesity, y);
-                                con.SetPixel(x, y, Color.FromArgb(g.A, r.R, g.G, b.B));
-                            }
-
-                    return bmp;
-            }),
-            new EditCommand("rotate", "Rotate the image", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Angle in degrees", typeof(float), 0) },
-                (SocketMessage m, object[] a, object o) => {
-                    Bitmap b = o as Bitmap;
-                    Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
-                    return b.RotateImage((float)a[0], middle);
-            }),
-            new EditCommand("rotateColors", "Rotate the color spaces of each pixel", typeof(Bitmap), typeof(Bitmap), new Argument[] { new Argument("Angle in degrees", typeof(float), 0) },
-                (SocketMessage m, object[] a, object o) => {
-                    Bitmap b = o as Bitmap;
-
-                    using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
-                        for (int x = 0; x < b.Width; x++)
-                            for (int y = 0; y < b.Height; y++)
-                            {
-                                Color col = c.GetPixel(x, y);
-                                c.SetPixel(x, y, Color.FromArgb(col.A,
-                                    new Vector3(col.GetHue() + (float)a[0], col.GetSaturation(), col.GetValue()).HsvToRgb()));
-                            }
-
-                    return b;
-            }),
-            new EditCommand("compress", "JPEG Compress the image", typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                new Argument("Compression level as unsigned integer number", typeof(long), null) },
-                (SocketMessage m, object[] a, object o) => {
-                    Bitmap b = o as Bitmap;
-                    long compressLevel = (a[0] as long?).GetValueOrDefault();
-
-                    ImageCodecInfo jpgEncoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
-                    Encoder myEncoder = Encoder.Quality;
-                    EncoderParameters myEncoderParameters = new EncoderParameters(1);
-
-                    MemoryStream tmp = new MemoryStream();
-                    EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, compressLevel);
-                    myEncoderParameters.Param[0] = myEncoderParameter;
-                    b.Save(tmp, jpgEncoder, myEncoderParameters);
-
-                    Bitmap output = new Bitmap(System.Drawing.Image.FromStream(tmp));
-
-                    b.Dispose();
-                    tmp.Dispose();
-
-                    return output;
-            }),
-            new EditCommand("backAndForth", "Make the gif go backward after it went forward and " +
-                "then it goes forward again because it loops and its all very fancy n stuff",
-                typeof(Bitmap[]), typeof(Bitmap[]), new Argument[] { },
-                (SocketMessage m, object[] a, object o) => {
-                    Bitmap[] bs = o as Bitmap[];
-                    return bs.Concat(bs.Skip(1).Reverse()).ToArray();
-            }),
-            new EditCommand("get", "Get single picture from a gif",
-                typeof(Bitmap[]), typeof(Bitmap), new Argument[] { new Argument("Index", typeof(int), 0) },
-                (SocketMessage m, object[] a, object o) => {
-                    object[] bs = o as Bitmap[];
-                    return bs[(a[0] as int?).GetValueOrDefault()];
-            }),
-            new EditCommand("transground", "Make the background transparent",
-                typeof(Bitmap), typeof(Bitmap), new Argument[] {
-                    new Argument("Background Coords", typeof(Vector2), new Vector2(0, 0)) ,
-                    new Argument("Thereshold", typeof(int), 10) },
-                (SocketMessage m, object[] a, object o) => {
-                    Bitmap b = o as Bitmap;
-                    Vector2 coords = (a[0] as Vector2?).GetValueOrDefault();
-                    int thereshold = (a[1] as int?).GetValueOrDefault();
-                    List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
-
-                    if (thereshold > byte.MaxValue - 1)
-                        thereshold = byte.MaxValue - 1;
-
-                    List<Point> getNeighbors(Point p)
+                    int dist; Color C;
+                    foreach (Point p in getNeighbors(cur))
                     {
-                        List<Point> re = new List<Point>();
-                        if (p.X > 0) re.Add(new Point(p.X - 1, p.Y));
-                        if (p.X < b.Width - 1) re.Add(new Point(p.X + 1, p.Y));
-                        if (p.Y > 0) re.Add(new Point(p.X, p.Y - 1));
-                        if (p.Y < b.Height - 1) re.Add(new Point(p.X, p.Y + 1));
-                        return re;
-                    }
-
-                    using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
-                    {
-                        Color backColor = c.GetPixel(OpenList[0].X, OpenList[0].Y);
-
-                        while (OpenList.Count > 0)
+                        if (c.GetRawPixel(p.X, p.Y).Alpha == byte.MaxValue &&
+                           (dist = (C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor).ReLU() / 3) < thereshold)
                         {
-                            Point cur = OpenList[0];
-                            OpenList.RemoveAt(0);
-
-                            int dist; Color C;
-                            foreach (Point p in getNeighbors(cur))
-                            {
-                                if (c.GetRawPixel(p.X, p.Y).Alpha == byte.MaxValue &&
-                                   (dist = (C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor).ReLU() / 3) < thereshold)
-                                {
-                                    c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
-                                    OpenList.Add(p);
-                                }
-                            }
+                            c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
+                            OpenList.Add(p);
                         }
                     }
+                }
+            }
 
-                    return b;
-            }),
-            //new EditCommand("caption", "Attempts to find a good caption for the image",
-            //    typeof(Bitmap), typeof(string), new Argument[] { },
-            //    (SocketMessage m, object[] a, object o) => {
-            //        Bitmap b = o as Bitmap;
+            return b;
+        }
 
-            //        var dumpChannel = Program.GetChannelFromID(667787680855359510);
-            //        var dumpedImage = DiscordNETWrapper.SendBitmap(b, (IMessageChannel)dumpChannel).Result;
-            //        string url = dumpedImage.Attachments.First().Url;
 
-            //        WebResponse imgSearchResponse = ("https://www.google.de/searchbyimage?image_url=" + 
-            //            HttpUtility.UrlEncode(url) + "&encoded_image=&image_content=&filename=&hl=de").
-            //            GetWebResponsefromURL();
-            //        string location = imgSearchResponse.ResponseUri.AbsoluteUri;
-
-            //        string resultHTML = location.GetHTMLfromURL();
-            //        string trimmedResult = resultHTML.GetEverythingBetween("<a class=\"fKDtNb\"", "</div>");
-
-            //        string href = "https://www.google.de" + trimmedResult.GetEverythingBetween("href=\"", "\"");
-            //        string caption = trimmedResult.GetEverythingBetween("style=\"font-style:italic\">", "</a>");
-
-            //        return caption;
-            //}),
-        };
+        enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
+        static readonly object memifyLock = new object();
 
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
         {

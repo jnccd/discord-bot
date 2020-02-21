@@ -8,8 +8,121 @@ using System.Text;
 
 namespace MEE7.Commands
 {
-    public partial class Edit : Command
+    public class TextCommands : EditCommandProvider
     {
+        public string mockDesc = "Mock the text";
+        public string mock(string s, SocketMessage m)
+        {
+            return string.Join("", s.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
+                    "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
+        }
+
+        public string crabDesc = "Crab the text";
+        public string crab(string s, SocketMessage m)
+        {
+            return ":crab: " + s + " :crab:\n https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s";
+        }
+
+        public string CAPSDesc = "Convert text to CAPS";
+        public string CAPS(string s, SocketMessage m)
+        {
+            return string.Join("", s.Select((x) => { return char.ToUpper(x); }));
+        }
+
+        public string SUPERCAPSDesc = "Convert text to SUPER CAPS";
+        public string SUPERCAPS(string s, SocketMessage m)
+        {
+            return string.Join("", s.Select((x) => { return char.ToUpper(x) + " "; }));
+        }
+
+        public string CopySpoilerifyDesc = "Convert text to a spoiler";
+        public string CopySpoilerify(string s, SocketMessage m)
+        {
+            return "`" + string.Join("", s.Select((x) => { return "||" + x + "||"; })) + "`";
+        }
+
+        public string SpoilerifyDesc = "Convert text to a spoiler";
+        public string Spoilerify(string s, SocketMessage m)
+        {
+            return string.Join("", s.Select((x) => { return "||" + x + "||"; }));
+        }
+
+        public string UnspoilerifyDesc = "Convert spoiler text to readable text";
+        public string Unspoilerify(string s, SocketMessage m)
+        {
+            return s.Replace("|", "");
+        }
+
+        public string AestheticifyDesc = "Convert text to Ａｅｓｔｈｅｔｉｃ text";
+        public string Aestheticify(string s, SocketMessage m)
+        {
+            return s.Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
+        }
+
+        public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
+        public string japanify(string s, SocketMessage m)
+        {
+            StringBuilder input = new StringBuilder(s);
+
+            for (int i = 0; i < input.Length; i++)
+                input[i] = char.ToLower(input[i]);
+
+            var oneSymbolKatakana = Katakana1S.Select(x => x.Item2);
+
+            if (oneSymbolKatakana.FirstOrDefault(x => x[0] == input[input.Length - 1]) == null)
+                input.Append("u");
+
+            input = input.Replace("l", "r");
+            input = input.Replace("v", "f");
+            input = input.Replace("qu", "キュ");
+
+            for (int i = 1; i < input.Length - 1; i++)
+                if (input[i] == input[i - 1] &&
+                    input[i] != 'a' &&
+                    input[i] != 'i' &&
+                    input[i] != 'u' &&
+                    input[i] != 'e' &&
+                    input[i] != 'o')
+                    input[i - 1] = 'ッ';
+
+            foreach (Tuple<string, string> t in Katakana3S)
+                input = input.Replace(t.Item2, t.Item1);
+            foreach (Tuple<string, string> t in Katakana2S)
+                input = input.Replace(t.Item2, t.Item1);
+            foreach (Tuple<string, string> t in Katakana1S)
+                input = input.Replace(t.Item2, t.Item1);
+
+            for (int i = 0; i < input.Length; i++)
+                if (input[i] <= 'z' && input[i] >= 'A' && oneSymbolKatakana.FirstOrDefault(x => x[0] == input[i]) == null)
+                    input.Insert(i + 1, 'o');
+
+            foreach (Tuple<string, string> t in Katakana3S)
+                input = input.Replace(t.Item2, t.Item1);
+            foreach (Tuple<string, string> t in Katakana2S)
+                input = input.Replace(t.Item2, t.Item1);
+            foreach (Tuple<string, string> t in Katakana1S)
+                input = input.Replace(t.Item2, t.Item1);
+
+            input = input.Replace("x", "イクス");
+            input = input.Replace("f", "フ");
+
+            input = input.Replace(" ", "");
+
+            return input.ToString();
+        }
+
+        public string unjapanifyDesc = "Convert katakana into readable stuff";
+        public string unjapanify(string s, SocketMessage m)
+        {
+            StringBuilder input = new StringBuilder(s);
+
+            foreach (Tuple<string, string> t in Katakana)
+                input = input.Replace(t.Item1, t.Item2);
+
+            return input.ToString();
+        }
+
+
         static Tuple<string, string>[] Katakana = new Tuple<string, string>[] {
             new Tuple<string, string>("ア", "a"),
             new Tuple<string, string>("イ", "i"),
@@ -244,94 +357,6 @@ namespace MEE7.Commands
             new Tuple<string, string>("ピャ", "pya"),
             new Tuple<string, string>("ピュ", "pyu"),
             new Tuple<string, string>("ピョ", "pyo"),
-        };
-
-        readonly EditCommand[] TextCommands = new EditCommand[]
-        {
-            new EditCommand("mock", "Mock the text", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) + 
-                    "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
-            }),
-            new EditCommand("crab", "Crab the text", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return ":crab: " + (o as string) + " :crab:\n https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s";
-            }),
-            new EditCommand("CAPS", "Convert text to CAPS", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return char.ToUpper(x); }));
-            }),
-            new EditCommand("SUPERCAPS", "Convert text to SUPER CAPS", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return char.ToUpper(x) + " "; }));
-            }),
-            new EditCommand("CopySpoilerify", "Convert text to a spoiler", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return "`" + string.Join("", (o as string).Select((x) => { return "||" + x + "||"; })) + "`";
-            }),
-            new EditCommand("Spoilerify", "Convert text to a spoiler", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return string.Join("", (o as string).Select((x) => { return "||" + x + "||"; }));
-            }),
-            new EditCommand("Unspoilerify", "Convert spoiler text to readable text", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return (o as string).Replace("|", "");
-            }),
-            new EditCommand("Aestheticify", "Convert text to Ａｅｓｔｈｅｔｉｃ text", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-                return (o as string).Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
-            }),
-            new EditCommand("japanify", "Convert the text into katakana symbols, doesnt actually translate", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-
-                StringBuilder input = new StringBuilder(o as string);
-
-                for (int i = 0; i < input.Length; i++)
-                    input[i] = char.ToLower(input[i]);
-
-                var oneSymbolKatakana = Katakana1S.Select(x => x.Item2);
-
-                if (oneSymbolKatakana.FirstOrDefault(x => x[0] == input[input.Length - 1]) == null)
-                    input.Append("u");
-
-                input = input.Replace("l", "r");
-                input = input.Replace("v", "f");
-                input = input.Replace("qu", "キュ");
-
-                for (int i = 1; i < input.Length - 1; i++)
-                    if (input[i] == input[i - 1] && 
-                        input[i] != 'a' &&
-                        input[i] != 'i' &&
-                        input[i] != 'u' &&
-                        input[i] != 'e' &&
-                        input[i] != 'o')
-                        input[i - 1] = 'ッ';
-
-                foreach (Tuple<string, string> t in Katakana3S)
-                    input = input.Replace(t.Item2, t.Item1);
-                foreach (Tuple<string, string> t in Katakana2S)
-                    input = input.Replace(t.Item2, t.Item1);
-                foreach (Tuple<string, string> t in Katakana1S)
-                    input = input.Replace(t.Item2, t.Item1);
-
-                for (int i = 0; i < input.Length; i++)
-                    if (input[i] <= 'z' && input[i] >= 'A' && oneSymbolKatakana.FirstOrDefault(x => x[0] == input[i]) == null)
-                        input.Insert(i + 1, 'o');
-
-                foreach (Tuple<string, string> t in Katakana3S)
-                    input = input.Replace(t.Item2, t.Item1);
-                foreach (Tuple<string, string> t in Katakana2S)
-                    input = input.Replace(t.Item2, t.Item1);
-                foreach (Tuple<string, string> t in Katakana1S)
-                    input = input.Replace(t.Item2, t.Item1);
-
-                input = input.Replace("x", "イクス");
-                input = input.Replace("f", "フ");
-
-                input = input.Replace(" ", "");
-
-                return input.ToString();
-            }),
-            new EditCommand("unjapanify", "Convert katakana into readable stuff", typeof(string), typeof(string), new Argument[0], (SocketMessage m, object[] a, object o) => {
-
-                StringBuilder input = new StringBuilder(o as string);
-
-                foreach (Tuple<string, string> t in Katakana)
-                    input = input.Replace(t.Item1, t.Item2);
-
-                return input.ToString();
-            }),
         };
     }
 }

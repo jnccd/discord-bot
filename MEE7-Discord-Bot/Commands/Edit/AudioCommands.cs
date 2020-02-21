@@ -15,95 +15,96 @@ using NAudio.Wave.SampleProviders;
 
 namespace MEE7.Commands
 {
-    public partial class Edit : Command
+    public class AudioCommands : EditCommandProvider
     {
-        readonly EditCommand[] AudioCommands = new EditCommand[] {
-            new EditCommand("playAudio", "Plays audio in voicechat", typeof(WaveStream), null, new Argument[0], (SocketMessage m, object[] args, object o) => {
-                SocketGuild g = Program.GetGuildFromChannel(m.Channel);
-                ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
-                if (channel != null)
+        public string playAudioDesc = "Plays audio in voicechat";
+        public void playAudio(WaveStream w, SocketMessage m)
+        {
+            SocketGuild g = Program.GetGuildFromChannel(m.Channel);
+            ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
+            if (channel != null)
+            {
+                try { channel.DisconnectAsync().Wait(); } catch { }
+
+                IAudioClient client = channel.ConnectAsync().Result;
+                using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(w))
+                    MultiMediaHelper.SendAudioAsync(client, naudioStream).Wait();
+
+                try { channel.DisconnectAsync().Wait(); } catch { }
+            }
+            else
+                DiscordNETWrapper.SendText("You are not in an AudioChannel on this server!", m.Channel).Wait();
+
+            w.Dispose();
+        }
+
+        public string drawAudioDesc = "Draw the samples";
+        public Bitmap drawAudio(WaveStream w, SocketMessage m)
+        {
+            var c = new WaveChannel32(w);
+
+            float[] normSamplesMin = new float[1000]; Array.Fill(normSamplesMin, 250);
+            float[] normSamplesMax = new float[1000]; Array.Fill(normSamplesMax, 250);
+            byte[] buffer = new byte[1024];
+            int reader = 0;
+            while (c.Position < c.Length)
+            {
+                reader = c.Read(buffer, 0, buffer.Length);
+                for (int i = 0; i < buffer.Length / 4; i++)
                 {
-                    try { channel.DisconnectAsync().Wait(); } catch { }
-
-                    IAudioClient client = channel.ConnectAsync().Result;
-                    using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(o as WaveStream))
-                            MultiMediaHelper.SendAudioAsync(client, naudioStream).Wait();
-
-                    try { channel.DisconnectAsync().Wait(); } catch { }
+                    float sample = BitConverter.ToSingle(buffer, i * 4) * 200 + 250;
+                    int index = (int)(((c.Position - buffer.Length) / 4.0 + i) / (c.Length / 4.0) * 1000);
+                    if (index >= normSamplesMax.Length)
+                        continue;
+                    if (normSamplesMax[index] < sample)
+                        normSamplesMax[index] = sample;
+                    if (normSamplesMin[index] > sample)
+                        normSamplesMin[index] = sample;
                 }
-                else
-                    DiscordNETWrapper.SendText("You are not in an AudioChannel on this server!", m.Channel).Wait();
+            }
 
-                (o as WaveStream).Dispose();
-                return null;
-            }),
-            new EditCommand("drawAudio", "Draw the samples", typeof(WaveStream), typeof(Bitmap), new Argument[0], (SocketMessage m, object[] args, object o) => {
-
-                WaveStream w = o as WaveStream;
-                var c = new WaveChannel32(w);
-
-                float[] normSamplesMin = new float[1000]; Array.Fill(normSamplesMin, 250);
-                float[] normSamplesMax = new float[1000]; Array.Fill(normSamplesMax, 250);
-                byte[] buffer = new byte[1024];
-                int reader = 0;
-                while (c.Position < c.Length)
-                {
-                    reader = c.Read(buffer, 0, buffer.Length);
-                    for (int i = 0; i < buffer.Length / 4; i++)
-                    {
-                        float sample = BitConverter.ToSingle(buffer, i * 4) * 200 + 250;
-                        int index = (int)(((c.Position - buffer.Length) / 4.0 + i) / (c.Length / 4.0) * 1000);
-                        if (index >= normSamplesMax.Length)
-                            continue;
-                        if (normSamplesMax[index] < sample)
-                            normSamplesMax[index] = sample;
-                        if (normSamplesMin[index] > sample)
-                            normSamplesMin[index] = sample;
-                    }
-                }
-
-                int j = 0;
-                Bitmap output = new Bitmap(1000, 500);
-                using (Graphics graphics = Graphics.FromImage(output))
-                    graphics.DrawLines(new Pen(Color.White), Enumerable.
-                        Range(0, 1000).
-                        Select(x => new Point[] {
+            int j = 0;
+            Bitmap output = new Bitmap(1000, 500);
+            using (Graphics graphics = Graphics.FromImage(output))
+                graphics.DrawLines(new Pen(Color.White), Enumerable.
+                    Range(0, 1000).
+                    Select(x => new Point[] {
                             new Point(j, (int)normSamplesMin[x]),
                             new Point(j++, (int)normSamplesMax[x]),
-                        }).
-                        SelectMany(x => x).
-                        ToArray());
+                    }).
+                    SelectMany(x => x).
+                    ToArray());
 
-                w.Dispose();
-                return output;
+            w.Dispose();
+            return output;
+        }
 
-            }),
-            new EditCommand("pitch", "Adds a Pitch to the sound", typeof(WaveStream), typeof(WaveStream), new Argument[] { new Argument("PitchFactor", typeof(float), null) },
-                    (SocketMessage m, object[] args, object o) => {
+        public string pitchDesc = "Adds a Pitch to the sound";
+        public WaveStream pitch(WaveStream w, SocketMessage m, float PitchFactor)
+        {
+            string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}pitch.bin";
 
-                        string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}pitch.bin";
+            SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider(w.ToSampleProvider())
+            {
+                PitchFactor = PitchFactor
+            };
 
-                        SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider((o as WaveStream).ToSampleProvider())
-                        {
-                            PitchFactor = (float)args[0]
-                        };
+            WaveFileWriter.CreateWaveFile16(filePath, pitch);
+            return new WaveFileReader(filePath);
+        }
 
-                        WaveFileWriter.CreateWaveFile16(filePath, pitch);
-                        return new WaveFileReader(filePath);
-            }),
-            new EditCommand("volume", "Adds Volume to the sound", typeof(WaveStream), typeof(WaveStream), new Argument[] { new Argument("VolumeFactor", typeof(float), null) },
-                    (SocketMessage m, object[] args, object o) => {
+        public string volumeDesc = "Adds Volume to the sound";
+        public WaveStream volume(WaveStream w, SocketMessage m, float VolumeFactor)
+        {
+            string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}volume.bin";
 
-                        string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}volume.bin";
+            VolumeSampleProvider pitch = new VolumeSampleProvider(w.ToSampleProvider())
+            {
+                Volume = VolumeFactor
+            };
 
-                        VolumeSampleProvider  pitch = new VolumeSampleProvider((o as WaveStream).ToSampleProvider())
-                        {
-                            Volume = (float)args[0]
-                        };
-
-                        WaveFileWriter.CreateWaveFile16(filePath, pitch);
-                        return new WaveFileReader(filePath);
-            }),
-        };
+            WaveFileWriter.CreateWaveFile16(filePath, pitch);
+            return new WaveFileReader(filePath);
+        }
     }
 }

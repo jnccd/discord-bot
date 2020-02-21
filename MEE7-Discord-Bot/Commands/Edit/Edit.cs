@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
+    public class EditCommandProvider { }
     public partial class Edit : Command
     {
         struct Argument
@@ -159,6 +160,7 @@ namespace MEE7.Commands
                 return RunPipe(this, message, inputData);
             }
         }
+        public class Null { }
         private static IEnumerable<EditCommand> Commands;
 
         public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
@@ -173,24 +175,11 @@ namespace MEE7.Commands
                $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
                 "\nEdit Commands:");
 
-            // Load EditCommand Arrays
-            FieldInfo[] CommandLists = GetType().GetRuntimeFields().
-                Where(x => x.Name.EndsWith("Commands") && x.Name != "Commands" && x.Name != "for" && x.FieldType == typeof(EditCommand[])).
-                OrderBy(x => {
-                    if (x.Name.StartsWith("Input"))
-                        return "0000";
-                    else
-                        return x.Name;
-                }).
-                ToArray();
-            foreach (FieldInfo f in CommandLists)
-            {
-                Commands = Commands.Union((EditCommand[])f.GetValue(this));
-                AddToHelpmenu(f.Name, (EditCommand[])f.GetValue(this));
-            }
-
             // Load Functions
-            Type[] classesWithEditCommands = { typeof(FunctionalEditCommands) };
+            Type[] classesWithEditCommands = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                                              from assemblyType in domainAssembly.GetTypes()
+                                              where assemblyType.IsSubclassOf(typeof(EditCommandProvider))
+                                              select assemblyType).ToArray();
             foreach (Type t in classesWithEditCommands) {
                 var curCommands = new List<EditCommand>();
                 var methods = t.GetMethods();
@@ -206,7 +195,9 @@ namespace MEE7.Commands
                         var param = method.GetParameters();
                         if (param[1].ParameterType == typeof(SocketMessage))
                         {
-                            var command = new EditCommand(method.Name, desc, param.First().ParameterType, method.ReturnType,
+                            var command = new EditCommand(method.Name, desc, 
+                                param.First().ParameterType == typeof(Null)? null : param.First().ParameterType, 
+                                method.ReturnType == typeof(void)? null : method.ReturnType,
                                 param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
                                 (SocketMessage m, object[] args, object o) =>
                                 {
