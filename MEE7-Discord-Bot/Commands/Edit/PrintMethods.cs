@@ -14,7 +14,7 @@ namespace MEE7.Commands
 {
     public partial class Edit : Command
     {
-        readonly PrintMethod[] PrintMethods = new PrintMethod[]
+        static readonly PrintMethod[] PrintMethods = new PrintMethod[]
         {
             new PrintMethod(typeof(string), (SocketMessage m, object o) => {
                 DiscordNETWrapper.SendText(o as string, m.Channel).Wait();

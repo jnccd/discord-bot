@@ -14,21 +14,22 @@ namespace MEE7.Commands
     {
         static readonly ArgumentParseMethod[] ArgumentParseMethods = new ArgumentParseMethod[]
         {
-            new ArgumentParseMethod(typeof(string), (string s) => s),
-            new ArgumentParseMethod(typeof(bool), (string s) => { if (s.ToLower() == "true") return true; else return false; }),
-            new ArgumentParseMethod(typeof(int), (string s) => (int)s.ConvertToDouble()),
-            new ArgumentParseMethod(typeof(long), (string s) => (long)s.ConvertToDouble()),
-            new ArgumentParseMethod(typeof(ulong), (string s) => Convert.ToUInt64(s)),
-            new ArgumentParseMethod(typeof(float), (string s) => (float)s.ConvertToDouble()),
-            new ArgumentParseMethod(typeof(double), (string s) => s.ConvertToDouble()),
-            new ArgumentParseMethod(typeof(PointF), (string s) => {
+            new ArgumentParseMethod(typeof(string), (SocketMessage m, string s) => s),
+            new ArgumentParseMethod(typeof(bool), (SocketMessage m, string s) => { if (s.ToLower() == "true") return true; else return false; }),
+            new ArgumentParseMethod(typeof(int), (SocketMessage m, string s) => (int)s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(long), (SocketMessage m, string s) => (long)s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(ulong), (SocketMessage m, string s) => Convert.ToUInt64(s)),
+            new ArgumentParseMethod(typeof(float), (SocketMessage m, string s) => (float)s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(double), (SocketMessage m, string s) => s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(PointF), (SocketMessage m, string s) => {
                 string[] sp = s.Split(':');
                 return new PointF((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
             }),
-            new ArgumentParseMethod(typeof(Vector2), (string s) => {
+            new ArgumentParseMethod(typeof(Vector2), (SocketMessage m, string s) => {
                 string[] sp = s.Split(':');
                 return new Vector2((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
             }),
+            new ArgumentParseMethod(typeof(Pipe), (SocketMessage m, string s) => Pipe.Parse(m, s)),
         };
     }
 }
