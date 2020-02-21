@@ -31,9 +31,9 @@ namespace MEE7.Commands
         class ArgumentParseMethod
         {
             public Type Type;
-            public Func<string, object> Function;
+            public Func<SocketMessage, string, object> Function;
 
-            public ArgumentParseMethod(Type Type, Func<string, object> Function)
+            public ArgumentParseMethod(Type Type, Func<SocketMessage, string, object> Function)
             {
                 this.Function = Function;
                 this.Type = Type;
@@ -144,7 +144,22 @@ namespace MEE7.Commands
                 this.Arguments = Arguments;
             }
         }
-        private readonly IEnumerable<EditCommand> Commands;
+        class Pipe : List<Tuple<object[], SubCommand>> 
+        { 
+            public string rawPipe;
+            public Type InputType() => this.First().Item2.InputType;
+            public Type OutputType() => this.Last().Item2.OutputType;
+
+            public static Pipe Parse(SocketMessage message, string rawPipe, Type InputType = null, Type OutputType = null)
+            {
+                return CheckPipe(GetExecutionPipe(message, rawPipe), true, InputType, OutputType);
+            }
+            public object Apply(SocketMessage message, object inputData)
+            {
+                return RunPipe(this, message, inputData);
+            }
+        }
+        private static IEnumerable<EditCommand> Commands;
 
         public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
             "\nFor more information just type **$edit**.")
@@ -188,7 +203,6 @@ namespace MEE7.Commands
                 $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
                 Combine() + "");
         }
-
         public override void Execute(SocketMessage message)
         {
             if (message.Content.Length <= PrefixAndCommand.Length + 1)
@@ -213,9 +227,10 @@ namespace MEE7.Commands
                 }
             }
         }
-        List<Tuple<object[], SubCommand>> GetExecutionPipe(SocketMessage message, string rawPipe, bool argumentParsing = true)
+
+        static Pipe GetExecutionPipe(SocketMessage message, string rawPipe, bool argumentParsing = true)
         {
-            List<Tuple<object[], SubCommand>> re = new List<Tuple<object[], SubCommand>>();
+            Pipe re = new Pipe() { rawPipe = rawPipe };
 
             if (rawPipe.Contains(""))
             {
@@ -302,7 +317,7 @@ namespace MEE7.Commands
                         for (int i = 0; i < command.Arguments.Length; i++)
                             if (i < args.Length)
                             {
-                                try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(args[i]); }
+                                try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]); }
                                 catch { throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}"); }
                             }
                             else if (command.Arguments[i].StandardValue == null)
@@ -321,7 +336,7 @@ namespace MEE7.Commands
 
             return re;
         }
-        List<Tuple<object[], SubCommand>> CheckPipe(List<Tuple<object[], SubCommand>> pipe, bool subPipe = false)
+        static Pipe CheckPipe(Pipe pipe, bool subPipe = false, Type InputType = null, Type OutputType = null)
         {
             if (pipe.Select(x => x.Item2.FunctionCalls()).Sum() >= 100) // TODO: Improve performance limit check
                 throw new Exception($"Only 100 instructions are allowed per pipe.");
@@ -340,10 +355,6 @@ namespace MEE7.Commands
                     throw new Exception($"Man you must have accidentaly dropped a infinite for loop into me.\n" +
                         $"No one would do this on purpose, that would be evil.\n" +
                         $"But don't worry I was programmed to ignore something like this.");
-
-                //if (!f.RawCommands[0].Contains("%" + f.VarName))
-                //    throw new Exception($"Why use a for loop if you dont even use any variables in the subpipe?\n" +
-                //        $"All the results would be the same D:");
             }
 
             if (!subPipe && pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
@@ -351,7 +362,7 @@ namespace MEE7.Commands
 
             return pipe;
         }
-        object RunPipe(List<Tuple<object[], SubCommand>> pipe, SocketMessage message, object initialData = null)
+        static object RunPipe(Pipe pipe, SocketMessage message, object initialData = null)
         {
             object currentData = initialData;
 
@@ -383,7 +394,7 @@ namespace MEE7.Commands
 
                                 string rawCommandThisLoop = forCommand.RawCommands[0].Replace($"%{forCommand.VarName}",
                                     (forCommand.Start + j * forCommand.StepWidth).ToString().Replace(",", "."));
-                                List<Tuple<object[], SubCommand>> parsedLoopedPipe =
+                                Pipe parsedLoopedPipe =
                                     CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
 
                                 array[j] = RunPipe(parsedLoopedPipe, message, usableData);
@@ -409,7 +420,7 @@ namespace MEE7.Commands
                             threads.Add(Task.Run(() => {
                                 double varValue = foreachCommand.Start + ((foreachCommand.End - foreachCommand.Start) * (j / (double)arraydCurrentData.Length));
                                 string rawCommandThisLoop = foreachCommand.RawCommands[0].Replace($"%{foreachCommand.VarName}", varValue.ToString().Replace(",", "."));
-                                List<Tuple<object[], SubCommand>> parsedLoopedPipe =
+                                Pipe parsedLoopedPipe =
                                     CheckPipe(GetExecutionPipe(message, rawCommandThisLoop), subPipe: true);
 
                                 array[j] = RunPipe(parsedLoopedPipe, message, arraydCurrentData[j]);
@@ -430,7 +441,8 @@ namespace MEE7.Commands
 
             return currentData;
         }
-        void PrintPipeOutput(object output, SocketMessage message)
+
+        static void PrintPipeOutput(object output, SocketMessage message)
         {
             if (output == null)
                 throw new Exception("I can't print `null` :/");
