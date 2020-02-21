@@ -74,7 +74,7 @@ namespace MEE7.Commands
             for (int i = 0; i < 50; i++)
             {
                 Thread.Sleep(100);
-                if (Process.GetCurrentProcess().PrivateMemorySize64 > 500L * 1024 * 1024)
+                if (Process.GetCurrentProcess().PrivateMemorySize64 > 1024L * 1024 * 1024)
                 {
                     cancelCulture.Cancel();
                     DiscordNETWrapper.SendText("```csharp\nCsharp Runner used up too much memory!```", message.Channel).Wait();
