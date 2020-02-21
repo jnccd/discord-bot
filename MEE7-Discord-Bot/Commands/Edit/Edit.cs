@@ -165,6 +165,15 @@ namespace MEE7.Commands
             "\nFor more information just type **$edit**.")
         {
             Commands = new List<EditCommand>();
+            HelpMenu = new EmbedBuilder();
+            HelpMenu.WithDescription("Operators:\n" +
+                "\\> Concatinates functions\n" +
+                "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
+                "\"\" Automatically choose a input function for your input\n" +
+               $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
+                "\nEdit Commands:");
+
+            // Load EditCommand Arrays
             FieldInfo[] CommandLists = GetType().GetRuntimeFields().
                 Where(x => x.Name.EndsWith("Commands") && x.Name != "Commands" && x.Name != "for" && x.FieldType == typeof(EditCommand[])).
                 OrderBy(x => {
@@ -175,17 +184,42 @@ namespace MEE7.Commands
                 }).
                 ToArray();
             foreach (FieldInfo f in CommandLists)
+            {
                 Commands = Commands.Union((EditCommand[])f.GetValue(this));
-
-            HelpMenu = new EmbedBuilder();
-            HelpMenu.WithDescription("Operators:\n" +
-                "\\> Concatinates functions\n" +
-                "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
-                "\"\" Automatically choose a input function for your input\n" +
-               $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
-                "\nEdit Commands:");
-            foreach (FieldInfo f in CommandLists)
                 AddToHelpmenu(f.Name, (EditCommand[])f.GetValue(this));
+            }
+
+            // Load Functions
+            Type[] classesWithEditCommands = { typeof(FunctionalEditCommands) };
+            foreach (Type t in classesWithEditCommands) {
+                var curCommands = new List<EditCommand>();
+                var methods = t.GetMethods();
+                var fields = t.GetFields();
+
+                foreach (var method in methods)
+                {
+                    try
+                    {
+                        var descVar = fields.First(x => x.Name.ToLower() == method.Name.ToLower() + "desc" && x.FieldType == typeof(string));
+                        var tInstance = Activator.CreateInstance(t);
+                        string desc = (string)descVar.GetValue(tInstance);
+                        var param = method.GetParameters();
+                        if (param[1].ParameterType == typeof(SocketMessage))
+                        {
+                            var command = new EditCommand(method.Name, desc, param.First().ParameterType, method.ReturnType,
+                                param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
+                                (SocketMessage m, object[] args, object o) =>
+                                {
+                                    return method.Invoke(tInstance, new object[] { o, m }.Union(args).ToArray());
+                                });
+                            curCommands.Add(command);
+                        }
+                    } catch { }
+                }
+
+                Commands = Commands.Union(curCommands);
+                AddToHelpmenu(t.Name, curCommands.ToArray());
+            }
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
         {
