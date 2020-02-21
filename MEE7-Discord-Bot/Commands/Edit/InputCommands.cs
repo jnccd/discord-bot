@@ -20,315 +20,311 @@ using System.Numerics;
 
 namespace MEE7.Commands
 {
-    public partial class Edit : Command
+    public class InputCommands : EditCommandProvider
     {
-        readonly EditCommand[] InputCommands = new EditCommand[] {
-            new EditCommand("lastT", "Gets the last messages text", null, typeof(string), new Argument[0], (SocketMessage m, object[] args, object o) => {
-                return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
-            }),
-            new EditCommand("lastP", "Gets the last messages picture", null, typeof(Bitmap), new Argument[0], (SocketMessage m, object[] args, object o) => {
-                IMessage lm = m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last();
-                string pic = null;
-                if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
-                {
-                    if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                        pic = lm.Attachments.ElementAt(0).Url;
-                    else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                        pic = lm.Attachments.ElementAt(0).Url;
-                }
-                string picLink = lm.Content.GetPictureLinkInMessage();
-                if (string.IsNullOrWhiteSpace(pic) && picLink != null)
-                    pic = picLink;
-                return pic.GetBitmapFromURL();
-            }),
-            new EditCommand("thisT", "Outputs the given text", null, typeof(string), new Argument[] { new Argument("Text", typeof(string), null) }, 
-                (SocketMessage m, object[] args, object o) => {
-                
-                    return args[0];
-            }),
-            new EditCommand("thisP", "Gets attached picture / picture from url argument", null, typeof(Bitmap), 
-                new Argument[] { new Argument("Picture URL", typeof(string), null) }, 
-                (SocketMessage m, object[] args, object o) => {
-                
-                    return GetPictureLinkFromMessage(m, (string)args[0]).GetBitmapFromURL();
-            }),
-            new EditCommand("thisG", "Gets attached gif / gif from url argument", null, typeof(Bitmap[]),
-                new Argument[] { new Argument("Gif URL", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+        public string lastTDesc = "Gets the last messages text";
+        public string LastT(Edit.Null n, SocketMessage m)
+        {
+            return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
+        }
 
-                    return GetPictureLinkFromMessage(m, (string)args[0]).GetBitmapsFromGIFURL();
-            }),
-            new EditCommand("thisA", "Gets mp3 or wav audio files attached to this message", null, typeof(WaveStream), new Argument[0],
-                (SocketMessage m, object[] args, object o) => {
-                    string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
-                    if (!string.IsNullOrWhiteSpace(url))
-                        return url.Getmp3AudioFromURL();
+        public string lastPDesc = "Gets the last messages picture";
+        public Bitmap LastP(Edit.Null n, SocketMessage m)
+        {
+            IMessage lm = m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last();
+            string pic = null;
+            if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
+            {
+                if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png"))
+                    pic = lm.Attachments.ElementAt(0).Url;
+                else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
+                    pic = lm.Attachments.ElementAt(0).Url;
+            }
+            string picLink = lm.Content.GetPictureLinkInMessage();
+            if (string.IsNullOrWhiteSpace(pic) && picLink != null)
+                pic = picLink;
+            return pic.GetBitmapFromURL();
+        }
 
-                    url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".wav")).Url;
-                    if (!string.IsNullOrWhiteSpace(url))
-                        return url.GetwavAudioFromURL();
+        public string thisTDesc = "Outputs the given text";
+        public string ThisT(Edit.Null n, SocketMessage m, string Text)
+        {
+            return Text;
+        }
 
-                    url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".ogg")).Url;
-                    if (!string.IsNullOrWhiteSpace(url))
-                        return url.GetoggAudioFromURL();
+        public string thisPDesc = "Gets attached picture / picture from url argument";
+        public Bitmap ThisP(Edit.Null n, SocketMessage m, string PictureURL)
+        {
+            return GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
+        }
 
-                    throw new Exception("No audio file found!");
-            }),
-            new EditCommand("profilePicture", "Gets a profile picture", null, typeof(Bitmap),
-                new Argument[] { new Argument("User ID / User Mention", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+        public string thisGDesc = "Gets attached gif / gif from url argument";
+        public Bitmap[] ThisG(Edit.Null n, SocketMessage m, string GifURL)
+        {
+            return GetPictureLinkFromMessage(m, GifURL).GetBitmapsFromGIFURL();
+        }
 
-                    SocketUser luser = Program.GetUserFromId(Convert.ToUInt64((args[0] as string).Trim(new char[] { ' ', '<', '>', '@', '!' })));
-                    string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
-                    return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
-            }),
-            new EditCommand("profilePictureG", "Gets a profile picture gif", null, typeof(Bitmap[]),
-                new Argument[] { new Argument("User ID / User Mention", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+        public string thisADesc = "Gets mp3 or wav audio files attached to this message";
+        public WaveStream ThisA(Edit.Null n, SocketMessage m)
+        {
+            string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
+            if (!string.IsNullOrWhiteSpace(url))
+                return url.Getmp3AudioFromURL();
 
-                    SocketUser luser = Program.GetUserFromId(Convert.ToUInt64((args[0] as string).Trim(new char[] { ' ', '<', '>', '@', '!' })));
-                    string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
-                    return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsFromGIFURL();
-            }),
-            new EditCommand("serverPicture", "Gets the server picture from a server id", null, typeof(Bitmap),
-                new Argument[] { new Argument("Server ID", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+            url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".wav")).Url;
+            if (!string.IsNullOrWhiteSpace(url))
+                return url.GetwavAudioFromURL();
 
-                    if (args[0] as string == "")
-                        return Program.GetGuildFromChannel(m.Channel).IconUrl.GetBitmapFromURL();
-                    else
-                        return Program.GetGuildFromID(Convert.ToUInt64((args[0] as string).Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
-            }),
-            new EditCommand("emote", "Gets the picture of the emote", null, typeof(Bitmap),
-                new Argument[] { new Argument("Emote", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+            //url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".ogg")).Url;
+            //if (!string.IsNullOrWhiteSpace(url))
+            //    return url.GetoggAudioFromURL();
 
-                    Emote.TryParse((args[0] as string).Trim(' '), out Emote res);
-                    if (res != null) return res.Url.GetBitmapFromURL();
-                    return Program.GetGuildFromChannel(m.Channel).Emotes.
-                        FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':'))).Url.
-                        GetBitmapFromURL();
-            }),
-            new EditCommand("emoteG", "Gets the pictures of the emote", null, typeof(Bitmap[]),
-                new Argument[] { new Argument("Emote", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+            throw new Exception("No audio file found!");
+        }
 
-                    Emote.TryParse((args[0] as string).Trim(' '), out Emote res);
-                    if (res != null) return res.Url.GetBitmapsFromGIFURL();
-                    return Program.GetGuildFromChannel(m.Channel).Emotes.
-                        FirstOrDefault(x => x.Name.Contains((args[0] as string).Trim(' ', ':')) && x.Animated).Url.
-                        GetBitmapsFromGIFURL();
-            }),
-            new EditCommand("mandelbrot", "Render a mandelbrot", null, typeof(Bitmap), 
-                new Argument[] { 
-                    new Argument("Zoom", typeof(double), 1),
-                    new Argument("Camera", typeof(Vector2), new Vector2(0, 0)),
-                    new Argument("Passes", typeof(int), 40),
-                },
-                (SocketMessage m, object[] a, object o) => {
+        public string profilePictureDesc = "Gets a profile picture";
+        public Bitmap ProfilePicture(Edit.Null n, SocketMessage m, string UserIDorMention)
+        {
+            SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
+            string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+        }
 
-                    Bitmap bmp = new Bitmap(500, 500);
-                    double zoom = (a[0] as double?).GetValueOrDefault();
-                    Vector2 cam = (a[1] as Vector2?).GetValueOrDefault();
-                    int passes = (a[2] as int?).GetValueOrDefault();
+        public string profilePictureGDesc = "Gets a profile picture gif";
+        public Bitmap[] profilePictureG(Edit.Null n, SocketMessage m, string UserIDorMention)
+        {
+            SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
+            string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsFromGIFURL();
+        }
 
-                    if (passes > 200)
-                        throw new Exception("200 passes should be enough, everything else would be spam and you dont wanna spam");
+        public string serverPictureDesc = "Gets the server picture from a server id";
+        public Bitmap serverPicture(Edit.Null n, SocketMessage m, string ServerID)
+        {
+            if (ServerID == "")
+                return Program.GetGuildFromChannel(m.Channel).IconUrl.GetBitmapFromURL();
+            else
+                return Program.GetGuildFromID(Convert.ToUInt64(ServerID.Trim(new char[] { ' ', '<', '>', '@', '!' }))).IconUrl.GetBitmapFromURL();
+        }
 
-                    zoom = Math.Pow(2, -zoom);
+        public string emoteDesc = "Gets the picture of the emote";
+        public Bitmap emote(Edit.Null n, SocketMessage m, string emote)
+        {
+            Emote.TryParse(emote.Trim(' '), out Emote res);
+            if (res != null) return res.Url.GetBitmapFromURL();
+            return Program.GetGuildFromChannel(m.Channel).Emotes.
+                FirstOrDefault(x => x.Name.Contains(emote.Trim(' ', ':'))).Url.
+                GetBitmapFromURL();
+        }
 
-                    using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                        for (int x = 0; x < bmp.Width; x++)
-                            for (int y = 0; y < bmp.Height; y++)
-                            {
-                                double cre = (2 * ((x / (double)bmp.Width) - 0.5)) * zoom - cam.X;
-                                double cim = (2 * ((y / (double)bmp.Height) - 0.5)) * zoom - cam.Y;
+        public string emoteGDesc = "Gets the pictures of the emote";
+        public Bitmap[] emoteG(Edit.Null n, SocketMessage m, string emote)
+        {
+            Emote.TryParse(emote.Trim(' '), out Emote res);
+            if (res != null) return res.Url.GetBitmapsFromGIFURL();
+            return Program.GetGuildFromChannel(m.Channel).Emotes.
+                FirstOrDefault(x => x.Name.Contains(emote.Trim(' ', ':')) && x.Animated).Url.
+                GetBitmapsFromGIFURL();
+        }
 
-                                double x2 = 0, y2 = 0;
-                                int count = 0;
+        public string mandelbrotDesc = "Render a mandelbrot";
+        public Bitmap mandelbrot(Edit.Null n, SocketMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
+        {
+            Bitmap bmp = new Bitmap(500, 500);
 
-                                for (int i = 0; i < passes; i++)
-	                            {
-		                            if (x2* x2 + y2* y2 < 1)
-                                         count++;
+            if (passes > 200)
+                throw new Exception("200 passes should be enough, everything else would be spam and you dont wanna spam");
 
-                                    double xtemp = x2 * x2 - y2 * y2 + cre;
-                                    y2 = 2 * x2* y2 + cim;
-		                            x2 = xtemp;
-	                            }
+            zoom = Math.Pow(2, -zoom);
 
-                                var float4 = HSVtoRGB((float)((Math.Atan2(y2, x2) + Math.PI) / (Math.PI * 2) * 360), 1, count * 10);
-                                con.SetPixel(x, y, Color.FromArgb((x2+y2 < 1000 ? 255 : 0), (int)(float4.X * 255), (int)(float4.Y * 255), (int)(float4.Z * 255)));
-                            }
-
-                    return bmp;
-            }),
-            new EditCommand("turingDrawing?", "Creates a random turing machine which operates on looped 2D tape", null, typeof(Bitmap[]),
-                new Argument[] {
-                    new Argument("Num States", typeof(int), 6),
-                    new Argument("Num Symbols", typeof(int), 3),
-                    new Argument("Draw Machine?", typeof(bool), false),
-                },
-                (SocketMessage m, object[] args, object o) => {
-
-                    int states = (int)args[0];
-                    int symbols = (int)args[1];
-
-                    int sizeX = 300, sizeY = sizeX;
-
-                    Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
-
-                    for (int i = 0; i < states; i++)
-                        for (int j = 0; j < symbols; j++)
-                            transitions[i, j] = new Tuple<int, int, Direction>(
-                                Program.RDM.Next(states),
-                                Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
-                                (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
-
-                    if ((bool)args[2])
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+                for (int x = 0; x < bmp.Width; x++)
+                    for (int y = 0; y < bmp.Height; y++)
                     {
-                        string machine = $"States: {Enumerable.Range(0,states).Select(x => x.ToString()).Combine()}" +
-                            $"Symbols: {Enumerable.Range(0,Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
-                            $"Transitions: ";
-                        for (int i = 0; i < states; i++)
-                            for (int j = 0; j < symbols; j++)
-                                machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
-                        DiscordNETWrapper.SendText(machine, m.Channel).Wait();
+                        double cre = (2 * ((x / (double)bmp.Width) - 0.5)) * zoom - camera.X;
+                        double cim = (2 * ((y / (double)bmp.Height) - 0.5)) * zoom - camera.Y;
 
-                        //Bitmap b = new Bitmap(1000, 1000);
-                        //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
-                        //for (int i = 0; i < states; i++)
-                        //    a.AddVertex(i);
-                        //foreach (var trans in transitions)
-                        //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
-                        //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
-                        //v.Generate();
-                    }
+                        double x2 = 0, y2 = 0;
+                        int count = 0;
 
-                    Bitmap[] re = new Bitmap[100];
-
-                    int curState = 0;
-                    int curSymbol = 0;
-                    int[,] curTape = new int[sizeX, sizeY];
-                    int curX = sizeX / 2;
-                    int curY = sizeY / 2;
-
-                    for (int i = 0; i < re.Length; i++)
-                    {
-                        for (int k = 0; k < 500; k++)
+                        for (int i = 0; i < passes; i++)
                         {
-                            var trans = transitions[curState, curSymbol];
-                            curState = trans.Item1;
-                            curSymbol = trans.Item2;
-                            curTape[curX,curY] = curSymbol;
+                            if (x2 * x2 + y2 * y2 < 1)
+                                count++;
 
-                            if (trans.Item3 == Direction.Down) curY++;
-                            else if (trans.Item3 == Direction.Up) curY--;
-                            else if (trans.Item3 == Direction.Left) curX--;
-                            else if (trans.Item3 == Direction.Right) curX++;
-
-                            if (curX >= sizeX) curX = 0;
-                            if (curY >= sizeY) curY = 0;
-                            if (curX < 0) curX = sizeX - 1;
-                            if (curY < 0) curY = sizeY - 1;
+                            double xtemp = x2 * x2 - y2 * y2 + cre;
+                            y2 = 2 * x2 * y2 + cim;
+                            x2 = xtemp;
                         }
 
-                        re[i] = new Bitmap(sizeX, sizeY);
-                        using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
-                            for (int x = 0; x < sizeX; x++)
-                                for (int y = 0; y < sizeY; y++)
-                                    c.SetPixel(x,y,TuringColors[curTape[x,y]]);
+                        var float4 = HSVtoRGB((float)((Math.Atan2(y2, x2) + Math.PI) / (Math.PI * 2) * 360), 1, count * 10);
+                        con.SetPixel(x, y, Color.FromArgb((x2 + y2 < 1000 ? 255 : 0), (int)(float4.X * 255), (int)(float4.Y * 255), (int)(float4.Z * 255)));
                     }
 
-                    return re;
-            }),
-            new EditCommand("audioFromYT", "Gets the mp3 of an youtube video", null, typeof(WaveStream),
-                new Argument[] { new Argument("YouTube Video URL", typeof(string), null) },
-                (SocketMessage m, object[] args, object o) => {
+            return bmp;
+        }
 
-                    MemoryStream mem = new MemoryStream();
-                    using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo((args[0] as string), "mp3"))
+        public string turingDrawingDesc = "[WIP] Creates a random turing machine which operates on looped 2D tape";
+        public Bitmap[] turingDrawing(Edit.Null n, SocketMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
+        {
+            int states = NumStates;
+            int symbols = NumSymbols;
+
+            int sizeX = 300, sizeY = sizeX;
+
+            Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
+
+            for (int i = 0; i < states; i++)
+                for (int j = 0; j < symbols; j++)
+                    transitions[i, j] = new Tuple<int, int, Direction>(
+                        Program.RDM.Next(states),
+                        Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
+                        (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
+
+            if (DrawMachine)
+            {
+                string machine = $"States: {Enumerable.Range(0, states).Select(x => x.ToString()).Combine()}" +
+                    $"Symbols: {Enumerable.Range(0, Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
+                    $"Transitions: ";
+                for (int i = 0; i < states; i++)
+                    for (int j = 0; j < symbols; j++)
+                        machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
+                DiscordNETWrapper.SendText(machine, m.Channel).Wait();
+
+                //Bitmap b = new Bitmap(1000, 1000);
+                //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
+                //for (int i = 0; i < states; i++)
+                //    a.AddVertex(i);
+                //foreach (var trans in transitions)
+                //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
+                //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
+                //v.Generate();
+            }
+
+            Bitmap[] re = new Bitmap[100];
+
+            int curState = 0;
+            int curSymbol = 0;
+            int[,] curTape = new int[sizeX, sizeY];
+            int curX = sizeX / 2;
+            int curY = sizeY / 2;
+
+            for (int i = 0; i < re.Length; i++)
+            {
+                for (int k = 0; k < 500; k++)
+                {
+                    var trans = transitions[curState, curSymbol];
+                    curState = trans.Item1;
+                    curSymbol = trans.Item2;
+                    curTape[curX, curY] = curSymbol;
+
+                    if (trans.Item3 == Direction.Down) curY++;
+                    else if (trans.Item3 == Direction.Up) curY--;
+                    else if (trans.Item3 == Direction.Left) curX--;
+                    else if (trans.Item3 == Direction.Right) curX++;
+
+                    if (curX >= sizeX) curX = 0;
+                    if (curY >= sizeY) curY = 0;
+                    if (curX < 0) curX = sizeX - 1;
+                    if (curY < 0) curY = sizeY - 1;
+                }
+
+                re[i] = new Bitmap(sizeX, sizeY);
+                using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
+                    for (int x = 0; x < sizeX; x++)
+                        for (int y = 0; y < sizeY; y++)
+                            c.SetPixel(x, y, TuringColors[curTape[x, y]]);
+            }
+
+            return re;
+        }
+
+        public string audioFromYTDesc = "Gets the mp3 of an youtube video";
+        public WaveStream audioFromYT(Edit.Null n, SocketMessage m, string YouTubeVideoURL)
+        {
+            MemoryStream mem = new MemoryStream();
+            using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(YouTubeVideoURL, "mp3"))
+            {
+                P.StandardOutput.BaseStream.CopyTo(mem);
+                return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
+            }
+        }
+
+        public string audioFromVoiceDesc = "Records audio from the voice chat you are currently in";
+        public WaveStream AudioFromVoice(Edit.Null n, SocketMessage m, ulong userID = 0, int RecordingTimeInSeconds = 5)
+        {
+            string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}audioFromVoice.bin";
+
+            int recordingTime = RecordingTimeInSeconds;
+            MemoryStream memOut = new MemoryStream();
+
+            if (recordingTime > 10)
+                throw new Exception("Thats too long UwU");
+
+            using (MemoryStream mem = new MemoryStream())
+            {
+
+                SocketGuild g = Program.GetGuildFromChannel(m.Channel);
+                ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
+
+                if (channel == null)
+                    throw new Exception("You are not in an AudioChannel on this server!");
+
+                try { channel.DisconnectAsync().Wait(); } catch { }
+
+                bool doneListening = false;
+
+                new Action(async () => {
+                    try
                     {
-                        P.StandardOutput.BaseStream.CopyTo(mem);
-                        return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
-                    }
-            }),
-            new EditCommand("audioFromVoice[WIP]?", "Records audio from the voice chat you are currently in", null, typeof(WaveStream),
-                new Argument[] { new Argument("User ID", typeof(ulong), 0), new Argument("Recording Time in Seconds", typeof(int), 5) },
-                (SocketMessage m, object[] args, object o) => {
+                        Thread.CurrentThread.Name = "Fuck";
+                        IAudioClient client = await channel.ConnectAsync();
 
-                    string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}audioFromVoice.bin";
+                        using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
+                            new StreamMediaFoundationReader(
+                                new FileStream($"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}StartListeningSoundEffect.mp3", FileMode.Open))))
+                            await MultiMediaHelper.SendAudioAsync(client, naudioStream);
 
-                    ulong? userID = args[0] as ulong?;
-                    int recordingTime = (args[1] as int?).Value;
-                    MemoryStream memOut = new MemoryStream();
+                        var u = (SocketGuildUser)(await channel.GetUsersAsync().FlattenAsync()).FirstOrDefault(x => userID == 0 ? !x.IsBot : !x.IsBot && x.Id == userID);
 
-                    if (recordingTime > 10)
-                        throw new Exception("Thats too long UwU");
+                        if (u == null)
+                            throw new Exception("I cant find that user!");
 
-                    using (MemoryStream mem = new MemoryStream()) {
+                        var streamMeUpScotty = (InputStream)u.AudioStream;
 
-                        SocketGuild g = Program.GetGuildFromChannel(m.Channel);
-                        ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
-
-                        if (channel == null)
-                            throw new Exception("You are not in an AudioChannel on this server!");
+                        var buffer = new byte[4096];
+                        DateTime startListeningTime = DateTime.Now;
+                        while (await streamMeUpScotty.ReadAsync(buffer, 0, buffer.Length) > 0 && (DateTime.Now - startListeningTime).TotalSeconds < recordingTime)
+                            mem.Write(buffer, 0, buffer.Length);
 
                         try { channel.DisconnectAsync().Wait(); } catch { }
 
-                        bool doneListening = false;
+                        mem.Position = 0;
+                        using (FileStream f = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                            mem.CopyTo(f);
 
-                        new Action(async () => {
-                            try
-                            {
-                                Thread.CurrentThread.Name = "Fuck";
-                                IAudioClient client = await channel.ConnectAsync();
+                        using (Process P = MultiMediaHelper.CreateFfmpegOut(filePath))
+                            P.StandardOutput.BaseStream.CopyTo(memOut);
 
-                                using (WaveStream naudioStream = WaveFormatConversionStream.CreatePcmStream(
-                                    new StreamMediaFoundationReader(
-                                        new FileStream($"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}StartListeningSoundEffect.mp3", FileMode.Open))))
-                                    await MultiMediaHelper.SendAudioAsync(client, naudioStream);
-
-                                var u = (SocketGuildUser)(await channel.GetUsersAsync().FlattenAsync()).FirstOrDefault(x => userID == 0 ? !x.IsBot : !x.IsBot && x.Id == userID);
-
-                                if (u == null)
-                                    throw new Exception("I cant find that user!");
-
-                                var streamMeUpScotty = (InputStream)u.AudioStream;
-
-                                var buffer = new byte[4096];
-                                DateTime startListeningTime = DateTime.Now;
-                                while (await streamMeUpScotty.ReadAsync(buffer, 0, buffer.Length) > 0 && (DateTime.Now - startListeningTime).TotalSeconds < recordingTime)
-                                    mem.Write(buffer, 0, buffer.Length);
-
-                                try { channel.DisconnectAsync().Wait(); } catch { }
-
-                                mem.Position = 0;
-                                using (FileStream f = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                                    mem.CopyTo(f);
-
-                                using (Process P = MultiMediaHelper.CreateFfmpegOut(filePath))
-                                    P.StandardOutput.BaseStream.CopyTo(memOut);
-
-                                File.Delete(filePath);
-                            }
-                            catch { }
-                            finally
-                            {
-                                try { channel.DisconnectAsync().Wait(); } catch { }
-                                doneListening = true;
-                            }
-                        }).Invoke();
-
-                        while (!doneListening)
-                            Thread.Sleep(100);
-
-                        memOut.Position = 0;
-                        return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(memOut));
+                        File.Delete(filePath);
                     }
-            }),
-        };
-        
+                    catch { }
+                    finally
+                    {
+                        try { channel.DisconnectAsync().Wait(); } catch { }
+                        doneListening = true;
+                    }
+                }).Invoke();
+
+                while (!doneListening)
+                    Thread.Sleep(100);
+
+                memOut.Position = 0;
+                return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(memOut));
+            }
+        }
+
+
         enum Direction { Up, Down, Left, Right }
         static Color[] TuringColors = new Color[] { Color.Black, Color.White, Color.Red, Color.Green, Color.Yellow, Color.Purple, Color.Blue, Color.Brown, Color.Gold, Color.Gray };
 

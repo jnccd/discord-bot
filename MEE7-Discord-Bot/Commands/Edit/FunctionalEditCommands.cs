@@ -1,16 +1,17 @@
 ﻿using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace MEE7.Commands
 {
-    class FunctionalEditCommands
+    class FunctionalEditCommands : EditCommandProvider
     {
-        public static string AddeDesc = "It adds E";
-        public static string Adde(string s, SocketMessage m)
+        public string AddeDesc = "It adds E";
+        public string Adde(string s, SocketMessage m, int count = 1)
         {
-            return s + "e";
+            return s + new string(Enumerable.Repeat('a', count).ToArray());
         }
     }
 }
