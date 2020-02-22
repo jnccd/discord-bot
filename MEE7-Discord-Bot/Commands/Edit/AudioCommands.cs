@@ -18,7 +18,7 @@ namespace MEE7.Commands
     public class AudioCommands : EditCommandProvider
     {
         public string playAudioDesc = "Plays audio in voicechat";
-        public void playAudio(WaveStream w, SocketMessage m)
+        public void PlayAudio(WaveStream w, SocketMessage m)
         {
             SocketGuild g = Program.GetGuildFromChannel(m.Channel);
             ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
@@ -39,7 +39,7 @@ namespace MEE7.Commands
         }
 
         public string drawAudioDesc = "Draw the samples";
-        public Bitmap drawAudio(WaveStream w, SocketMessage m)
+        public Bitmap DrawAudio(WaveStream w, SocketMessage m)
         {
             var c = new WaveChannel32(w);
 
@@ -80,7 +80,7 @@ namespace MEE7.Commands
         }
 
         public string pitchDesc = "Adds a Pitch to the sound";
-        public WaveStream pitch(WaveStream w, SocketMessage m, float PitchFactor)
+        public WaveStream Pitch(WaveStream w, SocketMessage m, float PitchFactor)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}pitch.bin";
 
@@ -94,7 +94,7 @@ namespace MEE7.Commands
         }
 
         public string volumeDesc = "Adds Volume to the sound";
-        public WaveStream volume(WaveStream w, SocketMessage m, float VolumeFactor)
+        public WaveStream Volume(WaveStream w, SocketMessage m, float VolumeFactor)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}volume.bin";
 

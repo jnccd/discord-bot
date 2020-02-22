@@ -11,14 +11,14 @@ namespace MEE7.Commands
     public class TextCommands : EditCommandProvider
     {
         public string mockDesc = "Mock the text";
-        public string mock(string s, SocketMessage m)
+        public string Mock(string s, SocketMessage m)
         {
             return string.Join("", s.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
                     "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
         }
 
         public string crabDesc = "Crab the text";
-        public string crab(string s, SocketMessage m)
+        public string Crab(string s, SocketMessage m)
         {
             return ":crab: " + s + " :crab:\n https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s";
         }
@@ -60,7 +60,7 @@ namespace MEE7.Commands
         }
 
         public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
-        public string japanify(string s, SocketMessage m)
+        public string Japanify(string s, SocketMessage m)
         {
             StringBuilder input = new StringBuilder(s);
 
@@ -112,7 +112,7 @@ namespace MEE7.Commands
         }
 
         public string unjapanifyDesc = "Convert katakana into readable stuff";
-        public string unjapanify(string s, SocketMessage m)
+        public string Unjapanify(string s, SocketMessage m)
         {
             StringBuilder input = new StringBuilder(s);
 
@@ -123,7 +123,7 @@ namespace MEE7.Commands
         }
 
 
-        static Tuple<string, string>[] Katakana = new Tuple<string, string>[] {
+        static readonly Tuple<string, string>[] Katakana = new Tuple<string, string>[] {
             new Tuple<string, string>("ア", "a"),
             new Tuple<string, string>("イ", "i"),
             new Tuple<string, string>("ウ", "u"),
@@ -234,7 +234,7 @@ namespace MEE7.Commands
             new Tuple<string, string>("ピュ", "pyu"),
             new Tuple<string, string>("ピョ", "pyo"),
         };
-        static Tuple<string, string>[] Katakana1S = new Tuple<string, string>[] {
+        static readonly Tuple<string, string>[] Katakana1S = new Tuple<string, string>[] {
             new Tuple<string, string>("ア", "a"),
             new Tuple<string, string>("イ", "i"),
             new Tuple<string, string>("ウ", "u"),
@@ -242,7 +242,7 @@ namespace MEE7.Commands
             new Tuple<string, string>("オ", "o"),
             new Tuple<string, string>("ン", "n"),
         };
-        static Tuple<string, string>[] Katakana2S = new Tuple<string, string>[] {
+        static readonly Tuple<string, string>[] Katakana2S = new Tuple<string, string>[] {
             new Tuple<string, string>("カ", "ka"),
             new Tuple<string, string>("キ", "ki"),
             new Tuple<string, string>("ク", "ku"),
@@ -314,7 +314,7 @@ namespace MEE7.Commands
             new Tuple<string, string>("ヂュ", "ju"),
             new Tuple<string, string>("ヂョ", "jo"),
         };
-        static Tuple<string, string>[] Katakana3S = new Tuple<string, string>[] {
+        static readonly Tuple<string, string>[] Katakana3S = new Tuple<string, string>[] {
             new Tuple<string, string>("シ", "shi"),
             new Tuple<string, string>("チ", "chi"),
             new Tuple<string, string>("ツ", "tsu"),

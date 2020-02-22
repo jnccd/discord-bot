@@ -16,7 +16,7 @@ namespace MEE7.Commands
     public class EditCommandProvider { }
     public partial class Edit : Command
     {
-        struct Argument
+        public struct Argument
         {
             public string Name;
             public Type Type;
@@ -51,14 +51,14 @@ namespace MEE7.Commands
                 this.Type = Type;
             }
         }
-        abstract class SubCommand 
+        public abstract class SubCommand 
         {
             public string Command;
             public Type InputType, OutputType;
 
             public int FunctionCalls() => 1;
         }
-        abstract class SubPipeCommand: SubCommand
+        public abstract class SubPipeCommand: SubCommand
         {
 #pragma warning disable CS0649
             public static new string Command;
@@ -67,7 +67,7 @@ namespace MEE7.Commands
             public string[] RawCommands;
             public List<Tuple<object[], SubCommand>>[] Pipes;
         }
-        class ForCommand: SubPipeCommand
+        public class ForCommand: SubPipeCommand
         {
             public static new string Command { get => "for"; set { } }
             public string VarName;
@@ -95,7 +95,7 @@ namespace MEE7.Commands
             public int Steps() => (int)((End - Start) / StepWidth);
             public new int FunctionCalls() => Steps() * Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x,y) => x + y);
         }
-        class ForeachCommand : SubPipeCommand
+        public class ForeachCommand : SubPipeCommand
         {
             public static new string Command { get => "foreach"; set { } }
             public string VarName;
@@ -121,7 +121,7 @@ namespace MEE7.Commands
 
             public new int FunctionCalls() => Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x, y) => x + y);
         }
-        class EditCommand: SubCommand
+        public class EditCommand: SubCommand
         {
             public string Desc;
             public Argument[] Arguments;
@@ -145,7 +145,7 @@ namespace MEE7.Commands
                 this.Arguments = Arguments;
             }
         }
-        class Pipe : List<Tuple<object[], SubCommand>> 
+        public class Pipe : List<Tuple<object[], SubCommand>> 
         { 
             public string rawPipe;
             public Type InputType() => this.First().Item2.InputType;
@@ -370,7 +370,8 @@ namespace MEE7.Commands
                 throw new Exception($"The first function has to be a input function");
 
             for (int i = 1; i < pipe.Count; i++)
-                if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType))
+                if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType) && 
+                    !pipe[i].Item2.InputType.IsGenericMethodParameter && !pipe[i - 1].Item2.OutputType.IsGenericMethodParameter)
                     throw new Exception($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
                         $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} from {pipe[i - 1].Item2.Command}");
 

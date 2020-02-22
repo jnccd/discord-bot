@@ -17,19 +17,20 @@ using Discord.Audio;
 using System.Threading;
 using Discord.Audio.Streams;
 using System.Numerics;
+using static MEE7.Commands.Edit;
 
 namespace MEE7.Commands
 {
     public class InputCommands : EditCommandProvider
     {
         public string lastTDesc = "Gets the last messages text";
-        public string LastT(Edit.Null n, SocketMessage m)
+        public string LastT(Null n, SocketMessage m)
         {
             return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
         }
 
         public string lastPDesc = "Gets the last messages picture";
-        public Bitmap LastP(Edit.Null n, SocketMessage m)
+        public Bitmap LastP(Null n, SocketMessage m)
         {
             IMessage lm = m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last();
             string pic = null;
@@ -47,25 +48,25 @@ namespace MEE7.Commands
         }
 
         public string thisTDesc = "Outputs the given text";
-        public string ThisT(Edit.Null n, SocketMessage m, string Text)
+        public string ThisT(Null n, SocketMessage m, string Text)
         {
             return Text;
         }
 
         public string thisPDesc = "Gets attached picture / picture from url argument";
-        public Bitmap ThisP(Edit.Null n, SocketMessage m, string PictureURL)
+        public Bitmap ThisP(Null n, SocketMessage m, string PictureURL)
         {
             return GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
         }
 
         public string thisGDesc = "Gets attached gif / gif from url argument";
-        public Bitmap[] ThisG(Edit.Null n, SocketMessage m, string GifURL)
+        public Bitmap[] ThisG(Null n, SocketMessage m, string GifURL)
         {
             return GetPictureLinkFromMessage(m, GifURL).GetBitmapsFromGIFURL();
         }
 
         public string thisADesc = "Gets mp3 or wav audio files attached to this message";
-        public WaveStream ThisA(Edit.Null n, SocketMessage m)
+        public WaveStream ThisA(Null n, SocketMessage m)
         {
             string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
             if (!string.IsNullOrWhiteSpace(url))
@@ -83,7 +84,7 @@ namespace MEE7.Commands
         }
 
         public string profilePictureDesc = "Gets a profile picture";
-        public Bitmap ProfilePicture(Edit.Null n, SocketMessage m, string UserIDorMention)
+        public Bitmap ProfilePicture(Null n, SocketMessage m, string UserIDorMention)
         {
             SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
             string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
@@ -91,7 +92,7 @@ namespace MEE7.Commands
         }
 
         public string profilePictureGDesc = "Gets a profile picture gif";
-        public Bitmap[] profilePictureG(Edit.Null n, SocketMessage m, string UserIDorMention)
+        public Bitmap[] ProfilePictureG(Null n, SocketMessage m, string UserIDorMention)
         {
             SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
             string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
@@ -99,7 +100,7 @@ namespace MEE7.Commands
         }
 
         public string serverPictureDesc = "Gets the server picture from a server id";
-        public Bitmap serverPicture(Edit.Null n, SocketMessage m, string ServerID)
+        public Bitmap ServerPicture(Null n, SocketMessage m, string ServerID)
         {
             if (ServerID == "")
                 return Program.GetGuildFromChannel(m.Channel).IconUrl.GetBitmapFromURL();
@@ -108,9 +109,9 @@ namespace MEE7.Commands
         }
 
         public string emoteDesc = "Gets the picture of the emote";
-        public Bitmap emote(Edit.Null n, SocketMessage m, string emote)
+        public Bitmap Emote(Null n, SocketMessage m, string emote)
         {
-            Emote.TryParse(emote.Trim(' '), out Emote res);
+            Discord.Emote.TryParse(emote.Trim(' '), out Emote res);
             if (res != null) return res.Url.GetBitmapFromURL();
             return Program.GetGuildFromChannel(m.Channel).Emotes.
                 FirstOrDefault(x => x.Name.Contains(emote.Trim(' ', ':'))).Url.
@@ -118,9 +119,9 @@ namespace MEE7.Commands
         }
 
         public string emoteGDesc = "Gets the pictures of the emote";
-        public Bitmap[] emoteG(Edit.Null n, SocketMessage m, string emote)
+        public Bitmap[] EmoteG(Null n, SocketMessage m, string emote)
         {
-            Emote.TryParse(emote.Trim(' '), out Emote res);
+            Discord.Emote.TryParse(emote.Trim(' '), out Emote res);
             if (res != null) return res.Url.GetBitmapsFromGIFURL();
             return Program.GetGuildFromChannel(m.Channel).Emotes.
                 FirstOrDefault(x => x.Name.Contains(emote.Trim(' ', ':')) && x.Animated).Url.
@@ -128,7 +129,7 @@ namespace MEE7.Commands
         }
 
         public string mandelbrotDesc = "Render a mandelbrot";
-        public Bitmap mandelbrot(Edit.Null n, SocketMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
+        public Bitmap Mandelbrot(Null n, SocketMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
         {
             Bitmap bmp = new Bitmap(500, 500);
 
@@ -165,7 +166,7 @@ namespace MEE7.Commands
         }
 
         public string turingDrawingDesc = "[WIP] Creates a random turing machine which operates on looped 2D tape";
-        public Bitmap[] turingDrawing(Edit.Null n, SocketMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
+        public Bitmap[] TuringDrawing(Null n, SocketMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
         {
             int states = NumStates;
             int symbols = NumSymbols;
@@ -240,7 +241,7 @@ namespace MEE7.Commands
         }
 
         public string audioFromYTDesc = "Gets the mp3 of an youtube video";
-        public WaveStream audioFromYT(Edit.Null n, SocketMessage m, string YouTubeVideoURL)
+        public WaveStream AudioFromYT(Null n, SocketMessage m, string YouTubeVideoURL)
         {
             MemoryStream mem = new MemoryStream();
             using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(YouTubeVideoURL, "mp3"))
@@ -251,7 +252,7 @@ namespace MEE7.Commands
         }
 
         public string audioFromVoiceDesc = "Records audio from the voice chat you are currently in";
-        public WaveStream AudioFromVoice(Edit.Null n, SocketMessage m, ulong userID = 0, int RecordingTimeInSeconds = 5)
+        public WaveStream AudioFromVoice(Null n, SocketMessage m, ulong userID = 0, int RecordingTimeInSeconds = 5)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}audioFromVoice.bin";
 
@@ -274,7 +275,8 @@ namespace MEE7.Commands
 
                 bool doneListening = false;
 
-                new Action(async () => {
+                new Action(async () =>
+                {
                     try
                     {
                         Thread.CurrentThread.Name = "Fuck";
@@ -326,7 +328,8 @@ namespace MEE7.Commands
 
 
         enum Direction { Up, Down, Left, Right }
-        static Color[] TuringColors = new Color[] { Color.Black, Color.White, Color.Red, Color.Green, Color.Yellow, Color.Purple, Color.Blue, Color.Brown, Color.Gold, Color.Gray };
+        static readonly Color[] TuringColors = new Color[]
+            { Color.Black, Color.White, Color.Red, Color.Green, Color.Yellow, Color.Purple, Color.Blue, Color.Brown, Color.Gold, Color.Gray };
 
         private static Vector4 HSVtoRGB(float H, float S, float V)
         {
