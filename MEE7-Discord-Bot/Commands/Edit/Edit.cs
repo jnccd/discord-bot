@@ -209,7 +209,7 @@ namespace MEE7.Commands
                 }
 
                 Commands = Commands.Union(curCommands);
-                AddToHelpmenu(t.Name, curCommands.ToArray());
+                AddToHelpmenu(t.Name, Commands.ToArray());
             }
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
@@ -219,14 +219,17 @@ namespace MEE7.Commands
                   $"`{(c.InputType == null ? "_" : c.InputType.ToReadableString())}` -> " +
                   $"`{(c.OutputType == null ? "_" : c.OutputType.ToReadableString())}`" +
                 $"";
-            int maxlength = editCommands.
-                Select(CommandToCommandTypeString).
-                Select(x => x.Length).
-                Max();
-            HelpMenu.AddFieldDirectly(Name, "" + editCommands.
-                Select(c => CommandToCommandTypeString(c) +
-                $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
-                Combine() + "");
+            if (editCommands.Length > 0)
+            {
+                int maxlength = editCommands.
+                    Select(CommandToCommandTypeString).
+                    Select(x => x.Length).
+                    Max();
+                HelpMenu.AddFieldDirectly(Name, "" + editCommands.
+                    Select(c => CommandToCommandTypeString(c) +
+                    $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
+                    Combine() + "");
+            }
         }
         public override void Execute(SocketMessage message)
         {
