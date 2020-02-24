@@ -209,7 +209,7 @@ namespace MEE7.Commands
                 }
 
                 Commands = Commands.Union(curCommands);
-                AddToHelpmenu(t.Name, Commands.ToArray());
+                AddToHelpmenu(t.Name, curCommands.ToArray());
             }
         }
         void AddToHelpmenu(string Name, EditCommand[] editCommands)
