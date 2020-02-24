@@ -60,21 +60,25 @@ namespace MEE7.Commands
                 }
 
             CancellationTokenSource cancelCulture = new CancellationTokenSource();
-            Thread runner = new Thread(() => {
+            Thread runner = new Thread(() =>
+            {
                 object re = null;
                 try
-                { 
-                    re = RunCode("using System;using System.Linq;" + code, cancelCulture.Token); 
+                {
+                    re = RunCode("using System;using System.Linq;" + code, cancelCulture.Token);
                 }
                 catch (Exception e) { re = e.Message; }
-                DiscordNETWrapper.SendText("```csharp\n" + (re == null ? "" : re.ToString()) + "```", message.Channel).Wait();
-            });
-            runner.Priority = ThreadPriority.Lowest;
+                DiscordNETWrapper.SendText("```csharp\n" + (re == null ? "null" : re.ToString().Replace("`", "")) + "```", message.Channel).Wait();
+            })
+            {
+                Priority = ThreadPriority.Lowest
+            };
+            long startMem = Process.GetCurrentProcess().PrivateMemorySize64;
             runner.Start();
             for (int i = 0; i < 50; i++)
             {
                 Thread.Sleep(100);
-                if (Process.GetCurrentProcess().PrivateMemorySize64 > 1024L * 1024 * 1024)
+                if (Process.GetCurrentProcess().PrivateMemorySize64 > startMem + 128L * 1024 * 1024)
                 {
                     cancelCulture.Cancel();
                     DiscordNETWrapper.SendText("```csharp\nCsharp Runner used up too much memory!```", message.Channel).Wait();
