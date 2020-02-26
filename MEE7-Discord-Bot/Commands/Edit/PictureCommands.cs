@@ -20,7 +20,7 @@ namespace MEE7.Commands
     public class PictureCommands : EditCommandProvider
     {
         public string colorChannelSwapDesc = "Swap the rgb color channels for each pixel";
-        public Bitmap colorChannelSwap(Bitmap bmp, SocketMessage m)
+        public Bitmap ColorChannelSwap(Bitmap bmp, SocketMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -35,7 +35,7 @@ namespace MEE7.Commands
         }
 
         public string reddifyDesc = "Make it red af";
-        public Bitmap reddify(Bitmap bmp, SocketMessage m)
+        public Bitmap Reddify(Bitmap bmp, SocketMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -50,7 +50,7 @@ namespace MEE7.Commands
         }
 
         public string invertDesc = "Invert the color of each pixel";
-        public Bitmap invert(Bitmap bmp, SocketMessage m)
+        public Bitmap Invert(Bitmap bmp, SocketMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -91,7 +91,7 @@ namespace MEE7.Commands
         }
 
         public string memifyDesc = "Turn a picture into a meme, get a list of available templates with the argument -list";
-        public Bitmap memify(Bitmap bmp, SocketMessage m, string Meme)
+        public Bitmap Memify(Bitmap bmp, SocketMessage m, string Meme)
         {
             lock (memifyLock)
             {
@@ -151,7 +151,7 @@ namespace MEE7.Commands
 
         public string textMemifyDesc = "Put text into a meme template, input -list as Meme and get a list templates\n" +
                 "The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox";
-        public Bitmap textMemify(string memeName, SocketMessage m, string Meme, string Font = "Arial", float FontSize = 1)
+        public Bitmap TextMemify(string memeName, SocketMessage m, string Meme, string Font = "Arial", float FontSize = 1)
         {
             string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTextTemplates");
 
@@ -201,7 +201,7 @@ namespace MEE7.Commands
         }
 
         public string expandDesc = "Expand the pixels";
-        public Bitmap expand(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public Bitmap Expand(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -218,7 +218,7 @@ namespace MEE7.Commands
         }
 
         public string stirDesc = "Stir the pixels";
-        public Bitmap stir(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public Bitmap Stir(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -239,7 +239,7 @@ namespace MEE7.Commands
         }
 
         public string fallDesc = "Fall the pixels";
-        public Bitmap fall(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public Bitmap Fall(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -260,7 +260,7 @@ namespace MEE7.Commands
         }
 
         public string wubbleDesc = "Wubble the pixels";
-        public Bitmap wubble(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public Bitmap Wubble(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -276,7 +276,7 @@ namespace MEE7.Commands
         }
 
         public string cyaDesc = "Cya the pixels";
-        public Bitmap cya(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public Bitmap Cya(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -292,7 +292,7 @@ namespace MEE7.Commands
         }
 
         public string inpandDesc = "Inpand the pixels";
-        public Bitmap inpand(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public Bitmap Inpand(Bitmap bmp, SocketMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -308,7 +308,7 @@ namespace MEE7.Commands
         }
 
         public string blockifyDesc = "Blockify the pixels";
-        public Bitmap blockify(Bitmap bmp, SocketMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
+        public Bitmap Blockify(Bitmap bmp, SocketMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
         {
             return ApplyTransformation(bmp,
                     (x, y) => new Vector2(x + (float)Math.Cos(x / frequenzy + offsetX) * strength,
@@ -332,7 +332,7 @@ namespace MEE7.Commands
         }
 
         public string sobelEdgesColorDesc = "Highlights horizontal edges";
-        public Bitmap sobelEdgesColor(Bitmap bmp, SocketMessage m)
+        public Bitmap SobelEdgesColor(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                                    {  0,  0,  0 },
@@ -340,7 +340,7 @@ namespace MEE7.Commands
         }
 
         public string sharpenDesc = "well guess what it does";
-        public Bitmap sharpen(Bitmap bmp, SocketMessage m)
+        public Bitmap Sharpen(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0, -1,  0 },
                                                                { -1,  5, -1 },
@@ -348,7 +348,7 @@ namespace MEE7.Commands
         }
 
         public string boxBlurDesc = "blur owo";
-        public Bitmap boxBlur(Bitmap bmp, SocketMessage m)
+        public Bitmap BoxBlur(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
                                                                {  1,  1,  1 },
@@ -356,7 +356,7 @@ namespace MEE7.Commands
         }
 
         public string gaussianBlurDesc = "more blur owo";
-        public Bitmap gaussianBlur(Bitmap bmp, SocketMessage m)
+        public Bitmap GaussianBlur(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                                    {  2,  4,  2 },
@@ -364,25 +364,25 @@ namespace MEE7.Commands
         }
 
         public string jkrowlingDesc = "Gay rights";
-        public Bitmap jkrowling(Bitmap bmp, SocketMessage m)
+        public Bitmap Jkrowling(Bitmap bmp, SocketMessage m)
         {
             return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
         }
 
         public string merkelDesc = "German rights";
-        public Bitmap merkel(Bitmap bmp, SocketMessage m)
+        public Bitmap Merkel(Bitmap bmp, SocketMessage m)
         {
             return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
         }
 
         public string transRightsDesc = "The input image says trans rights";
-        public Bitmap transRights(Bitmap bmp, SocketMessage m)
+        public Bitmap TransRights(Bitmap bmp, SocketMessage m)
         {
             return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, bmp);
         }
 
         public string rainbowDesc = "I'll try spinning colors that's a good trick";
-        public Bitmap[] rainbow(Bitmap b, SocketMessage m)
+        public Bitmap[] Rainbow(Bitmap b, SocketMessage m)
         {
             Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
             int[,] Alphas = new int[b.Width, b.Height];
@@ -417,7 +417,7 @@ namespace MEE7.Commands
         }
 
         public string spinToWinDesc = "I'll try spinning that's a good trick";
-        public Bitmap[] spinToWin(Bitmap b, SocketMessage m)
+        public Bitmap[] SpinToWin(Bitmap b, SocketMessage m)
         {
             Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
 
@@ -431,7 +431,7 @@ namespace MEE7.Commands
         }
 
         public string chromaticAbberationDesc = "Shifts the color spaces";
-        public Bitmap chromaticAbberation(Bitmap bmp, SocketMessage m, int intensity = 4)
+        public Bitmap ChromaticAbberation(Bitmap bmp, SocketMessage m, int intensity = 4)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -447,14 +447,14 @@ namespace MEE7.Commands
         }
 
         public string rotateDesc = "Rotate the image";
-        public Bitmap rotate(Bitmap b, SocketMessage m, float AngleInDegrees = 0)
+        public Bitmap Rotate(Bitmap b, SocketMessage m, float AngleInDegrees = 0)
         {
             Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
             return b.RotateImage(AngleInDegrees, middle);
         }
 
         public string rotateColorsDesc = "Rotate the color spaces of each pixel";
-        public Bitmap rotateColors(Bitmap b, SocketMessage m, float AngleInDegrees = 0)
+        public Bitmap RotateColors(Bitmap b, SocketMessage m, float AngleInDegrees = 0)
         {
             using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -469,7 +469,7 @@ namespace MEE7.Commands
         }
 
         public string compressDesc = "JPEG Compress the image";
-        public Bitmap compress(Bitmap b, SocketMessage m, long compressionLevel)
+        public Bitmap Compress(Bitmap b, SocketMessage m, long compressionLevel)
         {
             ImageCodecInfo jpgEncoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
             Encoder myEncoder = Encoder.Quality;
@@ -490,7 +490,7 @@ namespace MEE7.Commands
 
         public string backAndForthDesc = "Make the gif go backward after it went forward and " +
                 "then it goes forward again because it loops and its all very fancy n stuff";
-        public Bitmap[] backAndForth(Bitmap[] bs, SocketMessage m)
+        public Bitmap[] BackAndForth(Bitmap[] bs, SocketMessage m)
         {
             return bs.Concat(bs.Skip(1).Reverse()).ToArray();
         }
@@ -502,7 +502,7 @@ namespace MEE7.Commands
         }
 
         public string transgroundDesc = "Make the background transparent";
-        public Bitmap transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
+        public Bitmap Transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
         {
             Vector2 coords = BackgroundCoords;
             List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
