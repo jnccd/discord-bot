@@ -201,7 +201,9 @@ namespace MEE7.Commands
                                 param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
                                 (SocketMessage m, object[] args, object o) =>
                                 {
-                                    return method.Invoke(tInstance, new object[] { o, m }.Union(args).ToArray());
+                                    var completeArgs = new object[] { o, m }.ToList();
+                                    completeArgs.AddRange(args);
+                                    return method.Invoke(tInstance, completeArgs.ToArray());
                                 });
                             curCommands.Add(command);
                         }
