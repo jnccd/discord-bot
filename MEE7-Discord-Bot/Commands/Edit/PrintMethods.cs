@@ -16,10 +16,6 @@ namespace MEE7.Commands
     {
         static readonly PrintMethod[] PrintMethods = new PrintMethod[]
         {
-            new PrintMethod(typeof(string), (SocketMessage m, object o) => {
-                DiscordNETWrapper.SendText(o as string, m.Channel).Wait();
-
-            }),
             new PrintMethod(typeof(EmbedBuilder), (SocketMessage m, object o) => {
                 DiscordNETWrapper.SendEmbed(o as EmbedBuilder, m.Channel).Wait();
 
@@ -61,6 +57,10 @@ namespace MEE7.Commands
                 Stream s = new MemoryStream();
                 WaveFileWriter.WriteWavFileToStream(s, o as IWaveProvider);
                 DiscordNETWrapper.SendFile(s, m.Channel, ".mp3").Wait();
+
+            }),
+            new PrintMethod(typeof(object), (SocketMessage m, object o) => {
+                DiscordNETWrapper.SendText(o.ToString(), m.Channel).Wait();
 
             }),
         };
