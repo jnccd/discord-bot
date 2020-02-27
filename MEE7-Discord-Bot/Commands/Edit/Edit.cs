@@ -126,9 +126,10 @@ namespace MEE7.Commands
             public string Desc;
             public Argument[] Arguments;
             public Func<SocketMessage, object[], object, object> Function;
+            public MethodInfo sourceMethod;
 
             public EditCommand(string Command, string Desc, Type InputType, Type OutputType, Argument[] Arguments,
-                Func<SocketMessage, object[], object, object> Function)
+                Func<SocketMessage, object[], object, object> Function, MethodInfo sourceMethod = null)
             {
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
                     throw new IllegalCommandException("Illegal Symbol in the name!");
@@ -143,6 +144,7 @@ namespace MEE7.Commands
                 this.InputType = InputType;
                 this.OutputType = OutputType;
                 this.Arguments = Arguments;
+                this.sourceMethod = sourceMethod;
             }
         }
         public class Pipe : List<Tuple<object[], SubCommand>> 
@@ -201,9 +203,20 @@ namespace MEE7.Commands
                                 param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
                                 (SocketMessage m, object[] args, object o) =>
                                 {
+                                    if (param.First().ParameterType == typeof(Null))
+                                        o = new Null();
+
                                     var completeArgs = new object[] { o, m }.ToList();
                                     completeArgs.AddRange(args);
-                                    return method.Invoke(tInstance, completeArgs.ToArray());
+
+                                    if (method.IsGenericMethod)
+                                    {
+                                        var meth = method.MakeGenericMethod(o == null ? typeof(object) : o.GetType());
+                                        var re = meth.Invoke(tInstance, completeArgs.ToArray());
+                                        return re;
+                                    }
+                                    else
+                                        return method.Invoke(tInstance, completeArgs.ToArray());
                                 });
                             curCommands.Add(command);
                         }
@@ -250,8 +263,9 @@ namespace MEE7.Commands
                 }
                 catch (Exception e)
                 {
-                    DiscordNETWrapper.SendText($"{e.Message} " +
-                        $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", 
+                    var s = e.StackTrace.GetEverythingBetweenAll(Path.DirectorySeparatorChar.ToString(), "\n");
+                    DiscordNETWrapper.SendText($"{e.Message}" +
+                        $"{(s.Count > 0 ? $", {s.Last()}" : "")}", 
                         message.Channel).Wait();
                     return;
                 }
@@ -304,7 +318,7 @@ namespace MEE7.Commands
             foreach (string c in commands)
             {
                 string cwoargs = new string(c.TakeWhile(x => x != '(').ToArray()).Trim(' ');
-                string arg = c.GetEverythingBetween("(", ")");
+                string arg = new string((c + "").GetEverythingBetween("(", "").SkipLast(1).ToArray());
 
                 object[] parsedArgs = new object[0];
                 SubCommand reCommand = null;
@@ -312,6 +326,7 @@ namespace MEE7.Commands
                 string[] rawPipes = c.GetEverythingBetweenAll("{", "}").Select(x => x.Trim(' ')).ToArray();
                 if (rawPipes.Length > 0)
                 {
+                    arg = c.GetEverythingBetween("(", ")");
                     string[] args = arg.Split(':', ';');
 
                     if (cwoargs == ForCommand.Command)
@@ -341,14 +356,36 @@ namespace MEE7.Commands
 
                     if (argumentParsing)
                     {
-                        string[] args = arg.Split(',').Select(x => x.Trim(' ')).ToArray();
+                        k = 0; j = 0;
+                        string[] args = new string(arg.Select(x => {
+                            if (x == '(')
+                                k++;
+                            if (x == '{')
+                                j++;
+                            if (x == ')')
+                                k--;
+                            if (x == '}')
+                                j--;
+                            if (k == 0 && j == 0 && x == ',')
+                                x = '';
+                            return x;
+                        }).
+                        ToArray()).
+                        Split('').
+                        Select(x => x.Trim(' ')).
+                        ToArray();
+
                         if (args.Length == 1 && args[0] == "") args = new string[0];
                         parsedArgs = new object[command.Arguments.Length];
                         for (int i = 0; i < command.Arguments.Length; i++)
                             if (i < args.Length)
                             {
-                                try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]); }
-                                catch { throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}"); }
+                                try {
+                                    parsedArgs[i] = Convert.ChangeType(Pipe.Parse(message, args[i]).Apply(message, null), command.Arguments[i].Type);
+                                } catch {
+                                    try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]); }
+                                    catch { throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}"); }
+                                }
                             }
                             else if (command.Arguments[i].StandardValue == null)
                                 throw new Exception($"[{cwoargs}] {command.Arguments[i].Name} requires a value!");
@@ -368,17 +405,34 @@ namespace MEE7.Commands
         }
         static Pipe CheckPipe(Pipe pipe, bool subPipe = false, Type InputType = null, Type OutputType = null)
         {
-            if (pipe.Select(x => x.Item2.FunctionCalls()).Sum() >= 100) // TODO: Improve performance limit check
+            if (pipe.Select(x => x.Item2.FunctionCalls()).Sum() >= 100)
                 throw new Exception($"Only 100 instructions are allowed per pipe.");
 
             if (pipe.First().Item2.InputType != null && !subPipe)
                 throw new Exception($"The first function has to be a input function");
 
             for (int i = 1; i < pipe.Count; i++)
-                if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType) && 
-                    !pipe[i].Item2.InputType.IsGenericMethodParameter && !pipe[i - 1].Item2.OutputType.IsGenericMethodParameter)
+                try
+                {
+                    if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType) &&
+                    !pipe[i].Item2.InputType.ContainsGenericParameters && !pipe[i - 1].Item2.OutputType.ContainsGenericParameters)
                     throw new Exception($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
-                        $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} from {pipe[i - 1].Item2.Command}");
+                        $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
+                        $"from {pipe[i - 1].Item2.Command}");
+                }
+                catch (Exception e) { if (e.Message.StartsWith("Type Error")) throw e; }
+            for (int i = 1; i < pipe.Count - 1; i++)
+                try
+                {
+                    if (pipe[i].Item2.InputType.ContainsGenericParameters && i < pipe.Count - 1 &&
+                        !(pipe[i].Item2 as EditCommand).sourceMethod.MakeGenericMethod(pipe[i - 1].Item2.OutputType).ReturnType.
+                        IsAssignableFrom(pipe[i + 1].Item2.InputType))
+                        throw new Exception($"Generic Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
+                            $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
+                            $"from {pipe[i - 1].Item2.Command}");
+                }
+                catch (Exception e) { if (e.Message.StartsWith("Generic Type Error")) throw e; }
+
 
             foreach (ForCommand f in pipe.Select(x => x.Item2).Where(x => x is ForCommand).Select(x => x as ForCommand))
             {
@@ -465,7 +519,8 @@ namespace MEE7.Commands
                 catch (Exception e) { throw new Exception($"[{p.Item2.Command}] {e.Message} " + 
                     $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}"); }
 
-                if (p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType())))
+                if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) && 
+                    !p.Item2.OutputType.ContainsGenericParameters)
                     throw new Exception($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
                         $"{p.Item2.OutputType} but actually gave me a {currentData.GetType().ToReadableString()}");
             }

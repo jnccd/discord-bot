@@ -212,7 +212,7 @@ namespace MEE7.Commands
                     float div = bmp.Width + bmp.Height;
                     float maxDistance = (center / div).LengthSquared();
 
-                    float transformedLength = (diff / div).LengthSquared() * (1 / strength / 10);
+                    float transformedLength = (diff / div).LengthSquared() * (1 / strength * 100);
                     return point - diff * (1 / (1 + transformedLength)) * (1 / (1 + transformedLength));
                 });
         }
