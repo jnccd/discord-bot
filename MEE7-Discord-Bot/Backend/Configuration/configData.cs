@@ -1,4 +1,5 @@
-﻿using MEE7.Commands;
+﻿using Discord;
+using MEE7.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace MEE7.Configuration
         public string TwitchAPIAccessToken;
         public string ExtraStuff;
         public List<ManageRoleByEmoteMessage> manageRoleByEmoteMessages;
+        public List<Tuple<string, ulong, ulong, DateTime>> timers;
 
         public ConfigData()
         {
@@ -46,6 +48,7 @@ namespace MEE7.Configuration
             MessagePreviewServers = new List<ulong>();
             WarframeIDList = new List<string>();
             manageRoleByEmoteMessages = new List<ManageRoleByEmoteMessage>();
+            timers = new List<Tuple<string, ulong, ulong, DateTime>>();
         }
     }
 }
