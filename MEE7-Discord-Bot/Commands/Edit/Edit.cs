@@ -372,17 +372,21 @@ namespace MEE7.Commands
                         }).
                         ToArray()).
                         Split('').
-                        Select(x => x.Trim(' ')).
                         ToArray();
 
                         if (args.Length == 1 && args[0] == "") args = new string[0];
                         parsedArgs = new object[command.Arguments.Length];
+                        if (args.Length > parsedArgs.Length) args[parsedArgs.Length - 1] = args.Skip(parsedArgs.Length - 1).Combine(",");
                         for (int i = 0; i < command.Arguments.Length; i++)
                             if (i < args.Length)
                             {
-                                try {
+                                args[i] = args[i].Trim(' ');
+                                try
+                                {
                                     parsedArgs[i] = Convert.ChangeType(Pipe.Parse(message, args[i]).Apply(message, null), command.Arguments[i].Type);
-                                } catch {
+                                }
+                                catch
+                                {
                                     try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]); }
                                     catch { throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}"); }
                                 }
