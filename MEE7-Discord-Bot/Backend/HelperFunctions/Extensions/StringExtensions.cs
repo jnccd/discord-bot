@@ -310,8 +310,6 @@ namespace MEE7.Backend.HelperFunctions.Extensions
         }
         public static WebResponse GetWebResponsefromURL(this string URL)
         {
-            string googleImgCookie = "CONSENT=YES+DE.de+20151207-13-0; SLG_GWPT_Show_Hide_tmp=1; SLG_wptGlobTipTmp=1; BLPROV=Google; HSID=A-vqZZg8vQI3Q-EIq; SSID=A6kkf51j7vY_Ztcdt; APISID=CkhOuBICTgvR89NU/AoEgG4Va-p_0wiAQQ; SAPISID=VR6q92ueupcUlkcE/A-PsY1KJoxTZ4N23R; SID=pQd9ALQj3Wyie2H57TNx-5gfOVHws-na2PDdVj87rBbos2pv0ULd8f_GDMinApOqb5zsNA.; __Secure-3PSID=pQd9ALQj3Wyie2H57TNx-5gfOVHws-na2PDdVj87rBbos2pv3kFPx5H75oEpCwy9bPRRLw.; __Secure-3PAPISID=VR6q92ueupcUlkcE/A-PsY1KJoxTZ4N23R; __Secure-HSID=A-vqZZg8vQI3Q-EIq; __Secure-SSID=A6kkf51j7vY_Ztcdt; __Secure-APISID=CkhOuBICTgvR89NU/AoEgG4Va-p_0wiAQQ; SEARCH_SAMESITE=CgQI2o4B; ANID=AHWqTUmZ9PEkbS6012PBtaBthjQGSls0OoRkwQJ_w0DLBMeu2uhleyt-EUa5mbXt; NID=196=aRCKdxbW0za8uy_0QXRmMIiuqwa2j7jY0889LaQll0zUHrqcM2UUs8qNBQzn4ceO60ahnW64xunjI7xLZwcVpEcDnbdd_0pRVyu9StT-CRciM_mJQMlLKMYnZDkM7gwAZ_8QWMIPxdd6WXMnNlixoYE9RNd0pgPwaAKpTVUa-RrY9IRAkVH7AixUTFEQ6CzjAZ9svYMkbU7xUauwaSsRaGt9tfrp382HoCCxXv3FzqMSZDPqjwO0yuMn5MS2aAwkrtDncPk3AIsNjf0m-3edLq0DlMa1zrO9MM4rDR6_exeRuBOIfmtc3hI4rd_XrZaV; DV=c8Wi7yZ7UvM6wOHOSNGMdZA1YIn_-5bs_5BZ6oTAAAAAALC-OcS5CfPkFQAAAAA; 1P_JAR=2020-01-19-23";
-
             try
             {
                 HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
@@ -320,12 +318,6 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 req.AllowAutoRedirect = true;
                 req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
 
-                CookieContainer c = new CookieContainer();
-                googleImgCookie.Split("; ").Select(x => {
-                    c.Add(new Cookie(x.Split("=")[0], x.Split("=")[1]));
-                    return 1;
-                });
-                req.CookieContainer = c;
                 return req.GetResponse();
             }
             catch (Exception) { return null; }
