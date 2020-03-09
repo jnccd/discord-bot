@@ -12,15 +12,38 @@ using System.Threading.Tasks;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave.SampleProviders;
+using System.Net;
 
 namespace MEE7.Commands
 {
     public class AudioCommands : EditCommandProvider
     {
         public string SpeakDesc = "Plays audio in voicechat";
-        public void Speak(string text, SocketMessage m, string character = "GLaDOS")
+        public WaveStream Speak(string text, SocketMessage m, string character = "GLaDOS")
         {
+            if (text.Contains('"') || character.Contains('"'))
+                return null;
 
+            string payloadText = $"{{\"text\":\"{text}.\",\"character\":\"{character}\"}}";
+            byte[] payload = Encoding.UTF8.GetBytes(payloadText);
+
+            DiscordNETWrapper.SendText("`Speak` works using the api from `fifteen.ai` C:", m.Channel).Wait();
+
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create("https://api.fifteen.ai/app/getAudioFile");
+            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
+            req.Method = "POST";
+            req.ContentLength = payload.Length;
+            req.ContentType = "application/json;charset=UTF-8";
+            using (Stream dataStream = req.GetRequestStream())
+                dataStream.Write(payload);
+            WebResponse response = req.GetResponse();
+            using (Stream dataStream = response.GetResponseStream())
+            {
+                MemoryStream ms = new MemoryStream();
+                dataStream.CopyTo(ms);
+                ms.Position = 0;
+                return new WaveFileReader(ms);
+            }
         }
 
         public string playAudioDesc = "Plays audio in voicechat";
