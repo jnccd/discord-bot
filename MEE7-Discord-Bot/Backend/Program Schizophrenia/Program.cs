@@ -320,190 +320,194 @@ namespace MEE7
                 if (input == "exit")
                     break;
 
-                if (!input.StartsWith("/"))
+                try
                 {
-                    if (CurrentChannel == null)
-                        ConsoleWrapper.WriteLine("No channel selected!");
-                    else if (!string.IsNullOrWhiteSpace(input))
+                    if (!input.StartsWith("/"))
                     {
+                        if (CurrentChannel == null)
+                            ConsoleWrapper.WriteLine("No channel selected!");
+                        else if (!string.IsNullOrWhiteSpace(input))
+                        {
+                            try
+                            {
+                                DiscordNETWrapper.SendText(input, CurrentChannel).Wait();
+                            }
+                            catch (Exception e)
+                            {
+                                ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
+                            }
+                        }
+                    }
+                    else if (input.StartsWith("/file "))
+                    {
+                        if (CurrentChannel == null)
+                            ConsoleWrapper.WriteLine("No channel selected!");
+                        else
+                        {
+                            string[] splits = input.Split(' ');
+                            string path = splits.Skip(1).Aggregate((x, y) => x + " " + y);
+                            DiscordNETWrapper.SendFile(path.Trim('\"'), CurrentChannel).Wait();
+                        }
+                    }
+                    else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
+                    {
+                        #region set channel code
                         try
                         {
-                            DiscordNETWrapper.SendText(input, CurrentChannel).Wait();
+                            string[] splits = input.Split(' ');
+
+                            SocketChannel channel = client.GetChannel((ulong)Convert.ToInt64(splits[1]));
+                            IMessageChannel textChannel = (IMessageChannel)channel;
+                            if (textChannel != null)
+                            {
+                                CurrentChannel = (ISocketMessageChannel)textChannel;
+                                ConsoleWrapper.WriteLine("Succsessfully set new channel!", ConsoleColor.Green);
+                                ConsoleWrapper.Write("Current channel is: ");
+                                ConsoleWrapper.WriteLine(CurrentChannel, ConsoleColor.Magenta);
+                            }
+                            else
+                                ConsoleWrapper.WriteLine("Couldn't set new channel!", ConsoleColor.Red);
+                        }
+                        catch
+                        {
+                            ConsoleWrapper.WriteLine("Couldn't set new channel!", ConsoleColor.Red);
+                        }
+                        #endregion
+                    }
+                    else if (input.StartsWith("/del "))
+                    {
+                        #region deletion code
+                        try
+                        {
+                            string[] splits = input.Split(' ');
+                            IMessage M = null;
+                            bool DeletionComplete = false;
+
+                            for (int i = 0; !DeletionComplete; i++)
+                            {
+                                try
+                                {
+                                    M = ((ISocketMessageChannel)GetChannelFromID(Config.Data.ChannelsWrittenOn[i])).
+                                        GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
+
+                                    if (M != null)
+                                    {
+                                        M.DeleteAsync().Wait();
+                                        DeletionComplete = true;
+                                    }
+                                }
+                                catch { }
+                            }
                         }
                         catch (Exception e)
                         {
                             ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
                         }
+                        #endregion
                     }
-                }
-                else if (input.StartsWith("/file "))
-                {
-                    if (CurrentChannel == null)
-                        ConsoleWrapper.WriteLine("No channel selected!");
-                    else
+                    else if (input == "/PANIKDELETE")
                     {
-                        string[] splits = input.Split(' ');
-                        string path = splits.Skip(1).Aggregate((x, y) => x + " " + y);
-                        DiscordNETWrapper.SendFile(path.Trim('\"'), CurrentChannel).Wait();
-                    }
-                }
-                else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
-                {
-                    #region set channel code
-                    try
-                    {
-                        string[] splits = input.Split(' ');
-
-                        SocketChannel channel = client.GetChannel((ulong)Convert.ToInt64(splits[1]));
-                        IMessageChannel textChannel = (IMessageChannel)channel;
-                        if (textChannel != null)
+                        foreach (ulong ChannelID in Config.Data.ChannelsWrittenOn)
                         {
-                            CurrentChannel = (ISocketMessageChannel)textChannel;
-                            ConsoleWrapper.WriteLine("Succsessfully set new channel!", ConsoleColor.Green);
-                            ConsoleWrapper.Write("Current channel is: ");
-                            ConsoleWrapper.WriteLine(CurrentChannel, ConsoleColor.Magenta);
-                        }
-                        else
-                            ConsoleWrapper.WriteLine("Couldn't set new channel!", ConsoleColor.Red);
-                    }
-                    catch
-                    {
-                        ConsoleWrapper.WriteLine("Couldn't set new channel!", ConsoleColor.Red);
-                    }
-                    #endregion
-                }
-                else if (input.StartsWith("/del "))
-                {
-                    #region deletion code
-                    try
-                    {
-                        string[] splits = input.Split(' ');
-                        IMessage M = null;
-                        bool DeletionComplete = false;
-
-                        for (int i = 0; !DeletionComplete; i++)
-                        {
-                            try
+                            IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
+                            foreach (IMessage m in messages)
                             {
-                                M = ((ISocketMessageChannel)GetChannelFromID(Config.Data.ChannelsWrittenOn[i])).
-                                    GetMessageAsync(Convert.ToUInt64(splits[1])).GetAwaiter().GetResult();
-
-                                if (M != null)
-                                {
-                                    M.DeleteAsync().Wait();
-                                    DeletionComplete = true;
-                                }
+                                if (m.Author.Id == client.CurrentUser.Id)
+                                    m.DeleteAsync().Wait();
                             }
-                            catch { }
                         }
                     }
-                    catch (Exception e)
+                    else if (input == "/clear")
                     {
-                        ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
+                        Console.CursorTop = clearYcoords;
+                        Console.CursorLeft = 0;
+                        string large = "";
+                        for (int i = 0; i < (Console.BufferHeight - clearYcoords - 2) * Console.BufferWidth; i++)
+                            large += " ";
+                        Console.WriteLine(large);
+                        Console.CursorTop = clearYcoords;
+                        Console.CursorLeft = 0;
                     }
-                    #endregion
-                }
-                else if (input == "/PANIKDELETE")
-                {
-                    foreach (ulong ChannelID in Config.Data.ChannelsWrittenOn)
+                    else if (input == "/config")
                     {
-                        IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
-                        foreach (IMessage m in messages)
+                        Console.WriteLine(Config.ToString());
+                    }
+                    else if (input == "/restart")
+                    {
+                        Process.Start("MEE7.exe");
+                        break;
+                    }
+                    else if (input.StartsWith("/test"))
+                    {
+                        string[] split = input.Split(' ');
+                        int index = -1;
+                        if (split.Length > 0)
+                            try { index = Convert.ToInt32(split[1]); } catch { }
+                        Tests.Run(index);
+                    }
+                    else if (input.StartsWith("/roles")) // ServerID
+                    {
+                        string[] split = input.Split(' ');
+                        try
                         {
-                            if (m.Author.Id == client.CurrentUser.Id)
-                                m.DeleteAsync().Wait();
+                            ConsoleWrapper.WriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
                         }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                }
-                else if (input == "/clear")
-                {
-                    Console.CursorTop = clearYcoords;
-                    Console.CursorLeft = 0;
-                    string large = "";
-                    for (int i = 0; i < (Console.BufferHeight - clearYcoords - 2) * Console.BufferWidth; i++)
-                        large += " ";
-                    Console.WriteLine(large);
-                    Console.CursorTop = clearYcoords;
-                    Console.CursorLeft = 0;
-                }
-                else if (input == "/config")
-                {
-                    Console.WriteLine(Config.ToString());
-                }
-                else if (input == "/restart")
-                {
-                    Process.Start("MEE7.exe");
-                    break;
-                }
-                else if (input.StartsWith("/test"))
-                {
-                    string[] split = input.Split(' ');
-                    int index = -1;
-                    if (split.Length > 0)
-                        try { index = Convert.ToInt32(split[1]); } catch { }
-                    Tests.Run(index);
-                }
-                else if (input.StartsWith("/roles")) // ServerID
-                {
-                    string[] split = input.Split(' ');
-                    try
+                    else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
                     {
-                        ConsoleWrapper.WriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Roles.Select(x => x.Name)), ConsoleColor.Cyan);
+                        string[] split = input.Split(' ');
+                        try
+                        {
+                            ConsoleWrapper.WriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
+                                Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-                else if (input.StartsWith("/rolePermissions")) // ServerID RoleName
-                {
-                    string[] split = input.Split(' ');
-                    try
+                    else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
                     {
-                        ConsoleWrapper.WriteLine(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[2]).Permissions.ToList().
-                            Select(x => x.ToString()).Aggregate((x, y) => x + "\n" + y), ConsoleColor.Cyan);
+                        string[] split = input.Split(' ');
+                        try
+                        {
+                            GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
+                                AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3])).Wait();
+                            ConsoleWrapper.WriteLine("That worked!", ConsoleColor.Cyan);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-                else if (input.StartsWith("/assignRole")) // ServerID UserID RoleName
-                {
-                    string[] split = input.Split(' ');
-                    try
+                    else if (input.StartsWith("/channels")) // ChannelID
                     {
-                        GetGuildFromID(Convert.ToUInt64(split[1])).GetUser(Convert.ToUInt64(split[2])).
-                            AddRoleAsync(GetGuildFromID(Convert.ToUInt64(split[1])).Roles.First(x => x.Name == split[3])).Wait();
-                        ConsoleWrapper.WriteLine("That worked!", ConsoleColor.Cyan);
+                        string[] split = input.Split(' ');
+                        try
+                        {
+                            ConsoleWrapper.WriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-                else if (input.StartsWith("/channels")) // ChannelID
-                {
-                    string[] split = input.Split(' ');
-                    try
+                    else if (input.StartsWith("/read")) // ChannelID
                     {
-                        ConsoleWrapper.WriteLine(String.Join("\n", GetGuildFromID(Convert.ToUInt64(split[1])).Channels.Select(x => x.Name + "\t" + x.Id + "\t" + x.GetType())), ConsoleColor.Cyan);
+                        string[] split = input.Split(' ');
+                        try
+                        {
+                            var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
+                            ConsoleWrapper.WriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-                else if (input.StartsWith("/read")) // ChannelID
-                {
-                    string[] split = input.Split(' ');
-                    try
+                    else if (input.StartsWith("/modify")) // ChannelID
                     {
-                        var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
-                        ConsoleWrapper.WriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                        string[] split = input.Split(' ');
+                        try
+                        {
+                            var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
+                            message.ModifyAsync(m => m.Content = split.Skip(3).Combine(" "));
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                    else
+                        ConsoleWrapper.WriteLine("I dont know that command.", ConsoleColor.Red);
                 }
-                else if (input.StartsWith("/modify")) // ChannelID
-                {
-                    string[] split = input.Split(' ');
-                    try
-                    {
-                        var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
-                        message.ModifyAsync(m => m.Content = split.Skip(3).Combine(" "));
-                    }
-                    catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
-                }
-                else
-                    ConsoleWrapper.WriteLine("I dont know that command.", ConsoleColor.Red);
+                catch { }
                 ConsoleWrapper.Write("$");
             }
         }

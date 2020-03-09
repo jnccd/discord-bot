@@ -63,7 +63,7 @@ namespace MEE7.Commands
             }
             string eventName = split[2];
             IUserMessage eventMessage = DiscordNETWrapper.SendText($"```fix\n{eventName} in *Please wait*```", message.Channel).Result[0];
-            Config.Data.timers.Add(new Tuple<string, ulong, ulong, DateTime>(split[2], message.Channel.Id, eventMessage.Id, DateTime.Parse(split[1])));
+            Config.Data.timers.Add(new Tuple<string, ulong, ulong, DateTime>(eventName, message.Channel.Id, eventMessage.Id, DateTime.Parse(split[1])));
         }
     }
 }

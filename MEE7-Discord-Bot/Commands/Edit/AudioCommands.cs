@@ -17,6 +17,12 @@ namespace MEE7.Commands
 {
     public class AudioCommands : EditCommandProvider
     {
+        public string SpeakDesc = "Plays audio in voicechat";
+        public void Speak(string text, SocketMessage m, string character = "GLaDOS")
+        {
+
+        }
+
         public string playAudioDesc = "Plays audio in voicechat";
         public void PlayAudio(WaveStream w, SocketMessage m)
         {
