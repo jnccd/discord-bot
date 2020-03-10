@@ -16,7 +16,7 @@ namespace MEE7
 {
     public class Play : Command
     {
-        public Play() : base("play", "Plays youtube videos", false)
+        public Play() : base("play", "Plays youtube videos in voice chats", false, false)
         {
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithTitle("Give it a YoutTube link and it'll ~~maybe~~ work.");

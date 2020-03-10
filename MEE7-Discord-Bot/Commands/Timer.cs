@@ -13,7 +13,7 @@ namespace MEE7.Commands
 {
     public class Timer : Command
     {
-        public Timer() : base("timer", "Posts a continually updated message that shows the time until some event", isExperimental: false, isHidden: true)
+        public Timer() : base("timer", "Posts a continually updated message that shows the time until some event", isExperimental: false, isHidden: false)
         {
             Task.Factory.StartNew(() =>
             {

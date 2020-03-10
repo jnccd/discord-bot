@@ -16,7 +16,7 @@ namespace MEE7.Commands
 {
     public class Profile : Command
     {
-        public Profile() : base("profile", "Prints your bot profile (GDPR‎-Style)", false)
+        public Profile() : base("profile", "Prints your bot profile (GDPR‎-Style)", false, false)
         {
 
         }
