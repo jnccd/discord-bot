@@ -18,7 +18,8 @@ namespace MEE7.Commands
 {
     public class AudioCommands : EditCommandProvider
     {
-        public string SpeakDesc = "Plays audio in voicechat";
+        public string SpeakDesc = "Let's a fictional character narrate the text you input using the fifteen.ai api. " +
+            "Working characters include GLaDOS, Twilight Sparkle, Fluttershy, The Narrator, Tenth Doctor, Sans. Default Voice is GLaDOS";
         public WaveStream Speak(string text, SocketMessage m, string character = "GLaDOS")
         {
             if (text.Contains('"') || character.Contains('"'))
@@ -26,8 +27,6 @@ namespace MEE7.Commands
 
             string payloadText = $"{{\"text\":\"{text}.\",\"character\":\"{character}\"}}";
             byte[] payload = Encoding.UTF8.GetBytes(payloadText);
-
-            DiscordNETWrapper.SendText("`Speak` works using the api from `fifteen.ai` C:", m.Channel).Wait();
 
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create("https://api.fifteen.ai/app/getAudioFile");
             req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
