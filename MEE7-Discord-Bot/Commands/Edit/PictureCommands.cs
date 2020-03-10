@@ -504,6 +504,7 @@ namespace MEE7.Commands
         public string transgroundDesc = "Make the background transparent";
         public Bitmap Transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
         {
+            Bitmap bRe = new Bitmap(b);
             Vector2 coords = BackgroundCoords;
             List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
 
@@ -520,7 +521,7 @@ namespace MEE7.Commands
                 return re;
             }
 
-            using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
+            using (UnsafeBitmapContext c = new UnsafeBitmapContext(bRe))
             {
                 Color backColor = c.GetPixel(OpenList[0].X, OpenList[0].Y);
 
@@ -542,7 +543,7 @@ namespace MEE7.Commands
                 }
             }
 
-            return b;
+            return bRe;
         }
 
 
