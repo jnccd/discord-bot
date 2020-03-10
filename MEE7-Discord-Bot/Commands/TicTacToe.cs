@@ -16,7 +16,7 @@ namespace MEE7.Commands
     {
         List<TicTacToeGame> Games = new List<TicTacToeGame>();
 
-        public TicTacToe() : base("tictactoe", "Play TicTacToe against random people!", false)
+        public TicTacToe() : base("tictactoe", "Play TicTacToe against random people!", false, false)
         {
 
         }

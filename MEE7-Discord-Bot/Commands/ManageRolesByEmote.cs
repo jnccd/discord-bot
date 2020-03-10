@@ -25,7 +25,7 @@ namespace MEE7.Commands
 
     public class ManageRolesByEmote : Command
     {
-        public ManageRolesByEmote() : base("sendRoleEmojiMessage", "", isExperimental: false, isHidden: true)
+        public ManageRolesByEmote() : base("sendRoleEmojiMessage", "", isExperimental: false, isHidden: false)
         {
             Program.OnEmojiReactionAdded += OnEmojiReactionAdded;
             Program.OnEmojiReactionRemoved += OnEmojiReactionRemoved; ;
