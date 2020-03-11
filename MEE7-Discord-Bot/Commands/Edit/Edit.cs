@@ -308,7 +308,7 @@ namespace MEE7.Commands
                 if (message.Attachments.Count > 0 && (message.Attachments.First().Url.EndsWith(".mp3") || message.Attachments.First().Url.EndsWith(".wav")))
                     commands[0] = $"thisA";
                 else if (pipeInput.EndsWith(".gif") || message.Attachments.Count > 0 && message.Attachments.First().Url.EndsWith(".gif"))
-                    commands[0] = $"thisG";
+                    commands[0] = $"thisG({pipeInput})";
                 else if (pipeInput.EndsWith(".png") || pipeInput.EndsWith(".jpg"))
                     commands[0] = $"thisP({pipeInput})";
                 else
