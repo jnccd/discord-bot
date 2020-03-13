@@ -507,8 +507,7 @@ namespace MEE7.Commands
         public string transgroundDesc = "Make the background transparent";
         public Bitmap Transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
         {
-            Bitmap bRe = new Bitmap(b);
-            b.Dispose();
+            Bitmap reB = new Bitmap(b);
             Vector2 coords = BackgroundCoords;
             List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
 
@@ -519,13 +518,13 @@ namespace MEE7.Commands
             {
                 List<Point> re = new List<Point>();
                 if (p.X > 0) re.Add(new Point(p.X - 1, p.Y));
-                if (p.X < bRe.Width - 1) re.Add(new Point(p.X + 1, p.Y));
+                if (p.X < reB.Width - 1) re.Add(new Point(p.X + 1, p.Y));
                 if (p.Y > 0) re.Add(new Point(p.X, p.Y - 1));
-                if (p.Y < bRe.Height - 1) re.Add(new Point(p.X, p.Y + 1));
+                if (p.Y < reB.Height - 1) re.Add(new Point(p.X, p.Y + 1));
                 return re;
             }
 
-            using (UnsafeBitmapContext c = new UnsafeBitmapContext(bRe))
+            using (UnsafeBitmapContext c = new UnsafeBitmapContext(reB))
             {
                 Color backColor = c.GetPixel(OpenList[0].X, OpenList[0].Y);
 
@@ -537,7 +536,7 @@ namespace MEE7.Commands
                     int dist; Color C;
                     foreach (Point p in getNeighbors(cur))
                     {
-                        if (c.GetRawPixel(p.X, p.Y).Alpha == byte.MaxValue &&
+                        if (c.GetPixel(p.X, p.Y).A == byte.MaxValue &&
                            (dist = (C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor).ReLU() / 3) < thereshold)
                         {
                             c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
@@ -547,7 +546,8 @@ namespace MEE7.Commands
                 }
             }
 
-            return bRe;
+            b.Dispose();
+            return reB;
         }
 
         public string transcropDesc = "Crop the transparency";
