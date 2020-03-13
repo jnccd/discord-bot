@@ -376,7 +376,7 @@ namespace MEE7.Commands
 
                         if (args.Length == 1 && args[0] == "") args = new string[0];
                         parsedArgs = new object[command.Arguments.Length];
-                        if (args.Length > parsedArgs.Length) args[parsedArgs.Length - 1] = args.Skip(parsedArgs.Length - 1).Combine(",");
+                        if (args.Length > parsedArgs.Length && parsedArgs.Length != 0) args[parsedArgs.Length - 1] = args.Skip(parsedArgs.Length - 1).Combine(",");
                         for (int i = 0; i < command.Arguments.Length; i++)
                             if (i < args.Length)
                             {
@@ -534,12 +534,7 @@ namespace MEE7.Commands
 
         static void PrintPipeOutput(object output, SocketMessage message)
         {
-            if (output == null)
-                throw new Exception("I can't print `null` :/");
-
-            //if (output is Bitmap[] && (output as Bitmap[]).Length > 50)
-            //    throw new Exception($"My Internet is too slow to upload gifs this long");
-
+            if (output == null) return;
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }

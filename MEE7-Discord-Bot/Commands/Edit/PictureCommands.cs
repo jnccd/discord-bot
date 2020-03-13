@@ -546,6 +546,34 @@ namespace MEE7.Commands
             return bRe;
         }
 
+        public string transcropDesc = "Crop the transparency";
+        public Bitmap Transcrop(Bitmap b, SocketMessage m, int thereshold = 10)
+        {
+            if (thereshold > byte.MaxValue)
+                thereshold = byte.MaxValue;
+
+            int X = 0, Y = 0, W = b.Width - 1, H = b.Height - 1;
+
+            using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
+            {
+                while (X < b.Width - 1 && Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(X, y)).Where(a => a.A > thereshold).Count() < 4)
+                    X++;
+                var de = Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(X, y)).Where(a => a.A < thereshold);
+                var bug = de.Count();
+
+                while (Y < b.Height - 1 && Enumerable.Range(0, b.Width - 1).Select(x => c.GetPixel(x, Y)).Where(a => a.A > thereshold).Count() < 4)
+                    Y++;
+
+                while (W > 0 && Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(W, y)).Where(a => a.A > thereshold).Count() < 4)
+                    W--;
+
+                while (H > 0 && Enumerable.Range(0, b.Width - 1).Select(x => c.GetPixel(x, H)).Where(a => a.A > thereshold).Count() < 4)
+                    H--;
+            }
+
+            return b.CropImage(new Rectangle(X, Y, W - X, H - Y));
+        }
+
 
         enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
         static readonly object memifyLock = new object();
