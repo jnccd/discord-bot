@@ -498,6 +498,9 @@ namespace MEE7.Commands
         public string getDesc = "Get single picture from a gif";
         public Bitmap get(Bitmap[] bs, SocketMessage m, int index = 0)
         {
+            for (int i = 0; i < bs.Length; i++)
+                if (i != index)
+                    bs[i].Dispose();
             return bs[index];
         }
 
@@ -505,6 +508,7 @@ namespace MEE7.Commands
         public Bitmap Transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
         {
             Bitmap bRe = new Bitmap(b);
+            b.Dispose();
             Vector2 coords = BackgroundCoords;
             List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
 
@@ -515,9 +519,9 @@ namespace MEE7.Commands
             {
                 List<Point> re = new List<Point>();
                 if (p.X > 0) re.Add(new Point(p.X - 1, p.Y));
-                if (p.X < b.Width - 1) re.Add(new Point(p.X + 1, p.Y));
+                if (p.X < bRe.Width - 1) re.Add(new Point(p.X + 1, p.Y));
                 if (p.Y > 0) re.Add(new Point(p.X, p.Y - 1));
-                if (p.Y < b.Height - 1) re.Add(new Point(p.X, p.Y + 1));
+                if (p.Y < bRe.Height - 1) re.Add(new Point(p.X, p.Y + 1));
                 return re;
             }
 
@@ -571,7 +575,9 @@ namespace MEE7.Commands
                     H--;
             }
 
-            return b.CropImage(new Rectangle(X, Y, W - X, H - Y));
+            Bitmap re = b.CropImage(new Rectangle(X, Y, W - X, H - Y));
+            b.Dispose();
+            return re;
         }
 
 
