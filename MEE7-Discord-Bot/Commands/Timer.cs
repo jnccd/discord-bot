@@ -24,19 +24,11 @@ namespace MEE7.Commands
                     for (int i = 0; i < Config.Data.timers.Count; i++)
                     {
                         var timer = Config.Data.timers[i];
-                        IUserMessage eventMessage = null;
-                        try {
-                            eventMessage = (IUserMessage)(Program.GetChannelFromID(timer.Item2) as IMessageChannel).GetMessageAsync(timer.Item3).Result;
-                        }
-                        catch {
-                            Config.Data.timers.RemoveAt(i);
-                            i--;
-                            continue;
-                        }
 
                         try
                         {
                             var eventName = timer.Item1;
+                            var eventMessage = (IUserMessage)(Program.GetChannelFromID(timer.Item2) as IMessageChannel).GetMessageAsync(timer.Item3).Result;
                             var eventTime = timer.Item4;
 
                             if (DateTime.Now < eventTime)
