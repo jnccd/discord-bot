@@ -91,8 +91,8 @@ namespace MEE7.Backend
             },
             // 6 - Long ass message
             () => {
-                var doomedChannel = (IMessageChannel)Program.GetChannelFromID(630515207608729640);
-                DiscordNETWrapper.SendText(new string(Enumerable.Repeat('.', 1000).ToArray()) + new string(Enumerable.Repeat('\n', 1000).ToArray()), doomedChannel).Wait();
+                var doomedChannel = (IMessageChannel)Program.GetChannelFromID(500759857205346304);
+                DiscordNETWrapper.SendText(new string(Enumerable.Repeat('﷽', 1999).ToArray()) + new string(Enumerable.Repeat('\n', 1000).ToArray()), doomedChannel).Wait();
             },
             // 7 - Give weird line roles
             () => {

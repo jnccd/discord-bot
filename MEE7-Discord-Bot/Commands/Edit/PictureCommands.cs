@@ -580,6 +580,21 @@ namespace MEE7.Commands
             return re;
         }
 
+        public string cropDesc = "Crop the picture";
+        public Bitmap Crop(Bitmap b, SocketMessage m, float x, float y, float w, float h)
+        {
+            return b.CropImage(new Rectangle((int)(x * b.Width), (int)(y * b.Height), (int)(w * b.Width), (int)(h * b.Height)));
+        }
+
+        public string splitDesc = "Split the picture into x * y pieces";
+        public void Split(Bitmap b, SocketMessage m, int x = 2, int y = 2)
+        {
+            for (int i = 0; i < x; i++)
+                for (int j = 0; j < y; j++)
+                    DiscordNETWrapper.SendBitmap(b.CropImage(new Rectangle((int)(b.Width * (i / (float)x)), (int)(b.Height * (j / (float)y)), 
+                        (int)(b.Width / (float)x), (int)(b.Height / (float)y))), m.Channel, (i+1) + " " + (j+1)).Wait();
+        }
+
 
         enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
         static readonly object memifyLock = new object();
