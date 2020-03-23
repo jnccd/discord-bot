@@ -54,13 +54,13 @@ namespace MEE7.Commands
         }
 
         public string thisPDesc = "Gets attached picture / picture from url argument";
-        public Bitmap ThisP(Null n, SocketMessage m, string PictureURL)
+        public Bitmap ThisP(Null n, SocketMessage m, string PictureURL = "")
         {
             return GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
         }
 
         public string thisGDesc = "Gets attached gif / gif from url argument";
-        public Bitmap[] ThisG(Null n, SocketMessage m, string GifURL)
+        public Bitmap[] ThisG(Null n, SocketMessage m, string GifURL = "")
         {
             return GetPictureLinkFromMessage(m, GifURL).GetBitmapsFromGIFURL();
         }
