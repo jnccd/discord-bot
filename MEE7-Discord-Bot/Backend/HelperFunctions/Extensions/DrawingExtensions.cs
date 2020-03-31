@@ -8,12 +8,15 @@ namespace MEE7.Backend.HelperFunctions.Extensions
 {
     public static class DrawingExtensions
     {
-        public static Bitmap CropImage(this Bitmap source, Rectangle section)
+        public static Bitmap CropImage(this Bitmap source, Rectangle section, bool dispose = true)
         {
             Bitmap bmp = new Bitmap(section.Width, section.Height);
 
             using (Graphics g = Graphics.FromImage(bmp))
                 g.DrawImage(source, 0, 0, section, GraphicsUnit.Pixel);
+
+            if (dispose)
+                source.Dispose();
 
             return bmp;
         }

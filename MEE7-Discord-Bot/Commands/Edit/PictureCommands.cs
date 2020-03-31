@@ -576,7 +576,6 @@ namespace MEE7.Commands
             }
 
             Bitmap re = b.CropImage(new Rectangle(X, Y, W - X, H - Y));
-            b.Dispose();
             return re;
         }
 
@@ -592,7 +591,9 @@ namespace MEE7.Commands
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
                     DiscordNETWrapper.SendBitmap(b.CropImage(new Rectangle((int)(b.Width * (i / (float)x)), (int)(b.Height * (j / (float)y)), 
-                        (int)(b.Width / (float)x), (int)(b.Height / (float)y))), m.Channel, (i+1) + " " + (j+1)).Wait();
+                        (int)(b.Width / (float)x), (int)(b.Height / (float)y)), false), m.Channel, (i+1) + " " + (j+1)).Wait();
+
+            b.Dispose();
         }
 
         public string rotateWholeDesc = "Rotate the image including the bounds";
@@ -629,6 +630,12 @@ namespace MEE7.Commands
             return (Bitmap)b.CropImage(new Rectangle(
                 (int)upperLeft.X, (int)upperLeft.Y, (int)lowerRight.X - (int)upperLeft.X, (int)lowerRight.Y - (int)upperLeft.Y)).
                 Stretch(new Size((int)bSize.X, (int)bSize.Y));
+        }
+
+        public string stretchDesc = "Stretch the Image";
+        public Bitmap Stretch(Bitmap b, SocketMessage m, int w, int h)
+        {
+            return (Bitmap)b.Stretch(new Size(w, h));
         }
 
 

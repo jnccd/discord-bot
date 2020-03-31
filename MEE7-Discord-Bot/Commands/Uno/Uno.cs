@@ -288,34 +288,34 @@ namespace MEE7.Commands
                 int X = (int)(cardWidth * (ToNumber(t) - 1));
                 int YNumber = c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1)));
                 int Y = (int)(cardHeight * YNumber);
-                return CardsTexture.CropImage(new Rectangle(X, Y, CutOutWidth, CutOutHeight));
+                return CardsTexture.CropImage(new Rectangle(X, Y, CutOutWidth, CutOutHeight), false);
             }
             else
             {
                 if (t == UnoCardType.changecolor)
-                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(0 * cardHeight), CutOutWidth, CutOutHeight));
+                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(0 * cardHeight), CutOutWidth, CutOutHeight), false);
                 else if (t == UnoCardType.plus4)
-                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(2 * cardHeight), CutOutWidth, CutOutHeight));
+                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(2 * cardHeight), CutOutWidth, CutOutHeight), false);
                 else if (t == UnoCardType.skip)
                 {
                     int XNumber = c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1)));
-                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                 }
                 else if (t == UnoCardType.plus2)
                 {
                     int XNumber = 4 + (c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1))));
-                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                 }
                 else if (t == UnoCardType.reverse)
                 {
                     if (c == UnoColor.red)
-                        return CardsTexture.CropImage(new Rectangle((int)(8 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                        return CardsTexture.CropImage(new Rectangle((int)(8 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                     else if (c == UnoColor.yellow)
-                        return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight));
+                        return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                     else if (c == UnoColor.blue)
-                        return CardsTexture.CropImage(new Rectangle((int)(0 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight));
+                        return CardsTexture.CropImage(new Rectangle((int)(0 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight), false);
                     else if (c == UnoColor.green)
-                        return CardsTexture.CropImage(new Rectangle((int)(1 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight));
+                        return CardsTexture.CropImage(new Rectangle((int)(1 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight), false);
                 }
             }
             return null;
