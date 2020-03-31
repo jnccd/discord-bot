@@ -612,9 +612,23 @@ namespace MEE7.Commands
             if (x)
                 b.RotateFlip(RotateFlipType.RotateNoneFlipX);
             else
-                b.RotateFlip(RotateFlipType.Rotate180FlipY);
+                b.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
             return b;
+        }
+
+        public string zoomDesc = "Zoom to a certain point";
+        public Bitmap Zoom(Bitmap b, SocketMessage m, Vector2 point, float zoomLevel)
+        {
+            Vector2 bSize = new Vector2(b.Width, b.Height);
+            point = point * bSize;
+
+            Vector2 upperLeft = point * zoomLevel;
+            Vector2 lowerRight = bSize + (point - bSize) * zoomLevel;
+
+            return (Bitmap)b.CropImage(new Rectangle(
+                (int)upperLeft.X, (int)upperLeft.Y, (int)lowerRight.X - (int)upperLeft.X, (int)lowerRight.Y - (int)upperLeft.Y)).
+                Stretch(new Size((int)bSize.X, (int)bSize.Y));
         }
 
 
