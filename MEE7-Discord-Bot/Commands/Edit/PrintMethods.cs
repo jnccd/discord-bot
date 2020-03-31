@@ -3,11 +3,13 @@ using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using MEE7.Backend.HelperFunctions.Extensions;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace MEE7.Commands
@@ -36,9 +38,11 @@ namespace MEE7.Commands
                 using (MemoryStream s = new MemoryStream())
                 {
                     Bitmap[] bs = o as Bitmap[];
+                    int maxWidth = bs.Select(x => x.Width).Max();
+                    int maxHeight = bs.Select(x => x.Height).Max();
                     using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
                         foreach (Bitmap b in bs)
-                            c.AddFrame(b, -1, GifQuality.Bit8);
+                            c.AddFrame(b.CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), -1, GifQuality.Bit8);
 
                     DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
 
