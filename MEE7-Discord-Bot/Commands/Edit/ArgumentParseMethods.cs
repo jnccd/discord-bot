@@ -15,7 +15,7 @@ namespace MEE7.Commands
         static readonly ArgumentParseMethod[] ArgumentParseMethods = new ArgumentParseMethod[]
         {
             new ArgumentParseMethod(typeof(string), (SocketMessage m, string s) => s),
-            new ArgumentParseMethod(typeof(bool), (SocketMessage m, string s) => { if (s.ToLower() == "true") return true; else return false; }),
+            new ArgumentParseMethod(typeof(bool), (SocketMessage m, string s) => { if (s.ToLower() == "true" || s == "1") return true; else return false; }),
             new ArgumentParseMethod(typeof(int), (SocketMessage m, string s) => (int)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(long), (SocketMessage m, string s) => (long)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(ulong), (SocketMessage m, string s) => Convert.ToUInt64(s)),

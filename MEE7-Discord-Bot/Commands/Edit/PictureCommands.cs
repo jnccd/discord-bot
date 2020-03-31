@@ -595,6 +595,28 @@ namespace MEE7.Commands
                         (int)(b.Width / (float)x), (int)(b.Height / (float)y))), m.Channel, (i+1) + " " + (j+1)).Wait();
         }
 
+        public string rotateWholeDesc = "Rotate the image including the bounds";
+        public Bitmap RotateWhole(Bitmap b, SocketMessage m, bool left = true)
+        {
+            if (left)
+                b.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            else
+                b.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+            return b;
+        }
+
+        public string flipDesc = "Rotate the image including the bounds";
+        public Bitmap Flip(Bitmap b, SocketMessage m, bool x = true)
+        {
+            if (x)
+                b.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            else
+                b.RotateFlip(RotateFlipType.Rotate180FlipY);
+
+            return b;
+        }
+
 
         enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
         static readonly object memifyLock = new object();
