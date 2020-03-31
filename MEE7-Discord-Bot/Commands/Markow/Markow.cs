@@ -80,11 +80,15 @@ namespace MEE7.Commands
         }
         public void OnNonCommandMessageRecieved(IMessage message)
         {
-            IEnumerable<IMessage> messages = message.Channel.GetMessagesAsync(2).FlattenAsync().Result;
-            if (messages.Count() == 2)
-                MarkovHelper.AddToDict(messages.ElementAt(1).Content, message.Content);
-            else
-                MarkovHelper.AddToDict(message.Content);
+            try
+            {
+                IEnumerable<IMessage> messages = message.Channel.GetMessagesAsync(2).FlattenAsync().Result;
+                if (messages.Count() == 2)
+                    MarkovHelper.AddToDict(messages.ElementAt(1).Content, message.Content);
+                else
+                    MarkovHelper.AddToDict(message.Content);
+            }
+            catch { }
         }
         public void OnExit()
         {

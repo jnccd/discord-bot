@@ -632,7 +632,6 @@ namespace MEE7.Commands
         }
 
 
-        enum TransformMode { Expand, Stir, Fall, Wubble, Cya, Inpand }
         static readonly object memifyLock = new object();
 
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
