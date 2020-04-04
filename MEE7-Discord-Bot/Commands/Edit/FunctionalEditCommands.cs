@@ -42,7 +42,7 @@ namespace MEE7.Commands
         public Vector2 NewVector(Null n, SocketMessage m, double a, double b) => new Vector2((float)a, (float)b);
 
         public string ForFuncDesc = "foori foori";
-        public a[] ForFunc<a>(a o, SocketMessage m, string varName, float startValue, float endValue, float stepWidth, string pipe)
+        public a[] ForFunc<a>(a o, SocketMessage m, string pipe, string varName, float startValue, float endValue, float stepWidth)
         {
             List<a> results = new List<a>();
 
@@ -50,6 +50,22 @@ namespace MEE7.Commands
                 results.Add((a)Pipe.Parse(m, pipe.Replace("%" + varName, f.ToString().Replace(",", "."))).Apply(m, o));
             
             return results.ToArray();
+        }
+
+        public string MapDesc = "'tis map from haskel, your favorite language";
+        public a[] Map<a>(a[] os, SocketMessage m, string pipe)
+        {
+            var parsedPipe = Pipe.Parse(m, pipe);
+            return os.Select(x => (a)parsedPipe.Apply(m, x)).ToArray();
+        }
+
+        public string MapGDesc = "Map for gifs, because gifs are special now";
+        public Gif MapG<a>(Gif gif, SocketMessage m, string pipe, string varName = "i", float startValue = 0, float endValue = int.MinValue)
+        {
+            if (endValue == int.MinValue) endValue = gif.Item1.Length;
+            for (int i = 0; i < gif.Item1.Length; i++)
+                gif.Item1[i] = (Bitmap)Pipe.Parse(m, pipe.Replace("%" + varName, ((i / (float)gif.Item1.Length) * endValue).ToString().Replace(",", "."))).Apply(m, gif.Item1[i]);
+            return gif;
         }
     }
 }

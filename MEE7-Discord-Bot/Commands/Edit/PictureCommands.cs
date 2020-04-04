@@ -640,6 +640,35 @@ namespace MEE7.Commands
             return (Bitmap)b.Stretch(new Size(w, h));
         }
 
+        public string toGifDesc = "Converts a bitmap array to a gif";
+        public Gif toGif(Bitmap[] input, SocketMessage m)
+        {
+            return new Gif(input, Enumerable.Repeat(33, input.Length).ToArray());
+        }
+
+        public string toBitmapArrayDesc = "Converts a gif to a bitmap array";
+        public Bitmap[] toBitmapArray(Gif input, SocketMessage m)
+        {
+            return input.Item1;
+        }
+
+        public string ChangeSpeedDesc = "Change the gifs playback speed";
+        public Gif ChangeSpeed(Gif gif, SocketMessage m, float multiplier)
+        {
+            return new Gif(gif.Item1, gif.Item2.Select(x => (int)(x * multiplier)).ToArray());
+        }
+
+        public string MultiplyFramesDesc = "Copy each frame x times";
+        public Gif MultiplyFrames(Gif gif, SocketMessage m, int x)
+        {
+            List<Bitmap> re = new List<Bitmap>();
+            foreach (Bitmap b in gif.Item1)
+                for (int i = 0; i < x; i++)
+                    re.Add(b);
+
+            return new Gif(re.ToArray(), gif.Item2.Select(y => y / x > 0 ? y / x : 1).ToArray());
+        }
+
 
         static readonly object memifyLock = new object();
 
