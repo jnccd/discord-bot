@@ -62,7 +62,7 @@ namespace MEE7.Commands
         public string thisGDesc = "Gets attached gif / gif from url argument";
         public Gif ThisG(Null n, SocketMessage m, string GifURL = "")
         {
-            return (Gif)GetPictureLinkFromMessage(m, GifURL).GetBitmapsAndTimingsFromGIFURL();
+            return GetPictureLinkFromMessage(m, GifURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string thisADesc = "Gets mp3 or wav audio files attached to this message";
@@ -96,7 +96,7 @@ namespace MEE7.Commands
         {
             SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
             string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
-            return (Gif)(string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
+            return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string serverPictureDesc = "Gets the server picture from a server id";
