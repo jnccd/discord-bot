@@ -60,9 +60,9 @@ namespace MEE7.Commands
         }
 
         public string thisGDesc = "Gets attached gif / gif from url argument";
-        public Bitmap[] ThisG(Null n, SocketMessage m, string GifURL = "")
+        public Gif ThisG(Null n, SocketMessage m, string GifURL = "")
         {
-            return GetPictureLinkFromMessage(m, GifURL).GetBitmapsFromGIFURL();
+            return (Gif)GetPictureLinkFromMessage(m, GifURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string thisADesc = "Gets mp3 or wav audio files attached to this message";
@@ -92,11 +92,11 @@ namespace MEE7.Commands
         }
 
         public string profilePictureGDesc = "Gets a profile picture gif";
-        public Bitmap[] ProfilePictureG(Null n, SocketMessage m, string UserIDorMention)
+        public Gif ProfilePictureG(Null n, SocketMessage m, string UserIDorMention)
         {
             SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
             string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
-            return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsFromGIFURL();
+            return (Gif)(string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string serverPictureDesc = "Gets the server picture from a server id";
@@ -119,13 +119,13 @@ namespace MEE7.Commands
         }
 
         public string emoteGDesc = "Gets the pictures of the emote";
-        public Bitmap[] EmoteG(Null n, SocketMessage m, string emote)
+        public Gif EmoteG(Null n, SocketMessage m, string emote)
         {
             Discord.Emote.TryParse(emote.Trim(' '), out Emote res);
-            if (res != null) return res.Url.GetBitmapsFromGIFURL();
-            return Program.GetGuildFromChannel(m.Channel).Emotes.
+            if (res != null) return(Gif)res.Url.GetBitmapsAndTimingsFromGIFURL();
+            return (Gif)Program.GetGuildFromChannel(m.Channel).Emotes.
                 FirstOrDefault(x => x.Name.Contains(emote.Trim(' ', ':')) && x.Animated).Url.
-                GetBitmapsFromGIFURL();
+                GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string mandelbrotDesc = "Render a mandelbrot";
@@ -166,7 +166,7 @@ namespace MEE7.Commands
         }
 
         public string turingDrawingDesc = "[WIP] Creates a random turing machine which operates on looped 2D tape";
-        public Bitmap[] TuringDrawing(Null n, SocketMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
+        public Gif TuringDrawing(Null n, SocketMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
         {
             int states = NumStates;
             int symbols = NumSymbols;
@@ -237,7 +237,7 @@ namespace MEE7.Commands
                             c.SetPixel(x, y, TuringColors[curTape[x, y]]);
             }
 
-            return re;
+            return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
         }
 
         public string audioFromYTDesc = "Gets the mp3 of an youtube video";

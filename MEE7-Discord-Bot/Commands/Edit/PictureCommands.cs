@@ -14,6 +14,7 @@ using MEE7.Backend.HelperFunctions;
 using System.Drawing.Imaging;
 using System.Web;
 using System.Net;
+using static MEE7.Commands.Edit;
 
 namespace MEE7.Commands
 {
@@ -382,7 +383,7 @@ namespace MEE7.Commands
         }
 
         public string rainbowDesc = "I'll try spinning colors that's a good trick";
-        public Bitmap[] Rainbow(Bitmap b, SocketMessage m)
+        public Gif Rainbow(Bitmap b, SocketMessage m)
         {
             Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
             int[,] Alphas = new int[b.Width, b.Height];
@@ -413,11 +414,11 @@ namespace MEE7.Commands
                         }
             }
 
-            return re;
+            return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
         }
 
         public string spinToWinDesc = "I'll try spinning that's a good trick";
-        public Bitmap[] SpinToWin(Bitmap b, SocketMessage m)
+        public Gif SpinToWin(Bitmap b, SocketMessage m)
         {
             Vector2 middle = new Vector2(b.Width / 2, b.Height / 2);
 
@@ -427,7 +428,7 @@ namespace MEE7.Commands
             for (int i = 0; i < steps; i++)
                 re[i] = b.RotateImage(-stepWidth * i, middle);
 
-            return re;
+            return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
         }
 
         public string chromaticAbberationDesc = "Shifts the color spaces";
@@ -490,18 +491,19 @@ namespace MEE7.Commands
 
         public string backAndForthDesc = "Make the gif go backward after it went forward and " +
                 "then it goes forward again because it loops and its all very fancy n stuff";
-        public Bitmap[] BackAndForth(Bitmap[] bs, SocketMessage m)
+        public Gif BackAndForth(Gif gif, SocketMessage m)
         {
-            return bs.Concat(bs.Skip(1).Reverse()).ToArray();
+            return new Gif(gif.Item1.Concat(gif.Item1.Skip(1).Reverse()).ToArray(), 
+                           gif.Item2.Concat(gif.Item2.Skip(1).Reverse()).ToArray());
         }
 
         public string getDesc = "Get single picture from a gif";
-        public Bitmap get(Bitmap[] bs, SocketMessage m, int index = 0)
+        public Bitmap get(Gif gif, SocketMessage m, int index = 0)
         {
-            for (int i = 0; i < bs.Length; i++)
+            for (int i = 0; i < gif.Item1.Length; i++)
                 if (i != index)
-                    bs[i].Dispose();
-            return bs[index];
+                    gif.Item1[i].Dispose();
+            return gif.Item1[index];
         }
 
         public string transgroundDesc = "Make the background transparent";
