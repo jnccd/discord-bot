@@ -41,7 +41,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
         }
         public static string ToReadableString(this Type type)
         {
-            return "`" + type.ToString().Split('.').Last() + "`";
+            return "`" + type.ToString().Split('.', '+').Last() + "`";
         }
         public static byte[] ToArray(this Stream stream)
         {
