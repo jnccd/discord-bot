@@ -51,6 +51,23 @@ namespace MEE7.Commands
                 }
 
             }),
+            new PrintMethod(typeof(Gif), (SocketMessage m, object o) => {
+                using (MemoryStream s = new MemoryStream())
+                {
+                    Gif gif = o as Gif;
+                    int maxWidth = gif.Item1.Select(x => x.Width).Max();
+                    int maxHeight = gif.Item1.Select(x => x.Height).Max();
+                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
+                        for (int i = 0; i < gif.Item1.Length; i++)
+                            c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
+
+                    DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
+
+                    foreach (Bitmap b in gif.Item1)
+                        b.Dispose();
+                }
+
+            }),
             new PrintMethod(typeof(WaveStream), (SocketMessage m, object o) => {
                 Stream s = new MemoryStream();
                 WaveFileWriter.WriteWavFileToStream(s, o as WaveStream);
