@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MEE7.Backend.HelperFunctions
@@ -128,6 +129,25 @@ namespace MEE7.Backend.HelperFunctions
                 e.WithAuthor(Author);
             e.WithThumbnailUrl(ThumbnailURL);
             return e;
+        }
+
+        public static IEnumerable<IUserMessage> EnumerateMessages(IMessageChannel channel)
+        {
+            ulong lastMessageID = 0;
+            IEnumerable<IUserMessage> messages;
+
+            while (true)
+            {
+                if (lastMessageID == 0)
+                    messages = channel.GetMessagesAsync().FlattenAsync().Result.OfType<IUserMessage>();
+                else
+                    messages = channel.GetMessagesAsync(lastMessageID, Direction.Before, 100).FlattenAsync().Result.OfType<IUserMessage>();
+                
+                foreach (var message in messages)
+                    yield return message;
+
+                lastMessageID = messages.Last().Id;
+            }
         }
     }
 }

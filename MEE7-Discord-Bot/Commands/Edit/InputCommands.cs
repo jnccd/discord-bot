@@ -26,25 +26,36 @@ namespace MEE7.Commands
         public string lastTDesc = "Gets the last messages text";
         public string LastT(Null n, SocketMessage m)
         {
-            return m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last().Content;
+            var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1);
+            foreach (var lm in messages)
+                if (!string.IsNullOrWhiteSpace(lm.Content))
+                    try { return lm.Content; }
+                    catch { }
+            throw new Exception("Didn't find any");
         }
 
         public string lastPDesc = "Gets the last messages picture";
         public Bitmap LastP(Null n, SocketMessage m)
         {
-            IMessage lm = m.Channel.GetMessagesAsync(2).FlattenAsync().Result.Last();
-            string pic = null;
-            if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
-            {
-                if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                    pic = lm.Attachments.ElementAt(0).Url;
-                else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                    pic = lm.Attachments.ElementAt(0).Url;
-            }
-            string picLink = lm.Content.GetPictureLinkInMessage();
-            if (string.IsNullOrWhiteSpace(pic) && picLink != null)
-                pic = picLink;
-            return pic.GetBitmapFromURL();
+            var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1);
+            foreach (var lm in messages)
+                try
+                {
+                    string pic = null;
+                    if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
+                    {
+                        if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png"))
+                            pic = lm.Attachments.ElementAt(0).Url;
+                        else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
+                            pic = lm.Attachments.ElementAt(0).Url;
+                    }
+                    string picLink = lm.Content.GetPictureLinkInMessage();
+                    if (string.IsNullOrWhiteSpace(pic) && picLink != null)
+                        pic = picLink;
+                    return pic.GetBitmapFromURL();
+                }
+                catch { }
+            throw new Exception("Didn't find any");
         }
 
         public string thisTDesc = "Outputs the given text";
