@@ -228,13 +228,13 @@ namespace MEE7.Commands
                 AddToHelpmenu(t.Name, curCommands.ToArray());
             }
         }
-        void AddToHelpmenu(string Name, EditCommand[] editCommands)
-        {
-            string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**" +
+        string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**" +
                   $"({c.Arguments.Select(x => $"{x.Name} : {x.Type.ToReadableString()}").Combine(", ")}): " +
                   $"`{(c.InputType == null ? "_" : c.InputType.ToReadableString())}` -> " +
                   $"`{(c.OutputType == null ? "_" : c.OutputType.ToReadableString())}`" +
                 $"";
+        void AddToHelpmenu(string Name, EditCommand[] editCommands)
+        {
             if (editCommands.Length > 0)
             {
                 int maxlength = editCommands.
@@ -249,8 +249,25 @@ namespace MEE7.Commands
         }
         public override void Execute(SocketMessage message)
         {
-            if (message.Content.Length <= PrefixAndCommand.Length + 1)
+            var split = message.Content.Split(' ');
+            if (split.Length <= 1)
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
+            else if (split[1] == "help")
+            {
+                EditCommand command;
+                if (split.Length == 2)
+                    DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
+                else if ((command = Commands.FirstOrDefault(x => x.Command.ToLower() == split[2].ToLower())) != null)
+                    DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder($"**{command.Command}**",
+                        $"{command.Desc}\n{CommandToCommandTypeString(command)}"), message.Channel).Wait();
+            }
+            else if (split[1] == "search" && split.Length == 3)
+            {
+                var hits = Commands.OrderBy(x => x.Command.LevenshteinDistance(split[2]));
+                var top3 = hits.Take(3).ToArray();
+                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder("Search hits:", top3.Length == 0 ? "-" : 
+                    top3.Select(x => $"{Array.IndexOf(top3, x) + 1}. {x.Command}\n{x.Desc}\n{CommandToCommandTypeString(x)}").Combine("\n\n")), message.Channel).Wait();
+            }
             else
             {
                 try

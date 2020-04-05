@@ -507,14 +507,14 @@ namespace MEE7.Commands
         }
 
         public string transgroundDesc = "Make the background transparent";
-        public Bitmap Transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int thereshold = 10)
+        public Bitmap Transground(Bitmap b, SocketMessage m, Vector2 BackgroundCoords = new Vector2(), int threshold = 10)
         {
             Bitmap reB = new Bitmap(b);
             Vector2 coords = BackgroundCoords;
             List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
 
-            if (thereshold > byte.MaxValue - 1)
-                thereshold = byte.MaxValue - 1;
+            if (threshold > byte.MaxValue - 1)
+                threshold = byte.MaxValue - 1;
 
             List<Point> getNeighbors(Point p)
             {
@@ -539,7 +539,7 @@ namespace MEE7.Commands
                     foreach (Point p in getNeighbors(cur))
                     {
                         if (c.GetPixel(p.X, p.Y).A == byte.MaxValue &&
-                           (dist = (C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor).ReLU() / 3) < thereshold)
+                           (dist = (C = c.GetPixel(p.X, p.Y)).GetColorDist(backColor).ReLU() / 3) < threshold)
                         {
                             c.SetPixel(p.X, p.Y, Color.FromArgb(dist > 255 ? 255 : dist, C.R, C.G, C.B));
                             OpenList.Add(p);
@@ -553,27 +553,27 @@ namespace MEE7.Commands
         }
 
         public string transcropDesc = "Crop the transparency";
-        public Bitmap Transcrop(Bitmap b, SocketMessage m, int thereshold = 10)
+        public Bitmap Transcrop(Bitmap b, SocketMessage m, int threshold = 10)
         {
-            if (thereshold > byte.MaxValue)
-                thereshold = byte.MaxValue;
+            if (threshold > byte.MaxValue)
+                threshold = byte.MaxValue;
 
             int X = 0, Y = 0, W = b.Width - 1, H = b.Height - 1;
 
             using (UnsafeBitmapContext c = new UnsafeBitmapContext(b))
             {
-                while (X < b.Width - 1 && Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(X, y)).Where(a => a.A > thereshold).Count() < 4)
+                while (X < b.Width - 1 && Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(X, y)).Where(a => a.A > threshold).Count() < 4)
                     X++;
-                var de = Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(X, y)).Where(a => a.A < thereshold);
+                var de = Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(X, y)).Where(a => a.A < threshold);
                 var bug = de.Count();
 
-                while (Y < b.Height - 1 && Enumerable.Range(0, b.Width - 1).Select(x => c.GetPixel(x, Y)).Where(a => a.A > thereshold).Count() < 4)
+                while (Y < b.Height - 1 && Enumerable.Range(0, b.Width - 1).Select(x => c.GetPixel(x, Y)).Where(a => a.A > threshold).Count() < 4)
                     Y++;
 
-                while (W > 0 && Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(W, y)).Where(a => a.A > thereshold).Count() < 4)
+                while (W > 0 && Enumerable.Range(0, b.Height - 1).Select(y => c.GetPixel(W, y)).Where(a => a.A > threshold).Count() < 4)
                     W--;
 
-                while (H > 0 && Enumerable.Range(0, b.Width - 1).Select(x => c.GetPixel(x, H)).Where(a => a.A > thereshold).Count() < 4)
+                while (H > 0 && Enumerable.Range(0, b.Width - 1).Select(x => c.GetPixel(x, H)).Where(a => a.A > threshold).Count() < 4)
                     H--;
             }
 
