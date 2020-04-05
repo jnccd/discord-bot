@@ -521,8 +521,8 @@ namespace MEE7.Commands
                         currentData = array;
                     }
                 }
-                catch (Exception e) { throw new Exception($"[{p.Item2.Command}] {e.Message} " + 
-                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}"); }
+                catch (Exception e) { throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} " + 
+                    $"{e.InnerException.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}"); }
 
                 if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) && 
                     !p.Item2.OutputType.ContainsGenericParameters)
