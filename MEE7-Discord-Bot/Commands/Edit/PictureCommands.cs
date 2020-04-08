@@ -15,6 +15,7 @@ using System.Drawing.Imaging;
 using System.Web;
 using System.Net;
 using static MEE7.Commands.Edit;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace MEE7.Commands
 {
@@ -493,7 +494,7 @@ namespace MEE7.Commands
                 "then it goes forward again because it loops and its all very fancy n stuff";
         public Gif BackAndForth(Gif gif, SocketMessage m)
         {
-            return new Gif(gif.Item1.Concat(gif.Item1.Skip(1).Reverse()).ToArray(), 
+            return new Gif(gif.Item1.Concat(gif.Item1.Skip(1).Reverse().Select(x => (Bitmap)x.Clone())).ToArray(), 
                            gif.Item2.Concat(gif.Item2.Skip(1).Reverse()).ToArray());
         }
 
@@ -609,7 +610,7 @@ namespace MEE7.Commands
             return b;
         }
 
-        public string flipDesc = "Rotate the image including the bounds";
+        public string flipDesc = "Flip the image";
         public Bitmap Flip(Bitmap b, SocketMessage m, bool x = true)
         {
             if (x)
@@ -620,7 +621,7 @@ namespace MEE7.Commands
             return b;
         }
 
-        public string zoomDesc = "Zoom to a certain point";
+        public string zoomDesc = "Zoom to a certain point, zoomlevel should be between 1 and 0";
         public Bitmap Zoom(Bitmap b, SocketMessage m, Vector2 point, float zoomLevel)
         {
             Vector2 bSize = new Vector2(b.Width, b.Height);
@@ -658,6 +659,12 @@ namespace MEE7.Commands
             return new Gif(gif.Item1, gif.Item2.Select(x => (int)(x * multiplier)).ToArray());
         }
 
+        public string SetDelayDesc = "Change the gifs playback speed";
+        public Gif SetDelay(Gif gif, SocketMessage m, int delay)
+        {
+            return new Gif(gif.Item1, gif.Item2.Select(x => delay).ToArray());
+        }
+
         public string MultiplyFramesDesc = "Copy each frame x times";
         public Gif MultiplyFrames(Gif gif, SocketMessage m, int x)
         {
@@ -667,6 +674,28 @@ namespace MEE7.Commands
                     re.Add(b);
 
             return new Gif(re.ToArray(), gif.Item2.Select(y => y / x > 0 ? y / x : 1).ToArray());
+        }
+
+        public string renderHTMLDesc = "Render HTML";
+        public Bitmap RenderHTML(string html, SocketMessage m)
+        {
+            return html.ConvertHtmlToImage();
+        }
+
+        public string getHTMLFromWebsiteDesc = "Get the websites html";
+        public string GetHTMLFromWebsite(string url, SocketMessage m)
+        {
+            return url.GetHTMLfromURL();
+        }
+
+        public string getSizeDesc = "Get the size in byte of an image";
+        public long GetSize(Bitmap b, SocketMessage m)
+        {
+            using (var ms = new MemoryStream())
+            {
+                b.Save(ms, ImageFormat.Png);
+                return ms.Length;
+            }
         }
 
 

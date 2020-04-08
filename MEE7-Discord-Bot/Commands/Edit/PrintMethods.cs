@@ -57,7 +57,7 @@ namespace MEE7.Commands
                     Gif gif = o as Gif;
                     int maxWidth = gif.Item1.Select(x => x.Width).Max();
                     int maxHeight = gif.Item1.Select(x => x.Height).Max();
-                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
+                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
                         for (int i = 0; i < gif.Item1.Length; i++)
                             c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
 

@@ -553,6 +553,7 @@ namespace MEE7.Commands
         static void PrintPipeOutput(object output, SocketMessage message)
         {
             if (output == null) return;
+            var de = output.GetType();
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }
