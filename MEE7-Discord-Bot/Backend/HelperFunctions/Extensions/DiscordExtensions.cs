@@ -45,9 +45,11 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             else
                 return null;
         }
-        public static void AddFieldDirectly(this EmbedBuilder e, string Name, object Value, bool IsInline = false)
+        public static EmbedBuilder AddFieldDirectly(this EmbedBuilder e, string Name, object Value, bool IsInline = false)
         {
             string text = Value.ToString();
+            if (string.IsNullOrWhiteSpace(text))
+                return e;
             if (text.Length < 1024)
                 e.Fields.Add(new EmbedFieldBuilder() { Name = Name, Value = Value, IsInline = IsInline });
             else
@@ -56,12 +58,13 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 for (i = 1; text.Length >= 1015; i++)
                 {
                     int cutIndex = text.AllIndexesOf("\n").Where(x => x <= 1020).Max();
-                    if (cutIndex <= 0) return;
+                    if (cutIndex <= 0) return e;
                     e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text.Substring(0, cutIndex), IsInline = IsInline });
                     text = text.Remove(0, cutIndex);
                 }
                 e.Fields.Add(new EmbedFieldBuilder() { Name = $"{Name} {i}", Value = text, IsInline = IsInline });
             }
+            return e;
         }
         public static SelfmadeMessage EditContent(this SelfmadeMessage m, string newContent)
         {
