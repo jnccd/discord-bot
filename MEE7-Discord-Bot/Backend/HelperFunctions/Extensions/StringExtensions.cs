@@ -52,6 +52,12 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             int leftIndex = str.IndexOf(left);
             int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
 
+            if (right == "")
+                rightIndex = str.Length - 1;
+
+            if (left == "")
+                leftIndex = 0;
+
             if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
             {
                 //throw new Exception("String doesnt contain left or right borders!");
@@ -87,6 +93,7 @@ namespace MEE7.Backend.HelperFunctions.Extensions
                 {
                     str = str.Remove(0, leftIndex + left.Length);
                     re.Add(str.Remove(rightIndex - leftIndex - left.Length));
+                    str = str.Remove(0, rightIndex - leftIndex - right.Length - left.Length);
                 }
                 catch { break; }
 

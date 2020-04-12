@@ -107,32 +107,40 @@ namespace MEE7.Commands
             return output;
         }
 
+        object pitchLock = new object();
         public string pitchDesc = "Adds a Pitch to the sound";
         public WaveStream Pitch(WaveStream w, SocketMessage m, float PitchFactor)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}pitch.bin";
 
-            SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider(w.ToSampleProvider())
+            lock (pitchLock)
             {
-                PitchFactor = PitchFactor
-            };
+                SmbPitchShiftingSampleProvider pitch = new SmbPitchShiftingSampleProvider(w.ToSampleProvider())
+                {
+                    PitchFactor = PitchFactor
+                };
 
-            WaveFileWriter.CreateWaveFile16(filePath, pitch);
-            return new WaveFileReader(filePath);
+                WaveFileWriter.CreateWaveFile16(filePath, pitch);
+                return new WaveFileReader(filePath);
+            }
         }
 
+        object volumeLock = new object();
         public string volumeDesc = "Adds Volume to the sound";
         public WaveStream Volume(WaveStream w, SocketMessage m, float VolumeFactor)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}volume.bin";
 
-            VolumeSampleProvider pitch = new VolumeSampleProvider(w.ToSampleProvider())
+            lock (volumeLock)
             {
-                Volume = VolumeFactor
-            };
+                VolumeSampleProvider pitch = new VolumeSampleProvider(w.ToSampleProvider())
+                {
+                    Volume = VolumeFactor
+                };
 
-            WaveFileWriter.CreateWaveFile16(filePath, pitch);
-            return new WaveFileReader(filePath);
+                WaveFileWriter.CreateWaveFile16(filePath, pitch);
+                return new WaveFileReader(filePath);
+            }
         }
     }
 }
