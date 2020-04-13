@@ -698,6 +698,12 @@ namespace MEE7.Commands
             }
         }
 
+        public string GetDimensionsDesc = "Get the width and height";
+        public string GetDimensions(Bitmap b, SocketMessage m)
+        {
+            return $"{b.Width}w {b.Height}h";
+        }
+
 
         static readonly object memifyLock = new object();
 
