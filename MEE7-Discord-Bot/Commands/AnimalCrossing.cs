@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Backend.HelperFunctions.Extensions;
@@ -35,31 +36,48 @@ namespace MEE7
 
         void germanWikiQuery(string searchQuery, SocketMessage message)
         {
-            var searchPage = $"https://animalcrossingwiki.de/nachbarn/jens?do=search&sf=1&q={HttpUtility.UrlEncode(searchQuery)}%20%40nachbarn".GetHTMLfromURL();
-            if (searchPage.Contains("<div class=\"nothing\">Nichts gefunden.</div>"))
+            HtmlWeb web = new HtmlWeb();
+            var searchDoc = web.Load($"https://animalcrossingwiki.de/nachbarn/jens?do=search&sf=1&q={HttpUtility.UrlEncode(searchQuery)}+%40nachbarn");
+            string charLink;
+            try
             {
-                DiscordNETWrapper.SendText("Wasn das bidde?!?", message.Channel).Wait();
+                var result = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'wikilink1')]");
+                charLink = result.Skip(3).First().GetAttributeValue("href", "");
+                if (charLink == "")
+                    throw new Exception();
+            }
+            catch
+            {
+                DiscordNETWrapper.SendText("Couldn't find that villager", message.Channel).Wait();
                 return;
             }
 
-            string charPagelink = searchPage.GetEverythingBetween("search_quickresult", "======");
-            string charPagelink2 = "https://animalcrossingwiki.de" + charPagelink.GetEverythingBetween("<a href=\"", "\" class");
-            string charPageHTML = charPagelink2.GetHTMLfromURL();
-
-            string table = charPageHTML.GetEverythingBetween("wrap_nachbarntabelle", "</table>");
-            var tableEntries = table.GetEverythingBetweenAll("<tr class=\"row", "</tr>");
-            string charName = tableEntries[0].GetEverythingBetween(">  ", "  <");
-            string imgSrc = "https://animalcrossingwiki.de" + tableEntries[1].GetEverythingBetween("<img src=\"", "?");
+            var charDoc = web.Load("https://animalcrossingwiki.de" + charLink);
+            var table = charDoc.DocumentNode.SelectSingleNode("//table[contains(@class, 'inline')]");
+            var charName = table.SelectSingleNode("//th[contains(@class, 'col0 centeralign')]").InnerText.Trim(' ');
+            var tableEntries = table.ChildNodes.Where(x => x.Name == "tr");
+            var charImg = "https://animalcrossingwiki.de" + tableEntries.First().
+                ChildNodes.ElementAt(1).
+                ChildNodes.ElementAt(1).
+                GetAttributeValue("src", "");
+            if (charImg.Contains("?")) charImg = charImg.GetEverythingBetween("", "?");
+            var tierart = tableEntries.ElementAt(1).ChildNodes.ElementAt(2).InnerText.Trim(' ').Replace("Ã", "ß");
+            var personality = tableEntries.ElementAt(2).ChildNodes.ElementAt(2).InnerText.Trim(' ').Replace("Ã", "ß");
+            var gender = tableEntries.ElementAt(3).ChildNodes.ElementAt(2).InnerText.Trim(' ');
+            var birthday = tableEntries.ElementAt(4).ChildNodes.ElementAt(2).InnerText.Trim(' ');
+            var floskel = tableEntries.ElementAt(5).ChildNodes.ElementAt(2).InnerText.Trim(' ');
+            var fotospruch = tableEntries.ElementAt(6).ChildNodes.ElementAt(2).InnerText.Trim(' ');
+            var auftreten = tableEntries.ElementAt(7).InnerText.GetEverythingBetween("    ", "  ").Split('\n').Combine(", ");
 
             DiscordNETWrapper.SendEmbed(DiscordNETWrapper.
-                CreateEmbedBuilder(charName, "", imgSrc, null, imgSrc).
-                AddFieldDirectly("Tierart", tableEntries[2].GetEverythingBetweenAll("\">", "<")[3]).
-                AddFieldDirectly("Persönlichkeit", tableEntries[3].GetEverythingBetweenAll("\">", "<")[3]).
-                AddFieldDirectly("Geschlecht", tableEntries[4].GetEverythingBetween("col1 centeralign\"> ", " </td>")).
-                AddFieldDirectly("Geburtstag", tableEntries[5].GetEverythingBetween("centeralign\">  ", " <")).
-                AddFieldDirectly("Floskel", tableEntries[6].GetEverythingBetween(">  „", "“  <")).
-                AddFieldDirectly("Fotospruch", tableEntries[7].GetEverythingBetween(">  „", "“  <")).
-                AddFieldDirectly("Auftreten", tableEntries[8].GetEverythingBetweenAll("\">", "<").Skip(3).Combine(", ")),
+                CreateEmbedBuilder(charName, "", charImg, null, "").
+                AddFieldDirectly("Tierart", tierart).
+                AddFieldDirectly("Persönlichkeit", personality).
+                AddFieldDirectly("Geschlecht", gender).
+                AddFieldDirectly("Geburtstag", birthday).
+                AddFieldDirectly("Floskel", floskel).
+                AddFieldDirectly("Fotospruch", fotospruch).
+                AddFieldDirectly("Auftreten", auftreten),
                 message.Channel).Wait();
         }
 
