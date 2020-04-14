@@ -24,10 +24,10 @@ namespace MEE7.Commands
     public class InputCommands : EditCommandProvider
     {
         public string lastTDesc = "Gets the last messages text";
-        public string LastT(Null n, SocketMessage m)
+        public string LastT(Null n, SocketMessage m, int skipedHits = 0)
         {
             var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1);
-            foreach (var lm in messages)
+            foreach (var lm in messages.Skip(skipedHits))
                 if (!string.IsNullOrWhiteSpace(lm.Content))
                     try { return lm.Content; }
                     catch { }
@@ -35,10 +35,10 @@ namespace MEE7.Commands
         }
 
         public string lastPDesc = "Gets the last messages picture";
-        public Bitmap LastP(Null n, SocketMessage m)
+        public Bitmap LastP(Null n, SocketMessage m, int skipedHits = 0)
         {
             var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1);
-            foreach (var lm in messages)
+            foreach (var lm in messages.Skip(skipedHits))
                 try
                 {
                     string pic = null;
@@ -59,10 +59,10 @@ namespace MEE7.Commands
         }
 
         public string lastGDesc = "Gets the last messages gif";
-        public Gif LastG(Null n, SocketMessage m)
+        public Gif LastG(Null n, SocketMessage m, int skipedHits = 0)
         {
             var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1);
-            foreach (var lm in messages)
+            foreach (var lm in messages.Skip(skipedHits))
                 try
                 {
                     return GetPictureLinkFromMessage(lm, "").GetBitmapsAndTimingsFromGIFURL();
