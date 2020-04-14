@@ -222,4 +222,8 @@
     </None>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd ..&#xD;&#xA;start GitLab-Push.bat" />
+  </Target>
+
 </Project>
