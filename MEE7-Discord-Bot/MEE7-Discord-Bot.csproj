@@ -223,7 +223,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd ..&#xD;&#xA;start GitLab-Push.bat" />
+    <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;cd ..&#xD;&#xA;start GitLab-Push.bat&#xD;&#xA;)&#xD;&#xA;exit /b 0" />
   </Target>
 
 </Project>
