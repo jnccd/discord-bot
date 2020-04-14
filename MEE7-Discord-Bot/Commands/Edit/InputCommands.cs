@@ -58,6 +58,19 @@ namespace MEE7.Commands
             throw new Exception("Didn't find any");
         }
 
+        public string lastGDesc = "Gets the last messages gif";
+        public Gif LastG(Null n, SocketMessage m)
+        {
+            var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1);
+            foreach (var lm in messages)
+                try
+                {
+                    return GetPictureLinkFromMessage(lm, "").GetBitmapsAndTimingsFromGIFURL();
+                }
+                catch { }
+            throw new Exception("Didn't find any");
+        }
+
         public string thisTDesc = "Outputs the given text";
         public string ThisT(Null n, SocketMessage m, string Text)
         {
@@ -376,7 +389,7 @@ namespace MEE7.Commands
             else
                 return new Vector4(0, 0, 0, 0);
         }
-        private static string GetPictureLinkFromMessage(SocketMessage m, string arguments)
+        private static string GetPictureLinkFromMessage(IMessage m, string arguments)
         {
             string pic = null;
             if (m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
