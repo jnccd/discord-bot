@@ -222,8 +222,8 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;cd ..&#xD;&#xA;start GitLab-Push.bat&#xD;&#xA;)&#xD;&#xA;exit /b 0" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <Exec Command="cd ..&#xD;&#xA;start GitLab-Push.bat" />
   </Target>
 
 </Project>
