@@ -704,6 +704,29 @@ namespace MEE7.Commands
             return $"{b.Width}w {b.Height}h";
         }
 
+        public string ResizeDesc = "Resize an image by some multiplier";
+        public Bitmap Resize(Bitmap b, SocketMessage m, float multiplier)
+        {
+            return Stretch(b, m, (int)(b.Width * multiplier), (int)(b.Height * multiplier));
+        }
+
+        public string EmoteResizeDesc = "Resize an image to 48x48px which is the highest resolution discord currently displays an emote at";
+        public Bitmap EmoteResize(Bitmap b, SocketMessage m)
+        {
+            if (b.Width > b.Height)
+            {
+                float mult = 48f / b.Width;
+                int newH = (int)(b.Height * mult);
+                return Stretch(b, m, 48, newH);
+            }
+            else
+            {
+                float mult = 48f / b.Height;
+                int newW = (int)(b.Width * mult);
+                return Stretch(b, m, newW, 48);
+            }
+        }
+
 
         static readonly object memifyLock = new object();
 
