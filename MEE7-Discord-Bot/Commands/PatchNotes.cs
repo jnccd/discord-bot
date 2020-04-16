@@ -1,15 +1,12 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using MEE7.Configuration;
-using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 
 namespace MEE7.Commands
 {
@@ -24,7 +21,7 @@ namespace MEE7.Commands
         {
             ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(AcceptAllCertifications);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            
+
             List<string> PatchNotes = new List<string>();
 
             string url = "https://github.com/niklasCarstensen/Discord-Bot/commits/master";
@@ -36,7 +33,7 @@ namespace MEE7.Commands
                 string html = sr.ReadToEnd();
                 List<Tuple<string, string>> messages = html.
                     GetEverythingBetweenAll("<p class=\"commit-title h5 mb-1 text-gray-dark \">", "</p>").
-                    Select(x => new Tuple<string, string>(x.GetEverythingBetween("aria-label=\"", "\" "), 
+                    Select(x => new Tuple<string, string>(x.GetEverythingBetween("aria-label=\"", "\" "),
                                                           "https://github.com" + x.GetEverythingBetween("href=\"", "\">"))).ToList();
 
                 foreach (Tuple<string, string> tuple in messages)

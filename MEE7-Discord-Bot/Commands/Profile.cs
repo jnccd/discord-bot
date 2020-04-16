@@ -1,16 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7.Configuration;
 using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
+using System.Collections;
+using System.Reflection;
 
 namespace MEE7.Commands
 {

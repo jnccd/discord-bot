@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using TheArtOfDev.HtmlRenderer.WinForms;
 using static MEE7.Commands.Edit;
 
-namespace MEE7.Backend.HelperFunctions.Extensions
+namespace MEE7.Backend.HelperFunctions
 {
     public static class StringExtensions
     {
@@ -161,7 +161,8 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             Image gif = Image.FromStream(WebRequest.Create(url).GetResponse().GetResponseStream());
             FrameDimension dimension = new FrameDimension(gif.FrameDimensionsList[0]);
             return Enumerable.Range(0, gif.GetFrameCount(dimension)).
-                Select(x => {
+                Select(x =>
+                {
                     gif.SelectActiveFrame(dimension, x);
                     return new Bitmap(gif);
                 }).
@@ -173,12 +174,13 @@ namespace MEE7.Backend.HelperFunctions.Extensions
             FrameDimension dimension = new FrameDimension(gif.FrameDimensionsList[0]);
             int[] timings = new int[gif.GetFrameCount(dimension)];
             return new Gif(Enumerable.Range(0, gif.GetFrameCount(dimension)).
-                Select(x => {
+                Select(x =>
+                {
                     gif.SelectActiveFrame(dimension, x);
                     try
                     {
                         timings[x] = BitConverter.ToInt32(gif.GetPropertyItem(20736).Value, x * 4) * 10; // this works on windows sometimes
-                    } 
+                    }
                     catch
                     {
                         try
@@ -301,7 +303,8 @@ namespace MEE7.Backend.HelperFunctions.Extensions
 
                 DateTime start = DateTime.Now;
 
-                Task.Run(() => {
+                Task.Run(() =>
+                {
                     Thread.CurrentThread.Name = $"RunAsConsoleCommand Thread {RunAsConsoleCommandThreadIndex++}";
                     compiler.WaitForExit();
 

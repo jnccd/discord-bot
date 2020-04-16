@@ -1,13 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
+using System;
+using System.Linq;
 
 namespace MEE7.Commands
 {
@@ -44,13 +40,13 @@ namespace MEE7.Commands
                     DiscordNETWrapper.SendText("https://pbs.twimg.com/media/DuPdNCOV4AA20F6?format=jpg&name=small", message.Channel).Wait(); })
             };
         }
-        
-        public override void Execute(SocketMessage message) 
+
+        public override void Execute(SocketMessage message)
         {
-            string[] split = message.Content.Split(new char[] { ' ', '\n' }); 
+            string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
             {
-                EmbedBuilder Embed = new EmbedBuilder(); 
+                EmbedBuilder Embed = new EmbedBuilder();
                 Embed.WithColor(0, 128, 255);
                 foreach (Reaction react in reactions)
                 {

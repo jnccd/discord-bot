@@ -1,15 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.HelperFunctions;
 using System.IO;
+using System.Linq;
 
 namespace MEE7.Commands
 {
@@ -388,7 +385,7 @@ namespace MEE7.Commands
                     DiscordNETWrapper.SendText("You are not in a game :thinking:", message.Channel).Wait();
                     return;
                 }
-                
+
                 UnoCardType t = UnoCardType.one;
                 UnoColor c = UnoColor.none;
                 Enum.TryParse(split[2].ToLower(), out t);

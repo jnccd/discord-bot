@@ -3,14 +3,11 @@ using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using NAudio.Wave;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace MEE7.Commands
 {

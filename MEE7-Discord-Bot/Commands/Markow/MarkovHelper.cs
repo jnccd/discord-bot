@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using Newtonsoft.Json;
-using MEE7.Backend;
+using System.Linq;
 
-namespace MEE7
+namespace MEE7.Commands
 {
     public class NoEmptyElementException : Exception { public NoEmptyElementException(string message) : base(message) { } }
 
@@ -27,7 +25,7 @@ namespace MEE7
         public static void LoadDict()
         {
             if (SaveFileExists())
-                dict = JsonConvert.DeserializeObject<Dictionary<string, List<string>>> (File.ReadAllText(savePath));
+                dict = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(File.ReadAllText(savePath));
         }
 
         public static void AddToDict(string addition)

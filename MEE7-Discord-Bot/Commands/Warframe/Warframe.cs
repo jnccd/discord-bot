@@ -1,17 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using MEE7.Configuration;
-using MEE7.Backend;
-using Warframe_Alerts;
 using WarframeNET;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {
@@ -42,7 +39,7 @@ namespace MEE7.Commands
             user.WarframeChannelID = message.Channel.Id;
             if (split.Length == 1)
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
-            else if(split[1] == "filters")
+            else if (split[1] == "filters")
             {
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.AddFieldDirectly("Your Filters: ", (user.WarframeFilters.Count == 0 ?
@@ -119,7 +116,7 @@ namespace MEE7.Commands
             }
             return;
         }
-        
+
         List<EmbedBuilder> GetStateEmbeds()
         {
             if (WarframeHandler.worldState == null)
@@ -137,7 +134,7 @@ namespace MEE7.Commands
                     alerts.WithDescription(WarframeHandler.worldState.WS_Alerts.Select(x => ToTitle(x)).Aggregate((x, y) => x + "\n" + y));
                     re.Add(alerts);
                 }
-                
+
                 if (WarframeHandler.worldState.WS_Invasions.Count != 0)
                 {
                     EmbedBuilder invasions = new EmbedBuilder();
@@ -148,7 +145,7 @@ namespace MEE7.Commands
                             $"{inv.Node} - {inv.Description} - {inv.Completion}%");
                     re.Add(invasions);
                 }
-                
+
                 if (WarframeHandler.worldState.WS_Fissures.Count != 0)
                 {
                     EmbedBuilder fissures = new EmbedBuilder();
@@ -159,7 +156,7 @@ namespace MEE7.Commands
                         Aggregate((x, y) => x + "\n" + y));
                     re.Add(fissures);
                 }
-                
+
                 EmbedBuilder voidtrader = new EmbedBuilder();
                 voidtrader.WithColor(0, 128, 255);
                 if (WarframeHandler.worldState.WS_VoidTrader.Inventory.Count == 0)
@@ -185,11 +182,11 @@ namespace MEE7.Commands
                     nightwave.WithDescription($"Season {WarframeHandler.worldState.WS_NightWave.Season} Phase " +
                         $"{WarframeHandler.worldState.WS_NightWave.Phase}");
                     foreach (NightwaveChallenge x in WarframeHandler.worldState.WS_NightWave.ActiveChallenges)
-                        nightwave.AddFieldDirectly($"{(x.IsDaily ?? false ? "[Daily] " : "")}{(x.IsElite ?? false ? "[Elite] " : "")}{x.Title} - {x.Desc}", 
+                        nightwave.AddFieldDirectly($"{(x.IsDaily ?? false ? "[Daily] " : "")}{(x.IsElite ?? false ? "[Elite] " : "")}{x.Title} - {x.Desc}",
                             $"{x.Reputation} :arrow_up: until {x.Expiry}");
                     re.Add(nightwave);
                 }
-                
+
                 if (WarframeHandler.worldState.WS_Sortie?.Variants.Count > 0)
                 {
                     EmbedBuilder sortie = new EmbedBuilder();
@@ -200,7 +197,7 @@ namespace MEE7.Commands
                         Aggregate((x, y) => x + "\n\n" + y));
                     re.Add(sortie);
                 }
-                
+
                 if (WarframeHandler.worldState.WS_Events?.Count > 0)
                 {
                     EmbedBuilder events = new EmbedBuilder();
@@ -240,7 +237,7 @@ namespace MEE7.Commands
                     re.Add(syndicates);
                 }
             }
-            
+
             return re;
         }
         void RunNotificationLoop()
@@ -297,7 +294,7 @@ namespace MEE7.Commands
         List<string> GetNotifications()
         {
             List<string> notifications = new List<string>();
-            
+
             foreach (SyndicateMission mission in WarframeHandler.worldState.WS_SyndicateMissions)
                 for (int i = 0; i < mission.jobs.Count; i++)
                     if (mission.jobs[i].rewardPool != null && !Config.Data.WarframeIDList.Contains(mission.jobs[i].id))
@@ -308,7 +305,7 @@ namespace MEE7.Commands
                             notifications.Add(reward + " currently available from the " + mission.Syndicate + "'s " + (i + 1) + ". bounty until " + mission.EndTime.ToLocalTime().ToLongTimeString());
                         }
                     }
-            
+
             foreach (Alert a in WarframeHandler.worldState.WS_Alerts)
                 if (!Config.Data.WarframeIDList.Contains(a.Id))
                 {

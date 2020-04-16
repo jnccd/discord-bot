@@ -1,9 +1,7 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
+using MEE7.Backend.HelperFunctions;
 using System;
 using System.Linq;
-using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
 using System.Text;
 
 namespace MEE7.Commands

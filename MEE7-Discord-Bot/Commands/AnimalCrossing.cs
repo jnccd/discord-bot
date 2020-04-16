@@ -2,14 +2,12 @@
 using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace MEE7
+namespace MEE7.Commands
 {
     class AnimalCrossing : Command
     {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace WarframeNET
 {
@@ -28,7 +28,7 @@ namespace WarframeNET
         /// Name of the deployer.
         /// </summary>
         public string DeployerName { get; set; }
-        
+
         /// <summary>
         /// Clan of the deployer.
         /// </summary>

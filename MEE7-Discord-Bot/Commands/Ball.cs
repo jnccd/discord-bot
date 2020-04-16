@@ -2,10 +2,6 @@
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
@@ -23,7 +19,7 @@ namespace MEE7.Commands
             string m = commandmessage.Content.ToLower();
             if (m.Split(' ').Length >= 4 && m.Contains("?"))
             {
-                if (!m.Contains("why ") && !m.Contains("what ") && !m.Contains("who ") && 
+                if (!m.Contains("why ") && !m.Contains("what ") && !m.Contains("who ") &&
                     !m.Contains("warum ") && !m.Contains("was ") && !m.Contains("wieso ") && !m.Contains("weshalb "))
                 {
                     long sum = 0;

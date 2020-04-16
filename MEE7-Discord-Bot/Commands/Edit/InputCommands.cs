@@ -1,23 +1,19 @@
-﻿using Discord;
+﻿using BumpKit;
+using Discord;
+using Discord.Audio;
+using Discord.Audio.Streams;
 using Discord.WebSocket;
+using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.HelperFunctions;
-using Color = System.Drawing.Color;
-using BumpKit;
-using Discord.Audio;
-using System.Threading;
-using Discord.Audio.Streams;
 using System.Numerics;
+using System.Threading;
 using static MEE7.Commands.Edit;
+using Color = System.Drawing.Color;
 
 namespace MEE7.Commands
 {
@@ -146,7 +142,7 @@ namespace MEE7.Commands
         public Gif EmoteG(Null n, SocketMessage m, string emote)
         {
             Discord.Emote.TryParse(emote.Trim(' '), out Emote res);
-            if (res != null) return(Gif)res.Url.GetBitmapsAndTimingsFromGIFURL();
+            if (res != null) return (Gif)res.Url.GetBitmapsAndTimingsFromGIFURL();
             return (Gif)Program.GetGuildFromChannel(m.Channel).Emotes.
                 FirstOrDefault(x => x.Name.Contains(emote.Trim(' ', ':')) && x.Animated).Url.
                 GetBitmapsAndTimingsFromGIFURL();

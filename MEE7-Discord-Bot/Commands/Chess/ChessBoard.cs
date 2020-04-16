@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace MEE7.Chess
+namespace MEE7.Commands
 {
     public class InvalidChessPiece : System.Exception { }
 
@@ -36,7 +34,7 @@ namespace MEE7.Chess
 
         public bool GameEnded;
         public ChessPlayer Winner;
-        
+
         public ChessBoard(ChessPlayer PlayerOne, ChessPlayer PlayerTwo)
         {
             playerTop = PlayerOne;
@@ -47,16 +45,16 @@ namespace MEE7.Chess
 
             SetUpNewGame();
         }
-        
+
         public void SetUpNewGame()
         {
             ClearPieces();
             ClearThreefoldRepetitionCheck();
-            
+
             Turn = false;
             Winner = null;
             GameEnded = false;
-            
+
             // Pawns
             for (int i = 0; i < 8; i++)
                 Pieces[i, 1] = new ChessPiece(PlayerTop, ChessPieceType.Pawn);
@@ -780,7 +778,7 @@ namespace MEE7.Chess
                 if (Pieces[to.X, to.Y] == BottomKing)
                 {
                     EndGameNormally(PlayerTop, from);
-                    
+
                     if (slow)
                         Thread.Sleep(3000);
                 }
@@ -890,7 +888,7 @@ namespace MEE7.Chess
             if (!GameEnded)
                 PlayerWhoHasTheMove().Update();
         }
-        
+
         public object Clone()
         {
             ChessBoard re = (ChessBoard)MemberwiseClone();

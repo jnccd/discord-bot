@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using MEE7.Backend.HelperFunctions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -142,7 +141,7 @@ namespace MEE7.Backend.HelperFunctions
                     messages = channel.GetMessagesAsync().FlattenAsync().Result.OfType<IUserMessage>();
                 else
                     messages = channel.GetMessagesAsync(lastMessageID, Direction.Before, 100).FlattenAsync().Result.OfType<IUserMessage>();
-                
+
                 foreach (var message in messages)
                     yield return message;
 

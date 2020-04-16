@@ -1,23 +1,15 @@
 ﻿using Discord;
-using Discord.Audio;
 using Discord.Rest;
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Commands;
 using MEE7.Configuration;
-using NAudio.Wave;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,15 +21,15 @@ namespace MEE7
         static Command[] commands;
         static readonly EmbedBuilder helpMenu = new EmbedBuilder();
         static readonly Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                                      from assemblyType in domainAssembly.GetTypes()
-                                      where assemblyType.IsSubclassOf(typeof(Command))
-                                      select assemblyType).ToArray();
+                                               from assemblyType in domainAssembly.GetTypes()
+                                               where assemblyType.IsSubclassOf(typeof(Command))
+                                               select assemblyType).ToArray();
 
         static int concurrentCommandExecutions = 0;
         static readonly string commandExecutionLock = "";
         static readonly ulong[] experimentalChannels = new ulong[] { 473991188974927884 };
         static readonly List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
-        
+
         public delegate void NonCommandMessageRecievedHandler(SocketMessage message);
         public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
         public delegate void EmojiReactionAddedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
@@ -53,7 +45,7 @@ namespace MEE7
         static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
         static readonly Emoji errorEmoji = new Emoji("🤔");
-        
+
         static void UpdateWorkState()
         {
             if (concurrentCommandExecutions > 1)
@@ -169,7 +161,8 @@ namespace MEE7
         private static Task MessageReceived(SocketMessage message)
         {
             if (message.Channel.Id == logChannel)
-                Task.Run(() => {
+                Task.Run(() =>
+                {
                     if (message.Content.StartsWith(Program.logStartupMessagePräfix) &&
                         message.Content != Program.logStartupMessage)
                         Program.Exit(0);
@@ -272,7 +265,7 @@ namespace MEE7
 
                 Saver.SaveUser(message.Author.Id);
                 command.Execute(message);
-                
+
                 if (message.Channel is SocketGuildChannel)
                     ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
                         $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);

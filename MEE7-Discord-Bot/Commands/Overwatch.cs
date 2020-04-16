@@ -1,14 +1,10 @@
 ﻿using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace MEE7.Commands
@@ -28,7 +24,7 @@ namespace MEE7.Commands
             DiscordNETWrapper.SendText($"Updated at {today.CreatedAt.UtcDateTime.ToLongDateString()}, " +
                 $"{today.CreatedAt.UtcDateTime.ToShortTimeString()} by {today.ByUser.Battletag}", message.Channel).Wait();
             foreach (Tile t in today.Tiles())
-                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder(t.Name, t.Label == null ? t.Players : $"{t.Players} - {t.Label}", 
+                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder(t.Name, t.Label == null ? t.Players : $"{t.Players} - {t.Label}",
                     gameMode.FirstOrDefault(x => x.Id == t.Id)?.Image.Normal.AbsoluteUri), message.Channel).Wait();
         }
 

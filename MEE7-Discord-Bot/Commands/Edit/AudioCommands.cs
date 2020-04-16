@@ -1,18 +1,14 @@
 ﻿using Discord.Audio;
 using Discord.WebSocket;
+using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7.Backend;
-using MEE7.Backend.HelperFunctions;
-using NAudio.Wave.SampleProviders;
 using System.Net;
+using System.Text;
 
 namespace MEE7.Commands
 {

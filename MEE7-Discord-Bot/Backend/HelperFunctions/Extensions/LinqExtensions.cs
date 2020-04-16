@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MEE7.Backend.HelperFunctions.Extensions
+namespace MEE7.Backend.HelperFunctions
 {
     public static class LinqExtensions
     {

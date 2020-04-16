@@ -5,14 +5,12 @@ using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace MEE7
+namespace MEE7.Commands
 {
     public class Play : Command
     {

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MEE7.Backend
@@ -34,7 +33,7 @@ namespace MEE7.Backend
 
         public SelfmadeMessage()
         {
-            
+
         }
         public SelfmadeMessage(IMessage m)
         {
@@ -59,7 +58,7 @@ namespace MEE7.Backend
 
             DeleteFunc = m.DeleteAsync;
         }
-        
+
         string IMessage.Content => Content;
         DateTimeOffset IMessage.Timestamp => Timestamp;
         DateTimeOffset? IMessage.EditedTimestamp => EditedTimestamp;
@@ -80,7 +79,7 @@ namespace MEE7.Backend
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannelIds;
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds;
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds;
-        
+
         public Task DeleteAsync(RequestOptions options = null)
         {
             return DeleteFunc(options);

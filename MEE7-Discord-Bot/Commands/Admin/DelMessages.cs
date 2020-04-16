@@ -1,11 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MEE7.Commands.Admin
+namespace MEE7.Commands
 {
     public class DelMessages : Command
     {

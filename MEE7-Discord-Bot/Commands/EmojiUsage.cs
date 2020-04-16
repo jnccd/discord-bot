@@ -1,14 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7.Configuration;
-using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 
 namespace MEE7.Commands
 {
@@ -56,8 +53,11 @@ namespace MEE7.Commands
                 EmbedBuilder embed = new EmbedBuilder();
                 for (int i = 0; i < server.EmojiUsage.Keys.Count; i++)
                 {
-                    embed.Fields.Add(new EmbedFieldBuilder() { Name = ":" + server.EmojiUsage.Keys.ElementAt(i) + ":",
-                        Value = "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!" });
+                    embed.Fields.Add(new EmbedFieldBuilder()
+                    {
+                        Name = ":" + server.EmojiUsage.Keys.ElementAt(i) + ":",
+                        Value = "Used " + server.EmojiUsage[server.EmojiUsage.Keys.ElementAt(i)] + " times!"
+                    });
                 }
                 embed.WithColor(0, 128, 255);
                 DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();

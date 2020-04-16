@@ -1,15 +1,14 @@
 ﻿using Discord.WebSocket;
 using MEE7.Backend;
-using System;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MEE7.Backend.HelperFunctions;
-using System.Linq;
-using MEE7.Backend.HelperFunctions.Extensions;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.Scripting.Hosting;
+using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Diagnostics;
 
 namespace MEE7.Commands
 {
@@ -51,7 +50,7 @@ namespace MEE7.Commands
             }
             code = code.Split(" ").Skip(1).Combine(" ").Trim('`', ' ');
             string[] badWords = { "Console", "System.Runtime", "GC.", "System.Reflection", "System.IO", "Environment.Exit", "System.Threading" };
-            
+
             foreach (var badWord in badWords)
                 if (code.Contains(badWord))
                 {

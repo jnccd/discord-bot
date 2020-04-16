@@ -1,14 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7.Configuration;
 using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
 using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
+using System;
 
 namespace MEE7.Commands
 {
@@ -36,7 +31,8 @@ namespace MEE7.Commands
                             EmbedBuilder Embed = m.ToEmbed();
                             //Embed.AddFieldDirectly("Preview for: ", s);
                             DiscordNETWrapper.SendEmbed(Embed, message.Channel).Wait();
-                        } catch { }
+                        }
+                        catch { }
                     }
             }
         }

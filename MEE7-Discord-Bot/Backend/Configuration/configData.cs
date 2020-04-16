@@ -1,10 +1,6 @@
-﻿using Discord;
-using MEE7.Commands;
+﻿using MEE7.Commands;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEE7.Configuration
 {

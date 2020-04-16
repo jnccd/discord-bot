@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Numerics;
 using Color = System.Drawing.Color;
 
-namespace MEE7.Backend.HelperFunctions.Extensions
+namespace MEE7.Backend.HelperFunctions
 {
     public static class DrawingExtensions
     {

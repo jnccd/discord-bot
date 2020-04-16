@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using MEE7;
-using MEE7.Backend;
 
-namespace MEE7.Chess
+namespace MEE7.Commands
 {
     class ChessPlayerMinMax : ChessPlayer
     {
@@ -64,7 +60,7 @@ namespace MEE7.Chess
 -10,-20,-20,-20,-20,-20,-20,-10,
  20, 20,  0,  0,  0,  0, 20, 20,
  20, 30, 10,  0,  0, 10, 30, 20 };
-        
+
         public ChessMove[] GetAllMoves(ChessBoard Board, ChessPlayer Player)
         {
             List<ChessMove> moves = new List<ChessMove>(8 * 8);
@@ -257,7 +253,7 @@ namespace MEE7.Chess
                 return bestMove;
             }
         }
-        
+
         public override void Update()
         {
             ChessMove minimax = MiniMax(3, Parent, new ChessMove(), true);

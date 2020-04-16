@@ -1,11 +1,5 @@
 ﻿using Discord.WebSocket;
 using MEE7.Backend;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7;
 using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
@@ -30,7 +24,7 @@ namespace MEE7.Commands
             int steps = 0;
             Cell cell = new Cell();
             string output = "";
-            
+
             while (pc < message.Content.Length)
             {
                 switch (message.Content[pc])

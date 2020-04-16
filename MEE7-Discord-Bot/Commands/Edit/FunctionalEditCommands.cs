@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using static MEE7.Commands.Edit;
 
 namespace MEE7.Commands
@@ -48,7 +47,7 @@ namespace MEE7.Commands
 
             for (float f = startValue; f < endValue; f += stepWidth)
                 results.Add((a)Pipe.Parse(m, pipe.Replace("%" + varName, f.ToString().Replace(",", "."))).Apply(m, o));
-            
+
             return results.ToArray();
         }
 

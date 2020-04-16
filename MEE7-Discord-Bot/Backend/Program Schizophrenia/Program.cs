@@ -1,18 +1,12 @@
 ﻿using Discord;
-using Discord.Audio;
-using Discord.Rest;
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Commands;
 using MEE7.Configuration;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -48,7 +42,7 @@ namespace MEE7
         public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
         public static readonly string logStartupMessagePräfix = "new instance who dis?";
         public static readonly string logStartupMessage = logStartupMessagePräfix + " I am here: " + instanceIdentifier;
-        
+
         // Client 
         static DiscordSocketClient client;
         public static bool ClientReady { get; private set; }
@@ -243,7 +237,8 @@ namespace MEE7
                     ConsoleWrapper.WriteLine($"Error on instance creation of {commandTypes[i].Name}!", ConsoleColor.Red);
                 }
             }
-            commands = commandsList.OrderBy(x => {
+            commands = commandsList.OrderBy(x =>
+            {
                 if (x.CommandLine == "edit")
                     return "00000";
                 else
@@ -513,7 +508,7 @@ namespace MEE7
         }
         static void PrintConsoleStartup()
         {
-            lock (ConsoleWrapper.lockject) 
+            lock (ConsoleWrapper.lockject)
             {
                 Console.CursorLeft = 0;
                 ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
@@ -535,12 +530,12 @@ namespace MEE7
                 clearYcoords = Console.CursorTop;
             }
         }
-        static void CILimbo() 
+        static void CILimbo()
         {
-            while (true) 
-            { 
-                Thread.Sleep(int.MaxValue); 
-            } 
+            while (true)
+            {
+                Thread.Sleep(int.MaxValue);
+            }
         }
 
         static void BeforeClose()
@@ -564,7 +559,7 @@ namespace MEE7
             }
         }
         // ------------------------------------------------------------------------------------------------------------------
-        
+
         private static Task Client_Ready()
         {
             ClientReady = true;
@@ -649,7 +644,7 @@ namespace MEE7
             return false;
         }
         private delegate bool ConsoleEventDelegate(int eventType);
-        
+
         // Imports
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);

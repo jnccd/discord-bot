@@ -1,13 +1,11 @@
 ﻿using Discord;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MEE7.Backend.Configuration
 {
     public class DiscordEmote
     {
-        public Tuple<string, ulong> e = null; 
+        public Tuple<string, ulong> e = null;
         public string oji = null;
 
         public string Name
