@@ -449,7 +449,7 @@ namespace MEE7.Commands
                     if (pipe[i].Item2.InputType.ContainsGenericParameters && i < pipe.Count - 1 &&
                         !(pipe[i].Item2 as EditCommand).sourceMethod.MakeGenericMethod(pipe[i - 1].Item2.OutputType).ReturnType.
                         IsAssignableFrom(pipe[i + 1].Item2.InputType))
-                        throw new Exception($"Generic Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
+                        throw new Exception($"Generic Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should receive a " +
                             $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
                             $"from {pipe[i - 1].Item2.Command}");
                 }
