@@ -37,6 +37,8 @@ namespace MEE7
         void germanWikiQuery(string searchQuery, SocketMessage message)
         {
             HtmlWeb web = new HtmlWeb();
+            web.AutoDetectEncoding = false;
+            web.OverrideEncoding = Encoding.UTF8;
             var searchDoc = web.Load($"https://animalcrossingwiki.de/nachbarn/jens?do=search&sf=1&q={HttpUtility.UrlEncode(searchQuery)}+%40nachbarn");
             string charLink;
             try
