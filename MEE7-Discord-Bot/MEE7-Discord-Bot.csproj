@@ -222,4 +222,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\MessageDB\" />
+  </ItemGroup>
+
 </Project>

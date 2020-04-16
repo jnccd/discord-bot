@@ -1,5 +1,5 @@
-using System;
 using Newtonsoft.Json;
+using System;
 
 namespace WarframeNET
 {
@@ -12,12 +12,12 @@ namespace WarframeNET
         /// Id of the article.
         /// </summary>
         public string Id { get; set; }
-        
+
         /// <summary>
         /// Message of the article.
         /// </summary>
         public string Message { get; set; }
- 
+
         /// <summary>
         /// Estimate Time of Arrival of the article.
         /// </summary>

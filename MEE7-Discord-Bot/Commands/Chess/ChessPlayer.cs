@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MEE7.Chess
+﻿namespace MEE7.Commands
 {
     public class ChessPlayer
     {

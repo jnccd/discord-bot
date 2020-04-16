@@ -2,15 +2,10 @@
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
@@ -27,7 +22,7 @@ namespace MEE7.Commands
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",
                 (string[] split, ISocketMessageChannel Channel) => { return true; },
                 (SocketMessage commandmessage, string filePath, string[] split) => { DiscordNETWrapper.SendFile(filePath, commandmessage.Channel).Wait(); }),
-            new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) + 
+            new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) +
             ")\neg. " + Prefix + CommandLine + " drawPixel 10,45 Red",
                 (string[] split, ISocketMessageChannel Channel) => {
 
@@ -88,7 +83,7 @@ namespace MEE7.Commands
 
                     DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
                 }),
-            new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) + 
+            new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
             ")\neg. " + Prefix + CommandLine + " drawCircle 100,450 Red 25",
                 (string[] split, ISocketMessageChannel Channel) => {
 
@@ -290,7 +285,7 @@ namespace MEE7.Commands
                     string[] temps = split[2].Split(',');
                     int X = Convert.ToInt32(temps[0]);
                     int Y = Convert.ToInt32(temps[1]);
-                    
+
                     Bitmap temp;
                     System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
                     using (FileStream stream = new FileStream(filePath, FileMode.Open))

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace MEE7.Backend.HelperFunctions.Extensions
+namespace MEE7.Backend.HelperFunctions
 {
     public static class Extensions
     {
@@ -36,8 +36,11 @@ namespace MEE7.Backend.HelperFunctions.Extensions
         public static void InvokeParallel(this Delegate del, params object[] args)
         {
             foreach (var d in del.GetInvocationList())
-                Task.Run(() => { try { d.DynamicInvoke(args); }
-                                 catch { } });
+                Task.Run(() =>
+                {
+                    try { d.DynamicInvoke(args); }
+                    catch { }
+                });
         }
         public static string ToReadableString(this Type type)
         {

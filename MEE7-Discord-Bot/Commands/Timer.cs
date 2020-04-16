@@ -4,8 +4,6 @@ using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

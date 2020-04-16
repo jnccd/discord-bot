@@ -1,13 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using MEE7;
 using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
-using System;
-using System.Collections.Generic;
+using MEE7.Backend.HelperFunctions;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MEE7.Commands
 {
@@ -34,7 +29,7 @@ namespace MEE7.Commands
         }
         void PingReaction(IUserMessage message)
         {
-            message.AddReactionsAsync(new IEmote[] { PING_PONG, ANGRY_FACE }).Wait();  
+            message.AddReactionsAsync(new IEmote[] { PING_PONG, ANGRY_FACE }).Wait();
         }
 
         public override void Execute(SocketMessage message)

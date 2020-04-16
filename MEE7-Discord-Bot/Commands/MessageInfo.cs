@@ -1,14 +1,11 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using MEE7.Backend;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using MEE7.Backend.HelperFunctions;
-using Discord;
-using MEE7.Backend.HelperFunctions.Extensions;
+using System;
+using System.Linq;
 
-namespace MEE7.Commands._1FileCommands
+namespace MEE7.Commands
 {
     class MessageInfo : Command
     {
@@ -39,14 +36,16 @@ namespace MEE7.Commands._1FileCommands
             embed.AddFieldDirectly("Source:", m.Source, true);
             embed.AddFieldDirectly("Tags:", m.Tags.Count, true);
             embed.AddFieldDirectly("Type:", m.Type, true);
-            try {
+            try
+            {
                 embed.AddFieldDirectly("Emotes:", m.Content.GetEverythingBetweenAll("<", ">").
                 Select(x => Emote.TryParse($"<{x}>", out Emote e) ? e : null).
                 Where(x => x != null).
                 Select(x => x.Url).
                 Combine("\n"));
-            } catch {}
-            
+            }
+            catch { }
+
             DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();
         }
     }

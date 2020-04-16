@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 
-namespace MEE7.Chess
+namespace MEE7.Commands
 {
     public class ChessMove : ICloneable
     {

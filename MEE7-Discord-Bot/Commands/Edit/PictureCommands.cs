@@ -1,20 +1,15 @@
-﻿using Discord;
+﻿using BumpKit;
 using Discord.WebSocket;
+using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using BumpKit;
 using System.Numerics;
-using MEE7.Backend;
-using Color = System.Drawing.Color;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.HelperFunctions;
-using System.Drawing.Imaging;
-using System.Web;
-using System.Net;
 using static MEE7.Commands.Edit;
+using Color = System.Drawing.Color;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace MEE7.Commands
@@ -208,7 +203,8 @@ namespace MEE7.Commands
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
             return ApplyTransformation(bmp,
-                (x, y) => {
+                (x, y) =>
+                {
                     Vector2 point = new Vector2(x, y);
                     Vector2 diff = point - center;
                     float div = bmp.Width + bmp.Height;
@@ -225,7 +221,8 @@ namespace MEE7.Commands
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
             return ApplyTransformation(bmp,
-                (x, y) => {
+                (x, y) =>
+                {
                     Vector2 point = new Vector2(x, y);
                     Vector2 diff = point - center;
                     float div = bmp.Width + bmp.Height;
@@ -246,7 +243,8 @@ namespace MEE7.Commands
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
             return ApplyTransformation(bmp,
-                    (x, y) => {
+                    (x, y) =>
+                    {
                         Vector2 point = new Vector2(x, y);
                         Vector2 diff = point - center;
                         float div = bmp.Width + bmp.Height;
@@ -267,7 +265,8 @@ namespace MEE7.Commands
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
             return ApplyTransformation(bmp,
-                   (x, y) => {
+                   (x, y) =>
+                   {
                        Vector2 point = new Vector2(x, y);
                        Vector2 diff = point - center;
                        float div = bmp.Width + bmp.Height;
@@ -283,7 +282,8 @@ namespace MEE7.Commands
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
             return ApplyTransformation(bmp,
-                  (x, y) => {
+                  (x, y) =>
+                  {
                       Vector2 point = new Vector2(x, y);
                       Vector2 diff = point - center;
                       float div = bmp.Width + bmp.Height;
@@ -299,7 +299,8 @@ namespace MEE7.Commands
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
             return ApplyTransformation(bmp,
-                 (x, y) => {
+                 (x, y) =>
+                 {
                      Vector2 point = new Vector2(x, y);
                      Vector2 diff = point - center;
                      float div = bmp.Width + bmp.Height;
@@ -494,7 +495,7 @@ namespace MEE7.Commands
                 "then it goes forward again because it loops and its all very fancy n stuff";
         public Gif BackAndForth(Gif gif, SocketMessage m)
         {
-            return new Gif(gif.Item1.Concat(gif.Item1.Skip(1).Reverse().Select(x => (Bitmap)x.Clone())).ToArray(), 
+            return new Gif(gif.Item1.Concat(gif.Item1.Skip(1).Reverse().Select(x => (Bitmap)x.Clone())).ToArray(),
                            gif.Item2.Concat(gif.Item2.Skip(1).Reverse()).ToArray());
         }
 
@@ -593,8 +594,8 @@ namespace MEE7.Commands
         {
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
-                    DiscordNETWrapper.SendBitmap(b.CropImage(new Rectangle((int)(b.Width * (i / (float)x)), (int)(b.Height * (j / (float)y)), 
-                        (int)(b.Width / (float)x), (int)(b.Height / (float)y)), false), m.Channel, (i+1) + " " + (j+1)).Wait();
+                    DiscordNETWrapper.SendBitmap(b.CropImage(new Rectangle((int)(b.Width * (i / (float)x)), (int)(b.Height * (j / (float)y)),
+                        (int)(b.Width / (float)x), (int)(b.Height / (float)y)), false), m.Channel, (i + 1) + " " + (j + 1)).Wait();
 
             b.Dispose();
         }

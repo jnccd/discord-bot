@@ -1,11 +1,11 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
+using MEE7.Backend.HelperFunctions;
 using Newtonsoft.Json;
 using System.Collections;
 using System.IO;
-using System.Reflection;
-using MEE7.Backend.HelperFunctions;
-using Discord;
 using System.Linq;
+using System.Reflection;
 
 namespace MEE7.Configuration
 {
@@ -18,7 +18,8 @@ namespace MEE7.Configuration
         static readonly ulong DiscordConfigChannelID = Program.logChannel;
         static readonly string DiscordConfigMessage = "autosave";
         public static bool UnsavedChanges = false;
-        public static ConfigData Data {
+        public static ConfigData Data
+        {
             get
             {
                 lock (lockject)
@@ -76,7 +77,8 @@ namespace MEE7.Configuration
                         First(x => x.Content.StartsWith(DiscordConfigMessage) && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
                     using (var wc = new System.Net.WebClient())
                         discordConfig = wc.DownloadString(url);
-                } catch { }
+                }
+                catch { }
 
                 if (!string.IsNullOrWhiteSpace(discordConfig))
                     Data = JsonConvert.DeserializeObject<ConfigData>(discordConfig);

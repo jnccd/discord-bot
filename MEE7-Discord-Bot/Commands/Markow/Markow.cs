@@ -1,16 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using MEE7.Configuration;
-using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {
@@ -72,7 +68,7 @@ namespace MEE7.Commands
                     }
                 }
             }
-            
+
             MarkovHelper.AddToDict(input);
 
             loadedDict = true;

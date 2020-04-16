@@ -1,15 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MEE7.Chess;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.HelperFunctions;
 
 namespace MEE7.Commands
 {
@@ -53,7 +49,7 @@ namespace MEE7.Commands
                     DiscordNETWrapper.SendText("You can't play against Bots!", message.Channel).Wait();
                     return;
                 }
-                
+
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.MentionedUsers.ElementAt(0).Id ||
                         x.PlayerTop.UserID == message.MentionedUsers.ElementAt(0).Id))
                 {
@@ -138,7 +134,7 @@ namespace MEE7.Commands
 
         public void SendBoard(SocketMessage message)
         {
-            ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id || 
+            ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id ||
             x.PlayerTop.UserID == message.Author.Id);
             DiscordNETWrapper.SendBitmap(ChessBoardToPicture(Board), message.Channel, $"<@{Board.PlayerWhite.UserID}>(White) " +
                 $"vs. <@{Board.PlayerBlack.UserID}>(Black)\nCurrently its the {(Board.PlayerWhoHasTheMove() == Board.PlayerWhite ? "White" : "Black")} " +

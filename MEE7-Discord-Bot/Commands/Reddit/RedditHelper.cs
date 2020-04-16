@@ -1,14 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MEE7.Commands
@@ -108,7 +104,7 @@ namespace MEE7.Commands
                     await DiscordNETWrapper.SendFile(videofile, Channel, ResultTitle);
                     await DiscordNETWrapper.SendText(ResultPoints + (ResultPoints == "1" ? " fake internet point" : " fake internet points on " + subUrl.Remove(0, "https://www.reddit.com".Length)), Channel);
                 }
-                
+
                 // delete "Sending video post. Please wait..." message
                 IEnumerable<IMessage> messages = await Channel.GetMessagesAsync().FlattenAsync();
                 foreach (IMessage m in messages)

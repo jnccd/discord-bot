@@ -1,14 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using MEE7.Backend.Configuration;
+using MEE7.Backend.HelperFunctions;
+using MEE7.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MEE7.Backend.HelperFunctions;
-using MEE7.Configuration;
-using MEE7.Backend.HelperFunctions.Extensions;
-using MEE7.Backend.Configuration;
 
 namespace MEE7.Commands
 {
@@ -16,11 +14,11 @@ namespace MEE7.Commands
     {
         public ulong MessageID;
         public ulong ChannelID;
- 
+
         public List<Tuple<
             DiscordEmote, // Emote by Name,EmoteID,GuildID
             ulong> // RoleID
-            >EmoteRoleTuples = null;
+            > EmoteRoleTuples = null;
     }
 
     public class ManageRolesByEmote : Command
@@ -34,7 +32,7 @@ namespace MEE7.Commands
         private void OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
             foreach (var m in Config.Data.manageRoleByEmoteMessages)
-                foreach (var t in m.EmoteRoleTuples) 
+                foreach (var t in m.EmoteRoleTuples)
                     if (arg3.Emote.Name == t.Item1.Name)
                     {
                         var u = arg3.User.GetValueOrDefault();
@@ -63,7 +61,7 @@ namespace MEE7.Commands
             //    DiscordNETWrapper.SendText("You don't have permissions to give roles!", message.Channel).Wait();
             //    return;
             //}
-            
+
             var g = Program.GetGuildFromChannel(message.Channel);
             if (message.Author.Id != g.Owner.Id && message.Author.Id != Program.Master.Id)
             {
@@ -78,7 +76,8 @@ namespace MEE7.Commands
                 Split('|').
                 Select(x => x.Trim(' ')).
                 Select(x => x.Split(' ')).
-                Select(s => {
+                Select(s =>
+                {
                     IEmote e = null;
                     SocketRole r = null;
 
@@ -96,15 +95,15 @@ namespace MEE7.Commands
                 }).ToList();
 
             var roleMessage = DiscordNETWrapper.SendText("To get a role simply react to this message with the corresponding emote,\n" +
-                "to remove a role simply remove your reaction to this message.\n\n Emotes are mapped as follows:\n" + 
+                "to remove a role simply remove your reaction to this message.\n\n Emotes are mapped as follows:\n" +
                 emoteRoleTuples.Select(x => $"{x.Item1.Print()} - {g.Roles.First(y => y.Id == x.Item2).Name}").
-                Aggregate((x,y) => $"{x}\n{y}"), message.Channel).Result.Last();
+                Aggregate((x, y) => $"{x}\n{y}"), message.Channel).Result.Last();
 
             roleMessage.AddReactionsAsync(emoteRoleTuples.Select(x => x.Item1.ToIEmote()).ToArray()).Wait();
-            Config.Data.manageRoleByEmoteMessages.Add(new ManageRoleByEmoteMessage() 
-            { 
-                EmoteRoleTuples = emoteRoleTuples, 
-                MessageID = roleMessage.Id, 
+            Config.Data.manageRoleByEmoteMessages.Add(new ManageRoleByEmoteMessage()
+            {
+                EmoteRoleTuples = emoteRoleTuples,
+                MessageID = roleMessage.Id,
                 ChannelID = roleMessage.Channel.Id
             });
         }

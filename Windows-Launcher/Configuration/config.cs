@@ -12,7 +12,8 @@ namespace Starter
         static readonly string configPath = exePath + "config.json";
         static readonly string configBackupPath = exePath + "config_backup.json";
         public static bool UnsavedChanges = false;
-        public static ConfigData Data {
+        public static ConfigData Data
+        {
             get
             {
                 lock (lockject)

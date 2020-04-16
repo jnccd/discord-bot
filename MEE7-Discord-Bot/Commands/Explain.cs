@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
 
-namespace MEE7.Commands._OneFileCommands
+namespace MEE7.Commands
 {
     class Explain : Command
     {
@@ -26,15 +21,17 @@ namespace MEE7.Commands._OneFileCommands
 
             string search = WebUtility.UrlEncode(split.Skip(1).Combine(" "));
             string wikiSearch = split.Skip(1).Combine("_");
-            
+
             string urban = ($"https://www.urbandictionary.com/define.php?term={search}").GetHTMLfromURL();
             string wiki = ($"https://en.wikipedia.org/wiki/{wikiSearch}").GetHTMLfromURL();
 
             string wikiParse = "";
-            try {
+            try
+            {
                 string wikiArticle = wiki.GetEverythingBetween("<div class=\"mw-parser-output\">", "<tbody><tr>");
                 wikiParse = WebUtility.HtmlDecode(Regex.Replace(wikiArticle, "<[^>]*>", ""));
-            } catch { }
+            }
+            catch { }
             if (string.IsNullOrWhiteSpace(wikiParse))
             {
                 try
@@ -46,7 +43,8 @@ namespace MEE7.Commands._OneFileCommands
             }
 
             string urbanParse = "";
-            try {
+            try
+            {
                 string urbanTopCard = urban.GetEverythingBetween("<span class=\"category right hide unknown\">", "<div class=\"def-footer\">");
                 urbanParse = WebUtility.HtmlDecode(
                     Regex.Replace(urbanTopCard.
@@ -54,8 +52,9 @@ namespace MEE7.Commands._OneFileCommands
                         Replace("<div class=\"example\">", "\n\n").
                         Replace("<div class=\"tags\">", "\n\n"), "<[^>]*>", "").
                     Remove(0, "unknown".Length));
-            } catch { }
-            
+            }
+            catch { }
+
             EmbedBuilder b = new EmbedBuilder();
             if (!string.IsNullOrWhiteSpace(wikiParse))
                 b.AddFieldDirectly("Wikipedia:", wikiParse);

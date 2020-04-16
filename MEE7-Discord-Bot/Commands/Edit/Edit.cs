@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using MEE7.Backend.HelperFunctions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -51,14 +50,14 @@ namespace MEE7.Commands
                 this.Type = Type;
             }
         }
-        public abstract class SubCommand 
+        public abstract class SubCommand
         {
             public string Command;
             public Type InputType, OutputType;
 
             public int FunctionCalls() => 1;
         }
-        public abstract class SubPipeCommand: SubCommand
+        public abstract class SubPipeCommand : SubCommand
         {
 #pragma warning disable CS0649
             public static new string Command;
@@ -67,7 +66,7 @@ namespace MEE7.Commands
             public string[] RawCommands;
             public List<Tuple<object[], SubCommand>>[] Pipes;
         }
-        public class ForCommand: SubPipeCommand
+        public class ForCommand : SubPipeCommand
         {
             public static new string Command { get => "for"; set { } }
             public string VarName;
@@ -93,7 +92,7 @@ namespace MEE7.Commands
             }
 
             public int Steps() => (int)((End - Start) / StepWidth);
-            public new int FunctionCalls() => Steps() * Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x,y) => x + y);
+            public new int FunctionCalls() => Steps() * Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x, y) => x + y);
         }
         public class ForeachCommand : SubPipeCommand
         {
@@ -121,7 +120,7 @@ namespace MEE7.Commands
 
             public new int FunctionCalls() => Pipes[0].Select(x => x.Item2.FunctionCalls()).Aggregate((x, y) => x + y);
         }
-        public class EditCommand: SubCommand
+        public class EditCommand : SubCommand
         {
             public string Desc;
             public Argument[] Arguments;
@@ -147,8 +146,8 @@ namespace MEE7.Commands
                 this.sourceMethod = sourceMethod;
             }
         }
-        public class Pipe : List<Tuple<object[], SubCommand>> 
-        { 
+        public class Pipe : List<Tuple<object[], SubCommand>>
+        {
             public string rawPipe;
             public Type InputType() => this.First().Item2.InputType;
             public Type OutputType() => this.Last().Item2.OutputType;
@@ -183,7 +182,8 @@ namespace MEE7.Commands
                                               from assemblyType in domainAssembly.GetTypes()
                                               where assemblyType.IsSubclassOf(typeof(EditCommandProvider))
                                               select assemblyType).ToArray();
-            foreach (Type t in classesWithEditCommands) {
+            foreach (Type t in classesWithEditCommands)
+            {
                 var curCommands = new List<EditCommand>();
                 var methods = t.GetMethods();
                 var fields = t.GetFields();
@@ -198,9 +198,9 @@ namespace MEE7.Commands
                         var param = method.GetParameters();
                         if (param[1].ParameterType == typeof(SocketMessage))
                         {
-                            var command = new EditCommand(method.Name, desc, 
-                                param.First().ParameterType == typeof(Null)? null : param.First().ParameterType, 
-                                method.ReturnType == typeof(void)? null : method.ReturnType,
+                            var command = new EditCommand(method.Name, desc,
+                                param.First().ParameterType == typeof(Null) ? null : param.First().ParameterType,
+                                method.ReturnType == typeof(void) ? null : method.ReturnType,
                                 param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
                                 (SocketMessage m, object[] args, object o) =>
                                 {
@@ -221,7 +221,8 @@ namespace MEE7.Commands
                                 });
                             curCommands.Add(command);
                         }
-                    } catch { }
+                    }
+                    catch { }
                 }
 
                 Commands = Commands.Union(curCommands);
@@ -265,7 +266,7 @@ namespace MEE7.Commands
             {
                 var hits = Commands.OrderBy(x => x.Command.LevenshteinDistance(split[2]));
                 var top3 = hits.Take(3).ToArray();
-                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder("Search hits:", top3.Length == 0 ? "-" : 
+                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder("Search hits:", top3.Length == 0 ? "-" :
                     top3.Select(x => $"{Array.IndexOf(top3, x) + 1}. {x.Command}\n{x.Desc}\n{CommandToCommandTypeString(x)}").Combine("\n\n")), message.Channel).Wait();
             }
             else
@@ -283,7 +284,7 @@ namespace MEE7.Commands
                 {
                     var s = e.StackTrace.GetEverythingBetweenAll(Path.DirectorySeparatorChar.ToString(), "\n");
                     DiscordNETWrapper.SendText($"{e.Message}" +
-                        $"{(s.Count > 0 ? $", {s.Last()}" : "")}", 
+                        $"{(s.Count > 0 ? $", {s.Last()}" : "")}",
                         message.Channel).Wait();
                     return;
                 }
@@ -302,7 +303,8 @@ namespace MEE7.Commands
 
             string input = rawPipe.Trim(' ');
             int k = 0, j = 0;
-            string[] commands = new string(input.Select(x => {
+            string[] commands = new string(input.Select(x =>
+            {
                 if (x == '(')
                     k++;
                 if (x == '{')
@@ -352,7 +354,7 @@ namespace MEE7.Commands
                         if (args.Length != 4)
                             throw new Exception($"A for loop needs 4 parameters!");
 
-                        reCommand = new ForCommand(varName: args[0], start: args[1].ConvertToDouble(), 
+                        reCommand = new ForCommand(varName: args[0], start: args[1].ConvertToDouble(),
                             end: args[2].ConvertToDouble(), stepWidth: args[3].ConvertToDouble(),
                             rawCommands: rawPipes, rawPipes.Select(x => GetExecutionPipe(message, x, false)).ToArray());
                     }
@@ -375,7 +377,8 @@ namespace MEE7.Commands
                     if (argumentParsing)
                     {
                         k = 0; j = 0;
-                        string[] args = new string(arg.Select(x => {
+                        string[] args = new string(arg.Select(x =>
+                        {
                             if (x == '(')
                                 k++;
                             if (x == '{')
@@ -414,7 +417,7 @@ namespace MEE7.Commands
                             else
                                 parsedArgs[i] = command.Arguments[i].StandardValue;
                     }
-                    
+
                     reCommand = command;
                 }
 
@@ -438,9 +441,9 @@ namespace MEE7.Commands
                 {
                     if (!pipe[i].Item2.InputType.IsAssignableFrom(pipe[i - 1].Item2.OutputType) &&
                     !pipe[i].Item2.InputType.ContainsGenericParameters && !pipe[i - 1].Item2.OutputType.ContainsGenericParameters)
-                    throw new Exception($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
-                        $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
-                        $"from {pipe[i - 1].Item2.Command}");
+                        throw new Exception($"Type Error: {i + 1}. Command, {pipe[i].Item2.Command} should recieve a " +
+                            $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
+                            $"from {pipe[i - 1].Item2.Command}");
                 }
                 catch (Exception e) { if (e.Message.StartsWith("Type Error")) throw e; }
             for (int i = 1; i < pipe.Count - 1; i++)
@@ -475,7 +478,7 @@ namespace MEE7.Commands
 
             foreach (Tuple<object[], SubCommand> p in pipe)
             {
-                try 
+                try
                 {
                     if (p.Item2 is EditCommand)
                         currentData = (p.Item2 as EditCommand).Function(message, p.Item1, currentData);
@@ -489,7 +492,8 @@ namespace MEE7.Commands
                         for (int i = 0; i < forCommand.Steps(); i++)
                         {
                             int j = i;
-                            threads.Add(Task.Run(() => {
+                            threads.Add(Task.Run(() =>
+                            {
                                 object usableData;
                                 lock (currentData)
                                 {
@@ -524,7 +528,8 @@ namespace MEE7.Commands
                         for (int i = 0; i < arraydCurrentData.Length; i++)
                         {
                             int j = i;
-                            threads.Add(Task.Run(() => {
+                            threads.Add(Task.Run(() =>
+                            {
                                 double varValue = foreachCommand.Start + ((foreachCommand.End - foreachCommand.Start) * (j / (double)arraydCurrentData.Length));
                                 string rawCommandThisLoop = foreachCommand.RawCommands[0].Replace($"%{foreachCommand.VarName}", varValue.ToString().Replace(",", "."));
                                 Pipe parsedLoopedPipe =
@@ -538,10 +543,13 @@ namespace MEE7.Commands
                         currentData = array;
                     }
                 }
-                catch (Exception e) { throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} " + 
-                    $"{e.InnerException.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}"); }
+                catch (Exception e)
+                {
+                    throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} " +
+  $"{e.InnerException.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}");
+                }
 
-                if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) && 
+                if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) &&
                     !p.Item2.OutputType.ContainsGenericParameters)
                     throw new Exception($"Corrupt Function Error: {p.Item2.Command} was supposed to give me a " +
                         $"{p.Item2.OutputType} but actually gave me a {currentData.GetType().ToReadableString()}");

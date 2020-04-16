@@ -1,12 +1,9 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using MEE7.Backend;
-using MEE7.Backend.HelperFunctions.Extensions;
+using MEE7.Backend.HelperFunctions;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
-using System.Text;
 
 namespace MEE7.Commands
 {
