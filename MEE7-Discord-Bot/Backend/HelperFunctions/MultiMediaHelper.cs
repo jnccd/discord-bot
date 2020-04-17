@@ -59,9 +59,13 @@ namespace MEE7.Backend.HelperFunctions
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
 
+            string filename;
+            if (Program.RunningOnLinux) filename = "./youtube-dl";
+            else filename = "youtube-dl";
+
             return Process.Start(new ProcessStartInfo()
             {
-                FileName = "youtube-dl",
+                FileName = filename,
                 Arguments = $"--audio-format {audioFormat} -o - {YoutubeURL}",
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
@@ -70,9 +74,13 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static Process CreateFfmpegOut(string filePath)
         {
+            string filename;
+            if (Program.RunningOnLinux) filename = "./ffmpeg";
+            else filename = "ffmpeg";
+
             return Process.Start(new ProcessStartInfo
             {
-                FileName = "ffmpeg",
+                FileName = filename,
                 Arguments = $"-hide_banner -loglevel panic -ac 2 -f s16le -ar 48000 -i {filePath} -acodec pcm_u8 -ar 22050 -f wav -",
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
