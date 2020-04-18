@@ -326,6 +326,16 @@ namespace MEE7.Commands
                                             y + percent * (float)Math.Cos((x + offsetX) / scale)));
         }
 
+        public string TransformPictureDesc = "Perform a liqidify transformation on the image using a custom function";
+        public Bitmap TransformPicture(Bitmap bmp, SocketMessage m, Pipe transformationFunction)
+        {
+            if (transformationFunction.OutputType() != typeof(Vector2))
+                throw new Exception("Boi I need sum vectors!");
+
+            return ApplyTransformation(bmp,
+                    (x, y) => (Vector2)transformationFunction.Apply(m, bmp, new Dictionary<string, object>() { { "x", x }, { "y", y } }));
+        }
+
         public string sobelEdgesDesc = "Highlights horizontal edges";
         public Bitmap sobelEdges(Bitmap bmp, SocketMessage m)
         {
