@@ -13,8 +13,14 @@ namespace MEE7.Commands
         public string AddDesc = "Addition";
         public double Add(Null n, SocketMessage m, double a, double b) => a + b;
 
+        public string SubDesc = "Subtraction";
+        public double Sub(Null n, SocketMessage m, double a, double b) => a - b;
+
         public string MultDesc = "Multiplication";
         public double Mult(Null n, SocketMessage m, double a, double b) => a * b;
+
+        public string DivDesc = "Dividing";
+        public double Div(Null n, SocketMessage m, double a, double b) => a / b;
 
         public string PowDesc = "Powification";
         public double Pow(Null n, SocketMessage m, double a, double b) => Math.Pow(a, b);
@@ -59,7 +65,7 @@ namespace MEE7.Commands
         }
 
         public string MapGDesc = "Map for gifs, because gifs are special now";
-        public Gif MapG<a>(Gif gif, SocketMessage m, string pipe, string varName = "i", float startValue = 0, float endValue = int.MinValue)
+        public Gif MapG(Gif gif, SocketMessage m, string pipe, string varName = "i", float startValue = 0, float endValue = int.MinValue)
         {
             if (endValue == int.MinValue) endValue = gif.Item1.Length;
             for (int i = 0; i < gif.Item1.Length; i++)
