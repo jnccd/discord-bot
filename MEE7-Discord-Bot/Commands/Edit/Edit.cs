@@ -148,6 +148,7 @@ namespace MEE7.Commands
         }
         public class Pipe : List<Tuple<object[], SubCommand>>
         {
+            public bool isArgsPipe = false;
             public string rawPipe;
             public Type InputType() => this.First().Item2.InputType;
             public Type OutputType() => this.Last().Item2.OutputType;
@@ -156,13 +157,15 @@ namespace MEE7.Commands
             {
                 return CheckPipe(GetExecutionPipe(message, rawPipe), true, InputType, OutputType);
             }
-            public object Apply(SocketMessage message, object inputData)
+            public object Apply(SocketMessage message, object inputData, Dictionary<string, object> vars = null)
             {
-                return RunPipe(this, message, inputData);
+                return RunPipe(this, message, inputData, vars);
             }
         }
         public class Gif : Tuple<Bitmap[], int[]> { public Gif(Bitmap[] item1, int[] item2) : base(item1, item2) { } }
-        public class Null { }
+        public class EditNull { }
+        public class EditVariable { public string VarName; }
+
         private static IEnumerable<EditCommand> Commands;
 
         public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
@@ -199,13 +202,13 @@ namespace MEE7.Commands
                         if (param[1].ParameterType == typeof(SocketMessage))
                         {
                             var command = new EditCommand(method.Name, desc,
-                                param.First().ParameterType == typeof(Null) ? null : param.First().ParameterType,
+                                param.First().ParameterType == typeof(EditNull) ? null : param.First().ParameterType,
                                 method.ReturnType == typeof(void) ? null : method.ReturnType,
                                 param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
                                 (SocketMessage m, object[] args, object o) =>
                                 {
-                                    if (param.First().ParameterType == typeof(Null))
-                                        o = new Null();
+                                    if (param.First().ParameterType == typeof(EditNull))
+                                        o = new EditNull();
 
                                     var completeArgs = new object[] { o, m }.ToList();
                                     completeArgs.AddRange(args);
@@ -402,15 +405,35 @@ namespace MEE7.Commands
                             if (i < args.Length)
                             {
                                 args[i] = args[i].Trim(' ');
-                                try
-                                {
-                                    parsedArgs[i] = Convert.ChangeType(Pipe.Parse(message, args[i]).Apply(message, null), command.Arguments[i].Type);
-                                }
-                                catch
-                                {
-                                    try { parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]); }
-                                    catch { throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}"); }
-                                }
+
+                                // Args preprocessing
+                                if (args[i].StartsWith('%')) // If it starts with % its a var
+                                    parsedArgs[i] = new EditVariable() { VarName = args[i].Trim('%') };
+                                else
+                                    try // Try the ArgumentParseMethods on it
+                                    {
+                                        parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]);
+                                    }
+                                    catch
+                                    {
+                                        try // Assume the argument is a pipe and that the pipe takes null as input and uses no vars, try to run it to preprocess the arg
+                                        {
+                                            parsedArgs[i] = Convert.ChangeType(Pipe.Parse(message, args[i]).Apply(message, null), command.Arguments[i].Type);
+                                        }
+                                        catch
+                                        {
+                                            try // Assume the argument is a pipe again, only parse it and run it in runtime
+                                            {
+                                                parsedArgs[i] = Pipe.Parse(message, args[i]);
+                                                (parsedArgs[i] as Pipe).isArgsPipe = true;
+                                            }
+                                            catch
+                                            {
+                                                throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}");
+                                            }
+                                        }
+                                        
+                                    }
                             }
                             else if (command.Arguments[i].StandardValue == null)
                                 throw new Exception($"[{cwoargs}] {command.Arguments[i].Name} requires a value!");
@@ -472,7 +495,7 @@ namespace MEE7.Commands
 
             return pipe;
         }
-        static object RunPipe(Pipe pipe, SocketMessage message, object initialData = null)
+        static object RunPipe(Pipe pipe, SocketMessage message, object initialData = null, Dictionary<string, object> vars = null)
         {
             object currentData = initialData;
 
@@ -480,8 +503,20 @@ namespace MEE7.Commands
             {
                 try
                 {
+                    object[] args = p.Item1.Select(arg => {
+                        if (arg is EditVariable)
+                            if (vars == null || !vars.ContainsKey((arg as EditVariable).VarName))
+                                throw new Exception("you fowgot to define vawiabwes uwu");
+                            else
+                                return vars[(arg as EditVariable).VarName];
+                        else if (arg is Pipe && (arg as Pipe).isArgsPipe)
+                            return (arg as Pipe).Apply(message, null, vars);
+                        else
+                            return arg;
+                    }).ToArray();
+
                     if (p.Item2 is EditCommand)
-                        currentData = (p.Item2 as EditCommand).Function(message, p.Item1, currentData);
+                        currentData = (p.Item2 as EditCommand).Function(message, args, currentData);
                     else if (p.Item2 is ForCommand)
                     {
                         ForCommand forCommand = p.Item2 as ForCommand;
@@ -546,7 +581,7 @@ namespace MEE7.Commands
                 catch (Exception e)
                 {
                     throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} " +
-  $"{e.InnerException.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}");
+                        $"{e.InnerException.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}");
                 }
 
                 if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) &&

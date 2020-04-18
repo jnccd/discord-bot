@@ -11,40 +11,40 @@ namespace MEE7.Commands
     class FunctionalEditCommands : EditCommandProvider
     {
         public string AddDesc = "Addition";
-        public double Add(Null n, SocketMessage m, double a, double b) => a + b;
+        public double Add(EditNull n, SocketMessage m, double a, double b) => a + b;
 
         public string SubDesc = "Subtraction";
-        public double Sub(Null n, SocketMessage m, double a, double b) => a - b;
+        public double Sub(EditNull n, SocketMessage m, double a, double b) => a - b;
 
         public string MultDesc = "Multiplication";
-        public double Mult(Null n, SocketMessage m, double a, double b) => a * b;
+        public double Mult(EditNull n, SocketMessage m, double a, double b) => a * b;
 
         public string DivDesc = "Dividing";
-        public double Div(Null n, SocketMessage m, double a, double b) => a / b;
+        public double Div(EditNull n, SocketMessage m, double a, double b) => a / b;
 
         public string PowDesc = "Powification";
-        public double Pow(Null n, SocketMessage m, double a, double b) => Math.Pow(a, b);
+        public double Pow(EditNull n, SocketMessage m, double a, double b) => Math.Pow(a, b);
 
         public string SqrtDesc = "Sqrtification";
-        public double Sqrt(Null n, SocketMessage m, double a) => Math.Sqrt(a);
+        public double Sqrt(EditNull n, SocketMessage m, double a) => Math.Sqrt(a);
 
         public string LogDesc = "Logification";
-        public double Log(Null n, SocketMessage m, double a, double b) => Math.Log(a, b);
+        public double Log(EditNull n, SocketMessage m, double a, double b) => Math.Log(a, b);
 
         public string SinDesc = "Sinification";
-        public double Sin(Null n, SocketMessage m, double a) => Math.Sin(a);
+        public double Sin(EditNull n, SocketMessage m, double a) => Math.Sin(a);
 
         public string CosDesc = "Cosification";
-        public double Cos(Null n, SocketMessage m, double a) => Math.Cos(a);
+        public double Cos(EditNull n, SocketMessage m, double a) => Math.Cos(a);
 
         public string PiDesc = "Pi";
-        public double Pi(Null n, SocketMessage m) => Math.PI;
+        public double Pi(EditNull n, SocketMessage m) => Math.PI;
 
         public string EDesc = "E";
-        public double E(Null n, SocketMessage m) => Math.E;
+        public double E(EditNull n, SocketMessage m) => Math.E;
 
         public string newVectorDesc = "Creates a new Vector object";
-        public Vector2 NewVector(Null n, SocketMessage m, double a, double b) => new Vector2((float)a, (float)b);
+        public Vector2 NewVector(EditNull n, SocketMessage m, double a, double b) => new Vector2((float)a, (float)b);
 
         public string ForFuncDesc = "foori foori";
         public a[] ForFunc<a>(a o, SocketMessage m, string pipe, string varName, float startValue, float endValue, float stepWidth)
