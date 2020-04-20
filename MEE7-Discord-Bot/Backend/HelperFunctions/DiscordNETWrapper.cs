@@ -145,6 +145,9 @@ namespace MEE7.Backend.HelperFunctions
                 foreach (var message in messages)
                     yield return message;
 
+                if (messages.Count() == 0)
+                    break;
+
                 lastMessageID = messages.Last().Id;
             }
         }

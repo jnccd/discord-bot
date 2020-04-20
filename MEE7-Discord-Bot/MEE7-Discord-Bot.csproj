@@ -199,6 +199,9 @@
     <None Update="Commands\MemeTextTemplates\wait-thats-illegal.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MessageDB\db.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\Place\place.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -222,8 +225,6 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\MessageDB\" />
-  </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties commands_4messagedb_4db_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
 
 </Project>
