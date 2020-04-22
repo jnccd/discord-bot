@@ -8,11 +8,11 @@ namespace MEE7.Commands
 {
     public class PingReact : Command
     {
-        readonly Emoji ANGRY_FACE = new Emoji("😠");
-        readonly Emoji PING_PONG = new Emoji("🏓");
+        Emote pingRage;
 
         public PingReact() : base("", "", false, true)
         {
+            pingRage = Emote.Parse("<a:pingRage:702500510481121411>");
             Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }
 
@@ -29,7 +29,7 @@ namespace MEE7.Commands
         }
         void PingReaction(IUserMessage message)
         {
-            message.AddReactionsAsync(new IEmote[] { PING_PONG, ANGRY_FACE }).Wait();
+            message.AddReactionsAsync(new IEmote[] { pingRage }).Wait();
         }
 
         public override void Execute(SocketMessage message)
