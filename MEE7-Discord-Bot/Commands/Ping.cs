@@ -9,7 +9,7 @@ namespace MEE7.Commands
     {
         public override void Execute(SocketMessage message)
         {
-            DiscordNETWrapper.SendText($"Pong in {(int)(message.Timestamp - DateTime.Now).TotalMilliseconds}ms!", message.Channel).Wait();
+            DiscordNETWrapper.SendText($"Pong in {(int)(DateTime.Now - message.CreatedAt).TotalMilliseconds}ms!", message.Channel).Wait();
         }
     }
 }
