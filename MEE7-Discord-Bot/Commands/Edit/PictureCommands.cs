@@ -738,6 +738,12 @@ namespace MEE7.Commands
             }
         }
 
+        public string ReverseGDesc = "Make the gif go backwards";
+        public Gif ReverseG(Gif gif, SocketMessage m)
+        {
+            return new Gif(gif.Item1.Reverse().ToArray(),
+                           gif.Item2.Reverse().ToArray());
+        }
 
         static readonly object memifyLock = new object();
 
