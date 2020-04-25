@@ -59,6 +59,10 @@ namespace MEE7.Backend
             DeleteFunc = m.DeleteAsync;
         }
 
+        public bool IsSuppressed => throw new NotImplementedException();
+        public MessageReference Reference => throw new NotImplementedException();
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException();
+
         string IMessage.Content => Content;
         DateTimeOffset IMessage.Timestamp => Timestamp;
         DateTimeOffset? IMessage.EditedTimestamp => EditedTimestamp;
@@ -80,9 +84,11 @@ namespace MEE7.Backend
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds;
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds;
 
-        public Task DeleteAsync(RequestOptions options = null)
-        {
-            return DeleteFunc(options);
-        }
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => throw new NotImplementedException();
+        public Task DeleteAsync(RequestOptions options = null) => DeleteFunc(options);
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => throw new NotImplementedException();
     }
 }
