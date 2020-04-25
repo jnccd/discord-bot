@@ -35,7 +35,7 @@ namespace MEE7.Backend.HelperFunctions
         public static a MinElement<a>(this IEnumerable<a> xs, Func<a, double> f) { return xs.MinElement(f, out double _); }
         public static a MinElement<a>(this IEnumerable<a> xs, Func<a, double> f, out double min)
         {
-            min = 0; a minE = default;
+            min = double.MaxValue; a minE = default;
             foreach (a x in xs)
             {
                 double res = f(x);

@@ -49,7 +49,7 @@ namespace MEE7.Backend.HelperFunctions
         public static string GetEverythingBetween(this string str, string left, string right)
         {
             int leftIndex = str.IndexOf(left);
-            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + 1);
+            int rightIndex = str.IndexOf(right, leftIndex == -1 ? 0 : leftIndex + left.Length);
 
             if (right == "")
                 rightIndex = str.Length - 1;
@@ -57,7 +57,7 @@ namespace MEE7.Backend.HelperFunctions
             if (left == "")
                 leftIndex = 0;
 
-            if (leftIndex == -1 || rightIndex == -1 || leftIndex > rightIndex)
+            if (leftIndex == -1 || rightIndex == -1 || leftIndex + left.Length > rightIndex)
             {
                 //throw new Exception("String doesnt contain left or right borders!");
                 return "";
