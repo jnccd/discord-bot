@@ -688,12 +688,6 @@ namespace MEE7.Commands
             return new Gif(re.ToArray(), gif.Item2.Select(y => y / x > 0 ? y / x : 1).ToArray());
         }
 
-        public string renderHTMLDesc = "Render HTML";
-        public Bitmap RenderHTML(string html, SocketMessage m)
-        {
-            return html.ConvertHtmlToImage();
-        }
-
         public string getHTMLFromWebsiteDesc = "Get the websites html";
         public string GetHTMLFromWebsite(string url, SocketMessage m)
         {
@@ -746,7 +740,7 @@ namespace MEE7.Commands
                            gif.Item2.Reverse().ToArray());
         }
 
-        public string AddAsEmoteGDesc = "Add the gif to the server emotes";
+        public string AddAsEmoteGDesc = "Add the gif to the server emotes [WIP]!";
         public void AddAsEmoteG(Gif gif, SocketMessage m, string name = "uwu")
         {
             var guild = Program.GetGuildFromChannel(m.Channel);
