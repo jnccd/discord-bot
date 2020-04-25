@@ -1,4 +1,5 @@
-﻿using BumpKit;
+﻿using AnimatedGif;
+using BumpKit;
 using Discord.WebSocket;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -743,6 +744,30 @@ namespace MEE7.Commands
         {
             return new Gif(gif.Item1.Reverse().ToArray(),
                            gif.Item2.Reverse().ToArray());
+        }
+
+        public string AddAsEmoteGDesc = "Add the gif to the server emotes";
+        public void AddAsEmoteG(Gif gif, SocketMessage m, string name = "uwu")
+        {
+            var guild = Program.GetGuildFromChannel(m.Channel);
+            var guildUser = guild.GetUser(m.Author.Id);
+
+            if (!guildUser.GuildPermissions.AddReactions)
+                throw new Exception("U no have permission for dis :c");
+
+            using (MemoryStream s = new MemoryStream())
+            {
+                int maxWidth = gif.Item1.Select(x => x.Width).Max();
+                int maxHeight = gif.Item1.Select(x => x.Height).Max();
+                using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
+                    for (int i = 0; i < gif.Item1.Length; i++)
+                        c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
+
+                guild.CreateEmoteAsync(name, new Discord.Image(s)).Wait();
+
+                foreach (Bitmap b in gif.Item1)
+                    b.Dispose();
+            }
         }
 
         static readonly object memifyLock = new object();
