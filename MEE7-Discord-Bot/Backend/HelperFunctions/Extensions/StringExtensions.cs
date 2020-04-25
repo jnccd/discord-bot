@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using TheArtOfDev.HtmlRenderer.WinForms;
 using static MEE7.Commands.Edit;
 
 namespace MEE7.Backend.HelperFunctions
@@ -361,14 +360,6 @@ namespace MEE7.Backend.HelperFunctions
                 return req.GetResponse();
             }
             catch (Exception) { return null; }
-        }
-        public static Bitmap ConvertHtmlToImage(this string HTML, int width = 600, int height = 800)
-        {
-            Bitmap b = new Bitmap(width, height);
-            using (Graphics g = Graphics.FromImage(b))
-                g.FillRectangle(Brushes.White, new Rectangle(0, 0, width, height));
-            HtmlRender.Render(Graphics.FromImage(b), HTML, new PointF(0, 0), new SizeF(500, 500));
-            return b;
         }
     }
 }
