@@ -12,12 +12,19 @@ namespace MEE7.Backend.HelperFunctions
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);
             Embed.WithAuthor(m.Author);
-            Embed.WithTitle(string.IsNullOrWhiteSpace(m.Content) ?
-                m.Attachments.Select(x => x.Url).
-                Where(x => !x.EndsWith(".png") && !x.EndsWith(".jpg")).
-                Union(new string[] { "-" }).
-                Aggregate((x, y) => y == "-" ? x : x + " " + y) :
-                (m.Content.Length > 256 ? m.Content.Substring(0, 253) + "..." : m.Content));
+
+            if (string.IsNullOrWhiteSpace(m.Content))
+                Embed.WithTitle(m.Attachments.Select(x => x.Url).
+                    Where(x => !x.EndsWith(".png") && !x.EndsWith(".jpg")).
+                    Union(new string[] { "-" }).
+                    Aggregate((x, y) => y == "-" ? x : x + " " + y));
+            else if (m.Content.Length > 256)
+                Embed.WithTitle(m.Content.Substring(0, 253) + "...");
+            else if (m.Content.StartsWith("```"))
+                Embed.WithTitle(m.Content.Trim('`').GetEverythingBetween("\n", ""));
+            else
+                Embed.WithTitle(m.Content);
+
             try
             {
                 if (m.Attachments.Count > 0)
