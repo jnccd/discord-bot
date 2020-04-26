@@ -26,7 +26,7 @@ namespace MEE7.Commands
         public ManageRolesByEmote() : base("sendRoleEmojiMessage", "", isExperimental: false, isHidden: false)
         {
             Program.OnEmojiReactionAdded += OnEmojiReactionAdded;
-            Program.OnEmojiReactionRemoved += OnEmojiReactionRemoved; ;
+            Program.OnEmojiReactionRemoved += OnEmojiReactionRemoved;
         }
 
         private void OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)

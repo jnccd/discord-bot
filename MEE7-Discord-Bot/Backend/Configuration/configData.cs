@@ -28,7 +28,7 @@ namespace MEE7.Configuration
         public string TwitchAPIAccessToken;
         public string ExtraStuff;
         public List<ManageRoleByEmoteMessage> manageRoleByEmoteMessages;
-        public List<Tuple<string, ulong, ulong, DateTime>> timers;
+        public List<ConfigTimer> timers;
 
         public ConfigData()
         {
@@ -44,7 +44,7 @@ namespace MEE7.Configuration
             MessagePreviewServers = new List<ulong>();
             WarframeIDList = new List<string>();
             manageRoleByEmoteMessages = new List<ManageRoleByEmoteMessage>();
-            timers = new List<Tuple<string, ulong, ulong, DateTime>>();
+            timers = new List<ConfigTimer>();
         }
     }
 }

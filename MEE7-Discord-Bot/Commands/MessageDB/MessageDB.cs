@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace MEE7.Commands.MessageDB
@@ -45,6 +46,7 @@ namespace MEE7.Commands.MessageDB
                     var curGuild = Program.GetGuildFromChannel(message.Channel);
                     var jsonGuilds = ParseJson(File.ReadAllText(dbPath));
                     DBGuild db = DBFromGuild(curGuild);
+                    jsonGuilds = jsonGuilds.Where(x => x.Id != db.Id).ToArray();
                     jsonGuilds = jsonGuilds.Append(db).ToArray();
                     File.WriteAllText(dbPath, CreateJson(jsonGuilds));
                 }
