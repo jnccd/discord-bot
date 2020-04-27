@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using Newtonsoft.Json;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ namespace MEE7.Commands.MessageDB
 {
     class MessageDB : Command
     {
+        string dbDirPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}";
         string dbPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}db.json";
         object dbLock = new object();
 
@@ -44,33 +46,34 @@ namespace MEE7.Commands.MessageDB
                         return;
 
                     var curGuild = Program.GetGuildFromChannel(message.Channel);
-                    var jsonGuilds = ParseJson(File.ReadAllText(dbPath));
                     DBGuild db = DBFromGuild(curGuild);
-                    jsonGuilds = jsonGuilds.Where(x => x.Id != db.Id).ToArray();
-                    jsonGuilds = jsonGuilds.Append(db).ToArray();
-                    File.WriteAllText(dbPath, CreateJson(jsonGuilds));
+                    File.WriteAllText(GetFilePath(db), CreateJson(db));
+
+                    DiscordNETWrapper.SendText("Server db build!", message.Channel).Wait();
                 }
-                else if (split[1] == "countCAUchannelMessages")
+                else if (split[1] == "countChannelMessages")
                 {
-                    var jsonGuilds = ParseJson(File.ReadAllText(dbPath));
-                    
-                    DBGuild cauGuild = jsonGuilds.First(x => x.Id == 479950092938248193);
+                    DBGuild dbGuild = null;
+                    if ((dbGuild = GetGuild(message)) == null)
+                        return;
+
                     string re = "";
-                    foreach (var channel in cauGuild.TextChannels.OrderByDescending(x => x.Messages.Count))
+                    foreach (var channel in dbGuild.TextChannels.OrderByDescending(x => x.Messages.Count))
                     {
                         re += $"`{channel.Name}`: **{channel.Messages.Count}** messages\n";
                     }
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
-                else if (split[1] == "countCAUuserMessages")
+                else if (split[1] == "countUserMessages")
                 {
-                    var jsonGuilds = ParseJson(File.ReadAllText(dbPath));
-                    
-                    DBGuild cauGuild = jsonGuilds.First(x => x.Id == 479950092938248193);
+                    DBGuild dbGuild = null;
+                    if ((dbGuild = GetGuild(message)) == null)
+                        return;
+
                     string re = "";
 
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
-                    foreach (var channel in cauGuild.TextChannels)
+                    foreach (var channel in dbGuild.TextChannels)
                         allGuildMessages.AddRange(channel.Messages);
 
                     var grouping = allGuildMessages.GroupBy(x => x.AuthorName);
@@ -80,11 +83,73 @@ namespace MEE7.Commands.MessageDB
 
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
+                else if (split[1] == "plotActivityOverTime")
+                {
+                    DBGuild dbGuild = null;
+                    if ((dbGuild = GetGuild(message)) == null)
+                        return;
+
+                    List<DBMessage> allGuildMessages = new List<DBMessage>();
+                    try
+                    {
+                        ulong channelID = Convert.ToUInt64(split[2]);
+                        allGuildMessages = dbGuild.TextChannels.First(x => x.Id == channelID).Messages;
+                    }
+                    catch
+                    {
+                        allGuildMessages.Clear();
+                        foreach (var channel in dbGuild.TextChannels)
+                            allGuildMessages.AddRange(channel.Messages);
+                    }
+
+                    if (allGuildMessages.Count == 0)
+                    {
+                        DiscordNETWrapper.SendText("No messages to plot :/", message.Channel).Wait();
+                        return;
+                    }
+
+                    var messagesGroupedByDay = allGuildMessages.
+                        OrderBy(x => x.Timestamp).
+                        Select(x => new Tuple<DBMessage, string>(x, x.Timestamp.ToShortDateString())).
+                        GroupBy(x => x.Item2).
+                        Select(x => new Tuple<string, int>(x.Key, x.Count())).
+                        ToArray();
+
+                    Plot plt = new Plot();
+                    plt.PlotScatter(
+                        messagesGroupedByDay.
+                        Select(x => DateTime.Parse(x.Item1).ToOADate()).
+                        ToArray(), 
+                        messagesGroupedByDay.
+                        Select(x => (double)x.Item2).
+                        ToArray());
+                    plt.Ticks(dateTimeX: true);
+                    plt.Legend();
+                    plt.Title("Server Activity over Time");
+                    plt.YLabel("Messages send on that day");
+                    plt.XLabel("Day");
+
+                    DiscordNETWrapper.SendBitmap(plt.GetBitmap(), message.Channel).Wait();
+                }
             }
         }
 
-        DBGuild[] ParseJson(string json) => JsonConvert.DeserializeObject<DBGuild[]>(json);
-        string CreateJson(DBGuild[] db) => JsonConvert.SerializeObject(db);
+        DBGuild GetGuild(SocketMessage message)
+        {
+            var curGuild = Program.GetGuildFromChannel(message.Channel);
+            if (!File.Exists(GetFilePath(curGuild)))
+            {
+                DiscordNETWrapper.SendText("I don't have data saved for this server yet :/", message.Channel).Wait();
+                return null;
+            }
+            return ParseJson(File.ReadAllText(GetFilePath(curGuild)));
+        }
+
+        string GetFilePath(SocketGuild g) => $"{dbDirPath}{g.Id}db.json";
+        string GetFilePath(DBGuild g) => $"{dbDirPath}{g.Id}db.json";
+
+        DBGuild ParseJson(string json) => JsonConvert.DeserializeObject<DBGuild>(json);
+        string CreateJson(DBGuild db) => JsonConvert.SerializeObject(db);
 
         public DBGuild DBFromGuild(SocketGuild guild)
         {
