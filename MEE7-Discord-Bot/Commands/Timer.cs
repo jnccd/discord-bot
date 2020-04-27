@@ -95,15 +95,15 @@ namespace MEE7.Commands
         public override void Execute(SocketMessage message)
         {
             string[] split = message.Content.Split(' ');
-            if (split.Length != 4)
+            if (split.Length < 4)
             {
-                DiscordNETWrapper.SendText("You didn't give me proper arguments to work with :angery:", message.Channel).Wait();
+                DiscordNETWrapper.SendText("You didn't give me enough arguments to work with :angery:", message.Channel).Wait();
                 return;
             }
 
             string inAt = split[1];
             string time = split[2];
-            string eventName = split[3];
+            string eventName = split.Skip(3).Combine(" ");
 
             IUserMessage eventMessage = DiscordNETWrapper.SendText($"```fix\n{eventName} in *Please wait*```", message.Channel).Result[0];
             DateTime eventTime = DateTime.Now;
