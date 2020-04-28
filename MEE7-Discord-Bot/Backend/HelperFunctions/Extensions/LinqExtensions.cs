@@ -59,10 +59,5 @@ namespace MEE7.Backend.HelperFunctions
             a[] arr = xs.ToArray();
             return arr[Program.RDM.Next(arr.Length)];
         }
-        public static string RemoveLastGroup(this string s, char seperator)
-        {
-            string[] split = s.Split(seperator);
-            return split.Take(split.Length - 1).Foldl("", (a, b) => a + seperator + b).Remove(0, 1);
-        }
     }
 }
