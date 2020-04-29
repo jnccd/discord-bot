@@ -40,6 +40,44 @@ namespace MEE7.Commands
             Program.OnConnected += () => {
                 PingEmote = Emote.Parse("<a:ping:703994951377092661>");
                 CancelEmote = new Emoji("❌");
+
+                // Big boi loopi loop
+                Task.Factory.StartNew(() =>
+                {
+                    string getTimer(TimeSpan t) => $"{t.Days} Days, {t.Hours} Hours, {t.Minutes} Minutes, {t.Seconds} Seconds";
+
+                    while (true)
+                    {
+                        for (int i = 0; i < Config.Data.timers.Count; i++)
+                        {
+                            var timer = Config.Data.timers[i];
+
+                            try
+                            {
+                                var eventMessage = (IUserMessage)(Program.GetChannelFromID(timer.ChannelId) as IMessageChannel).GetMessageAsync(timer.MessageId).Result;
+
+                                if (DateTime.Now < timer.EventTime)
+                                    eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} in {getTimer(timer.EventTime - DateTime.Now)}```");
+                                else
+                                {
+                                    eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} happened at {timer.EventTime}```");
+                                    var pingUsers = eventMessage.GetReactionUsersAsync(PingEmote, 100).FlattenAsync().Result.Append(Program.GetUserFromId(timer.AuthorId));
+                                    string mentions = pingUsers.Where(x => !x.IsBot).Select(x => x.Mention).Combine(" ");
+                                    if (pingUsers.Where(x => !x.IsBot).Count() > 0)
+                                        DiscordNETWrapper.SendText($"{mentions} {eventMessage.GetJumpUrl()}", eventMessage.Channel).Wait();
+
+                                    Config.Data.timers.RemoveAt(i);
+                                    i--;
+                                }
+
+                                Thread.Sleep(1000);
+                            }
+                            catch { Thread.Sleep(1000); }
+                        }
+
+                        Thread.Sleep(200);
+                    }
+                });
             };
             Program.OnEmojiReactionAdded += (Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) => {
                 if (arg3.Emote.Name == CancelEmote.Name)
@@ -54,42 +92,6 @@ namespace MEE7.Commands
                     }
                 }
             };
-            Task.Factory.StartNew(() =>
-            {
-                string getTimer(TimeSpan t) => $"{t.Days} Days, {t.Hours} Hours, {t.Minutes} Minutes, {t.Seconds} Seconds";
-
-                while (true)
-                {
-                    for (int i = 0; i < Config.Data.timers.Count; i++)
-                    {
-                        var timer = Config.Data.timers[i];
-
-                        try
-                        {
-                            var eventMessage = (IUserMessage)(Program.GetChannelFromID(timer.ChannelId) as IMessageChannel).GetMessageAsync(timer.MessageId).Result;
-
-                            if (DateTime.Now < timer.EventTime)
-                                eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} in {getTimer(timer.EventTime - DateTime.Now)}```");
-                            else
-                            {
-                                eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} happened at {timer.EventTime}```");
-                                var pingUsers = eventMessage.GetReactionUsersAsync(PingEmote, 100).FlattenAsync().Result;
-                                string mentions = pingUsers.Where(x => !x.IsBot).Select(x => x.Mention).Combine(" ");
-                                if (pingUsers.Where(x => !x.IsBot).Count() > 0)
-                                    DiscordNETWrapper.SendText($"{mentions} {eventMessage.GetJumpUrl()}", eventMessage.Channel).Wait();
-
-                                Config.Data.timers.RemoveAt(i);
-                                i--;
-                            }
-
-                            Thread.Sleep(1000);
-                        }
-                        catch { }
-                    }
-
-                    Thread.Sleep(200);
-                }
-            });
         }
 
         public override void Execute(SocketMessage message)
