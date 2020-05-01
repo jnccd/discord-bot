@@ -61,8 +61,11 @@ namespace MEE7.Commands
                                 else
                                 {
                                     eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} happened at {timer.EventTime}```");
-                                    var pingUsers = eventMessage.GetReactionUsersAsync(PingEmote, 100).FlattenAsync().Result.Append(Program.GetUserFromId(timer.AuthorId));
-                                    string mentions = pingUsers.Where(x => !x.IsBot).Select(x => x.Mention).Combine(" ");
+                                    var pingUsers = eventMessage.GetReactionUsersAsync(PingEmote, 100).FlattenAsync().Result;
+                                    string mentions = pingUsers.
+                                        Where(x => !x.IsBot && x.Id != timer.AuthorId).
+                                        Append(Program.GetUserFromId(timer.AuthorId)).
+                                        Select(x => x.Mention).Combine(" ");
                                     if (pingUsers.Where(x => !x.IsBot).Count() > 0)
                                         DiscordNETWrapper.SendText($"{mentions} {eventMessage.GetJumpUrl()}", eventMessage.Channel).Wait();
 
