@@ -6,7 +6,7 @@ namespace MEE7.Commands
 {
     public class Brainfuck : Command
     {
-        public Brainfuck() : base("bf", "Brainfuck Interpreter", false)
+        public Brainfuck() : base("bf", "Brainfuck Interpreter", false, true)
         {
 
         }
