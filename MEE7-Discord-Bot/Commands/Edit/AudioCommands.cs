@@ -15,20 +15,32 @@ namespace MEE7.Commands
     public class AudioCommands : EditCommandProvider
     {
         public string SpeakDesc = "Let's a fictional character narrate the text you input using the fifteen.ai api. " +
-            "Working characters include GLaDOS, Twilight Sparkle, Fluttershy, The Narrator, Tenth Doctor, Sans. Default Voice is GLaDOS";
-        public WaveStream Speak(string text, SocketMessage m, string character = "GLaDOS")
+            "Working characters include GLaDOS (Emotions: Homicidal), Twilight Sparkle (Emotions: Happy, Neutral), Fluttershy (Emotions: Neutral), " +
+            "Rarity (Emotions: Neutral), Applejack (Emotions: Neutral), Rainbow Dash (Emotions: Neutral), Pinkie Pie (Emotions: Neutral), " +
+            "Derpy Hooves (Emotions: Neutral), Solider (Emotions: Neutral), Miss Pauling (Emotions: Neutral), Rise Kujikawa (Emotions: Neutral). " +
+            "Default Voice is GLaDOS\n" +
+            "Available voices last updated: 03.05.2020";
+        public WaveStream Speak(string text, SocketMessage m, string character = "GLaDOS", string emotion = "Homicidal")
         {
             if (text.Contains('"') || character.Contains('"'))
                 return null;
 
-            string payloadText = $"{{\"text\":\"{text}.\",\"character\":\"{character}\"}}";
+            string payloadText = $"{{\"text\":\"{text}.\",\"character\":\"{character}\",\"emotion\":\"{emotion}\"}}";
             byte[] payload = Encoding.UTF8.GetBytes(payloadText);
 
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create("https://api.fifteen.ai/app/getAudioFile");
-            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
             req.Method = "POST";
-            req.ContentLength = payload.Length;
+            req.ContentLength = payloadText.Length;
             req.ContentType = "application/json;charset=UTF-8";
+            req.Referer = "https://fifteen.ai/app";
+            req.Accept = "application/json, text/plain, */*";
+            req.Headers.Add("accept-encoding", "gzip, deflate, br");
+            req.Headers.Add("accept-language", "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7");
+            req.Headers.Add("origin", "https://fifteen.ai");
+            req.Headers.Add("sec-fetch-dest", "empty");
+            req.Headers.Add("sec-fetch-mode", "cors");
+            req.Headers.Add("sec-fetch-site", "same-site");
+            req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.132 Safari/537.36";
             using (Stream dataStream = req.GetRequestStream())
                 dataStream.Write(payload);
             WebResponse response = req.GetResponse();
