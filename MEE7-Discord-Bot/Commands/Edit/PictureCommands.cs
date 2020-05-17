@@ -353,7 +353,23 @@ namespace MEE7.Commands
                                                                    { -1, -2, -1 } }, 1, true);
         }
 
-        public string sharpenDesc = "well guess what it does";
+        public string laplaceEdgesDesc = "https://de.wikipedia.org/wiki/Laplace-Filter";
+        public Bitmap LaplaceEdges(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  0,  1,  0 },
+                                                    {  1, -4,  1 },
+                                                    {  0,  1,  0 } }, 1, true);
+        }
+
+        public string laplace45EdgesDesc = "https://de.wikipedia.org/wiki/Laplace-Filter";
+        public Bitmap Laplace45Edges(Bitmap bmp, SocketMessage m)
+        {
+            return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
+                                                    {  1, -8,  1 },
+                                                    {  1,  1,  1 } }, 1, true);
+        }
+
+        public string sharpenDesc = "well guess what it does [doesnt really work I think]";
         public Bitmap Sharpen(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0, -1,  0 },
@@ -361,7 +377,7 @@ namespace MEE7.Commands
                                                                {  0, -1,  0 } }, 1 / 5f);
         }
 
-        public string boxBlurDesc = "blur owo";
+        public string boxBlurDesc = "blur owo [doesnt really work I think]";
         public Bitmap BoxBlur(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
@@ -369,7 +385,7 @@ namespace MEE7.Commands
                                                                {  1,  1,  1 } }, 1 / 9f);
         }
 
-        public string gaussianBlurDesc = "more blur owo";
+        public string gaussianBlurDesc = "more blur owo [doesnt really work I think]";
         public Bitmap GaussianBlur(Bitmap bmp, SocketMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
