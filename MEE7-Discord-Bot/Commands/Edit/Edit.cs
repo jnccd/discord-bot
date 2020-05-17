@@ -279,7 +279,7 @@ namespace MEE7.Commands
                     PrintPipeOutput(
                         RunPipe(
                             CheckPipe(
-                                GetExecutionPipe(message, message.Content.Remove(0, PrefixAndCommand.Length + 1))),
+                                GetExecutionPipe(message, split.Skip(1).Combine(" "))),
                             message),
                     message);
                 }
