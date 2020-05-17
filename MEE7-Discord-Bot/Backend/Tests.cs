@@ -110,11 +110,11 @@ namespace MEE7.Backend
                         try { user.RemoveRoleAsync(bottomLine).Wait(); } catch{}
                 }
             },
-            // 8 - 
+            // 8 - Louis
             () => {
                 var uniServer = Program.GetGuildFromID(479950092938248193);
                 var louis = uniServer.Users.First(x => x.Id == 224640348096299010);
-                Console.WriteLine($"{louis.ActiveClients.First()}, {louis.Status.}, {louis.Activity.Name}, {louis.Activity.Type}");
+                Console.WriteLine($"{louis.ActiveClients.First()}, {louis.Status}, {louis.Activity.Name}, {louis.Activity.Type}");
             },
         };
     }
