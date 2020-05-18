@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -191,12 +192,161 @@ namespace MEE7
         {
             client.Log += Client_Log;
             client.Ready += Client_Ready;
-
-            client.JoinedGuild += Client_JoinedGuild;
             client.MessageReceived += MessageReceived;
             client.ReactionAdded += Client_ReactionAdded;
             client.ReactionRemoved += Client_ReactionRemoved;
-            client.UserJoined += Client_UserJoined;
+            client.JoinedGuild += Client_JoinedGuild;
+
+            client.ChannelCreated += (SocketChannel arg) =>
+            {
+                OnChannelCreated?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.ChannelDestroyed += (SocketChannel arg) =>
+            {
+                OnChannelDestroyed?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.ChannelUpdated += (SocketChannel arg1, SocketChannel arg2) =>
+            {
+                OnChannelUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.CurrentUserUpdated += (SocketSelfUser arg1, SocketSelfUser arg2) =>
+            {
+                OnCurrentUserUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.GuildAvailable += (SocketGuild arg) =>
+            {
+                OnGuildAvailable?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.GuildMembersDownloaded += (SocketGuild arg) =>
+            {
+                OnGuildMembersDownloaded?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.GuildMemberUpdated += (SocketGuildUser arg1, SocketGuildUser arg2) =>
+            {
+                OnGuildMemberUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.GuildUnavailable += (SocketGuild arg) =>
+            {
+                OnGuildUnavailable?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.GuildUpdated += (SocketGuild arg1, SocketGuild arg2) =>
+            {
+                OnGuildUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.LatencyUpdated += (int arg1, int arg2) =>
+            {
+                OnLatencyUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.LeftGuild += (SocketGuild arg) =>
+            {
+                OnLeftGuild?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.LoggedIn += () =>
+            {
+                OnLoggedIn?.InvokeParallel();
+                return Task.FromResult(default(object));
+            };
+            client.LoggedOut += () =>
+            {
+                OnLoggedOut?.InvokeParallel();
+                return Task.FromResult(default(object));
+            };
+            client.MessageDeleted += (Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2) =>
+            {
+                OnMessageDeleted?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.MessagesBulkDeleted += (IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, ISocketMessageChannel arg2) =>
+            {
+                OnMessagesBulkDeleted?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.MessageUpdated += (Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3) =>
+            {
+                OnMessageUpdated?.InvokeParallel(arg1, arg2, arg3);
+                return Task.FromResult(default(object));
+            };
+            client.ReactionsCleared += (Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2) =>
+            {
+                OnReactionsCleared?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.RecipientAdded += (SocketGroupUser arg) =>
+            {
+                OnRecipientAdded?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.RecipientRemoved += (SocketGroupUser arg) =>
+            {
+                OnRecipientRemoved?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.RoleCreated += (SocketRole arg) =>
+            {
+                OnRoleCreated?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.RoleDeleted += (SocketRole arg) =>
+            {
+                OnRoleDeleted?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.RoleUpdated += (SocketRole arg1, SocketRole arg2) =>
+            {
+                OnRoleUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.UserBanned += (SocketUser arg1, SocketGuild arg2) =>
+            {
+                OnUserBanned?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.UserIsTyping += (SocketUser arg1, ISocketMessageChannel arg2) =>
+            {
+                OnUserIsTyping?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.UserJoined += (SocketGuildUser arg) =>
+            {
+                OnUserJoined?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.UserLeft += (SocketGuildUser arg) =>
+            {
+                OnUserLeft?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
+            client.UserUnbanned += (SocketUser arg1, SocketGuild arg2) =>
+            {
+                OnUserUnbanned?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.UserUpdated += (SocketUser arg1, SocketUser arg2) =>
+            {
+                OnUserUpdated?.InvokeParallel(arg1, arg2);
+                return Task.FromResult(default(object));
+            };
+            client.UserVoiceStateUpdated += (SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3) =>
+            {
+                OnUserVoiceStateUpdated?.InvokeParallel(arg1, arg2, arg3);
+                return Task.FromResult(default(object));
+            };
+            client.VoiceServerUpdated += (SocketVoiceServer arg) =>
+            {
+                OnVoiceServerUpdated?.InvokeParallel(arg);
+                return Task.FromResult(default(object));
+            };
         }
         static void Login()
         {

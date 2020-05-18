@@ -40,6 +40,64 @@ namespace MEE7
         public static event EmojiReactionUpdatedHandler OnEmojiReactionUpdated;
         public delegate void UserJoinedHandler(SocketGuildUser arg);
         public static event UserJoinedHandler OnUserJoined;
+        public delegate void ChannelCreatedHandler(SocketChannel arg);
+        public static event ChannelCreatedHandler OnChannelCreated;
+        public delegate void ChannelDestroyedHandler(SocketChannel arg);
+        public static event ChannelDestroyedHandler OnChannelDestroyed;
+        public delegate void ChannelUpdatedHandler(SocketChannel arg1, SocketChannel arg2);
+        public static event ChannelUpdatedHandler OnChannelUpdated;
+        public delegate void CurrentUserUpdatedHandler(SocketSelfUser arg1, SocketSelfUser arg2);
+        public static event CurrentUserUpdatedHandler OnCurrentUserUpdated;
+        public delegate void GuildAvailableHandler(SocketGuild arg);
+        public static event GuildAvailableHandler OnGuildAvailable;
+        public delegate void GuildMembersDownloadedHandler(SocketGuild arg);
+        public static event GuildMembersDownloadedHandler OnGuildMembersDownloaded;
+        public delegate void GuildMemberUpdatedHandler(SocketGuildUser arg1, SocketGuildUser arg2);
+        public static event GuildMemberUpdatedHandler OnGuildMemberUpdated;
+        public delegate void GuildUnavailableHandler(SocketGuild arg);
+        public static event GuildUnavailableHandler OnGuildUnavailable;
+        public delegate void GuildUpdatedHandler(SocketGuild arg1, SocketGuild arg2);
+        public static event GuildUpdatedHandler OnGuildUpdated;
+        public delegate void LatencyUpdatedHandler(int arg1, int arg2);
+        public static event LatencyUpdatedHandler OnLatencyUpdated;
+        public delegate void LeftGuildHandler(SocketGuild arg);
+        public static event LeftGuildHandler OnLeftGuild;
+        public delegate void LoggedInHandler();
+        public static event LoggedInHandler OnLoggedIn;
+        public delegate void LoggedOutHandler();
+        public static event LoggedOutHandler OnLoggedOut;
+        public delegate void MessageDeletedHandler(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2);
+        public static event MessageDeletedHandler OnMessageDeleted;
+        public delegate void MessagesBulkDeletedHandler(IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, ISocketMessageChannel arg2);
+        public static event MessagesBulkDeletedHandler OnMessagesBulkDeleted;
+        public delegate void MessageUpdatedHandler(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3);
+        public static event MessageUpdatedHandler OnMessageUpdated;
+        public delegate void ReactionsClearedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2);
+        public static event ReactionsClearedHandler OnReactionsCleared;
+        public delegate void RecipientAddedHandler(SocketGroupUser arg1);
+        public static event RecipientAddedHandler OnRecipientAdded;
+        public delegate void RecipientRemovedHandler(SocketGroupUser arg1);
+        public static event RecipientRemovedHandler OnRecipientRemoved;
+        public delegate void RoleCreatedHandler(SocketRole arg1);
+        public static event RoleCreatedHandler OnRoleCreated;
+        public delegate void RoleDeletedHandler(SocketRole arg1);
+        public static event RoleDeletedHandler OnRoleDeleted;
+        public delegate void RoleUpdatedHandler(SocketRole arg1, SocketRole arg2);
+        public static event RoleUpdatedHandler OnRoleUpdated;
+        public delegate void UserBannedHandler(SocketUser arg1, SocketGuild arg2);
+        public static event UserBannedHandler OnUserBanned;
+        public delegate void UserIsTypingHandler(SocketUser arg1, ISocketMessageChannel arg2);
+        public static event UserIsTypingHandler OnUserIsTyping;
+        public delegate void UserLeftHandler(SocketGuildUser arg);
+        public static event UserLeftHandler OnUserLeft;
+        public delegate void UserUnbannedHandler(SocketUser arg, SocketGuild arg2);
+        public static event UserUnbannedHandler OnUserUnbanned;
+        public delegate void UserUpdatedHandler(SocketUser arg1, SocketUser arg2);
+        public static event UserUpdatedHandler OnUserUpdated;
+        public delegate void UserVoiceStateUpdatedHandler(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3);
+        public static event UserVoiceStateUpdatedHandler OnUserVoiceStateUpdated;
+        public delegate void VoiceServerUpdatedHandler(SocketVoiceServer arg1);
+        public static event VoiceServerUpdatedHandler OnVoiceServerUpdated;
 
         static readonly List<Tuple<RestUserMessage, Exception>> cachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
         static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
@@ -97,7 +155,7 @@ namespace MEE7
 
                 if (!hasRead || !hasReadHistory || !hasFiles)
                 {
-                    await g.TextChannels.ElementAt(0).SendMessageAsync("Whoever added me has big gay and didn't give me all the usual permissions.");
+                    await g.TextChannels.ElementAt(0).SendMessageAsync("Whoever added me didn't give me all the usual permissions :c");
                     return;
                 }
             }
@@ -151,11 +209,6 @@ namespace MEE7
                     catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 });
 
-            return Task.FromResult(default(object));
-        }
-        private static Task Client_UserJoined(SocketGuildUser arg)
-        {
-            OnUserJoined?.InvokeParallel(arg);
             return Task.FromResult(default(object));
         }
         private static Task MessageReceived(SocketMessage message)

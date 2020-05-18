@@ -47,7 +47,7 @@ namespace MEE7.Backend.HelperFunctions
             }
             return minE;
         }
-        public static bool ContainsAny<a>(this IEnumerable<a> xs, IEnumerable<a> ys)
+        public static bool ContainsAny<a>(this IEnumerable<a> xs, params a[] ys)
         {
             foreach (a y in ys)
                 if (xs.Contains(y))
