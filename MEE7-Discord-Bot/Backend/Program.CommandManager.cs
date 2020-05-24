@@ -18,7 +18,7 @@ namespace MEE7
     public static partial class Program
     {
 #if DEBUG
-        public const string Prefix = "$$";
+        public const string Prefix = "d$";
 #else
         public const string Prefix = "$";
 #endif

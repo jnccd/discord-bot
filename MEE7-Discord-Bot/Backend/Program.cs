@@ -116,7 +116,10 @@ namespace MEE7
                 ConsoleWrapper.WriteLine("CI Environment detected!");
             else
             {
-                Console.Title = "MEE7";
+                if (runConfig == "Debug")
+                    Console.Title = "MEE7 - DEBUG";
+                else
+                    Console.Title = "MEE7";
                 //if (!RunningOnLinux)
                 //    ShowWindow(GetConsoleWindow(), 2);
                 Thread.CurrentThread.Name = "Main";
