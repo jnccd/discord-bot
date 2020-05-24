@@ -213,15 +213,26 @@ namespace MEE7.Commands
                                     var completeArgs = new object[] { o, m }.ToList();
                                     completeArgs.AddRange(args);
 
+                                    for (int i = 0; i < completeArgs.Count; i++)
+                                        if (completeArgs[i] is IConvertible)
+                                            completeArgs[i] = Convert.ChangeType(completeArgs[i], param[i].ParameterType);
+
                                     if (method.IsGenericMethod)
                                     {
-                                        var type = typeof(object);
-                                        if (o != null) type = o.GetType();
-                                        if (type.IsArray) type = type.GetElementType();
-                                        var meth = method.MakeGenericMethod(new Type[] { type }.
-                                            Concat(Enumerable.Repeat(typeof(object), method.GetGenericArguments().Length - 1)).ToArray());
-                                        var re = meth.Invoke(tInstance, completeArgs.ToArray());
-                                        return re;
+                                        try
+                                        {
+                                            var type = typeof(object);
+                                            if (o != null) type = o.GetType();
+                                            if (type.IsArray) type = type.GetElementType();
+                                            var meth = method.MakeGenericMethod(new Type[] { type }.
+                                                Concat(Enumerable.Repeat(typeof(object), method.GetGenericArguments().Length - 1)).ToArray());
+                                            return meth.Invoke(tInstance, completeArgs.ToArray());
+                                        }
+                                        catch
+                                        {
+                                            var meth = method.MakeGenericMethod(Enumerable.Repeat(typeof(object), method.GetGenericArguments().Length).ToArray());
+                                            return meth.Invoke(tInstance, completeArgs.ToArray());
+                                        }
                                     }
                                     else
                                         return method.Invoke(tInstance, completeArgs.ToArray());
@@ -602,7 +613,13 @@ namespace MEE7.Commands
         static void PrintPipeOutput(object output, SocketMessage message)
         {
             if (output == null) return;
-            var de = output.GetType();
+            object[] arr;
+            if (output.GetType().IsArray && (arr = output as object[]).All(x => x.GetType() == typeof(Bitmap)))
+            {
+                output = new Bitmap[arr.Length];
+                for (int i = 0; i < arr.Length; i++)
+                    (output as Bitmap[])[i] = (Bitmap)arr[i];
+            }
             PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }
