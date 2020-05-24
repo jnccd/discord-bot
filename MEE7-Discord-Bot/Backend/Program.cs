@@ -24,7 +24,7 @@ namespace MEE7
 #if DEBUG
         public static readonly string runConfig = "Debug";
 #else
-            public static readonly string runConfig = "Release";
+        public static readonly string runConfig = "Release";
 #endif
 
         static string buildDate;
@@ -38,7 +38,11 @@ namespace MEE7
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
 
+#if DEBUG
+        public static readonly ulong logChannel = 714100318656397334;
+#else
         public static readonly ulong logChannel = 665219921692852271;
+#endif
         public static readonly bool logToDiscord = true;
         public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
         public static readonly string logStartupMessagePräfix = "new instance who dis?";
@@ -398,7 +402,9 @@ namespace MEE7
         static void SetState()
         {
             if (runConfig == "Debug")
-                client.SetGameAsync($"{Prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
+            {
+                //client.SetGameAsync($"{Prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
+            }
             else
                 client.SetGameAsync($"{Prefix}help", "", ActivityType.Listening).Wait();
         }
