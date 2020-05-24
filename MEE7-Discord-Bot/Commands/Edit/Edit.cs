@@ -229,7 +229,7 @@ namespace MEE7.Commands
                             curCommands.Add(command);
                         }
                     }
-                    catch { }
+                    catch { Console.WriteLine("[Edit] Failed to load: " + method.Name); }
                 }
 
                 Commands = Commands.Union(curCommands);
