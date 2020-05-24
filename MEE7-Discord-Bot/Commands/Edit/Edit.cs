@@ -188,7 +188,7 @@ namespace MEE7.Commands
             foreach (Type t in classesWithEditCommands)
             {
                 var curCommands = new List<EditCommand>();
-                var methods = t.GetMethods();
+                var methods = t.GetMethods().Where(x => x.DeclaringType == t);
                 var fields = t.GetFields();
 
                 foreach (var method in methods)
@@ -229,7 +229,9 @@ namespace MEE7.Commands
                             curCommands.Add(command);
                         }
                     }
-                    catch { Console.WriteLine("[Edit] Failed to load: " + method.Name); }
+                    catch { 
+                        ConsoleWrapper.WriteLine("[Edit] Failed to load: " + method.Name); 
+                    }
                 }
 
                 Commands = Commands.Union(curCommands);
