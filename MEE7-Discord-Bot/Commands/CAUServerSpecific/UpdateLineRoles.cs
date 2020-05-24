@@ -21,15 +21,19 @@ namespace MEE7.Commands.CAUServerSpecific
             var bottomLine = uniServer.GetRole(665555692983156746);
             Program.OnGuildMemberUpdated += (SocketGuildUser arg1, SocketGuildUser arg2) =>
             {
-                if (arg2.Roles.FirstOrDefault(x => x.Position > topLine.Position) != null)
-                    try { arg2.AddRoleAsync(topLine).Wait(); } catch { }
-                else
-                    try { arg2.RemoveRoleAsync(topLine).Wait(); } catch { }
+                if (arg2.Guild.Id == uniServer.Id)
+                {
+                    var roles = arg2.Roles;
+                    if (roles.Any(x => x.Position > topLine.Position) && !roles.Any(x => x.Id == topLine.Id))
+                        try { arg2.AddRoleAsync(topLine).Wait(); } catch { }
+                    if (!roles.Any(x => x.Position > topLine.Position) && roles.Any(x => x.Id == topLine.Id))
+                        try { arg2.RemoveRoleAsync(topLine).Wait(); } catch { }
 
-                if (arg2.Roles.FirstOrDefault(x => !x.IsEveryone && x.Position < bottomLine.Position) != null)
-                    try { arg2.AddRoleAsync(bottomLine).Wait(); } catch { }
-                else
-                    try { arg2.RemoveRoleAsync(bottomLine).Wait(); } catch { }
+                    if (roles.Any(x => x.Position < bottomLine.Position && !x.IsEveryone) && !roles.Any(x => x.Id == bottomLine.Id))
+                        try { arg2.AddRoleAsync(bottomLine).Wait(); } catch { }
+                    if (!roles.Any(x => x.Position < bottomLine.Position && !x.IsEveryone) && roles.Any(x => x.Id == bottomLine.Id))
+                        try { arg2.RemoveRoleAsync(bottomLine).Wait(); } catch { }
+                }
             };
         }
 
