@@ -188,14 +188,14 @@ namespace MEE7
         }
         private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
         {
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 Tuple<RestUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
                     if (arg3.User.GetValueOrDefault().Id == Master.Id)
-                        await error.Item1.ModifyAsync(m => m.Content = errorMessage);
+                        error.Item1.ModifyAsync(m => m.Content = errorMessage).Wait();
                 }
             });
             if (arg3.UserId != OwnID)
