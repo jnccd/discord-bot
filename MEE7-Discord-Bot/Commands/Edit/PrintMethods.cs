@@ -56,7 +56,8 @@ namespace MEE7.Commands
                     int maxHeight = gif.Item1.Select(x => x.Height).Max();
                     using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
                         for (int i = 0; i < gif.Item1.Length; i++)
-                            c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
+                            c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), 
+                                gif.Item2[i], GifQuality.Bit8);
 
                     DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
 
@@ -75,6 +76,13 @@ namespace MEE7.Commands
                 Stream s = new MemoryStream();
                 WaveFileWriter.WriteWavFileToStream(s, o as IWaveProvider);
                 DiscordNETWrapper.SendFile(s, m.Channel, ".mp3").Wait();
+
+            }),
+            new PrintMethod(typeof(Array), (SocketMessage m, object o) => {
+                Array arr = o as Array;
+                DiscordNETWrapper.SendText(
+                    $"[{Enumerable.Range(0, arr.Length).Select(x => arr.GetValue(x).ToString()).Combine(", ")}]", 
+                    m.Channel).Wait();
 
             }),
             new PrintMethod(typeof(object), (SocketMessage m, object o) => {

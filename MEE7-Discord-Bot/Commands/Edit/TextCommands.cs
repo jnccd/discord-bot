@@ -11,7 +11,7 @@ namespace MEE7.Commands
         public string mockDesc = "Mock the text";
         public string Mock(string s, SocketMessage m)
         {
-            return string.Join("", s.Select((x) => { return (Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x)); })) +
+            return string.Join("", s.Select((x) => { return Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x); })) +
                     "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
         }
 

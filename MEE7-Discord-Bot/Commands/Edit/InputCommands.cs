@@ -148,6 +148,24 @@ namespace MEE7.Commands
                 GetBitmapsAndTimingsFromGIFURL();
         }
 
+        public string stringArrayDesc = "Returns an string array from the argument";
+        public string[] StringArray(EditNull n, SocketMessage m, string rawArr)
+        {
+            return rawArr.Split(',').Select(x => x.Trim(' ')).ToArray();
+        }
+
+        public string intArrayDesc = "Returns an int array from the argument";
+        public int[] IntArray(EditNull n, SocketMessage m, string rawArr)
+        {
+            return rawArr.Split(',').Select(x => Convert.ToInt32(x.Trim(' '))).ToArray();
+        }
+
+        public string rangeDesc = "Returns an int array with numbers from start to start + count";
+        public int[] Range(EditNull n, SocketMessage m, int start, int count)
+        {
+            return Enumerable.Range(start, count).ToArray();
+        }
+
         public string mandelbrotDesc = "Render a mandelbrot";
         public Bitmap Mandelbrot(EditNull n, SocketMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
         {
