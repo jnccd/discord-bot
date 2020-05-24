@@ -17,7 +17,12 @@ namespace MEE7
 {
     public static partial class Program
     {
+#if DEBUG
+        public const string Prefix = "$$";
+#else
         public const string Prefix = "$";
+#endif
+
         static Command[] commands;
         static readonly EmbedBuilder helpMenu = new EmbedBuilder();
         static readonly Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
