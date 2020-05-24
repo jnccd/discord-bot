@@ -75,7 +75,12 @@ namespace MEE7.Commands
 
                                 Thread.Sleep(1000);
                             }
-                            catch { Thread.Sleep(1000); }
+                            catch {
+                                if (DateTime.Now > timer.EventTime)
+                                    Config.Data.timers.RemoveAt(i--);
+
+                                Thread.Sleep(1000);
+                            }
                         }
 
                         Thread.Sleep(200);
