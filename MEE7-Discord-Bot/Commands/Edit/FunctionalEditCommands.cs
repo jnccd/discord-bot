@@ -57,11 +57,21 @@ namespace MEE7.Commands
             return results.ToArray();
         }
 
-        public string MapDesc = "'tis map from haskel, your favorite language";
-        public a[] Map<a>(a[] os, SocketMessage m, string pipe)
+        public string MapDesc = "'tis map from haskel";
+        public b[] Map<a, b>(a[] os, SocketMessage m, string pipe)
         {
-            var parsedPipe = Pipe.Parse(m, pipe);
-            return os.Select(x => (a)parsedPipe.Apply(m, x)).ToArray();
+            if (pipe.Contains("=>"))
+            {
+                string[] split = pipe.Split("=>").Select(x => x.Trim(' ')).ToArray();
+                var parsedPipe = Pipe.Parse(m, split[1]);
+                return os.Select(x => (b)parsedPipe.
+                    Apply(m, x, new Dictionary<string, object>() { { split[0], x } })).ToArray();
+            }
+            else
+            {
+                var parsedPipe = Pipe.Parse(m, pipe);
+                return os.Select(x => (b)parsedPipe.Apply(m, x)).ToArray();
+            }
         }
 
         public string MapGDesc = "Map for gifs, because gifs are special now";

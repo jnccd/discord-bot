@@ -334,7 +334,8 @@ namespace MEE7.Commands
                 throw new Exception("Boi I need sum vectors!");
 
             return ApplyTransformation(bmp,
-                    (x, y) => (Vector2)transformationFunction.Apply(m, bmp, new Dictionary<string, object>() { { "x", x }, { "y", y } }));
+                    (x, y) => (Vector2)transformationFunction.
+                    Apply(m, bmp, new Dictionary<string, object>() { { "x", x }, { "y", y } }));
         }
 
         public string sobelEdgesDesc = "Highlights horizontal edges";

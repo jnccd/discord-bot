@@ -215,7 +215,11 @@ namespace MEE7.Commands
 
                                     if (method.IsGenericMethod)
                                     {
-                                        var meth = method.MakeGenericMethod(o == null ? typeof(object) : o.GetType());
+                                        var type = typeof(object);
+                                        if (o != null) type = o.GetType();
+                                        if (type.IsArray) type = type.GetElementType();
+                                        var meth = method.MakeGenericMethod(new Type[] { type }.
+                                            Concat(Enumerable.Repeat(typeof(object), method.GetGenericArguments().Length - 1)).ToArray());
                                         var re = meth.Invoke(tInstance, completeArgs.ToArray());
                                         return re;
                                     }
