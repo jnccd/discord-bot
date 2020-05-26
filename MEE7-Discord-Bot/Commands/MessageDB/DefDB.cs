@@ -59,12 +59,22 @@ namespace MEE7.Commands.MessageDB
         public DateTime Timestamp;
         public string[] Attachements;
         public string Content;
+        public string Link;
         public List<DBEmbed> Embeds;
+        public List<DBReaction> Reactions;
         public List<ulong> MentionedChannels;
         public List<ulong> MentionedUsers;
         public List<ulong> MentionedRoles;
         public ulong Channel;
         public bool IsPinned;
+    }
+
+    public class DBReaction
+    {
+        public ulong id;
+        public string name;
+        public string print;
+        public int count;
     }
 
     public class DBEmbed

@@ -38,7 +38,7 @@ namespace MEE7.Commands.MessageDB
                 {
                     if (message.Author.Id != Program.Master.Id)
                     {
-                        DiscordNETWrapper.SendText("You are not allowed to do that :/", message.Channel).Wait();
+                        DiscordNETWrapper.SendText("I'm sorry Dave, I'm afraid I can't do that", message.Channel).Wait();
                         return;
                     }
 
@@ -82,6 +82,20 @@ namespace MEE7.Commands.MessageDB
                         re += $"`{g.Key}`: **{g.Count()}** messages\n";
 
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
+                }
+                else if (split[1] == "getMostReactedMessages")
+                {
+                    DBGuild dbGuild = null;
+                    if ((dbGuild = GetGuild(message)) == null)
+                        return;
+
+                    List<DBMessage> allGuildMessages = new List<DBMessage>();
+                    foreach (var channel in dbGuild.TextChannels)
+                        allGuildMessages.AddRange(channel.Messages);
+
+                    var top5 = allGuildMessages.OrderByDescending(x => x.Reactions.Sum(y => y.count)).Take(5);
+
+                    DiscordNETWrapper.SendText(top5.Select(x => $"{x.Reactions.Sum(y => y.count)}: {x.Link}").Combine("\n"), message.Channel).Wait();
                 }
                 else if (split[1] == "plotActivityOverTime")
                 {
@@ -153,56 +167,67 @@ namespace MEE7.Commands.MessageDB
 
         public DBGuild DBFromGuild(SocketGuild guild)
         {
-            DBGuild re = new DBGuild();
-            re.CreatedAt = guild.CreatedAt.UtcDateTime;
-            re.IconUrl = guild.IconUrl;
-            re.Id = guild.Id;
-            re.Name = guild.Name;
-            re.OwnerId = guild.OwnerId;
-            re.SplashUrl = guild.SplashUrl;
+            DBGuild re = new DBGuild
+            {
+                CreatedAt = guild.CreatedAt.UtcDateTime,
+                IconUrl = guild.IconUrl,
+                Id = guild.Id,
+                Name = guild.Name,
+                OwnerId = guild.OwnerId,
+                SplashUrl = guild.SplashUrl,
 
-            re.TextChannels = new List<DBTextChannel>();
+                TextChannels = new List<DBTextChannel>()
+            };
             foreach (var textChannel in guild.TextChannels)
             {
-                DBTextChannel reChannel = new DBTextChannel();
+                DBTextChannel reChannel = new DBTextChannel
+                {
+                    CreatedAt = textChannel.CreatedAt.UtcDateTime,
+                    GuildId = re.Id,
+                    Id = textChannel.Id,
+                    Name = textChannel.Name,
 
-                reChannel.CreatedAt = textChannel.CreatedAt.UtcDateTime;
-                reChannel.GuildId = re.Id;
-                reChannel.Id = textChannel.Id;
-                reChannel.Name = textChannel.Name;
-
-                reChannel.Messages = new List<DBMessage>();
+                    Messages = new List<DBMessage>()
+                };
                 foreach (var message in DiscordNETWrapper.EnumerateMessages(textChannel as IMessageChannel))
                 {
-                    DBMessage reMessage = new DBMessage();
-
-                    reMessage.Attachements = message.Attachments.Select(x => x.Url).ToArray();
-                    reMessage.AuthorId = message.Author.Id;
-                    reMessage.AuthorName = message.Author.Username;
-                    reMessage.Channel = message.Channel.Id;
-                    reMessage.Content = message.Content;
-                    reMessage.Embeds = message.Embeds.Select(x => new DBEmbed() 
-                    { 
-                        AuthorURL = x.Author.HasValue ? x.Author.Value.Url : "", 
-                        Color = x.Color, 
-                        Desc = x.Description, 
-                        Fields = x.Fields.Select(y => new DBEmbedField() 
-                        { 
-                            Title = y.Name,
-                            Content = y.Value
+                    DBMessage reMessage = new DBMessage
+                    {
+                        Attachements = message.Attachments.Select(x => x.Url).ToArray(),
+                        AuthorId = message.Author.Id,
+                        AuthorName = message.Author.Username,
+                        Channel = message.Channel.Id,
+                        Content = message.Content,
+                        Link = message.GetJumpUrl(),
+                        Embeds = message.Embeds.Select(x => new DBEmbed()
+                        {
+                            AuthorURL = x.Author.HasValue ? x.Author.Value.Url : "",
+                            Color = x.Color,
+                            Desc = x.Description,
+                            Fields = x.Fields.Select(y => new DBEmbedField()
+                            {
+                                Title = y.Name,
+                                Content = y.Value
+                            }).ToList(),
+                            Footer = x.Footer.HasValue ? x.Footer.Value.Text : "",
+                            ImageUrl = x.Image.HasValue ? x.Image.Value.Url : "",
+                            ThumbnailUrl = x.Thumbnail.HasValue ? x.Thumbnail.Value.Url : "",
+                            Timestamp = x.Timestamp.HasValue ? x.Timestamp.Value.UtcDateTime : DateTime.MinValue,
+                            Title = x.Title
                         }).ToList(),
-                        Footer = x.Footer.HasValue ? x.Footer.Value.Text : "",
-                        ImageUrl = x.Image.HasValue ? x.Image.Value.Url : "",
-                        ThumbnailUrl = x.Thumbnail.HasValue ? x.Thumbnail.Value.Url : "",
-                        Timestamp = x.Timestamp.HasValue ? x.Timestamp.Value.UtcDateTime : DateTime.MinValue,
-                        Title = x.Title
-                    }).ToList();
-                    reMessage.Id = message.Id;
-                    reMessage.IsPinned = message.IsPinned;
-                    reMessage.MentionedChannels = message.MentionedChannelIds.ToList();
-                    reMessage.MentionedRoles = message.MentionedRoleIds.ToList();
-                    reMessage.MentionedUsers = message.MentionedUserIds.ToList();
-                    reMessage.Timestamp = message.Timestamp.UtcDateTime;
+                        Reactions = message.Reactions.Select(x => new DBReaction() {
+                            id = x.Key is Emote ? (x.Key as Emote).Id : 0,
+                            name = x.Key.Name,
+                            print = x.Key.Print(),
+                            count = x.Value.ReactionCount
+                        }).ToList(),
+                        Id = message.Id,
+                        IsPinned = message.IsPinned,
+                        MentionedChannels = message.MentionedChannelIds.ToList(),
+                        MentionedRoles = message.MentionedRoleIds.ToList(),
+                        MentionedUsers = message.MentionedUserIds.ToList(),
+                        Timestamp = message.Timestamp.UtcDateTime
+                    };
 
                     reChannel.Messages.Add(reMessage);
                 }

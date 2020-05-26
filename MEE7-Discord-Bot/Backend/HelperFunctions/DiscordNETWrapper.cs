@@ -137,10 +137,17 @@ namespace MEE7.Backend.HelperFunctions
 
             while (true)
             {
-                if (lastMessageID == 0)
-                    messages = channel.GetMessagesAsync().FlattenAsync().Result.OfType<IUserMessage>();
-                else
-                    messages = channel.GetMessagesAsync(lastMessageID, Direction.Before, 100).FlattenAsync().Result.OfType<IUserMessage>();
+                try
+                {
+                    if (lastMessageID == 0)
+                        messages = channel.GetMessagesAsync().FlattenAsync().Result.OfType<IUserMessage>();
+                    else
+                        messages = channel.GetMessagesAsync(lastMessageID, Direction.Before, 100).FlattenAsync().Result.OfType<IUserMessage>();
+                }
+                catch
+                {
+                    break;
+                }
 
                 foreach (var message in messages)
                     yield return message;
