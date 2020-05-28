@@ -24,6 +24,14 @@ namespace MEE7.Commands.MessageDB
             public string name;
             public Action<DBGuild, SocketMessage, string[]> doStuffLul;
         }
+        class EmoteCounter
+        {
+            public Emote e;
+            public int messageHits;
+            public int hitMessages;
+            public int reactionHits;
+            public int reactedMessages;
+        }
         readonly WeirdCommandThingy[] commands = new WeirdCommandThingy[]
         {
             new WeirdCommandThingy()
@@ -112,6 +120,36 @@ namespace MEE7.Commands.MessageDB
                     plt.XLabel("Day");
 
                     DiscordNETWrapper.SendBitmap(plt.GetBitmap(), message.Channel).Wait();
+                }
+            },
+            new WeirdCommandThingy()
+            {
+                name = "getMostUsedEmotes",
+                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                    var serverMessages = dbGuild.TextChannels.SelectMany(x => x.Messages);
+
+                    var emotes = Program.GetGuildFromID(dbGuild.Id).Emotes.Select(x => new EmoteCounter() { e=x }).ToArray();
+
+                    foreach (var m in serverMessages)
+                        foreach (var e in emotes)
+                        {
+                            var hits = m.Content.AllIndexesOf(e.e.Print()).Count;
+                            e.messageHits += hits;
+                            if (hits > 0) 
+                                e.hitMessages++;
+
+                            DBReaction react;
+                            if (m.Reactions != null && (react = m.Reactions.FirstOrDefault(x => x.id == e.e.Id)) != null)
+                            {
+                                e.reactionHits += react.count;
+                                e.reactedMessages++;
+                            }
+                        }
+
+                    emotes = emotes.OrderByDescending(x => x.messageHits).ToArray();
+
+                    DiscordNETWrapper.SendText(emotes.Select(x => $"{x.e.Name} - {x.e.Print()} used {x.messageHits} times in {x.hitMessages} " +
+                        $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
                 }
             },
             new WeirdCommandThingy()
