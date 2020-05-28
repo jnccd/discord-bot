@@ -49,7 +49,7 @@ namespace MEE7.Commands.MessageDB
                     DBGuild db = DBFromGuild(curGuild);
                     File.WriteAllText(GetFilePath(db), CreateJson(db));
 
-                    DiscordNETWrapper.SendText("Server db build!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText("Server db built!", message.Channel).Wait();
                 }
                 else if (split[1] == "countChannelMessages")
                 {
