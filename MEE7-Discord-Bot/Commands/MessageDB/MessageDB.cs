@@ -15,61 +15,31 @@ namespace MEE7.Commands.MessageDB
 {
     class MessageDB : Command
     {
-        string dbDirPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}";
-        string dbPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}db.json";
-        object dbLock = new object();
+        readonly string dbDirPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}";
+        readonly string dbPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}db.json";
+        readonly object dbLock = new object();
 
-        public MessageDB() : base("messageDB", "makes database stuff without databases because no", false, true)
+        class WeirdCommandThingy
         {
-
+            public string name;
+            public Action<DBGuild, SocketMessage, string[]> doStuffLul;
         }
-
-        public override void Execute(SocketMessage message)
+        readonly WeirdCommandThingy[] commands = new WeirdCommandThingy[]
         {
-            var split = message.Content.Split(' ');
-
-            lock (dbLock)
+            new WeirdCommandThingy()
             {
-                if (split.Length <= 1)
-                {
-                    return;
-                }
-                else if (split[1] == "build")
-                {
-                    if (message.Author.Id != Program.Master.Id)
-                    {
-                        DiscordNETWrapper.SendText("I'm sorry Dave, I'm afraid I can't do that", message.Channel).Wait();
-                        return;
-                    }
-
-                    if (!File.Exists(dbPath))
-                        return;
-
-                    var curGuild = Program.GetGuildFromChannel(message.Channel);
-                    DBGuild db = DBFromGuild(curGuild);
-                    File.WriteAllText(GetFilePath(db), CreateJson(db));
-
-                    DiscordNETWrapper.SendText("Server db built!", message.Channel).Wait();
-                }
-                else if (split[1] == "countChannelMessages")
-                {
-                    DBGuild dbGuild = null;
-                    if ((dbGuild = GetGuild(message)) == null)
-                        return;
-
+                name = "countChannelMessages",
+                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
                     string re = "";
                     foreach (var channel in dbGuild.TextChannels.OrderByDescending(x => x.Messages.Count))
-                    {
-                        re += $"`{channel.Name}`: **{channel.Messages.Count}** messages\n";
-                    }
+                     re += $"`{channel.Name}`: **{channel.Messages.Count}** messages\n";
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
-                else if (split[1] == "countUserMessages")
-                {
-                    DBGuild dbGuild = null;
-                    if ((dbGuild = GetGuild(message)) == null)
-                        return;
-
+            },
+            new WeirdCommandThingy()
+            {
+                name = "countUserMessages",
+                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
                     string re = "";
 
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
@@ -83,12 +53,11 @@ namespace MEE7.Commands.MessageDB
 
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
-                else if (split[1] == "getMostReactedMessages")
-                {
-                    DBGuild dbGuild = null;
-                    if ((dbGuild = GetGuild(message)) == null)
-                        return;
-
+            },
+            new WeirdCommandThingy()
+            {
+                name = "getMostReactedMessages",
+                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
                     foreach (var channel in dbGuild.TextChannels)
                         allGuildMessages.AddRange(channel.Messages);
@@ -97,16 +66,15 @@ namespace MEE7.Commands.MessageDB
 
                     DiscordNETWrapper.SendText(top5.Select(x => $"{x.Reactions.Sum(y => y.count)}: {x.Link}").Combine("\n"), message.Channel).Wait();
                 }
-                else if (split[1] == "plotActivityOverTime")
-                {
-                    DBGuild dbGuild = null;
-                    if ((dbGuild = GetGuild(message)) == null)
-                        return;
-
+            },
+            new WeirdCommandThingy()
+            {
+                name = "plotActivityOverTime",
+                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
                     try
                     {
-                        ulong channelID = Convert.ToUInt64(split[2]);
+                        ulong channelID = Convert.ToUInt64(args[0]);
                         allGuildMessages = dbGuild.TextChannels.First(x => x.Id == channelID).Messages;
                     }
                     catch
@@ -133,7 +101,7 @@ namespace MEE7.Commands.MessageDB
                     plt.PlotScatter(
                         messagesGroupedByDay.
                         Select(x => DateTime.Parse(x.Item1).ToOADate()).
-                        ToArray(), 
+                        ToArray(),
                         messagesGroupedByDay.
                         Select(x => (double)x.Item2).
                         ToArray());
@@ -144,6 +112,65 @@ namespace MEE7.Commands.MessageDB
                     plt.XLabel("Day");
 
                     DiscordNETWrapper.SendBitmap(plt.GetBitmap(), message.Channel).Wait();
+                }
+            },
+            new WeirdCommandThingy()
+            {
+                name = "",
+                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                    
+                }
+            },
+        };
+
+        public MessageDB() : base("messageDB", "makes database stuff without databases because no", false, true)
+        {
+
+        }
+
+        public override void Execute(SocketMessage message)
+        {
+            var split = message.Content.Split(' ');
+
+            lock (dbLock)
+            {
+                if (split.Length <= 1)
+                {
+                    DiscordNETWrapper.SendText(
+                        "Hi im a database, I save data. (secretly im just a chonky json file but psssst, tell no one)\n" +
+                        "If you want to build a database for the discord server you are writing this message on type `$messageDB build`, " +
+                        "but only trained professionals are allowed to use that command because it takes a lot of resources to exectue it\n" +
+                       $"Other commands that you can use once a database has been build are: {commands.Select(x => $"`{x.name}`").Combine(", ")}", message.Channel).Wait();
+                    return;
+                }
+                else if (split[1] == "build")
+                {
+                    if (message.Author.Id != Program.Master.Id)
+                    {
+                        DiscordNETWrapper.SendText("I'm sorry Dave, I'm afraid I can't do that", message.Channel).Wait();
+                        return;
+                    }
+
+                    if (!File.Exists(dbPath))
+                        return;
+
+                    var curGuild = Program.GetGuildFromChannel(message.Channel);
+                    DBGuild db = DBFromGuild(curGuild);
+                    File.WriteAllText(GetFilePath(db), CreateJson(db));
+
+                    DiscordNETWrapper.SendText("Server db built!", message.Channel).Wait();
+                }
+                else
+                {
+                    var command = commands.FirstOrDefault(x => x.name == split[1]);
+                    if (command == null)
+                        return;
+
+                    DBGuild dbGuild = null;
+                    if ((dbGuild = GetGuild(message)) == null)
+                        return;
+
+                    command.doStuffLul(dbGuild, message, split.Skip(2).ToArray());
                 }
             }
         }
