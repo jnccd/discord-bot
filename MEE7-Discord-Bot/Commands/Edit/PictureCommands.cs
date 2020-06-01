@@ -527,8 +527,8 @@ namespace MEE7.Commands
                            gif.Item2.Concat(gif.Item2.Skip(1).Reverse()).ToArray());
         }
 
-        public string getDesc = "Get single picture from a gif";
-        public Bitmap Get(Gif gif, SocketMessage m, int index = 0)
+        public string getPicDesc = "Get single picture from a gif";
+        public Bitmap GetPic(Gif gif, SocketMessage m, int index = 0)
         {
             for (int i = 0; i < gif.Item1.Length; i++)
                 if (i != index)
