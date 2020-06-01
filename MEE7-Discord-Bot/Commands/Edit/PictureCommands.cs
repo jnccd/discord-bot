@@ -394,22 +394,22 @@ namespace MEE7.Commands
                                                                    {  1,  2,  1 } }, 1 / 16f);
         }
 
-        public string jkrowlingDesc = "Gay rights";
-        public Bitmap Jkrowling(Bitmap bmp, SocketMessage m)
+        public string gayPrideDesc = "Gay rights";
+        public Bitmap GayPride(Bitmap bmp, SocketMessage m)
         {
             return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
-        }
-
-        public string merkelDesc = "German rights";
-        public Bitmap Merkel(Bitmap bmp, SocketMessage m)
-        {
-            return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
         }
 
         public string transRightsDesc = "The input image says trans rights";
         public Bitmap TransRights(Bitmap bmp, SocketMessage m)
         {
             return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, bmp);
+        }
+
+        public string merkelDesc = "Add a german flag to the background of your image";
+        public Bitmap Merkel(Bitmap bmp, SocketMessage m)
+        {
+            return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
         }
 
         public string rainbowDesc = "I'll try spinning colors that's a good trick";
@@ -528,7 +528,7 @@ namespace MEE7.Commands
         }
 
         public string getDesc = "Get single picture from a gif";
-        public Bitmap get(Gif gif, SocketMessage m, int index = 0)
+        public Bitmap Get(Gif gif, SocketMessage m, int index = 0)
         {
             for (int i = 0; i < gif.Item1.Length; i++)
                 if (i != index)
@@ -671,13 +671,13 @@ namespace MEE7.Commands
         }
 
         public string toGifDesc = "Converts a bitmap array to a gif";
-        public Gif toGif(Bitmap[] input, SocketMessage m)
+        public Gif ToGif(Bitmap[] input, SocketMessage m)
         {
             return new Gif(input, Enumerable.Repeat(33, input.Length).ToArray());
         }
 
         public string toBitmapArrayDesc = "Converts a gif to a bitmap array";
-        public Bitmap[] toBitmapArray(Gif input, SocketMessage m)
+        public Bitmap[] ToBitmapArray(Gif input, SocketMessage m)
         {
             return input.Item1;
         }
@@ -915,7 +915,7 @@ namespace MEE7.Commands
                     for (int y = 0; y < P.Height; y++)
                     {
                         Color C = c.GetPixel(x, y);
-                        if (C.A > 5 && edges.All(a => a.GetColorDist(C) > 70))
+                        if (C.A > 5 && edges.All(a => a.GetColorDist(C) < 30))
                             if (Horz)
                                 c.SetPixel(x, y, Cs[x * Cs.Length / P.Width]);
                             else
