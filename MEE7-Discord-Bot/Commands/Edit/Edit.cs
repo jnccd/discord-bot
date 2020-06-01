@@ -285,9 +285,11 @@ namespace MEE7.Commands
             else if (split[1] == "search" && split.Length == 3)
             {
                 var hits = Commands.OrderBy(x => x.Command.LevenshteinDistance(split[2]));
-                var top3 = hits.Take(3).ToArray();
-                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder("Search hits:", top3.Length == 0 ? "-" :
-                    top3.Select(x => $"{Array.IndexOf(top3, x) + 1}. {x.Command}\n{x.Desc}\n{CommandToCommandTypeString(x)}").Combine("\n\n")), message.Channel).Wait();
+                var topHits = hits.Take(3).ToArray();
+                topHits = topHits.Union(Commands.Where(x => x.Command.Contains(split[2], StringComparison.OrdinalIgnoreCase)).Take(2)).ToArray();
+                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder("Search hits:", topHits.Length == 0 ? "-" :
+                    topHits.Select(x => $"{Array.IndexOf(topHits, x) + 1}. {x.Command}\n{x.Desc}\n{CommandToCommandTypeString(x)}").
+                    Combine("\n\n")), message.Channel).Wait();
             }
             else
             {
