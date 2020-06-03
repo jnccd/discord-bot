@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 
@@ -18,7 +18,7 @@ namespace MEE7.Commands
             public int Number;
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             int pc = 0;
             int steps = 0;

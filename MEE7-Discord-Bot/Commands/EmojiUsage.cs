@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;
@@ -43,7 +42,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             DiscordServer server = Config.Data.ServerList.FirstOrDefault(x => x.ServerID == message.GetServerID());
             if (server == null)

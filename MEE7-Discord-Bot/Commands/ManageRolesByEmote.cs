@@ -53,7 +53,7 @@ namespace MEE7.Commands
                     }
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             //if (Program.GetGuildFromChannel(message.Channel).Roles.
             //    FirstOrDefault(x => x.Permissions.ManageRoles && x.Members.FirstOrDefault(y => y.Id == message.Author.Id) != null) == null)

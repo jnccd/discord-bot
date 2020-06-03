@@ -1,7 +1,6 @@
 ﻿using Discord;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MEE7.Commands.MessageDB
 {

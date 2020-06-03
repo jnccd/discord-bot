@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace MEE7.Commands.MessageDB
 {
@@ -22,7 +20,7 @@ namespace MEE7.Commands.MessageDB
         class WeirdCommandThingy
         {
             public string name;
-            public Action<DBGuild, SocketMessage, string[]> doStuffLul;
+            public Action<DBGuild, IMessage, string[]> doStuffLul;
         }
         class EmoteCounter
         {
@@ -37,7 +35,7 @@ namespace MEE7.Commands.MessageDB
             new WeirdCommandThingy()
             {
                 name = "countChannelMessages",
-                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     string re = "";
                     foreach (var channel in dbGuild.TextChannels.OrderByDescending(x => x.Messages.Count))
                      re += $"`{channel.Name}`: **{channel.Messages.Count}** messages\n";
@@ -47,7 +45,7 @@ namespace MEE7.Commands.MessageDB
             new WeirdCommandThingy()
             {
                 name = "countUserMessages",
-                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     string re = "";
 
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
@@ -65,7 +63,7 @@ namespace MEE7.Commands.MessageDB
             new WeirdCommandThingy()
             {
                 name = "getMostReactedMessages",
-                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
                     foreach (var channel in dbGuild.TextChannels)
                         allGuildMessages.AddRange(channel.Messages);
@@ -78,7 +76,7 @@ namespace MEE7.Commands.MessageDB
             new WeirdCommandThingy()
             {
                 name = "plotActivityOverTime",
-                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
                     try
                     {
@@ -125,7 +123,7 @@ namespace MEE7.Commands.MessageDB
             new WeirdCommandThingy()
             {
                 name = "getMostUsedEmotes",
-                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     var serverMessages = dbGuild.TextChannels.SelectMany(x => x.Messages);
 
                     var emotes = Program.GetGuildFromID(dbGuild.Id).Emotes.Select(x => new EmoteCounter() { e=x }).ToArray();
@@ -135,7 +133,7 @@ namespace MEE7.Commands.MessageDB
                         {
                             var hits = m.Content.AllIndexesOf(e.e.Print()).Count;
                             e.messageHits += hits;
-                            if (hits > 0) 
+                            if (hits > 0)
                                 e.hitMessages++;
 
                             DBReaction react;
@@ -155,8 +153,8 @@ namespace MEE7.Commands.MessageDB
             new WeirdCommandThingy()
             {
                 name = "",
-                doStuffLul = (DBGuild dbGuild, SocketMessage message, string[] args) => {
-                    
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
+
                 }
             },
         };
@@ -166,7 +164,7 @@ namespace MEE7.Commands.MessageDB
 
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             var split = message.Content.Split(' ');
 
@@ -213,7 +211,7 @@ namespace MEE7.Commands.MessageDB
             }
         }
 
-        DBGuild GetGuild(SocketMessage message)
+        DBGuild GetGuild(IMessage message)
         {
             var curGuild = Program.GetGuildFromChannel(message.Channel);
             if (!File.Exists(GetFilePath(curGuild)))
@@ -280,7 +278,8 @@ namespace MEE7.Commands.MessageDB
                             Timestamp = x.Timestamp.HasValue ? x.Timestamp.Value.UtcDateTime : DateTime.MinValue,
                             Title = x.Title
                         }).ToList(),
-                        Reactions = message.Reactions.Select(x => new DBReaction() {
+                        Reactions = message.Reactions.Select(x => new DBReaction()
+                        {
                             id = x.Key is Emote ? (x.Key as Emote).Id : 0,
                             name = x.Key.Name,
                             print = x.Key.Print(),

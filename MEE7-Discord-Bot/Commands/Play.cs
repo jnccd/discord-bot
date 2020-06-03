@@ -20,7 +20,7 @@ namespace MEE7.Commands
             HelpMenu.WithTitle("Give it a YoutTube link and it'll ~~maybe~~ work.");
         }
 
-        public override async void Execute(SocketMessage message)
+        public override async void Execute(IMessage message)
         {
             if (!message.Content.Contains(" "))
             {

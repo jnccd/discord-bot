@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;
@@ -15,7 +14,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage commandmessage)
+        public override void Execute(IMessage commandmessage)
         {
             EmbedBuilder Embed = new EmbedBuilder();
             Embed.WithColor(0, 128, 255);

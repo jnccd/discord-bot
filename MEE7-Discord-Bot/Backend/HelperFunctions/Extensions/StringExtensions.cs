@@ -128,11 +128,12 @@ namespace MEE7.Backend.HelperFunctions
                     uriResult != null && uriResult.Scheme == Uri.UriSchemeHttp)
                 {
                     var req = (HttpWebRequest)HttpWebRequest.Create(s);
-                    req.Method = "HEAD";
-                    using (var resp = req.GetResponse())
-                        if (resp.ContentType.ToLower(CultureInfo.InvariantCulture)
-                                .StartsWith("image/"))
-                            return s;
+                    req.Method = "GET";
+                    req.AllowAutoRedirect = true;
+                    req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.142 Safari/537.36";
+                    using var resp = req.GetResponse();
+                    if (resp.ContentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/"))
+                        return s;
                 }
             }
             return null;

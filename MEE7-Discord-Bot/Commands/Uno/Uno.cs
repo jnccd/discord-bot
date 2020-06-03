@@ -318,8 +318,15 @@ namespace MEE7.Commands
             return null;
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage messageIn)
         {
+            if (!(messageIn is SocketMessage))
+            {
+                DiscordNETWrapper.SendText("This command only works on discord", messageIn.Channel).Wait();
+                return;
+            }
+            var message = messageIn as SocketMessage;
+
             string[] split = message.Content.Split(' ');
             if (split.Contains("new"))
             {

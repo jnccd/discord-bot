@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -14,7 +14,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage commandmessage)
+        public override void Execute(IMessage commandmessage)
         {
             string m = commandmessage.Content.ToLower();
             if (m.Split(' ').Length >= 4 && m.Contains("?"))

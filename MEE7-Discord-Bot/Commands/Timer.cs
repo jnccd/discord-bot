@@ -37,7 +37,8 @@ namespace MEE7.Commands
 
         public Timer() : base("timer", "Posts a continually updated message that shows the time until some event", isExperimental: false, isHidden: false)
         {
-            Program.OnConnected += () => {
+            Program.OnConnected += () =>
+            {
                 PingEmote = Emote.Parse("<a:ping:703994951377092661>");
                 CancelEmote = new Emoji("❌");
 
@@ -75,7 +76,8 @@ namespace MEE7.Commands
 
                                 Thread.Sleep(1000);
                             }
-                            catch {
+                            catch
+                            {
                                 if (DateTime.Now > timer.EventTime)
                                     Config.Data.timers.RemoveAt(i--);
 
@@ -87,7 +89,8 @@ namespace MEE7.Commands
                     }
                 });
             };
-            Program.OnEmojiReactionAdded += (Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) => {
+            Program.OnEmojiReactionAdded += (Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) =>
+            {
                 if (arg3.Emote.Name == CancelEmote.Name)
                 {
                     var timer = Config.Data.timers.FirstOrDefault(x => x.MessageId == arg1.Id);
@@ -102,7 +105,7 @@ namespace MEE7.Commands
             };
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split(' ');
             if (split.Length < 4)

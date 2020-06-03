@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 
 namespace MEE7.Commands
@@ -11,7 +10,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             if (message.Author.Id == Program.Master.Id)
             {

@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -41,7 +40,7 @@ namespace MEE7.Commands
             };
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)
@@ -70,7 +69,7 @@ namespace MEE7.Commands
 
         class Reaction
         {
-            public delegate void Send(SocketMessage message);
+            public delegate void Send(IMessage message);
             public string name, desc;
             public Send execute;
 

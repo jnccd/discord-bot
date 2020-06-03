@@ -20,11 +20,11 @@ namespace MEE7.Commands
         {
             subCommands = new PlaceCommand[] {
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",
-                (string[] split, ISocketMessageChannel Channel) => { return true; },
-                (SocketMessage commandmessage, string filePath, string[] split) => { DiscordNETWrapper.SendFile(filePath, commandmessage.Channel).Wait(); }),
+                (string[] split, IMessageChannel Channel) => { return true; },
+                (IMessage commandmessage, string filePath, string[] split) => { DiscordNETWrapper.SendFile(filePath, commandmessage.Channel).Wait(); }),
             new PlaceCommand("drawPixel", "Draws the specified color to the specified place(0 - " + (placeSize / pixelSize - 1) + ", 0 - " + (placeSize / pixelSize - 1) +
             ")\neg. " + Prefix + CommandLine + " drawPixel 10,45 Red",
-                (string[] split, ISocketMessageChannel Channel) => {
+                (string[] split, IMessageChannel Channel) => {
 
                     int X, Y;
                     if (split.Length != 4)
@@ -62,7 +62,7 @@ namespace MEE7.Commands
                     return true;
 
                 },
-                (SocketMessage commandmessage, string filePath, string[] split) => {
+                (IMessage commandmessage, string filePath, string[] split) => {
 
                     string[] temps = split[2].Split(',');
                     int X = Convert.ToInt32(temps[0]);
@@ -85,7 +85,7 @@ namespace MEE7.Commands
                 }),
             new PlaceCommand("drawCircle", "Draws a circle in some color, in the given size and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
             ")\neg. " + Prefix + CommandLine + " drawCircle 100,450 Red 25",
-                (string[] split, ISocketMessageChannel Channel) => {
+                (string[] split, IMessageChannel Channel) => {
 
                     int X, Y, S;
                     if (split.Length != 5)
@@ -139,7 +139,7 @@ namespace MEE7.Commands
                     return true;
 
                 },
-                (SocketMessage commandmessage, string filePath, string[] split) => {
+                (IMessage commandmessage, string filePath, string[] split) => {
 
                     string[] temps = split[2].Split(',');
                     int X = Convert.ToInt32(temps[0]);
@@ -165,7 +165,7 @@ namespace MEE7.Commands
                 }),
             new PlaceCommand("drawRekt", "Draws a rectangle in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
             ") and size\neg. " + Prefix + CommandLine + " drawRekt 100,250 Red 200,100",
-                (string[] split, ISocketMessageChannel Channel) => {
+                (string[] split, IMessageChannel Channel) => {
 
                     int X, Y, W, H;
                     if (split.Length < 5)
@@ -215,7 +215,7 @@ namespace MEE7.Commands
                     return true;
 
                 },
-                (SocketMessage commandmessage, string filePath, string[] split) => {
+                (IMessage commandmessage, string filePath, string[] split) => {
 
                     string[] temps = split[2].Split(',');
                     int X = Convert.ToInt32(temps[0]);
@@ -242,7 +242,7 @@ namespace MEE7.Commands
                 }),
             new PlaceCommand("drawString", "Draws a string in some color and in the given coordinates(0 - " + (placeSize - 1) + ", 0 - " + (placeSize - 1) +
             ")\neg. " + Prefix + CommandLine + " drawString 100,250 Red OwO what dis",
-                (string[] split, ISocketMessageChannel Channel) => {
+                (string[] split, IMessageChannel Channel) => {
 
                     int X, Y;
                     if (split.Length < 5)
@@ -280,7 +280,7 @@ namespace MEE7.Commands
                     return true;
 
                 },
-                (SocketMessage commandmessage, string filePath, string[] split) => {
+                (IMessage commandmessage, string filePath, string[] split) => {
 
                     string[] temps = split[2].Split(',');
                     int X = Convert.ToInt32(temps[0]);
@@ -306,8 +306,8 @@ namespace MEE7.Commands
 
         class PlaceCommand
         {
-            public delegate bool ConditionCheck(string[] split, ISocketMessageChannel Channel);
-            public delegate void Execution(SocketMessage commandmessage, string filePath, string[] split);
+            public delegate bool ConditionCheck(string[] split, IMessageChannel Channel);
+            public delegate void Execution(IMessage commandmessage, string filePath, string[] split);
             public string command, desc;
             public ConditionCheck check;
             public Execution execute;
@@ -321,7 +321,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             if (split.Length == 1)

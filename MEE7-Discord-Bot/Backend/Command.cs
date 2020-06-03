@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 
 namespace MEE7.Backend
 {
@@ -27,7 +26,7 @@ namespace MEE7.Backend
 
         public EmbedBuilder HelpMenu;
 
-        // May be implemented later
+        // May be implemented later (probably never)
         //private class SubCommand
         //{
         //    public SubCommand[] SubCommands;
@@ -50,6 +49,6 @@ namespace MEE7.Backend
             IsHidden = isHidden;
         }
 
-        public abstract void Execute(SocketMessage message);
+        public abstract void Execute(IMessage message);
     }
 }

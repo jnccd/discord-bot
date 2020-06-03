@@ -29,7 +29,7 @@ namespace MEE7.Backend
         public List<ulong> MentionedRoleIds;
         public List<ulong> MentionedUserIds;
 
-        public Func<RequestOptions, Task> DeleteFunc = (RequestOptions options) => { throw new NotImplementedException(); };
+        public Func<RequestOptions, Task> DeleteFunc = (RequestOptions options) => Task.FromResult(default(object));
 
         public SelfmadeMessage()
         {

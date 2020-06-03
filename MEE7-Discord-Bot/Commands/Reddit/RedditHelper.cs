@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
@@ -50,7 +49,7 @@ namespace MEE7.Commands
             return postJson;
         }
 
-        public static async Task SendPostJsonToDiscordChannel(string postJson, string subUrl, ISocketMessageChannel Channel, SocketUser Author)
+        public static async Task SendPostJsonToDiscordChannel(string postJson, string subUrl, IMessageChannel Channel, IUser Author)
         {
             // Resutls
             string ResultURL = "", ResultPicURL = "", ResultTitle = "", ResultTimestamp = "0", ResultPoints = "";

@@ -24,43 +24,45 @@ namespace MEE7.Commands
             HelpMenu.WithDescription("Chess Commands:");
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 
             if (split.Length < 2 || split[1] == "help")
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
-            else if (split[1] == "newGame")
+            else if (split[1] == "newGame" && message is SocketMessage)
             {
+                var socketMessage = message as SocketMessage;
+
                 if (Boards.Exists(x => x.PlayerBottom.UserID == message.Author.Id || x.PlayerTop.UserID == message.Author.Id))
                 {
                     DiscordNETWrapper.SendText("You are already in a game!", message.Channel).Wait();
                     return;
                 }
 
-                if (message.MentionedUsers.Count != 1)
+                if (socketMessage.MentionedUsers.Count != 1)
                 {
                     DiscordNETWrapper.SendText("You need exactly one User to play against!", message.Channel).Wait();
                     return;
                 }
 
-                if (message.MentionedUsers.ElementAt(0).IsBot || message.Author.IsBot)
+                if (socketMessage.MentionedUsers.ElementAt(0).IsBot || message.Author.IsBot)
                 {
                     DiscordNETWrapper.SendText("You can't play against Bots!", message.Channel).Wait();
                     return;
                 }
 
-                if (Boards.Exists(x => x.PlayerBottom.UserID == message.MentionedUsers.ElementAt(0).Id ||
-                        x.PlayerTop.UserID == message.MentionedUsers.ElementAt(0).Id))
+                if (Boards.Exists(x => x.PlayerBottom.UserID == (message as SocketMessage).MentionedUsers.ElementAt(0).Id ||
+                        x.PlayerTop.UserID == (message as SocketMessage).MentionedUsers.ElementAt(0).Id))
                 {
-                    DiscordNETWrapper.SendText(message.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel).Wait();
+                    DiscordNETWrapper.SendText(socketMessage.MentionedUsers.ElementAt(0).Mention + " is already in a game!", message.Channel).Wait();
                     return;
                 }
 
                 Boards.Add(new ChessBoard(new ChessPlayerDiscord(message.Author.Id),
-                           new ChessPlayerDiscord(message.MentionedUsers.ElementAt(0).Id)));
+                           new ChessPlayerDiscord(socketMessage.MentionedUsers.ElementAt(0).Id)));
                 DiscordNETWrapper.SendText("Created new chess game!", message.Channel).Wait();
-                SendBoard(message);
+                SendBoard(socketMessage);
             }
             else if (split[1] == "game")
                 SendBoard(message);
@@ -132,7 +134,7 @@ namespace MEE7.Commands
                 DiscordNETWrapper.SendText("Thats not a proper chess command, type \"$chess help\" if you need some", message.Channel).Wait();
         }
 
-        public void SendBoard(SocketMessage message)
+        public void SendBoard(IMessage message)
         {
             ChessBoard Board = Boards.Find(x => x.PlayerBottom.UserID == message.Author.Id ||
             x.PlayerTop.UserID == message.Author.Id);

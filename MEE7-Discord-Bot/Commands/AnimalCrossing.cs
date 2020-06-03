@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
@@ -17,7 +17,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             var split = message.Content.Split(' ');
             if (split.Length <= 1)
@@ -33,7 +33,7 @@ namespace MEE7.Commands
             }
         }
 
-        void germanWikiQuery(string searchQuery, SocketMessage message)
+        void germanWikiQuery(string searchQuery, IMessage message)
         {
             HtmlWeb web = new HtmlWeb();
             web.AutoDetectEncoding = false;
@@ -49,7 +49,7 @@ namespace MEE7.Commands
 
                 var searchDoc = web.Load(searchURL);
                 searchHits = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'wikilink1')]");
-            } 
+            }
             catch
             {
                 DiscordNETWrapper.SendText("Error occured while using the search page", message.Channel).Wait();
@@ -86,7 +86,7 @@ namespace MEE7.Commands
             DiscordNETWrapper.SendText("Couldn't find anything", message.Channel).Wait();
             return;
         }
-        void germanWikiNeighbor(string charLink, HtmlWeb web, SocketMessage message)
+        void germanWikiNeighbor(string charLink, HtmlWeb web, IMessage message)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace MEE7.Commands
                 return;
             }
         }
-        void germanWikiKatalog(string link, HtmlWeb web, SocketMessage message)
+        void germanWikiKatalog(string link, HtmlWeb web, IMessage message)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace MEE7.Commands
                 return;
             }
         }
-        void germanWikiTapeten(string link, HtmlWeb web, SocketMessage message, string searchQuery)
+        void germanWikiTapeten(string link, HtmlWeb web, IMessage message, string searchQuery)
         {
             try
             {
@@ -163,7 +163,8 @@ namespace MEE7.Commands
 
                 var tapets = doc.DocumentNode.SelectNodes("//tr");
                 var searchIndex = tapets.
-                    Select(x => {
+                    Select(x =>
+                    {
                         string name = "";
                         try
                         {
@@ -172,7 +173,7 @@ namespace MEE7.Commands
                         catch { }
                         return new Tuple<HtmlNode, string>(x, name);
                     }).
-                    Where(x => !string.IsNullOrWhiteSpace(x.Item2) && 
+                    Where(x => !string.IsNullOrWhiteSpace(x.Item2) &&
                                !x.Item2.StartsWith("Kaufpreis") &&
                                !x.Item2.StartsWith("Verkaufspreis") &&
                                !x.Item2.StartsWith("Quelle")).
@@ -197,7 +198,7 @@ namespace MEE7.Commands
         }
 
 
-        void englishWikiQuery(string searchQuery, SocketMessage message)
+        void englishWikiQuery(string searchQuery, IMessage message)
         {
             var searchPage = ("https://animalcrossing.fandom.com/wiki/Special:Search?query=" + HttpUtility.UrlEncode(searchQuery)).GetHTMLfromURL();
             if (searchPage.Contains("<i>No results found.</i>"))

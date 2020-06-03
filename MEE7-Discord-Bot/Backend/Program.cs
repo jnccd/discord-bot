@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -19,7 +18,7 @@ using Environment = System.Environment;
 
 namespace MEE7
 {
-    public partial class Program
+    public static partial class Program
     {
 #if DEBUG
         public static readonly string runConfig = "Debug";
@@ -95,7 +94,7 @@ namespace MEE7
 
             if (!RunningOnCI)
                 try { HandleConsoleCommandsLoop(); }
-                catch (Exception e) { CILimbo(); e.ToString(); }
+                catch (Exception e) { CILimbo(); }
             else
                 CILimbo();
 
@@ -140,6 +139,7 @@ namespace MEE7
             Login();
 
             CreateCommandInstances();
+            Task.Run(() => BootTwitterModule());
 
             while (!ClientReady) { Thread.Sleep(20); }
 
@@ -804,7 +804,7 @@ namespace MEE7
         }
         private delegate bool ConsoleEventDelegate(int eventType);
 
-        // Imports
+        // Imports (that don't work on unix uwu)
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);
         [DllImport("kernel32.dll")]

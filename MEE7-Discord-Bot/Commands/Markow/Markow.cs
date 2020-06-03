@@ -92,7 +92,7 @@ namespace MEE7.Commands
                 MarkovHelper.SaveDict();
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
 

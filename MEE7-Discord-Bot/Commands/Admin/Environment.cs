@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -13,7 +12,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             if (message.Author.Id != Program.Master.Id)
                 DiscordNETWrapper.SendText("Sorry but only my Owner is allowed to use this Command.", message.Channel).Wait();

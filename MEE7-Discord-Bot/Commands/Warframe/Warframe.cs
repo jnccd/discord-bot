@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;
@@ -32,7 +31,7 @@ namespace MEE7.Commands
                                       "               eg. \"+Detonite&Solaris\" to only get alerted for detonite injectors from solaris" +
                                       "```");
         }
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split(new char[] { ' ', '\n' });
             DiscordUser user = Config.Data.UserList.Find(x => x.UserID == message.Author.Id);
