@@ -69,7 +69,7 @@ namespace MEE7.Commands
             return true;
         }
 
-        public override void Execute(SocketMessage commandmessage)
+        public override void Execute(IMessage commandmessage)
         {
             if (commandmessage.Channel is SocketGuildChannel)
             {

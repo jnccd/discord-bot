@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -39,7 +39,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string code = message.Content;
             code = code.Replace("\n", " ");

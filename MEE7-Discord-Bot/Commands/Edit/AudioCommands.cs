@@ -1,4 +1,5 @@
-﻿using Discord.Audio;
+﻿using Discord;
+using Discord.Audio;
 using Discord.WebSocket;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
@@ -20,7 +21,7 @@ namespace MEE7.Commands
             "Derpy Hooves (Emotions: Neutral), Solider (Emotions: Neutral), Miss Pauling (Emotions: Neutral), Rise Kujikawa (Emotions: Neutral). " +
             "Default Voice is GLaDOS\n" +
             "Available voices last updated: 03.05.2020";
-        public WaveStream Speak(string text, SocketMessage m, string character = "GLaDOS", string emotion = "Homicidal")
+        public WaveStream Speak(string text, IMessage m, string character = "GLaDOS", string emotion = "Homicidal")
         {
             if (text.Contains('"') || character.Contains('"'))
                 return null;
@@ -54,7 +55,7 @@ namespace MEE7.Commands
         }
 
         public string playAudioDesc = "Plays audio in voicechat";
-        public void PlayAudio(WaveStream w, SocketMessage m)
+        public void PlayAudio(WaveStream w, IMessage m)
         {
             SocketGuild g = Program.GetGuildFromChannel(m.Channel);
             ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
@@ -75,7 +76,7 @@ namespace MEE7.Commands
         }
 
         public string drawAudioDesc = "Draw the samples";
-        public Bitmap DrawAudio(WaveStream w, SocketMessage m)
+        public Bitmap DrawAudio(WaveStream w, IMessage m)
         {
             var c = new WaveChannel32(w);
 
@@ -102,7 +103,7 @@ namespace MEE7.Commands
             int j = 0;
             Bitmap output = new Bitmap(1000, 500);
             using (Graphics graphics = Graphics.FromImage(output))
-                graphics.DrawLines(new Pen(Color.White), Enumerable.
+                graphics.DrawLines(new Pen(System.Drawing.Color.White), Enumerable.
                     Range(0, 1000).
                     Select(x => new Point[] {
                             new Point(j, (int)normSamplesMin[x]),
@@ -117,7 +118,7 @@ namespace MEE7.Commands
 
         object pitchLock = new object();
         public string pitchDesc = "Adds a Pitch to the sound";
-        public WaveStream Pitch(WaveStream w, SocketMessage m, float PitchFactor)
+        public WaveStream Pitch(WaveStream w, IMessage m, float PitchFactor)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}pitch.bin";
 
@@ -135,7 +136,7 @@ namespace MEE7.Commands
 
         object volumeLock = new object();
         public string volumeDesc = "Adds Volume to the sound";
-        public WaveStream Volume(WaveStream w, SocketMessage m, float VolumeFactor)
+        public WaveStream Volume(WaveStream w, IMessage m, float VolumeFactor)
         {
             string filePath = $"Commands{Path.DirectorySeparatorChar}Edit{Path.DirectorySeparatorChar}volume.bin";
 

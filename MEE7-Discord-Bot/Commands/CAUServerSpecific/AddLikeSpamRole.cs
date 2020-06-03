@@ -19,7 +19,7 @@ namespace MEE7.Commands
             };
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
 
         }

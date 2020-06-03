@@ -35,7 +35,7 @@ namespace MEE7
         static readonly ulong[] experimentalChannels = new ulong[] { 473991188974927884 };
         static readonly List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
 
-        public delegate void NonCommandMessageRecievedHandler(SocketMessage message);
+        public delegate void NonCommandMessageRecievedHandler(IMessage message);
         public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
         public delegate void EmojiReactionAddedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
         public static event EmojiReactionAddedHandler OnEmojiReactionAdded;
@@ -104,7 +104,7 @@ namespace MEE7
         public delegate void VoiceServerUpdatedHandler(SocketVoiceServer arg1);
         public static event VoiceServerUpdatedHandler OnVoiceServerUpdated;
 
-        static readonly List<Tuple<RestUserMessage, Exception>> cachedErrorMessages = new List<Tuple<RestUserMessage, Exception>>();
+        static readonly List<Tuple<IUserMessage, Exception>> cachedErrorMessages = new List<Tuple<IUserMessage, Exception>>();
         static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
             "The code monkeys at our headquarters are working VEWY HAWD to fix this!";
         static readonly Emoji errorEmoji = new Emoji("🤔");
@@ -120,7 +120,7 @@ namespace MEE7
         }
         public static void DisposeErrorMessages()
         {
-            foreach (Tuple<RestUserMessage, Exception> err in cachedErrorMessages)
+            foreach (Tuple<IUserMessage, Exception> err in cachedErrorMessages)
             {
                 err.Item1.RemoveAllReactionsAsync().Wait();
                 err.Item1.ModifyAsync(m => m.Content = errorMessage).Wait();
@@ -170,7 +170,7 @@ namespace MEE7
         {
             Task.Run(async () =>
             {
-                Tuple<RestUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                Tuple<IUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
@@ -195,7 +195,7 @@ namespace MEE7
         {
             Task.Run(() =>
             {
-                Tuple<RestUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                Tuple<IUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
@@ -216,7 +216,7 @@ namespace MEE7
 
             return Task.FromResult(default(object));
         }
-        private static Task MessageReceived(SocketMessage message)
+        private static Task MessageReceived(IMessage message)
         {
             if (message.Channel.Id == logChannel)
                 Task.Run(() =>
@@ -235,7 +235,7 @@ namespace MEE7
                 });
             return Task.FromResult(default(object));
         }
-        private static void ParallelMessageReceived(SocketMessage message)
+        private static void ParallelMessageReceived(IMessage message)
         {
             if (message.Channel is SocketGuildChannel)
                 Saver.SaveServer(message.GetServerID());
@@ -301,7 +301,7 @@ namespace MEE7
                     DiscordNETWrapper.SendText("You are already executing a command, wait for the current one to finish.", message.Channel).Wait();
             }
         }
-        private static void ExecuteCommand(Command command, SocketMessage message)
+        private static void ExecuteCommand(Command command, IMessage message)
         {
             if (command.GetType() == typeof(Template) && !experimentalChannels.Contains(message.Channel.Id))
                 return;
@@ -335,10 +335,10 @@ namespace MEE7
             {
                 try // Try in case I dont have the permissions to write at all
                 {
-                    RestUserMessage m = message.Channel.SendMessageAsync(errorMessage).Result;
+                    IUserMessage m = message.Channel.SendMessageAsync(errorMessage).Result;
 
                     m.AddReactionAsync(errorEmoji).Wait();
-                    cachedErrorMessages.Add(new Tuple<RestUserMessage, Exception>(m, e));
+                    cachedErrorMessages.Add(new Tuple<IUserMessage, Exception>(m, e));
                 }
                 catch { }
 

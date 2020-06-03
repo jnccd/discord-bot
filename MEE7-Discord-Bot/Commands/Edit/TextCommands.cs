@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using MEE7.Backend.HelperFunctions;
 using System;
 using System.Linq;
@@ -9,56 +9,56 @@ namespace MEE7.Commands
     public class TextCommands : EditCommandProvider
     {
         public string mockDesc = "Mock the text";
-        public string Mock(string s, SocketMessage m)
+        public string Mock(string s, IMessage m)
         {
             return string.Join("", s.Select((x) => { return Program.RDM.Next(2) == 1 ? char.ToUpper(x) : char.ToLower(x); })) +
                     "\n https://images.complex.com/complex/images/c_limit,w_680/fl_lossy,pg_1,q_auto/bujewhyvyyg08gjksyqh/spongebob";
         }
 
         public string crabDesc = "Crab the text";
-        public string Crab(string s, SocketMessage m)
+        public string Crab(string s, IMessage m)
         {
             return ":crab: " + s + " :crab:\n https://www.youtube.com/watch?v=LDU_Txk06tM&t=75s";
         }
 
         public string CAPSDesc = "Convert text to CAPS";
-        public string CAPS(string s, SocketMessage m)
+        public string CAPS(string s, IMessage m)
         {
             return string.Join("", s.Select((x) => { return char.ToUpper(x); }));
         }
 
         public string SUPERCAPSDesc = "Convert text to SUPER CAPS";
-        public string SUPERCAPS(string s, SocketMessage m)
+        public string SUPERCAPS(string s, IMessage m)
         {
             return string.Join("", s.Select((x) => { return char.ToUpper(x) + " "; }));
         }
 
         public string CopySpoilerifyDesc = "Convert text to a spoiler";
-        public string CopySpoilerify(string s, SocketMessage m)
+        public string CopySpoilerify(string s, IMessage m)
         {
             return "`" + string.Join("", s.Select((x) => { return "||" + x + "||"; })) + "`";
         }
 
         public string SpoilerifyDesc = "Convert text to a spoiler";
-        public string Spoilerify(string s, SocketMessage m)
+        public string Spoilerify(string s, IMessage m)
         {
             return string.Join("", s.Select((x) => { return "||" + x + "||"; }));
         }
 
         public string UnspoilerifyDesc = "Convert spoiler text to readable text";
-        public string Unspoilerify(string s, SocketMessage m)
+        public string Unspoilerify(string s, IMessage m)
         {
             return s.Replace("|", "");
         }
 
         public string AestheticifyDesc = "Convert text to Ａｅｓｔｈｅｔｉｃ text";
-        public string Aestheticify(string s, SocketMessage m)
+        public string Aestheticify(string s, IMessage m)
         {
             return s.Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
         }
 
         public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
-        public string Japanify(string s, SocketMessage m)
+        public string Japanify(string s, IMessage m)
         {
             StringBuilder input = new StringBuilder(s);
 
@@ -110,7 +110,7 @@ namespace MEE7.Commands
         }
 
         public string unjapanifyDesc = "Convert katakana into readable stuff";
-        public string Unjapanify(string s, SocketMessage m)
+        public string Unjapanify(string s, IMessage m)
         {
             StringBuilder input = new StringBuilder(s);
 

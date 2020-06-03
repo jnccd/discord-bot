@@ -1,8 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using MEE7.Backend;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MEE7.Commands
 {
@@ -13,6 +10,6 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage message) => new Edit().Execute(message);
+        public override void Execute(IMessage message) => new Edit().Execute(message);
     }
 }

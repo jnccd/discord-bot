@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -25,18 +24,18 @@ namespace MEE7.Commands
                 "a subreddit yourself by adding it as an argument, eg. `$meme me_irl`");
         }
 
-        public override void Execute(SocketMessage commandmessage)
+        public override void Execute(IMessage message)
         {
             // Getting a subreddit
             bool worked = false;
             string url = "";
 
-            if (commandmessage.Content.Split(new char[] { ' ', '\n' }).Length > 1)
+            if (message.Content.Split(new char[] { ' ', '\n' }).Length > 1)
             {
-                url = "https://www.reddit.com/r/" + commandmessage.Content.Split(new char[] { ' ', '\n' })[1] + "/";
+                url = "https://www.reddit.com/r/" + message.Content.Split(new char[] { ' ', '\n' })[1] + "/";
                 if (!RedditHelper.IsReachable(url))
                 {
-                    DiscordNETWrapper.SendText("Thats not a valid subreddit!", commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText("Thats not a valid subreddit!", message.Channel).Wait();
                     return;
                 }
             }
@@ -49,7 +48,7 @@ namespace MEE7.Commands
                 try
                 {
                     string postJson = RedditHelper.GetPostJsonFromSubreddit(url);
-                    RedditHelper.SendPostJsonToDiscordChannel(postJson, url, commandmessage.Channel, commandmessage.Author).Wait();
+                    RedditHelper.SendPostJsonToDiscordChannel(postJson, url, message.Channel, message.Author).Wait();
                     worked = true;
                 }
                 catch (Exception e)

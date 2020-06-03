@@ -1,9 +1,7 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using MEE7.Backend;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MEE7.Commands.CAUServerSpecific
 {
@@ -37,6 +35,6 @@ namespace MEE7.Commands.CAUServerSpecific
             };
         }
 
-        public override void Execute(SocketMessage message) { }
+        public override void Execute(IMessage message) { }
     }
 }

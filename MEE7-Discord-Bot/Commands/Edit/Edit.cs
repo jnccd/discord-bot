@@ -31,9 +31,9 @@ namespace MEE7.Commands
         class ArgumentParseMethod
         {
             public Type Type;
-            public Func<SocketMessage, string, object> Function;
+            public Func<IMessage, string, object> Function;
 
-            public ArgumentParseMethod(Type Type, Func<SocketMessage, string, object> Function)
+            public ArgumentParseMethod(Type Type, Func<IMessage, string, object> Function)
             {
                 this.Function = Function;
                 this.Type = Type;
@@ -42,9 +42,9 @@ namespace MEE7.Commands
         class PrintMethod
         {
             public Type Type;
-            public Action<SocketMessage, object> Function;
+            public Action<IMessage, object> Function;
 
-            public PrintMethod(Type Type, Action<SocketMessage, object> Function)
+            public PrintMethod(Type Type, Action<IMessage, object> Function)
             {
                 this.Function = Function;
                 this.Type = Type;
@@ -124,11 +124,11 @@ namespace MEE7.Commands
         {
             public string Desc;
             public Argument[] Arguments;
-            public Func<SocketMessage, object[], object, object> Function;
+            public Func<IMessage, object[], object, object> Function;
             public MethodInfo sourceMethod;
 
             public EditCommand(string Command, string Desc, Type InputType, Type OutputType, Argument[] Arguments,
-                Func<SocketMessage, object[], object, object> Function, MethodInfo sourceMethod = null)
+                Func<IMessage, object[], object, object> Function, MethodInfo sourceMethod = null)
             {
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
                     throw new IllegalCommandException("Illegal Symbol in the name!");
@@ -153,11 +153,11 @@ namespace MEE7.Commands
             public Type InputType() => this.First().Item2.InputType;
             public Type OutputType() => this.Last().Item2.OutputType;
 
-            public static Pipe Parse(SocketMessage message, string rawPipe, Type InputType = null, Type OutputType = null)
+            public static Pipe Parse(IMessage message, string rawPipe, Type InputType = null, Type OutputType = null)
             {
                 return CheckPipe(GetExecutionPipe(message, rawPipe), true, InputType, OutputType);
             }
-            public object Apply(SocketMessage message, object inputData, Dictionary<string, object> vars = null)
+            public object Apply(IMessage message, object inputData, Dictionary<string, object> vars = null)
             {
                 return RunPipe(this, message, inputData, vars);
             }
@@ -199,13 +199,13 @@ namespace MEE7.Commands
                         var tInstance = Activator.CreateInstance(t);
                         string desc = (string)descVar.GetValue(tInstance);
                         var param = method.GetParameters();
-                        if (param[1].ParameterType == typeof(SocketMessage))
+                        if (param[1].ParameterType == typeof(IMessage))
                         {
                             var command = new EditCommand(method.Name, desc,
                                 param.First().ParameterType == typeof(EditNull) ? null : param.First().ParameterType,
                                 method.ReturnType == typeof(void) ? null : method.ReturnType,
                                 param.Skip(2).Select(x => new Argument(x.Name, x.ParameterType, x.DefaultValue)).ToArray(),
-                                (SocketMessage m, object[] args, object o) =>
+                                (IMessage m, object[] args, object o) =>
                                 {
                                     if (param.First().ParameterType == typeof(EditNull))
                                         o = new EditNull();
@@ -240,8 +240,9 @@ namespace MEE7.Commands
                             curCommands.Add(command);
                         }
                     }
-                    catch { 
-                        ConsoleWrapper.WriteLine("[Edit] Failed to load: " + method.Name); 
+                    catch
+                    {
+                        ConsoleWrapper.WriteLine("[Edit] Failed to load: " + method.Name);
                     }
                 }
 
@@ -268,7 +269,7 @@ namespace MEE7.Commands
                     Combine() + "");
             }
         }
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             var split = message.Content.Split(' ');
             if (split.Length <= 1)
@@ -313,7 +314,7 @@ namespace MEE7.Commands
             }
         }
 
-        static Pipe GetExecutionPipe(SocketMessage message, string rawPipe, bool argumentParsing = true)
+        static Pipe GetExecutionPipe(IMessage message, string rawPipe, bool argumentParsing = true)
         {
             Pipe re = new Pipe() { rawPipe = rawPipe };
 
@@ -451,7 +452,7 @@ namespace MEE7.Commands
                                                 throw new Exception($"I couldn't decipher the argument \"{args[i]}\" that you gave to {cwoargs}");
                                             }
                                         }
-                                        
+
                                     }
                             }
                             else if (command.Arguments[i].StandardValue == null)
@@ -514,7 +515,7 @@ namespace MEE7.Commands
 
             return pipe;
         }
-        static object RunPipe(Pipe pipe, SocketMessage message, object initialData = null, Dictionary<string, object> vars = null)
+        static object RunPipe(Pipe pipe, IMessage message, object initialData = null, Dictionary<string, object> vars = null)
         {
             object currentData = initialData;
 
@@ -522,7 +523,8 @@ namespace MEE7.Commands
             {
                 try
                 {
-                    object[] args = p.Item1.Select(arg => {
+                    object[] args = p.Item1.Select(arg =>
+                    {
                         if (arg is EditVariable)
                             if (vars == null || !vars.ContainsKey((arg as EditVariable).VarName))
                                 throw new Exception("you fowgot to define vawiabwes uwu");
@@ -612,7 +614,7 @@ namespace MEE7.Commands
             return currentData;
         }
 
-        static void PrintPipeOutput(object output, SocketMessage message)
+        static void PrintPipeOutput(object output, IMessage message)
         {
             if (output == null) return;
             object[] arr;

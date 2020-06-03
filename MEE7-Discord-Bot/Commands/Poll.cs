@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System.Linq;
@@ -20,7 +19,7 @@ namespace MEE7.Commands
                 $"Nothing much,The Sky,My dick");
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string[] split = message.Content.Split('\n');
             if (split.Length < 2)

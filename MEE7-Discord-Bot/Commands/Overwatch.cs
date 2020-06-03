@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using Newtonsoft.Json;
@@ -16,7 +16,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var gameMode = GetGamemodeJson("https://overwatcharcade.today/api/overwatch/arcademodes".GetHTMLfromURL());

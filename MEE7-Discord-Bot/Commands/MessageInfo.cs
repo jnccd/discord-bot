@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -14,7 +13,7 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             string idText = message.Content.Split(' ').Last().Split('/').Last();
             IMessage m;

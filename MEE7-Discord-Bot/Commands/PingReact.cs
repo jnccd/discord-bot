@@ -16,8 +16,15 @@ namespace MEE7.Commands
             Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }
 
-        public void OnNonCommandMessageRecieved(SocketMessage message)
+        public void OnNonCommandMessageRecieved(IMessage messageIn)
         {
+            if (!(messageIn is SocketMessage))
+            {
+                DiscordNETWrapper.SendText("This command only works on discord", messageIn.Channel).Wait();
+                return;
+            }
+            var message = messageIn as SocketMessage;
+
             if (message.MentionedUsers.Count == 0 && message.MentionedRoles.Count == 0 || !(message is IUserMessage))
                 return;
 
@@ -32,7 +39,7 @@ namespace MEE7.Commands
             message.AddReactionsAsync(new IEmote[] { pingRage }).Wait();
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             return;
         }

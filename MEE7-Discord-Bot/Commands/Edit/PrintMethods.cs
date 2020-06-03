@@ -1,6 +1,5 @@
 ﻿using AnimatedGif;
 using Discord;
-using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
@@ -15,23 +14,23 @@ namespace MEE7.Commands
     {
         static readonly PrintMethod[] PrintMethods = new PrintMethod[]
         {
-            new PrintMethod(typeof(EmbedBuilder), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(EmbedBuilder), (IMessage m, object o) => {
                 DiscordNETWrapper.SendEmbed(o as EmbedBuilder, m.Channel).Wait();
 
             }),
-            new PrintMethod(typeof(Tuple<string, EmbedBuilder>), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(Tuple<string, EmbedBuilder>), (IMessage m, object o) => {
                 var t = o as Tuple<string, EmbedBuilder>;
                 DiscordNETWrapper.SendEmbed(t.Item2, m.Channel).Wait();
                 DiscordNETWrapper.SendText(t.Item1, m.Channel).Wait();
 
             }),
-            new PrintMethod(typeof(Bitmap), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(Bitmap), (IMessage m, object o) => {
                 var b = o as Bitmap;
                 DiscordNETWrapper.SendBitmap(b, m.Channel).Wait();
                 b.Dispose();
 
             }),
-            new PrintMethod(typeof(Bitmap[]), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(Bitmap[]), (IMessage m, object o) => {
                 using (MemoryStream s = new MemoryStream())
                 {
                     Bitmap[] bs = o as Bitmap[];
@@ -48,7 +47,7 @@ namespace MEE7.Commands
                 }
 
             }),
-            new PrintMethod(typeof(Gif), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(Gif), (IMessage m, object o) => {
                 using (MemoryStream s = new MemoryStream())
                 {
                     Gif gif = o as Gif;
@@ -56,7 +55,7 @@ namespace MEE7.Commands
                     int maxHeight = gif.Item1.Select(x => x.Height).Max();
                     using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
                         for (int i = 0; i < gif.Item1.Length; i++)
-                            c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), 
+                            c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)),
                                 gif.Item2[i], GifQuality.Bit8);
 
                     DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
@@ -66,26 +65,26 @@ namespace MEE7.Commands
                 }
 
             }),
-            new PrintMethod(typeof(WaveStream), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(WaveStream), (IMessage m, object o) => {
                 Stream s = new MemoryStream();
                 WaveFileWriter.WriteWavFileToStream(s, o as WaveStream);
                 DiscordNETWrapper.SendFile(s, m.Channel, ".mp3").Wait();
 
             }),
-            new PrintMethod(typeof(IWaveProvider), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(IWaveProvider), (IMessage m, object o) => {
                 Stream s = new MemoryStream();
                 WaveFileWriter.WriteWavFileToStream(s, o as IWaveProvider);
                 DiscordNETWrapper.SendFile(s, m.Channel, ".mp3").Wait();
 
             }),
-            new PrintMethod(typeof(Array), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(Array), (IMessage m, object o) => {
                 Array arr = o as Array;
                 DiscordNETWrapper.SendText(
-                    $"[{Enumerable.Range(0, arr.Length).Select(x => arr.GetValue(x).ToString()).Combine(", ")}]", 
+                    $"[{Enumerable.Range(0, arr.Length).Select(x => arr.GetValue(x).ToString()).Combine(", ")}]",
                     m.Channel).Wait();
 
             }),
-            new PrintMethod(typeof(object), (SocketMessage m, object o) => {
+            new PrintMethod(typeof(object), (IMessage m, object o) => {
                 DiscordNETWrapper.SendText(o.ToString(), m.Channel).Wait();
 
             }),

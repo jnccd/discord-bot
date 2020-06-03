@@ -14,7 +14,7 @@ namespace MEE7.Commands
             Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }
 
-        public void OnNonCommandMessageRecieved(SocketMessage message)
+        public void OnNonCommandMessageRecieved(IMessage message)
         {
             if (Config.Data.MessagePreviewServers.Contains(Program.GetGuildFromChannel(message.Channel).Id))
             {
@@ -37,7 +37,7 @@ namespace MEE7.Commands
             }
         }
 
-        public override void Execute(SocketMessage message)
+        public override void Execute(IMessage message)
         {
             if (message.Channel is SocketGuildChannel)
             {
