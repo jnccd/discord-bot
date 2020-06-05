@@ -40,17 +40,23 @@ namespace MEE7.Backend
 
         public Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
         {
-            var res = TweetSharpWrapper.SendReplyImage(service, thread.First(), text ?? "-", filePath);
+            var res = TweetSharpWrapper.SendReplyImage(service, thread.First(), 
+                string.IsNullOrWhiteSpace(text) ? "here's ya image 😊" : text, filePath);
             if (res != null && res.Item1 != null && res.Item2.StatusCode == HttpStatusCode.OK)
                 thread.Insert(0, res.Item1);
+            else
+                this.SendMessageAsync("That didn't work :c").Wait();
             return Task.FromResult(default(IUserMessage));
         }
 
         public Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
         {
-            var res = TweetSharpWrapper.SendReplyImage(service, thread.First(), text ?? "-", stream, filename);
+            var res = TweetSharpWrapper.SendReplyImage(service, thread.First(), 
+                string.IsNullOrWhiteSpace(text) ? "here's ya image 😊" : text, stream, filename);
             if (res != null && res.Item1 != null && res.Item2.StatusCode == HttpStatusCode.OK)
                 thread.Insert(0, res.Item1);
+            else
+                this.SendMessageAsync("That didn't work :c").Wait();
             return Task.FromResult(default(IUserMessage));
         }
 
