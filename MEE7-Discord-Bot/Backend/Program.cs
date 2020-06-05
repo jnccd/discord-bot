@@ -123,7 +123,7 @@ namespace MEE7
                 //    ShowWindow(GetConsoleWindow(), 2);
                 Thread.CurrentThread.Name = "Main";
                 Console.ForegroundColor = ConsoleColor.White;
-                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.BelowNormal;
 
                 handler = new ConsoleEventDelegate(ConsoleEventCallback);
                 if (!RunningOnLinux)

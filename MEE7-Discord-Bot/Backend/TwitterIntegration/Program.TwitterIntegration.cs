@@ -17,6 +17,13 @@ namespace MEE7
 
         public static void BootTwitterModule()
         {
+            ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} BootTwitterModule!");
+
+            ConsoleWrapper.LogToDiscordIfEnabled(Environment.GetEnvironmentVariable("customer_key")+
+                    Environment.GetEnvironmentVariable("customer_key_secret")+
+                    Environment.GetEnvironmentVariable("access_token")+
+                    Environment.GetEnvironmentVariable("access_token_secret"));
+
             try
             {
                 service = new TwitterService(
