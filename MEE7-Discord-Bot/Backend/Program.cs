@@ -139,7 +139,6 @@ namespace MEE7
             Login();
 
             CreateCommandInstances();
-            Task.Run(() => BootTwitterModule());
 
             while (!ClientReady) { Thread.Sleep(20); }
 
@@ -155,6 +154,7 @@ namespace MEE7
 
             StartAutosaveLoop();
 
+            Task.Run(() => BootTwitterModule());
             CallOnConnected();
         }
         static void LoadBuildDate()
