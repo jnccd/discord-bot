@@ -29,7 +29,7 @@ namespace MEE7.Backend
 
         public DateTimeOffset CreatedAt => user.CreatedDate;
 
-        public ulong Id => 0;
+        public ulong Id => (ulong)user.Id;
 
         public string Mention => user.ScreenName;
 
