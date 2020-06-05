@@ -69,7 +69,7 @@ namespace MEE7.Backend
         public static void PrintTwitterRateLimitStatus(TwitterService service)
         {
             TwitterRateLimitStatus rate = service.Response.RateLimitStatus;
-            ConsoleWrapper.WriteLine($"Twitter rate limit status: {rate.RemainingHits}/{rate.HourlyLimit}");
+            ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Twitter rate limit status: {rate.RemainingHits}/{rate.HourlyLimit}");
         }
     }
 }
