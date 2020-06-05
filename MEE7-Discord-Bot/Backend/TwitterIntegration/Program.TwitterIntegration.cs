@@ -25,11 +25,11 @@ namespace MEE7
                     Environment.GetEnvironmentVariable("access_token"),
                     Environment.GetEnvironmentVariable("access_token_secret"));
 
-                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToShortTimeString()} Connected to Twitter!");
+                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Connected to Twitter!");
             }
             catch (Exception e)
             {
-                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToShortTimeString()} Failed to connect to Twitter!\n" + e);
+                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Failed to connect to Twitter!\n" + e);
                 return;
             }
 
@@ -39,7 +39,7 @@ namespace MEE7
             }
             catch (Exception e)
             {
-                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToShortTimeString()} Error during twitter loop!\n" + e);
+                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Error during twitter loop!\n" + e);
                 return;
             }
         }
@@ -54,7 +54,7 @@ namespace MEE7
                 if (mentions != null)
                     foreach (var m in mentions.Reverse())
                     {
-                        ConsoleWrapper.WriteLine($"{DateTime.Now.ToShortTimeString()} Recieved Tweet: " + m.Text);
+                        ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Recieved Tweet: " + m.Text);
 
                         try
                         {
