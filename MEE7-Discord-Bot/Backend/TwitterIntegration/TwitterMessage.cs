@@ -17,7 +17,7 @@ namespace MEE7.Backend
             Content = HttpUtility.HtmlDecode(Content);
             if (Content.StartsWith("@MEE7_Bot "))
                 Content = Content.Remove(0, "@MEE7_Bot ".Length);
-            Content = Content.Replace("\\\"", "\"");
+            Content = Content.Replace("\\\"", "\"").Replace("\n", " ");
             Content = Content.Trim(' ');
 
             foreach (var v in s.Entities.Urls)

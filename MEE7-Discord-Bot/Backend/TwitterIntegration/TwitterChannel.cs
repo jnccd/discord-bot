@@ -45,7 +45,7 @@ namespace MEE7.Backend
             if (res != null && res.Item1 != null && res.Item2.StatusCode == HttpStatusCode.OK)
                 thread.Insert(0, res.Item1);
             else
-                this.SendMessageAsync("That didn't work :c").Wait();
+                this.SendMessageAsync("That didn't work :c\n{res.Item2.Error}").Wait();
             return Task.FromResult(default(IUserMessage));
         }
 
@@ -56,15 +56,24 @@ namespace MEE7.Backend
             if (res != null && res.Item1 != null && res.Item2.StatusCode == HttpStatusCode.OK)
                 thread.Insert(0, res.Item1);
             else
-                this.SendMessageAsync("That didn't work :c").Wait();
+                this.SendMessageAsync($"That didn't work :c\n{res.Item2.Error}").Wait();
             return Task.FromResult(default(IUserMessage));
         }
 
         public Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
-            var res = TweetSharpWrapper.SendReply(service, thread.First(), text ?? "-");
+            if (string.IsNullOrWhiteSpace(text))
+                return Task.FromResult(default(IUserMessage));
+            if (text.Length >= 280)
+                text = text.Substring(0, 279);
+            text = new string((from c in text
+                               where c == ' ' || c == '\n' || (c >= '!' && c <= 'z')
+                               select c).ToArray());
+            var res = TweetSharpWrapper.SendReply(service, thread.First(), text);
             if (res != null && res.Item1 != null && res.Item2.StatusCode == HttpStatusCode.OK)
                 thread.Insert(0, res.Item1);
+            else
+                this.SendMessageAsync($"That didn't work :c\nTwitter said: {res.Item2.Error}").Wait();
             return Task.FromResult(default(IUserMessage));
         }
 
