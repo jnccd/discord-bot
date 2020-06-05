@@ -112,7 +112,7 @@ namespace MEE7.Backend.HelperFunctions
             }
         }
 
-        private static void LogToDiscordIfEnabled(object msg)
+        public static void LogToDiscordIfEnabled(object msg)
         {
             if (Program.logToDiscord)
                 try
