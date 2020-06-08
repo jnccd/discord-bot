@@ -42,7 +42,7 @@ namespace MEE7.Commands
             else
                 url = Subreddits[Program.RDM.Next(Subreddits.Length)];
 
-            Thread.CurrentThread.Name = "kek";
+            Thread.CurrentThread.Name = "Meme";
             while (!worked)
             {
                 try
