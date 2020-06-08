@@ -3,6 +3,7 @@ using Discord;
 using Discord.Audio;
 using Discord.Audio.Streams;
 using Discord.WebSocket;
+using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using System;
@@ -123,8 +124,16 @@ namespace MEE7.Commands
         public string myProfilePicDesc = "Gets your profile picture";
         public Bitmap MyProfilePic(EditNull n, IMessage m)
         {
-            string avatarURL = m.Author.GetAvatarUrl(ImageFormat.Png, 512);
-            return (string.IsNullOrWhiteSpace(avatarURL) ? m.Author.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+            if (m is TwitterMessage)
+            {
+                string url = (m as TwitterMessage).Author.GetAvatarUrl();
+                return url.GetBitmapFromURL();
+            }
+            else
+            {
+                string avatarURL = m.Author.GetAvatarUrl(ImageFormat.Png, 512);
+                return (string.IsNullOrWhiteSpace(avatarURL) ? m.Author.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+            }
         }
 
         public string serverPicDesc = "Gets the server picture from a server id";
