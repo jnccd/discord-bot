@@ -8,4 +8,4 @@ deploy:
     stage: deploy
     script: 
         - docker-compose build
-        - BotToken=$BotToken CI_SERVER=$CI_SERVER docker-compose up -d
+        - BotToken=$BotToken access_token=$access_token access_token_secret=$access_token_secret customer_key=$customer_key customer_key_secret=$customer_key_secret  CI_SERVER=$CI_SERVER docker-compose up -d
