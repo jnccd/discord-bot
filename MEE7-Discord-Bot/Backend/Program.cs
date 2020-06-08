@@ -476,7 +476,27 @@ namespace MEE7
 
                 try
                 {
-                    if (!input.StartsWith("/"))
+                    if (input.StartsWith(Prefix))
+                    {
+                        if (CurrentChannel == null)
+                            ConsoleWrapper.WriteLine("No channel selected!");
+                        else
+                            try
+                            {
+                                SelfmadeMessage m = new SelfmadeMessage
+                                {
+                                    Channel = CurrentChannel,
+                                    Content = input,
+                                    Author = Master
+                                };
+                                Task.Run(() => MessageReceived(m));
+                            }
+                            catch (Exception e)
+                            {
+                                ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
+                            }
+                    } 
+                    else if (!input.StartsWith("/"))
                     {
                         if (CurrentChannel == null)
                             ConsoleWrapper.WriteLine("No channel selected!");
