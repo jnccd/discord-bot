@@ -8,6 +8,10 @@ services:
     restart: on-failure
     environment:
       - BotToken
+      - access_token
+      - access_token_secret
+      - customer_key
+      - customer_key_secret
       - CI_SERVER
       
 volumes:
