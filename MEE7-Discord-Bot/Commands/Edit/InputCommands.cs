@@ -104,24 +104,31 @@ namespace MEE7.Commands
             throw new Exception("No audio file found!");
         }
 
-        public string profilePictureDesc = "Gets a profile picture";
-        public Bitmap ProfilePicture(EditNull n, IMessage m, string UserIDorMention)
+        public string profilePicDesc = "Gets a profile picture";
+        public Bitmap ProfilePic(EditNull n, IMessage m, string UserIDorMention)
         {
             SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
             string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
             return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
         }
 
-        public string profilePictureGDesc = "Gets a profile picture gif";
-        public Gif ProfilePictureG(EditNull n, IMessage m, string UserIDorMention)
+        public string profilePicGDesc = "Gets a profile picture gif";
+        public Gif ProfilePicG(EditNull n, IMessage m, string UserIDorMention)
         {
             SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
             string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
             return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
-        public string serverPictureDesc = "Gets the server picture from a server id";
-        public Bitmap ServerPicture(EditNull n, IMessage m, string ServerID)
+        public string myProfilePicDesc = "Gets your profile picture";
+        public Bitmap MyProfilePic(EditNull n, IMessage m)
+        {
+            string avatarURL = m.Author.GetAvatarUrl(ImageFormat.Png, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? m.Author.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+        }
+
+        public string serverPicDesc = "Gets the server picture from a server id";
+        public Bitmap ServerPic(EditNull n, IMessage m, string ServerID)
         {
             if (ServerID == "")
                 return Program.GetGuildFromChannel(m.Channel).IconUrl.GetBitmapFromURL();
