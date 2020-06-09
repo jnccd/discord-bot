@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Numerics;
 using System.Threading;
+using TweetSharp;
 using static MEE7.Commands.Edit;
 using Color = System.Drawing.Color;
 
@@ -108,9 +109,18 @@ namespace MEE7.Commands
         public string profilePicDesc = "Gets a profile picture";
         public Bitmap ProfilePic(EditNull n, IMessage m, string UserIDorMention)
         {
-            SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
-            string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
-            return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+            if (UserIDorMention.Contains('@') && !UserIDorMention.Contains('<') && !UserIDorMention.Contains('>'))
+            {
+                TwitterUser user = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions()
+                { ScreenName = UserIDorMention.Trim(' ', '@') });
+                return user.ProfileImageUrl.Replace("_normal", "_400x400").GetBitmapFromURL();
+            }
+            else
+            {
+                SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
+                string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
+                return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+            }
         }
 
         public string profilePicGDesc = "Gets a profile picture gif";
