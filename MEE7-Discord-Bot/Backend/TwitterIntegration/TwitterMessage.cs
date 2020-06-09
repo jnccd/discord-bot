@@ -1,4 +1,5 @@
 ﻿using Discord;
+using MEE7.Backend.HelperFunctions;
 using System.Collections.Generic;
 using System.Compat.Web;
 using System.Linq;
@@ -15,8 +16,7 @@ namespace MEE7.Backend
         {
             this.Content = s.Text;
             Content = HttpUtility.HtmlDecode(Content);
-            if (Content.StartsWith("@MEE7_Bot "))
-                Content = Content.Remove(0, "@MEE7_Bot ".Length);
+            Content = Content.Split(' ').SkipWhile(x => x.StartsWith("@")).Combine(" ");
             Content = Content.Replace("\\\"", "\"").Replace("\n", " ");
             Content = Content.Trim(' ');
 

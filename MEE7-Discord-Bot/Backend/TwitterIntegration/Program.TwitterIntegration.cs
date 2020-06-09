@@ -13,7 +13,7 @@ namespace MEE7
 {
     public static partial class Program
     {
-        static TwitterService service;
+        public static TwitterService twitterService;
 
         public static void BootTwitterModule()
         {
@@ -21,7 +21,7 @@ namespace MEE7
 
             try
             {
-                service = new TwitterService(
+                twitterService = new TwitterService(
                     Environment.GetEnvironmentVariable("customer_key"),
                     Environment.GetEnvironmentVariable("customer_key_secret"),
                     Environment.GetEnvironmentVariable("access_token"),
@@ -47,12 +47,12 @@ namespace MEE7
         }
         static void StartTwitterLoop()
         {
-            long lastMentionId = service.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions() { Count = 1 }).Last().Id;
-            TweetSharpWrapper.PrintTwitterRateLimitStatus(service);
+            long lastMentionId = twitterService.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions() { Count = 1 }).Last().Id;
+            TweetSharpWrapper.PrintTwitterRateLimitStatus(twitterService);
 
             while (true)
             {
-                var mentions = service.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions() { SinceId = lastMentionId });
+                var mentions = twitterService.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions() { SinceId = lastMentionId });
                 if (mentions != null)
                     foreach (var m in mentions.Reverse())
                     {
@@ -60,8 +60,8 @@ namespace MEE7
 
                         try
                         {
-                            TwitterChannel c = new TwitterChannel(m, service);
-                            TweetSharpWrapper.PrintTwitterRateLimitStatus(service);
+                            TwitterChannel c = new TwitterChannel(m, twitterService);
+                            TweetSharpWrapper.PrintTwitterRateLimitStatus(twitterService);
                             if (c.InitialMessage.Content.StartsWith(Program.Prefix))
                                 Task.Run(() => Program.ParallelMessageReceived(c.InitialMessage));
                         }
