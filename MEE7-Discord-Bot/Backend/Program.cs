@@ -442,6 +442,7 @@ namespace MEE7
         {
             Task.Run(() =>
             {
+                Thread.CurrentThread.Name = "Autosaver";
                 while (true)
                 {
                     Thread.Sleep(AutoSaveIntervalInMinutes * 60000);
