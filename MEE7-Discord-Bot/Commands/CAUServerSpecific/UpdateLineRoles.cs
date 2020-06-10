@@ -15,10 +15,10 @@ namespace MEE7.Commands.CAUServerSpecific
         private void Program_OnConnected()
         {
             var uniServer = Program.GetGuildFromID(479950092938248193);
-            var topLine = uniServer.GetRole(647144287485820928);
-            var bottomLine = uniServer.GetRole(665555692983156746);
             Program.OnGuildMemberUpdated += (SocketGuildUser arg1, SocketGuildUser arg2) =>
             {
+                var topLine = uniServer.GetRole(647144287485820928);
+                var bottomLine = uniServer.GetRole(665555692983156746);
                 if (arg2.Guild.Id == uniServer.Id)
                 {
                     var roles = arg2.Roles;
