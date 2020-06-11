@@ -37,72 +37,83 @@ namespace MEE7.Commands
 
         public Timer() : base("timer", "Posts a continually updated message that shows the time until some event", isExperimental: false, isHidden: false)
         {
-            Program.OnConnected += () =>
+            Program.OnConnected += Program_OnConnected;
+            Program.OnEmojiReactionAdded += Program_OnEmojiReactionAdded;
+            Program.OnMessageDeleted += Program_OnMessageDeleted;
+        }
+
+        private void Program_OnConnected()
+        {
+            PingEmote = Emote.Parse("<a:ping:703994951377092661>");
+            CancelEmote = new Emoji("❌");
+
+            // Big boi loopi loop
+            Task.Factory.StartNew(() =>
             {
-                PingEmote = Emote.Parse("<a:ping:703994951377092661>");
-                CancelEmote = new Emoji("❌");
+                Thread.CurrentThread.Name = "Timer Thread";
+                string getTimer(TimeSpan t) => $"{t.Days} Days, {t.Hours} Hours, {t.Minutes} Minutes, {t.Seconds} Seconds";
 
-                // Big boi loopi loop
-                Task.Factory.StartNew(() =>
+                while (true)
                 {
-                    string getTimer(TimeSpan t) => $"{t.Days} Days, {t.Hours} Hours, {t.Minutes} Minutes, {t.Seconds} Seconds";
-
-                    while (true)
+                    for (int i = 0; i < Config.Data.timers.Count; i++)
                     {
-                        for (int i = 0; i < Config.Data.timers.Count; i++)
+                        var timer = Config.Data.timers[i];
+
+                        try
                         {
-                            var timer = Config.Data.timers[i];
+                            var eventMessage = (IUserMessage)(Program.GetChannelFromID(timer.ChannelId) as IMessageChannel).GetMessageAsync(timer.MessageId).Result;
 
-                            try
+                            if (DateTime.Now < timer.EventTime)
+                                eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} in {getTimer(timer.EventTime - DateTime.Now)}```");
+                            else
                             {
-                                var eventMessage = (IUserMessage)(Program.GetChannelFromID(timer.ChannelId) as IMessageChannel).GetMessageAsync(timer.MessageId).Result;
+                                eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} happened at {timer.EventTime}```");
+                                var pingUsers = eventMessage.GetReactionUsersAsync(PingEmote, 100).FlattenAsync().Result;
+                                string mentions = pingUsers.
+                                    Where(x => !x.IsBot && x.Id != timer.AuthorId).
+                                    Append(Program.GetUserFromId(timer.AuthorId)).
+                                    Select(x => x.Mention).Combine(" ");
+                                if (pingUsers.Where(x => !x.IsBot).Count() > 0)
+                                    DiscordNETWrapper.SendText($"{mentions} {eventMessage.GetJumpUrl()}", eventMessage.Channel).Wait();
 
-                                if (DateTime.Now < timer.EventTime)
-                                    eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} in {getTimer(timer.EventTime - DateTime.Now)}```");
-                                else
-                                {
-                                    eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} happened at {timer.EventTime}```");
-                                    var pingUsers = eventMessage.GetReactionUsersAsync(PingEmote, 100).FlattenAsync().Result;
-                                    string mentions = pingUsers.
-                                        Where(x => !x.IsBot && x.Id != timer.AuthorId).
-                                        Append(Program.GetUserFromId(timer.AuthorId)).
-                                        Select(x => x.Mention).Combine(" ");
-                                    if (pingUsers.Where(x => !x.IsBot).Count() > 0)
-                                        DiscordNETWrapper.SendText($"{mentions} {eventMessage.GetJumpUrl()}", eventMessage.Channel).Wait();
-
-                                    Config.Data.timers.RemoveAt(i);
-                                    i--;
-                                }
-
-                                Thread.Sleep(1000);
+                                Config.Data.timers.RemoveAt(i);
+                                i--;
                             }
-                            catch
-                            {
-                                if (DateTime.Now > timer.EventTime)
-                                    Config.Data.timers.RemoveAt(i--);
 
-                                Thread.Sleep(1000);
-                            }
+                            Thread.Sleep(1000);
                         }
+                        catch
+                        {
+                            if (DateTime.Now > timer.EventTime)
+                                Config.Data.timers.RemoveAt(i--);
 
-                        Thread.Sleep(200);
+                            Thread.Sleep(1000);
+                        }
                     }
-                });
-            };
-            Program.OnEmojiReactionAdded += (Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) =>
-            {
-                if (arg3.Emote.Name == CancelEmote.Name)
-                {
-                    var timer = Config.Data.timers.FirstOrDefault(x => x.MessageId == arg1.Id);
-                    if (timer != null && arg3.User.Value.Id == timer.AuthorId)
-                    {
-                        var eventMessage = timer.GetMessage();
 
-                        eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} was cancelled :c```");
-                        Config.Data.timers.Remove(timer);
-                    }
+                    Thread.Sleep(200);
                 }
-            };
+            });
+        }
+        private void Program_OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        {
+            if (arg3.Emote.Name == CancelEmote.Name)
+            {
+                var timer = Config.Data.timers.FirstOrDefault(x => x.MessageId == arg1.Id);
+                if (timer != null && arg3.User.Value.Id == timer.AuthorId)
+                {
+                    var eventMessage = timer.GetMessage();
+
+                    eventMessage.ModifyAsync(m => m.Content = $"```fix\n{timer.EventName} was cancelled :c```");
+                    Config.Data.timers.Remove(timer);
+                }
+            }
+        }
+        private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+        {
+            for (int i = 0; i < Config.Data.timers.Count; i++)
+                if (Config.Data.timers[i].MessageId == arg1.Id)
+                    Config.Data.timers.RemoveAt(i--);
         }
 
         public override void Execute(IMessage message)
