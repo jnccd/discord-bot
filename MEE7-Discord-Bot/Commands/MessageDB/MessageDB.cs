@@ -34,11 +34,21 @@ namespace MEE7.Commands.MessageDB
         {
             new WeirdCommandThingy()
             {
+                name = "countMessages",
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
+                    List<DBMessage> allGuildMessages = new List<DBMessage>();
+                    foreach (var channel in dbGuild.TextChannels)
+                        allGuildMessages.AddRange(channel.Messages);
+                    DiscordNETWrapper.SendText(allGuildMessages.Count.ToString(), message.Channel).Wait();
+                }
+            },
+            new WeirdCommandThingy()
+            {
                 name = "countChannelMessages",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     string re = "";
-                    foreach (var channel in dbGuild.TextChannels.OrderByDescending(x => x.Messages.Count))
-                     re += $"`{channel.Name}`: **{channel.Messages.Count}** messages\n";
+                    foreach (var channel in dbGuild.TextChannels.OrderByDescending(x => x.Messages.Count).Take(10))
+                        re += $"`{channel.Name}`: **{channel.Messages.Count}** messages\n";
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
             },
@@ -54,7 +64,7 @@ namespace MEE7.Commands.MessageDB
 
                     var grouping = allGuildMessages.GroupBy(x => x.AuthorName);
 
-                    foreach (var g in grouping.OrderByDescending(g => g.Count()))
+                    foreach (var g in grouping.OrderByDescending(g => g.Count()).Take(10))
                         re += $"`{g.Key}`: **{g.Count()}** messages\n";
 
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
@@ -62,13 +72,13 @@ namespace MEE7.Commands.MessageDB
             },
             new WeirdCommandThingy()
             {
-                name = "getMostReactedMessages",
+                name = "getMostReactedToMessages",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
                     List<DBMessage> allGuildMessages = new List<DBMessage>();
                     foreach (var channel in dbGuild.TextChannels)
                         allGuildMessages.AddRange(channel.Messages);
 
-                    var top5 = allGuildMessages.OrderByDescending(x => x.Reactions.Sum(y => y.count)).Take(5);
+                    var top5 = allGuildMessages.OrderByDescending(x => x.Reactions.Sum(y => y.count)).Take(10);
 
                     DiscordNETWrapper.SendText(top5.Select(x => $"{x.Reactions.Sum(y => y.count)}: {x.Link}").Combine("\n"), message.Channel).Wait();
                 }
