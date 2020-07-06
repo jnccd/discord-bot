@@ -12,8 +12,13 @@ namespace MEE7.Commands
 
         public PingReact() : base("", "", false, true)
         {
-            pingRage = Emote.Parse("<a:pingRage:702500510481121411>");
+            Program.OnConnected += Program_OnConnected;
             Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
+        }
+
+        private void Program_OnConnected()
+        {
+            pingRage = Emote.Parse("<a:pingRage:702500510481121411>");
         }
 
         public void OnNonCommandMessageRecieved(IMessage messageIn)
