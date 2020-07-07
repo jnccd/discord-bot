@@ -154,7 +154,39 @@ namespace MEE7.Commands.MessageDB
                             }
                         }
 
-                    emotes = emotes.OrderByDescending(x => x.messageHits).ToArray();
+                    emotes = emotes.OrderByDescending(x => x.messageHits + x.reactionHits).Take(10).ToArray();
+
+                    DiscordNETWrapper.SendText(emotes.Select(x => $"{x.e.Name} - {x.e.Print()} used {x.messageHits} times in {x.hitMessages} " +
+                        $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
+                }
+            },
+            new WeirdCommandThingy()
+            {
+                name = "getLeastUsedNoGifEmotes",
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
+                    var serverMessages = dbGuild.TextChannels.SelectMany(x => x.Messages);
+
+                    var emotes = Program.GetGuildFromID(dbGuild.Id).Emotes.
+                        Where(x => !x.Animated).
+                        Select(x => new EmoteCounter() { e=x }).ToArray();
+
+                    foreach (var m in serverMessages)
+                        foreach (var e in emotes)
+                        {
+                            var hits = m.Content.AllIndexesOf(e.e.Print()).Count;
+                            e.messageHits += hits;
+                            if (hits > 0)
+                                e.hitMessages++;
+
+                            DBReaction react;
+                            if (m.Reactions != null && (react = m.Reactions.FirstOrDefault(x => x.id == e.e.Id)) != null)
+                            {
+                                e.reactionHits += react.count;
+                                e.reactedMessages++;
+                            }
+                        }
+
+                    emotes = emotes.OrderBy(x => x.messageHits + x.reactionHits).Take(10).ToArray();
 
                     DiscordNETWrapper.SendText(emotes.Select(x => $"{x.e.Name} - {x.e.Print()} used {x.messageHits} times in {x.hitMessages} " +
                         $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
@@ -186,7 +218,8 @@ namespace MEE7.Commands.MessageDB
                         "Hi im a database, I save data. (secretly im just a chonky json file but psssst, tell no one)\n" +
                         "If you want to build a database for the discord server you are writing this message on type `$messageDB build`, " +
                         "but only trained professionals are allowed to use that command because it takes a lot of resources to exectue it\n" +
-                       $"Other commands that you can use once a database has been build are: {commands.Select(x => $"`{x.name}`").Combine(", ")}", message.Channel).Wait();
+                       $"Other commands that you can use once a database has been build are: " +
+                       $"{commands.Where(x => !string.IsNullOrWhiteSpace(x.name)).Select(x => $"`{x.name}`").Combine(", ")}", message.Channel).Wait();
                     return;
                 }
                 else if (split[1] == "build")
