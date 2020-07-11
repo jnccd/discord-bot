@@ -31,6 +31,13 @@ namespace MEE7.Commands
                     var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
                     id = users.First(x => x.ToString() == split[1]).Id.ToString();
                 }
+                else if (split[1] == "nicest")
+                {
+                    var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
+                    var nicest = users.MaxElement(x => x.Id.ToString().AllIndexesOf("69").Count);
+                    DiscordNETWrapper.SendText("The nicest user here is " + nicest.Username, message.Channel).Wait();
+                    return;
+                }
                 else if (id.Any(x => !char.IsDigit(x)))
                 {
                     var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
