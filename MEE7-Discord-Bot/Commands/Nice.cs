@@ -23,33 +23,23 @@ namespace MEE7.Commands
             if (split.Length != 2)
                 return;
 
-            var id = split[1].Trim(new char[] { ' ', '<', '>', '@', '!' });
-            try
+            if (split[1] == "nicest")
             {
-                if (split[1].Contains('#'))
-                {
-                    var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
-                    id = users.First(x => x.ToString() == split[1]).Id.ToString();
-                }
-                else if (split[1] == "nicest")
-                {
-                    var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
-                    var nicest = users.MaxElement(x => x.Id.ToString().AllIndexesOf("69").Count);
-                    DiscordNETWrapper.SendText("The nicest user here is " + nicest.Username, message.Channel).Wait();
-                    return;
-                }
-                else if (id.Any(x => !char.IsDigit(x)))
-                {
-                    var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
-                    id = users.First(x => x.Username == split[1]).Id.ToString();
-                }
-            }
-            catch
-            {
-                DiscordNETWrapper.SendText("Can't find that user :/", message.Channel).Wait();
+                var users = message.Channel.GetUsersAsync().FlattenAsync().Result;
+                var nicest = users.MaxElement(x => x.Id.ToString().AllIndexesOf("69").Count);
+                DiscordNETWrapper.SendText("The nicest user here is " + nicest.Username, message.Channel).Wait();
                 return;
             }
 
+            var user = DiscordNETWrapper.ParseUser(split[1], message.Channel.GetUsersAsync().FlattenAsync().Result);
+
+            if (user == null)
+            {
+                DiscordNETWrapper.SendText("Couldn't find that user", message.Channel).Wait();
+                return;
+            }
+
+            var id = user.Id.ToString();
             var nices = id.AllIndexesOf("69").Count;
 
             if (nices == 0)

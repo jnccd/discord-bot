@@ -118,6 +118,33 @@ namespace MEE7.Backend.HelperFunctions
             return sendMessages;
         }
 
+        public static IUser ParseUser(string user, IEnumerable<IUser> possibleUsers)
+        {
+            try
+            {
+                if (user.Contains('#'))
+                {
+                    return possibleUsers.First(x => x.ToString() == user);
+                }
+                else if (user.All(x => char.IsDigit(x)))
+                {
+                    return Program.GetUserFromId(ulong.Parse(user));
+                }
+                else if (possibleUsers.All(x => x is IGuildUser))
+                {
+                    return possibleUsers.First(x => (x as IGuildUser).Nickname == user);
+                }
+                else
+                {
+                    return possibleUsers.First(x => x.Username == user);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static EmbedBuilder CreateEmbedBuilder(string TitleText = "", string DescText = "", string ImgURL = "", IUser Author = null, string ThumbnailURL = "")
         {
             EmbedBuilder e = new EmbedBuilder();
