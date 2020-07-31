@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TweetSharp;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -118,25 +119,46 @@ namespace MEE7.Backend.HelperFunctions
             return sendMessages;
         }
 
-        public static IUser ParseUser(string user, IEnumerable<IUser> possibleUsers)
+        public static IUser ParseUser(string userText, IMessageChannel c)
+        {
+            return ParseUser(userText, c.GetUsersAsync().FlattenAsync().Result);
+        }
+
+        public static IUser ParseUser(string userText, IEnumerable<IUser> possibleUsers = null)
         {
             try
             {
-                if (user.Contains('#'))
+                if (userText.Contains('@') && !userText.Contains('<') && !userText.Contains('>'))
                 {
-                    return possibleUsers.First(x => x.ToString() == user);
+                    TwitterUser user = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions(){ ScreenName = userText.Trim(' ', '@') });
+                    return new TwitterDiscordUser(user);
                 }
-                else if (user.All(x => char.IsDigit(x)))
+                else if (userText.Contains('@'))
                 {
-                    return Program.GetUserFromId(ulong.Parse(user));
+                    return Program.GetUserFromId(Convert.ToUInt64(userText.Trim(new char[] { ' ', '<', '>', '@', '!' })));
                 }
-                else if (possibleUsers.All(x => x is IGuildUser))
+                else if (userText.Contains('#'))
                 {
-                    return possibleUsers.First(x => (x as IGuildUser).Nickname == user);
+                    return possibleUsers.First(x => x.ToString() == userText);
+                }
+                else if (userText.All(x => char.IsDigit(x)))
+                {
+                    return Program.GetUserFromId(ulong.Parse(userText));
                 }
                 else
                 {
-                    return possibleUsers.First(x => x.Username == user);
+                    List<Tuple<string, IUser>> users = new List<Tuple<string, IUser>>();
+
+                    foreach (var user in possibleUsers)
+                    {
+                        if (user is SocketGuildUser)
+                        {
+                            users.Add(new Tuple<string, IUser>((user as SocketGuildUser).Nickname, user));
+                        }
+                        users.Add(new Tuple<string, IUser>(user.Username, user));
+                    }
+
+                    return users.MinElement(x => x.Item1.LevenshteinDistance(userText)).Item2;
                 }
             }
             catch
