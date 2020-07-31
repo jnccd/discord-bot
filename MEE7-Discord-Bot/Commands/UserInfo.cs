@@ -8,7 +8,7 @@ namespace MEE7.Commands
 {
     class UserInfo : Command
     {
-        public UserInfo() : base("userInfo", "Posts user information, takes message ID as argument", isExperimental: false, isHidden: false)
+        public UserInfo() : base("userInfo", "Posts user information, takes message ID as argument", isExperimental: false, isHidden: true)
         {
 
         }

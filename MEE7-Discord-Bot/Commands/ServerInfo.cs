@@ -8,7 +8,7 @@ namespace MEE7.Commands
 {
     public class ServerInfo : Command
     {
-        public ServerInfo() : base("serverInfo", "Posts server information", false, false)
+        public ServerInfo() : base("serverInfo", "Posts server information", false, true)
         {
 
         }

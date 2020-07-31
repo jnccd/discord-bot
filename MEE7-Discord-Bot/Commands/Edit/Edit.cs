@@ -168,8 +168,8 @@ namespace MEE7.Commands
 
         private static IEnumerable<EditCommand> Commands;
 
-        public Edit() : base("edit", "This is a little more advanced command which allows you to edit data using a set of functions which can be executed in a pipe." +
-            "\nFor more information just type **$edit**.")
+        public Edit() : base("edit", "This is a little more advanced command which allows you to chain together functions that were made specific for this command. " +
+            $"Shortcut: **{Program.Prefix}-**\nFor more information just type **{Program.Prefix}edit**.")
         {
             Commands = new List<EditCommand>();
             HelpMenu = new EmbedBuilder();

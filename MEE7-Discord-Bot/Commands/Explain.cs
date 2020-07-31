@@ -1,8 +1,11 @@
 ﻿using Discord;
+using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace MEE7.Commands
@@ -21,45 +24,31 @@ namespace MEE7.Commands
             string search = WebUtility.UrlEncode(split.Skip(1).Combine(" "));
             string wikiSearch = split.Skip(1).Combine("_");
 
-            string urban = ($"https://www.urbandictionary.com/define.php?term={search}").GetHTMLfromURL();
-            string wiki = ($"https://en.wikipedia.org/wiki/{wikiSearch}").GetHTMLfromURL();
+            string urbanURL = ($"https://www.urbandictionary.com/define.php?term={search}");
+            string wikiURL = ($"https://en.wikipedia.org/wiki/{wikiSearch}");
 
-            string wikiParse = "";
+            HtmlWeb web = new HtmlWeb
+            {
+                AutoDetectEncoding = false,
+                OverrideEncoding = Encoding.UTF8
+            };
             try
             {
-                string wikiArticle = wiki.GetEverythingBetween("<div class=\"mw-parser-output\">", "<tbody><tr>");
-                wikiParse = WebUtility.HtmlDecode(Regex.Replace(wikiArticle, "<[^>]*>", ""));
-            }
-            catch { }
-            if (string.IsNullOrWhiteSpace(wikiParse))
-            {
-                try
-                {
-                    string wikiArticle = wiki.GetEverythingBetween("</table>", "<div id=\"toc\" class=\"toc\">");
-                    wikiParse = WebUtility.HtmlDecode(Regex.Replace(wikiArticle, "<[^>]*>", ""));
-                }
-                catch { }
-            }
+                var searchDoc = web.Load(urbanURL);
+                var words = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'word')]");
+                var meanings = searchDoc.DocumentNode.SelectNodes("//div[contains(@class, 'meaning')]");
+                var examples = searchDoc.DocumentNode.SelectNodes("//div[contains(@class, 'example')]");
 
-            string urbanParse = "";
-            try
-            {
-                string urbanTopCard = urban.GetEverythingBetween("<span class=\"category right hide unknown\">", "<div class=\"def-footer\">");
-                urbanParse = WebUtility.HtmlDecode(
-                    Regex.Replace(urbanTopCard.
-                        Replace("<br/>", "\n").
-                        Replace("<div class=\"example\">", "\n\n").
-                        Replace("<div class=\"tags\">", "\n\n"), "<[^>]*>", "").
-                    Remove(0, "unknown".Length));
+                DiscordNETWrapper.SendEmbed(DiscordNETWrapper.
+                    CreateEmbedBuilder(words.First().InnerText).
+                    AddFieldDirectly("Meaning", WebUtility.HtmlDecode(meanings.First().InnerText)).
+                    AddFieldDirectly("Example", WebUtility.HtmlDecode(examples.First().InnerText)), message.Channel).Wait();
             }
-            catch { }
-
-            EmbedBuilder b = new EmbedBuilder();
-            if (!string.IsNullOrWhiteSpace(wikiParse))
-                b.AddFieldDirectly("Wikipedia:", wikiParse);
-            if (!string.IsNullOrWhiteSpace(urbanParse))
-                b.AddFieldDirectly("Urban Dictionary:", urbanParse);
-            DiscordNETWrapper.SendEmbed(b, message.Channel).Wait();
+            catch
+            {
+                DiscordNETWrapper.SendText("Error occured while parsing HTML stuff", message.Channel).Wait();
+                return;
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MEE7.Commands
 {
     class AnimalCrossing : Command
     {
-        public AnimalCrossing() : base("animalCrossing", "Finds a npc", false, false)
+        public AnimalCrossing() : base("animalCrossing", "Finds a animal crossing npc", false, false)
         {
 
         }

@@ -35,7 +35,7 @@ namespace MEE7.Commands
         Emote PingEmote;
         Emoji CancelEmote;
 
-        public Timer() : base("timer", "Posts a continually updated message that shows the time until some event", isExperimental: false, isHidden: false)
+        public Timer() : base("timer", "Posts a updating message for some event", isExperimental: false, isHidden: false)
         {
             Program.OnConnected += Program_OnConnected;
             Program.OnEmojiReactionAdded += Program_OnEmojiReactionAdded;

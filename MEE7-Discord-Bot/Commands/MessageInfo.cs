@@ -8,7 +8,7 @@ namespace MEE7.Commands
 {
     class MessageInfo : Command
     {
-        public MessageInfo() : base("messageInfo", "Posts message information, takes message ID as argument", isExperimental: false, isHidden: false)
+        public MessageInfo() : base("messageInfo", "Posts message information, takes message ID as argument", isExperimental: false, isHidden: true)
         {
 
         }
