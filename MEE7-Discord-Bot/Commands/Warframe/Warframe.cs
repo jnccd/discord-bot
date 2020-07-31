@@ -17,7 +17,7 @@ namespace MEE7.Commands
         const int updateIntervalMin = 5;
         private readonly string lockject = "";
 
-        public Warframe() : base("warframe", "Get notifications for warframe rewards", false)
+        public Warframe() : base("warframe", "Get notifications for warframe rewards or check the world state", false)
         {
             Program.OnConnected += () => Task.Factory.StartNew(RunNotificationLoop);
             HelpMenu = new EmbedBuilder();

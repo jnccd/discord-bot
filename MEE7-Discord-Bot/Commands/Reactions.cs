@@ -10,7 +10,7 @@ namespace MEE7.Commands
     {
         Reaction[] reactions;
 
-        public Reactions() : base("reaction", "Post reaction images", false)
+        public Reactions() : base("reaction", "Post reaction images", false, true)
         {
             reactions = new Reaction[]
             {

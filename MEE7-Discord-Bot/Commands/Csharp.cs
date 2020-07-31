@@ -14,7 +14,7 @@ namespace MEE7.Commands
 {
     public class Csharp : Command
     {
-        public Csharp() : base("c#", "Run csharp code", isExperimental: false, isHidden: false)
+        public Csharp() : base("c#", "Run csharp code", isExperimental: false, isHidden: true)
         {
 
         }

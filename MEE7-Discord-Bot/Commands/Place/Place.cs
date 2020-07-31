@@ -16,7 +16,7 @@ namespace MEE7.Commands
         const int pixelSize = 10;
         readonly PlaceCommand[] subCommands;
 
-        public Place() : base("place", "Basically just r/place", false)
+        public Place() : base("place", "Basically just r/place", false, true)
         {
             subCommands = new PlaceCommand[] {
             new PlaceCommand("print", "Prints the canvas without this annoying help message.",

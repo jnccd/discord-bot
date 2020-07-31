@@ -425,7 +425,7 @@ namespace MEE7
                     string desc = ((commands[i].Desc == null ? "" : commands[i].Desc + "   ")).Trim(' ');
                     helpMenu.AddFieldDirectly(commands[i].Prefix + commands[i].CommandLine +
                         (commands[i].IsExperimental ? " [EXPERIMENTAL]" : "") + (commands[i].HelpMenu == null ? "" : " (h)"),
-                        string.IsNullOrWhiteSpace(desc) ? "-" : desc, true);
+                        string.IsNullOrWhiteSpace(desc) ? "-" : desc, string.IsNullOrWhiteSpace(desc) || desc.Length < 100 ? true : false);
                 }
             }
             helpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code " +

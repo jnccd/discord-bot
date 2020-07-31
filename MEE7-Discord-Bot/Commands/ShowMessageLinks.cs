@@ -9,7 +9,7 @@ namespace MEE7.Commands
 {
     public class ShowMessageLinks : Command
     {
-        public ShowMessageLinks() : base("toggleMessageLinkPreviews", "Preview linked messages", false, false)
+        public ShowMessageLinks() : base("toggleMessageLinkPreviews", "Preview message links on this server", false, false)
         {
             Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
         }

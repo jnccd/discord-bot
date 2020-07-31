@@ -10,7 +10,7 @@ namespace MEE7.Commands
 {
     public class EmojiUsage : Command
     {
-        public EmojiUsage() : base("emojiUsage", "Which emojis are actually used on this server?", false)
+        public EmojiUsage() : base("emojiUsage", "Which emojis are actually used on this server?", false, true)
         {
             Program.OnConnected += OnConnected;
             Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
