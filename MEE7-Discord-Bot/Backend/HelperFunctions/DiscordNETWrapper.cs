@@ -158,7 +158,7 @@ namespace MEE7.Backend.HelperFunctions
                         users.Add(new Tuple<string, IUser>(user.Username, user));
                     }
 
-                    return users.MinElement(x => x.Item1.LevenshteinDistance(userText)).Item2;
+                    return users.MinElement(x => userText.ModifiedLevenshteinDistance(x.Item1)).Item2;
                 }
             }
             catch
