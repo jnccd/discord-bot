@@ -11,7 +11,7 @@ namespace MEE7.Commands
 {
     class Nice : Command
     {
-        public Nice()
+        public Nice() : base("nice", "Check if a user is nice", isHidden: false)
         {
 
         }
@@ -31,7 +31,7 @@ namespace MEE7.Commands
                 return;
             }
 
-            var user = DiscordNETWrapper.ParseUser(split[1], message.Channel.GetUsersAsync().FlattenAsync().Result);
+            var user = DiscordNETWrapper.ParseUser(split.Skip(1).Combine(" "), message.Channel);
 
             if (user == null)
             {
