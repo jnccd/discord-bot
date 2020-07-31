@@ -107,28 +107,19 @@ namespace MEE7.Commands
         }
 
         public string profilePicDesc = "Gets a profile picture";
-        public Bitmap ProfilePic(EditNull n, IMessage m, string UserIDorMention)
+        public Bitmap ProfilePic(EditNull n, IMessage m, string user)
         {
-            if (UserIDorMention.Contains('@') && !UserIDorMention.Contains('<') && !UserIDorMention.Contains('>'))
-            {
-                TwitterUser user = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions()
-                { ScreenName = UserIDorMention.Trim(' ', '@') });
-                return user.ProfileImageUrl.Replace("_normal", "_400x400").GetBitmapFromURL();
-            }
-            else
-            {
-                SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
-                string avatarURL = luser.GetAvatarUrl(ImageFormat.Png, 512);
-                return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
-            }
+            IUser iuser = DiscordNETWrapper.ParseUser(user, m.Channel);
+            string avatarURL = iuser.GetAvatarUrl(ImageFormat.Png, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? iuser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
         }
 
         public string profilePicGDesc = "Gets a profile picture gif";
-        public Gif ProfilePicG(EditNull n, IMessage m, string UserIDorMention)
+        public Gif ProfilePicG(EditNull n, IMessage m, string user)
         {
-            SocketUser luser = Program.GetUserFromId(Convert.ToUInt64(UserIDorMention.Trim(new char[] { ' ', '<', '>', '@', '!' })));
-            string avatarURL = luser.GetAvatarUrl(ImageFormat.Gif, 512);
-            return (string.IsNullOrWhiteSpace(avatarURL) ? luser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
+            IUser iuser = DiscordNETWrapper.ParseUser(user, m.Channel);
+            string avatarURL = iuser.GetAvatarUrl(ImageFormat.Gif, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? iuser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string myProfilePicDesc = "Gets your profile picture";
