@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;
@@ -25,30 +26,22 @@ namespace MEE7.Commands
 
             List<string> PatchNotes = new List<string>();
 
-            string url = "https://github.com/niklasCarstensen/Discord-Bot/commits/master";
-            WebRequest req = HttpWebRequest.Create(url);
-            req.Timeout = 10000;
-            WebResponse W = req.GetResponse();
-            using (StreamReader sr = new StreamReader(W.GetResponseStream()))
+            HtmlWeb web = new HtmlWeb();
+            var searchDoc = web.Load("https://github.com/niklasCarstensen/Discord-Bot/commits/master");
+
+            var commits = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'link-gray-dark text-bold js-navigation-open')]");
+
+            foreach (var commit in commits)
             {
-                string html = sr.ReadToEnd();
-                List<Tuple<string, string>> messages = html.
-                    GetEverythingBetweenAll("<p class=\"commit-title h5 mb-1 text-gray-dark \">", "</p>").
-                    Select(x => new Tuple<string, string>(x.GetEverythingBetween("aria-label=\"", "\" "),
-                                                          "https://github.com" + x.GetEverythingBetween("href=\"", "\">"))).ToList();
+                if (commit.InnerText == Config.Data.LastCommitMessage)
+                    break;
 
-                foreach (Tuple<string, string> tuple in messages)
-                {
-                    if (tuple.Item1 == Config.Data.LastCommitMessage)
-                        break;
-
-                    PatchNotes.Add($"[{tuple.Item1}]({tuple.Item2})");
-                }
-
-                if (messages.Count > 0)
-                    Config.Data.LastCommitMessage = messages.First().Item1;
-                Config.Save();
+                PatchNotes.Add($"[{commit.InnerText}](https://github.com{commit.GetAttributeValue("href", "")})");
             }
+
+            if (commits.Count > 0)
+                Config.Data.LastCommitMessage = commits.First().InnerText;
+            Config.Save();
 
             PatchNotes.Reverse();
             if (PatchNotes.Count > 0)
@@ -64,7 +57,8 @@ namespace MEE7.Commands
 #endif
             }
         }
-        bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, 
+            System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
         {
             return true;
         }
