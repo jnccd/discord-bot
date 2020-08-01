@@ -1,4 +1,5 @@
 ﻿using Discord;
+using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -62,6 +63,8 @@ namespace MEE7.Backend
 
         public Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
+            if (embed != null)
+                text += $"\n{embed.Title} \n{embed.Description} \n{embed.Fields.Select(x => $"{x.Name} {x.Value}").Combine("\n")}";
             if (string.IsNullOrWhiteSpace(text))
                 return Task.FromResult(default(IUserMessage));
             if (text.Length >= 280)
