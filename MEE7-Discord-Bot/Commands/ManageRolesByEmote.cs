@@ -69,8 +69,9 @@ namespace MEE7.Commands
         {
             var g = Program.GetGuildFromChannel(message.Channel);
             if (message.Author.Id != g.Owner.Id && message.Author.Id != Program.Master.Id 
-                && g.Roles.Where(x => x.Members.FirstOrDefault(x => x.Id == message.Author.Id) != null).Select(x => x.Position).Max() > 
-                   g.Roles.Where(x => x.Members.FirstOrDefault(x => x.Id == Program.GetSelf().Id) != null).Select(x => x.Position).Max())
+                && (g.Roles.Where(x => x.Members.FirstOrDefault(x => x.Id == message.Author.Id) != null).Select(x => x.Position).Max() < 
+                   g.Roles.Where(x => x.Members.FirstOrDefault(x => x.Id == Program.GetSelf().Id) != null).Select(x => x.Position).Max() ||
+                   !g.Roles.Where(x => x.Members.FirstOrDefault(x => x.Id == message.Author.Id) != null).Any(x => x.Permissions.ManageRoles) ))
             {
                 DiscordNETWrapper.SendText("You don't have permissions to use this command!", message.Channel).Wait();
                 return;
