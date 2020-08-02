@@ -10,6 +10,6 @@ namespace MEE7.Commands
 
         }
 
-        public override void Execute(IMessage message) => new Edit().Execute(message);
+        public override void Execute(IMessage message) => new Edit.Edit().Execute(message);
     }
 }

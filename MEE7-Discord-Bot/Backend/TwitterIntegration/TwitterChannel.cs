@@ -96,17 +96,23 @@ namespace MEE7.Backend
         {
             return Task.FromResult(default(IMessage));
         }
-        public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = 100, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        public async IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = 100, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            await Task.Delay(1);
+            foreach (var s in thread.Take(limit))
+            {
+                yield return new ReadOnlyCollection<TwitterMessage>((new TwitterMessage[] { new TwitterMessage(s, this) }).ToList());
+            }
         }
-        public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = 100, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        public async IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = 100, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            await Task.Delay(1);
+            yield return new ReadOnlyCollection<TwitterMessage>((new TwitterMessage[] { }).ToList());
         }
-        public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = 100, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        public async IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = 100, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            throw new NotImplementedException();
+            await Task.Delay(1);
+            yield return new ReadOnlyCollection<TwitterMessage>((new TwitterMessage[] { }).ToList());
         }
         public Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
         {

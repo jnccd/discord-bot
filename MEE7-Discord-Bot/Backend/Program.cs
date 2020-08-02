@@ -94,7 +94,7 @@ namespace MEE7
 
             if (!RunningOnCI)
                 try { HandleConsoleCommandsLoop(); }
-                catch (Exception e) { CILimbo(); }
+                catch { CILimbo(); }
             else
                 CILimbo();
 

@@ -179,30 +179,30 @@ namespace MEE7.Backend.HelperFunctions
             return e;
         }
 
-        public static IEnumerable<IUserMessage> EnumerateMessages(IMessageChannel channel)
+        public static IEnumerable<IMessage> EnumerateMessages(IMessageChannel channel)
         {
             ulong lastMessageID = 0;
-            IEnumerable<IUserMessage> messages;
+            IEnumerable<IMessage> messages;
 
             while (true)
             {
                 try
                 {
                     if (lastMessageID == 0)
-                        messages = channel.GetMessagesAsync().FlattenAsync().Result.OfType<IUserMessage>();
+                        messages = channel.GetMessagesAsync().FlattenAsync().Result.OfType<IMessage>();
                     else
-                        messages = channel.GetMessagesAsync(lastMessageID, Direction.Before, 100).FlattenAsync().Result.OfType<IUserMessage>();
+                        messages = channel.GetMessagesAsync(lastMessageID, Direction.Before, 100).FlattenAsync().Result.OfType<IMessage>();
                 }
                 catch
                 {
                     break;
                 }
 
-                foreach (var message in messages)
-                    yield return message;
-
                 if (messages.Count() == 0)
                     break;
+
+                foreach (var message in messages)
+                    yield return message;
 
                 lastMessageID = messages.Last().Id;
             }

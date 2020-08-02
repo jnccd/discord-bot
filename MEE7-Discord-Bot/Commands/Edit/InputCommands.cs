@@ -75,9 +75,8 @@ namespace MEE7.Commands.Edit
         {
             var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1 + messagesToSkip);
             foreach (var lm in messages)
-                if (!string.IsNullOrWhiteSpace(lm.Content))
-                    try { return lm; }
-                    catch { }
+                try { return lm; }
+                catch { }
             throw new Exception("Didn't find any");
         }
 
