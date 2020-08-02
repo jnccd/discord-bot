@@ -10,10 +10,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
     public class EditCommandProvider { }
-    public partial class Edit : Command
+    public class Edit : Command
     {
         public struct Argument
         {
@@ -26,28 +26,6 @@ namespace MEE7.Commands
                 this.Name = Name;
                 this.Type = Type;
                 this.StandardValue = StandardValue;
-            }
-        }
-        class ArgumentParseMethod
-        {
-            public Type Type;
-            public Func<IMessage, string, object> Function;
-
-            public ArgumentParseMethod(Type Type, Func<IMessage, string, object> Function)
-            {
-                this.Function = Function;
-                this.Type = Type;
-            }
-        }
-        class PrintMethod
-        {
-            public Type Type;
-            public Action<IMessage, object> Function;
-
-            public PrintMethod(Type Type, Action<IMessage, object> Function)
-            {
-                this.Function = Function;
-                this.Type = Type;
             }
         }
         public abstract class SubCommand
@@ -134,7 +112,7 @@ namespace MEE7.Commands
                     throw new IllegalCommandException("Illegal Symbol in the name!");
 
                 foreach (Argument arg in Arguments)
-                    if (ArgumentParseMethods.FirstOrDefault(x => x.Type == arg.Type) == null)
+                    if (ArgumentParseMethod.ArgumentParseMethods.FirstOrDefault(x => x.Type == arg.Type) == null)
                         throw new IllegalCommandException($"Argument {arg.Name} doesn't have a corresponding Parse Method! {arg.Type.ToReadableString()}");
 
                 this.Command = Command;
@@ -432,7 +410,7 @@ namespace MEE7.Commands
                                 else
                                     try // Try the ArgumentParseMethods on it
                                     {
-                                        parsedArgs[i] = ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]);
+                                        parsedArgs[i] = ArgumentParseMethod.ArgumentParseMethods.First(x => x.Type == command.Arguments[i].Type).Function(message, args[i]);
                                     }
                                     catch
                                     {
@@ -510,7 +488,7 @@ namespace MEE7.Commands
                         $"But don't worry I was programmed to ignore something like this.");
             }
 
-            if (!subPipe && pipe.Last().Item2.OutputType != null && PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
+            if (!subPipe && pipe.Last().Item2.OutputType != null && PrintMethod.PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(pipe.Last().Item2.OutputType)) == null)
                 throw new Exception($"Unprintable Output Error: I wasn't taught how to print {pipe.Last().Item2.OutputType.ToReadableString()}");
 
             return pipe;
@@ -624,7 +602,7 @@ namespace MEE7.Commands
                 for (int i = 0; i < arr.Length; i++)
                     (output as Bitmap[])[i] = (Bitmap)arr[i];
             }
-            PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
+            PrintMethod.PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
     }
 }

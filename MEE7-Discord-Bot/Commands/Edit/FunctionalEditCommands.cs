@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
-using static MEE7.Commands.Edit;
+using static MEE7.Commands.Edit.Edit;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
     class FunctionalEditCommands : EditCommandProvider
     {
