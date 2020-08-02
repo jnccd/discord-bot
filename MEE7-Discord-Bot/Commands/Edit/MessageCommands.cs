@@ -9,6 +9,12 @@ namespace MEE7.Commands.Edit
 {
     class MessageCommands : EditCommandProvider
     {
+        public string getContentDesc = "Gets the messages text";
+        public string GetContent(IMessage inM, IMessage m)
+        {
+            return inM.Content;
+        }
+
         public string getMediaLinksDesc = "Gets the messages attachment links";
         public string GetMediaLinks(IMessage inM, IMessage m)
         {
