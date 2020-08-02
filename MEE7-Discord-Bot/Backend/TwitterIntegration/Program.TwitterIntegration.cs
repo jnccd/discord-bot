@@ -73,7 +73,7 @@ namespace MEE7
                         lastMentionId = m.Id;
                     }
 
-                Thread.Sleep(50000); // 48 seconds times 75 hourly allowed hits would exactly be one hour
+                Thread.Sleep(45000); // 48 seconds times 75 hourly allowed hits would exactly be one hour
             }
         }
     }
