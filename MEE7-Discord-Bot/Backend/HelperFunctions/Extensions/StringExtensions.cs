@@ -11,7 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using static MEE7.Commands.Edit;
+using static MEE7.Commands.Edit.Edit;
 
 namespace MEE7.Backend.HelperFunctions
 {

@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Text;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
     public class TextCommands : EditCommandProvider
     {

@@ -7,12 +7,22 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using static MEE7.Commands.Edit.Edit;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
-    public partial class Edit : Command
+    class PrintMethod
     {
-        static readonly PrintMethod[] PrintMethods = new PrintMethod[]
+        public Type Type;
+        public Action<IMessage, object> Function;
+
+        public PrintMethod(Type Type, Action<IMessage, object> Function)
+        {
+            this.Function = Function;
+            this.Type = Type;
+        }
+
+        public static readonly PrintMethod[] PrintMethods = new PrintMethod[]
         {
             new PrintMethod(typeof(EmbedBuilder), (IMessage m, object o) => {
                 DiscordNETWrapper.SendEmbed(o as EmbedBuilder, m.Channel).Wait();

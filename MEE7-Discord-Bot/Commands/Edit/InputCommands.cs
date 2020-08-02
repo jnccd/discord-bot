@@ -15,10 +15,10 @@ using System.Net;
 using System.Numerics;
 using System.Threading;
 using TweetSharp;
-using static MEE7.Commands.Edit;
+using static MEE7.Commands.Edit.Edit;
 using Color = System.Drawing.Color;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
     public class InputCommands : EditCommandProvider
     {
@@ -67,6 +67,17 @@ namespace MEE7.Commands
                     return GetPictureLinkFromMessage(lm, "").GetBitmapsAndTimingsFromGIFURL();
                 }
                 catch { }
+            throw new Exception("Didn't find any");
+        }
+
+        public string lastMDesc = "Gets the last message";
+        public IMessage LastM(EditNull n, IMessage m, int messagesToSkip = 0)
+        {
+            var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1 + messagesToSkip);
+            foreach (var lm in messages)
+                if (!string.IsNullOrWhiteSpace(lm.Content))
+                    try { return lm; }
+                    catch { }
             throw new Exception("Didn't find any");
         }
 

@@ -4,12 +4,22 @@ using MEE7.Backend.HelperFunctions;
 using System;
 using System.Drawing;
 using System.Numerics;
+using static MEE7.Commands.Edit.Edit;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
-    public partial class Edit : Command
+    public class ArgumentParseMethod
     {
-        static readonly ArgumentParseMethod[] ArgumentParseMethods = new ArgumentParseMethod[]
+        public Type Type;
+        public Func<IMessage, string, object> Function;
+
+        public ArgumentParseMethod(Type Type, Func<IMessage, string, object> Function)
+        {
+            this.Function = Function;
+            this.Type = Type;
+        }
+
+        public static readonly ArgumentParseMethod[] ArgumentParseMethods = new ArgumentParseMethod[]
         {
             new ArgumentParseMethod(typeof(string), (IMessage m, string s) => s),
             new ArgumentParseMethod(typeof(bool), (IMessage m, string s) => { if (s.ToLower() == "true" || s == "1") return true; else return false; }),

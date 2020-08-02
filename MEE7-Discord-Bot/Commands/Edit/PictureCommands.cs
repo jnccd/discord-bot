@@ -9,11 +9,11 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using static MEE7.Commands.Edit;
+using static MEE7.Commands.Edit.Edit;
 using Color = System.Drawing.Color;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
     public class PictureCommands : EditCommandProvider
     {

@@ -11,7 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.Edit
 {
     public class AudioCommands : EditCommandProvider
     {
