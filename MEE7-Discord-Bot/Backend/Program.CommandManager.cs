@@ -129,7 +129,7 @@ namespace MEE7
 
         public static Command GetCommandInstance(string CommandName)
         {
-            return commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == CommandName.ToLower());
+            return commands.FirstOrDefault(x => x.CommandLine.ToLower() == CommandName.ToLower());
         }
 
         // Events

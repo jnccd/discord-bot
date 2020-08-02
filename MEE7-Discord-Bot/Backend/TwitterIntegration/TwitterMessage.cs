@@ -38,7 +38,14 @@ namespace MEE7.Backend
             this.Tags = new List<Discord.ITag>();
             this.Timestamp = s.CreatedDate;
             this.Type = Discord.MessageType.Default;
-            this.Attachments = s.Entities.Media.Select(x => new TwitterDiscordAttachment(x) as IAttachment).ToList();
+
+            this.Attachments = new List<IAttachment>();
+            this.Attachments.AddRange(s.Entities.Media.Select(x => new TwitterDiscordAttachment(x.MediaUrl, x.Sizes.Large.Width, x.Sizes.Large.Height, x) as IAttachment));
+            if (s.ExtendedEntities != null)
+                this.Attachments.AddRange(s.ExtendedEntities.Media.
+                    Where(x => x.VideoInfo != null).
+                    Select(x => new TwitterDiscordAttachment(
+                        x.VideoInfo.Variants.MaxElement(x => x.BitRate).Url.AbsoluteUri, x.Sizes.Large.Width, x.Sizes.Large.Height, x)).ToList());
             this.s = s;
         }
     }

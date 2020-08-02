@@ -14,5 +14,12 @@ namespace MEE7.Commands.Edit
         {
             return $"`{(inM.Attachments.Count == 0 ? "There weren't any :/" : inM.Attachments.Select(x => x.Url).Combine("\n"))}`";
         }
+
+        public string getVideoLinksDesc = "Gets the messages video links";
+        public string GetVideoLinks(IMessage inM, IMessage m)
+        {
+            return inM.Attachments.Where(x => x.Url.Contains(".mp4")).Count() == 0 ?
+                "There weren't any :/" : inM.Attachments.Select(x => x.Url).Where(x => x.Contains(".mp4")).Combine("\n");
+        }
     }
 }
