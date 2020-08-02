@@ -74,7 +74,8 @@ namespace MEE7.Commands.Edit
         public IMessage LastM(EditNull n, IMessage m, int messagesToSkip = 0)
         {
             var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1 + messagesToSkip);
-            foreach (var lm in messages)
+            var debug = messages.Take(50);
+            foreach (var lm in debug)
                 try { return lm; }
                 catch { }
             throw new Exception("Didn't find any");

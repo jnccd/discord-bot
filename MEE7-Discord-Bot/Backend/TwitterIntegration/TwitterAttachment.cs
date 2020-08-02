@@ -1,24 +1,31 @@
 ﻿using Discord;
+using System.Linq;
 using TweetSharp;
 
 namespace MEE7.Backend
 {
     class TwitterDiscordAttachment : IAttachment
     {
-        public TwitterMedia m;
+        public string url;
+        public int size, width, height;
+        public TwitterEntity m;
 
-        public TwitterDiscordAttachment(TwitterMedia m)
+        public TwitterDiscordAttachment(string url, int width, int height, TwitterEntity source)
         {
-            this.m = m;
+            this.url = url;
+            this.size = size;
+            this.width = width;
+            this.height = height;
+            this.m = source;
         }
 
         public ulong Id => 0;
 
-        public string Filename => m.MediaUrl;
+        public string Filename => url.Split("/").Last();
 
-        public string Url => m.MediaUrl;
+        public string Url => url;
 
-        public string ProxyUrl => m.MediaUrl;
+        public string ProxyUrl => url;
 
         public int Size => 100;
 
