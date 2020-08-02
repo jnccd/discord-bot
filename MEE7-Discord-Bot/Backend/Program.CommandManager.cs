@@ -127,6 +127,11 @@ namespace MEE7
             }
         }
 
+        public static Command GetCommandInstance(string CommandName)
+        {
+            return commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == CommandName.ToLower());
+        }
+
         // Events
         private static async Task Client_JoinedGuild(SocketGuild arg)
         {
