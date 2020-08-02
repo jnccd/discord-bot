@@ -117,6 +117,14 @@ namespace MEE7.Commands.Edit
             throw new Exception("No audio file found!");
         }
 
+        public string GetTweetDesc = "Gets a tweet by id";
+        public IMessage GetTweet(EditNull n, IMessage m, long tweetID)
+        {
+            var channel = new TwitterChannel(Program.twitterService.GetTweet(new GetTweetOptions() { Id = tweetID, IncludeEntities = true }), Program.twitterService);
+
+            return channel.InitialMessage;
+        }
+
         public string profilePicDesc = "Gets a profile picture";
         public Bitmap ProfilePic(EditNull n, IMessage m, string user)
         {
@@ -232,81 +240,6 @@ namespace MEE7.Commands.Edit
             return bmp;
         }
 
-        public string turingDrawingDesc = "[WIP] Creates a random turing machine which operates on looped 2D tape";
-        public Gif TuringDrawing(EditNull n, IMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
-        {
-            int states = NumStates;
-            int symbols = NumSymbols;
-
-            int sizeX = 300, sizeY = sizeX;
-
-            Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
-
-            for (int i = 0; i < states; i++)
-                for (int j = 0; j < symbols; j++)
-                    transitions[i, j] = new Tuple<int, int, Direction>(
-                        Program.RDM.Next(states),
-                        Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
-                        (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
-
-            if (DrawMachine)
-            {
-                string machine = $"States: {Enumerable.Range(0, states).Select(x => x.ToString()).Combine()}" +
-                    $"Symbols: {Enumerable.Range(0, Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
-                    $"Transitions: ";
-                for (int i = 0; i < states; i++)
-                    for (int j = 0; j < symbols; j++)
-                        machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
-                DiscordNETWrapper.SendText(machine, m.Channel).Wait();
-
-                //Bitmap b = new Bitmap(1000, 1000);
-                //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
-                //for (int i = 0; i < states; i++)
-                //    a.AddVertex(i);
-                //foreach (var trans in transitions)
-                //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
-                //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
-                //v.Generate();
-            }
-
-            Bitmap[] re = new Bitmap[100];
-
-            int curState = 0;
-            int curSymbol = 0;
-            int[,] curTape = new int[sizeX, sizeY];
-            int curX = sizeX / 2;
-            int curY = sizeY / 2;
-
-            for (int i = 0; i < re.Length; i++)
-            {
-                for (int k = 0; k < 500; k++)
-                {
-                    var trans = transitions[curState, curSymbol];
-                    curState = trans.Item1;
-                    curSymbol = trans.Item2;
-                    curTape[curX, curY] = curSymbol;
-
-                    if (trans.Item3 == Direction.Down) curY++;
-                    else if (trans.Item3 == Direction.Up) curY--;
-                    else if (trans.Item3 == Direction.Left) curX--;
-                    else if (trans.Item3 == Direction.Right) curX++;
-
-                    if (curX >= sizeX) curX = 0;
-                    if (curY >= sizeY) curY = 0;
-                    if (curX < 0) curX = sizeX - 1;
-                    if (curY < 0) curY = sizeY - 1;
-                }
-
-                re[i] = new Bitmap(sizeX, sizeY);
-                using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
-                    for (int x = 0; x < sizeX; x++)
-                        for (int y = 0; y < sizeY; y++)
-                            c.SetPixel(x, y, TuringColors[curTape[x, y]]);
-            }
-
-            return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
-        }
-
         public string audioFromYTDesc = "Gets the mp3 of an youtube video";
         public WaveStream AudioFromYT(EditNull n, IMessage m, string YouTubeVideoURL)
         {
@@ -392,6 +325,81 @@ namespace MEE7.Commands.Edit
                 return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(memOut));
             }
         }
+
+        //public string turingDrawingDesc = "[WIP] Creates a random turing machine which operates on looped 2D tape";
+        //public Gif TuringDrawing(EditNull n, IMessage m, int NumStates = 6, int NumSymbols = 3, bool DrawMachine = false)
+        //{
+        //    int states = NumStates;
+        //    int symbols = NumSymbols;
+
+        //    int sizeX = 300, sizeY = sizeX;
+
+        //    Tuple<int, int, Direction>[,] transitions = new Tuple<int, int, Direction>[states, symbols];
+
+        //    for (int i = 0; i < states; i++)
+        //        for (int j = 0; j < symbols; j++)
+        //            transitions[i, j] = new Tuple<int, int, Direction>(
+        //                Program.RDM.Next(states),
+        //                Program.RDM.Next(Math.Min(symbols, TuringColors.Length)),
+        //                (Direction)Program.RDM.Next(Enum.GetValues(typeof(Direction)).Length));
+
+        //    if (DrawMachine)
+        //    {
+        //        string machine = $"States: {Enumerable.Range(0, states).Select(x => x.ToString()).Combine()}" +
+        //            $"Symbols: {Enumerable.Range(0, Math.Min(symbols, TuringColors.Length)).Select(x => TuringColors[x].ToString()).Combine()}" +
+        //            $"Transitions: ";
+        //        for (int i = 0; i < states; i++)
+        //            for (int j = 0; j < symbols; j++)
+        //                machine += $"\n({i}, {TuringColors[j]}) -> ({transitions[i, j].ToString()})";
+        //        DiscordNETWrapper.SendText(machine, m.Channel).Wait();
+
+        //        //Bitmap b = new Bitmap(1000, 1000);
+        //        //AdjacencyGraph<int, Edge<int>> a = new AdjacencyGraph<int, Edge<int>>();
+        //        //for (int i = 0; i < states; i++)
+        //        //    a.AddVertex(i);
+        //        //foreach (var trans in transitions)
+        //        //    a.AddEdge(new Edge<int>(trans.Item1, trans.Item3));
+        //        //GraphvizAlgorithm<int, Edge<int>> v = new GraphvizAlgorithm<int, Edge<int>>(a);
+        //        //v.Generate();
+        //    }
+
+        //    Bitmap[] re = new Bitmap[100];
+
+        //    int curState = 0;
+        //    int curSymbol = 0;
+        //    int[,] curTape = new int[sizeX, sizeY];
+        //    int curX = sizeX / 2;
+        //    int curY = sizeY / 2;
+
+        //    for (int i = 0; i < re.Length; i++)
+        //    {
+        //        for (int k = 0; k < 500; k++)
+        //        {
+        //            var trans = transitions[curState, curSymbol];
+        //            curState = trans.Item1;
+        //            curSymbol = trans.Item2;
+        //            curTape[curX, curY] = curSymbol;
+
+        //            if (trans.Item3 == Direction.Down) curY++;
+        //            else if (trans.Item3 == Direction.Up) curY--;
+        //            else if (trans.Item3 == Direction.Left) curX--;
+        //            else if (trans.Item3 == Direction.Right) curX++;
+
+        //            if (curX >= sizeX) curX = 0;
+        //            if (curY >= sizeY) curY = 0;
+        //            if (curX < 0) curX = sizeX - 1;
+        //            if (curY < 0) curY = sizeY - 1;
+        //        }
+
+        //        re[i] = new Bitmap(sizeX, sizeY);
+        //        using (UnsafeBitmapContext c = new UnsafeBitmapContext(re[i]))
+        //            for (int x = 0; x < sizeX; x++)
+        //                for (int y = 0; y < sizeY; y++)
+        //                    c.SetPixel(x, y, TuringColors[curTape[x, y]]);
+        //    }
+
+        //    return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
+        //}
 
 
         enum Direction { Up, Down, Left, Right }

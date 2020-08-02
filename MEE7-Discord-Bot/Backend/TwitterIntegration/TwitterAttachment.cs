@@ -13,7 +13,7 @@ namespace MEE7.Backend
         public TwitterDiscordAttachment(string url, int width, int height, TwitterEntity source)
         {
             this.url = url;
-            this.size = size;
+            this.size = width * height;
             this.width = width;
             this.height = height;
             this.m = source;

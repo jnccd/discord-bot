@@ -168,13 +168,13 @@ namespace MEE7.Commands.Edit
                 var curCommands = new List<EditCommand>();
                 var methods = t.GetMethods().Where(x => x.DeclaringType == t);
                 var fields = t.GetFields();
+                var tInstance = Activator.CreateInstance(t);
 
                 foreach (var method in methods)
                 {
                     try
                     {
                         var descVar = fields.First(x => x.Name.ToLower() == method.Name.ToLower() + "desc" && x.FieldType == typeof(string));
-                        var tInstance = Activator.CreateInstance(t);
                         string desc = (string)descVar.GetValue(tInstance);
                         var param = method.GetParameters();
                         if (param[1].ParameterType == typeof(IMessage))
@@ -217,6 +217,8 @@ namespace MEE7.Commands.Edit
                                 });
                             curCommands.Add(command);
                         }
+                        else
+                            throw new Exception(method.Name + " does not have proper arguments!");
                     }
                     catch
                     {
