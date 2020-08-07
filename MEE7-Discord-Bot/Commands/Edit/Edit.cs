@@ -285,11 +285,8 @@ namespace MEE7.Commands.Edit
                 }
                 catch (Exception e)
                 {
-                    var s = e.StackTrace.GetEverythingBetweenAll(Path.DirectorySeparatorChar.ToString(), "\n");
-                    DiscordNETWrapper.SendText($"{e.Message}" +
-                        $"{(s.Count > 0 ? $", {s.Last()}" : "")}",
+                    DiscordNETWrapper.SendText($"{e.Message} ||{e.InnerException.StackTrace.Split('\\').Last()}||",
                         message.Channel).Wait();
-                    return;
                 }
             }
         }
@@ -581,8 +578,7 @@ namespace MEE7.Commands.Edit
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} " +
-                        $"{e.InnerException.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}");
+                    throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} ", e.InnerException);
                 }
 
                 if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) &&
@@ -596,7 +592,7 @@ namespace MEE7.Commands.Edit
 
         static void PrintPipeOutput(object output, IMessage message)
         {
-            if (output == null) return;
+            if (output == null || (output is string && string.IsNullOrWhiteSpace(output as string))) return;
             object[] arr;
             if (output.GetType().IsArray && (arr = output as object[]).All(x => x.GetType() == typeof(Bitmap)))
             {
