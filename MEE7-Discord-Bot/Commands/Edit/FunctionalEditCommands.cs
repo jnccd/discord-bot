@@ -82,5 +82,11 @@ namespace MEE7.Commands.Edit
                 gif.Item1[i] = (Bitmap)Pipe.Parse(m, pipe.Replace("%" + varName, ((i / (float)gif.Item1.Length) * endValue).ToString().Replace(",", "."))).Apply(m, gif.Item1[i]);
             return gif;
         }
+
+        public string ErrorDesc = "Literally just crashes";
+        public void Error(EditNull n, IMessage m)
+        {
+            throw new Exception("notlikethis");
+        }
     }
 }
