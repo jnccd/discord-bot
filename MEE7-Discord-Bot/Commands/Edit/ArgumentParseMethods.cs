@@ -21,8 +21,6 @@ namespace MEE7.Commands.Edit
 
         public static readonly ArgumentParseMethod[] ArgumentParseMethods = new ArgumentParseMethod[]
         {
-            new ArgumentParseMethod(typeof(string), (IMessage m, string s) => s),
-            new ArgumentParseMethod(typeof(bool), (IMessage m, string s) => { if (s.ToLower() == "true" || s == "1") return true; else return false; }),
             new ArgumentParseMethod(typeof(byte), (IMessage m, string s) => Convert.ToByte(s)),
             new ArgumentParseMethod(typeof(short), (IMessage m, string s) => Convert.ToInt16(s)),
             new ArgumentParseMethod(typeof(int), (IMessage m, string s) => Convert.ToInt32(s)),
@@ -30,6 +28,15 @@ namespace MEE7.Commands.Edit
             new ArgumentParseMethod(typeof(ulong), (IMessage m, string s) => Convert.ToUInt64(s)),
             new ArgumentParseMethod(typeof(float), (IMessage m, string s) => (float)s.ConvertToDouble()),
             new ArgumentParseMethod(typeof(double), (IMessage m, string s) => s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(string), (IMessage m, string s) => s),
+            new ArgumentParseMethod(typeof(bool), (IMessage m, string s) => {
+                if (s.ToLower() == "true" || s == "1")
+                    return true;
+                else if (s.ToLower() == "false" || s == "0")
+                    return false;
+                else
+                    throw new Exception("no");
+            }),
             new ArgumentParseMethod(typeof(PointF), (IMessage m, string s) => {
                 string[] sp = s.Split(':');
                 return new PointF((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
