@@ -377,7 +377,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sobelEdgesDesc = "Highlights horizontal edges";
-        public Bitmap sobelEdges(Bitmap bmp, IMessage m)
+        public Bitmap SobelEdges(Bitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                                    {  0,  0,  0 },
@@ -574,6 +574,33 @@ namespace MEE7.Commands.Edit
             return gif.Item1[index];
         }
 
+        public string getNumFramesDesc = "Get the number of gif frames";
+        public int GetNumFrames(Gif gif, IMessage m)
+        {
+            int num = gif.Item1.Count();
+            for (int i = 0; i < gif.Item1.Length; i++)
+                gif.Item1[i].Dispose();
+            return num;
+        }
+
+        public string whiteDesc = "Get my skin color";
+        public Color White(EditNull n, IMessage m)
+        {
+            return Color.White;
+        }
+
+        public string colDesc = "Get my skin color";
+        public Color Col(EditNull n, IMessage m, byte r, byte g, byte b)
+        {
+            return Color.FromArgb(r, g, b);
+        }
+
+        public string lerpDesc = "Get my skin color";
+        public Color Lerp(EditNull n, IMessage m, Color a, Color b, float l)
+        {
+            return a.Lerp(b, l);
+        }
+
         public string transgroundDesc = "Make the background transparent";
         public Bitmap Transground(Bitmap b, IMessage m, Vector2 BackgroundCoords = new Vector2(), int threshold = 10)
         {
@@ -618,6 +645,91 @@ namespace MEE7.Commands.Edit
 
             b.Dispose();
             return reB;
+        }
+
+        public string transgroundColorDesc = "Make the background color transparent";
+        public Bitmap TransgroundColor(Bitmap b, IMessage m, Color backColor, int threshold = 50, float alphaMult = 1)
+        {
+            int dist = 0;
+            Color c;
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                        if ((dist = (c = con.GetPixel(x, y)).GetColorDist(backColor)) < threshold)
+                        {
+                            dist = (int)(dist * alphaMult);
+                            Color o = c.Lerp(backColor, -1);
+                            o = Color.FromArgb((dist > 255 ? 255 : dist).ReLU(), o);
+                            con.SetPixel(x, y, o);
+                        }
+
+            return b;
+        }
+
+        public string transgroundHSVDesc = "Thereshold HSV values to transparency, note that the SV values are in [0, 100]";
+        public Bitmap TransgroundHSV(Bitmap b, IMessage m, float lowerH = 0, float higherH = 360, float lowerS = 0, float higherS = 100, float lowerV = 0, float higherV = 0)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c.ColorToHSV(out double h, out double s, out double v);
+                        if (h < lowerH || h > higherH || 
+                            s * 100 < lowerS || s * 100 > higherS || 
+                            v * 100 < lowerV || v * 100 > higherV)
+                            con.SetPixel(x, y, Color.FromArgb(0, c));
+                    }
+
+            return b;
+        }
+
+        public string hueScaleDesc = "Grayscaled Hue channel of the image";
+        public Bitmap HueScale(Bitmap b, IMessage m)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c.ColorToHSV(out double h, out double s, out double v);
+                        int rangeH = (int)(h * 255 / 360);
+                        con.SetPixel(x, y, Color.FromArgb(255, rangeH, rangeH, rangeH));
+                    }
+
+            return b;
+        }
+
+        public string satScaleDesc = "Grayscaled Saturation channel of the image";
+        public Bitmap SatScale(Bitmap b, IMessage m)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c.ColorToHSV(out double h, out double s, out double v);
+                        int rangeS = (int)(s * 255);
+                        con.SetPixel(x, y, Color.FromArgb(255, rangeS, rangeS, rangeS));
+                    }
+
+            return b;
+        }
+
+        public string valScaleDesc = "Grayscaled Value channel of the image";
+        public Bitmap ValScale(Bitmap b, IMessage m)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c.ColorToHSV(out double h, out double s, out double v);
+                        int rangeV = (int)(v * 255);
+                        con.SetPixel(x, y, Color.FromArgb(255, rangeV, rangeV, rangeV));
+                    }
+
+            return b;
         }
 
         public string transcropDesc = "Crop the transparency";
@@ -726,7 +838,7 @@ namespace MEE7.Commands.Edit
             return new Gif(gif.Item1, gif.Item2.Select(x => (int)(x * multiplier)).ToArray());
         }
 
-        public string SetDelayDesc = "Change the gifs playback speed";
+        public string getDelayDesc = "Change the gifs playback speed";
         public Gif SetDelay(Gif gif, IMessage m, int delay)
         {
             return new Gif(gif.Item1, gif.Item2.Select(x => delay).ToArray());

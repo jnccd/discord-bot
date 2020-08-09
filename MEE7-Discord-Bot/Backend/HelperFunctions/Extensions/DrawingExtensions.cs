@@ -147,5 +147,34 @@ namespace MEE7.Backend.HelperFunctions
             return new Point((int)(cos * (P.X - RotationOrigin.X) - sin * (P.Y - RotationOrigin.Y) + RotationOrigin.X),
                              (int)(sin * (P.X - RotationOrigin.X) + cos * (P.Y - RotationOrigin.Y) + RotationOrigin.Y));
         }
+        public static Color Lerp(this Color s, Color t, float k) // from http://www.java2s.com/example/csharp/system.drawing/lerp-between-two-color.html
+        {
+            static float keepInIntv(float f)
+            {
+                if (f < 0) f = 0;
+                if (f > 255) f = 255;
+                return f;
+            }
+
+            var bk = (1 - k);
+            var a = s.A * bk + t.A * k;
+            var r = s.R * bk + t.R * k;
+            var g = s.G * bk + t.G * k;
+            var b = s.B * bk + t.B * k;
+            a = keepInIntv(a);
+            r = keepInIntv(r);
+            g = keepInIntv(g);
+            b = keepInIntv(b);
+            return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
+        }
+        public static void ColorToHSV(this Color color, out double hue, out double saturation, out double value)
+        {
+            int max = Math.Max(color.R, Math.Max(color.G, color.B));
+            int min = Math.Min(color.R, Math.Min(color.G, color.B));
+
+            hue = color.GetHue();
+            saturation = (max == 0) ? 0 : 1d - (1d * min / max);
+            value = max / 255d;
+        }
     }
 }

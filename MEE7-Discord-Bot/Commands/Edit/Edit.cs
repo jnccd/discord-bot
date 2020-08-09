@@ -111,9 +111,9 @@ namespace MEE7.Commands.Edit
                 if (Command.ContainsOneOf(new string[] { "|", ">", "<", "." }))
                     throw new IllegalCommandException("Illegal Symbol in the name!");
 
-                foreach (Argument arg in Arguments)
-                    if (ArgumentParseMethod.ArgumentParseMethods.FirstOrDefault(x => x.Type == arg.Type) == null)
-                        throw new IllegalCommandException($"Argument {arg.Name} doesn't have a corresponding Parse Method! {arg.Type.ToReadableString()}");
+                //foreach (Argument arg in Arguments)
+                //    if (ArgumentParseMethod.ArgumentParseMethods.FirstOrDefault(x => x.Type == arg.Type) == null)
+                //        throw new IllegalCommandException($"Argument {arg.Name} doesn't have a corresponding Parse Method! {arg.Type.ToReadableString()}");
 
                 this.Command = Command;
                 this.Desc = Desc;

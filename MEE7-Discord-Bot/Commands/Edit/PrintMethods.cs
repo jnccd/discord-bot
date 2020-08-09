@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using static MEE7.Commands.Edit.Edit;
+using Color = System.Drawing.Color;
 
 namespace MEE7.Commands.Edit
 {
@@ -58,22 +59,26 @@ namespace MEE7.Commands.Edit
 
             }),
             new PrintMethod(typeof(Gif), (IMessage m, object o) => {
-                using (MemoryStream s = new MemoryStream())
-                {
-                    Gif gif = o as Gif;
-                    int maxWidth = gif.Item1.Select(x => x.Width).Max();
-                    int maxHeight = gif.Item1.Select(x => x.Height).Max();
-                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
-                        for (int i = 0; i < gif.Item1.Length; i++)
-                            c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)),
-                                gif.Item2[i], GifQuality.Bit8);
+                using MemoryStream s = new MemoryStream(); Gif gif = o as Gif;
+                int maxWidth = gif.Item1.Select(x => x.Width).Max();
+                int maxHeight = gif.Item1.Select(x => x.Height).Max();
+                using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
+                    for (int i = 0; i < gif.Item1.Length; i++)
+                        c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)),
+                            gif.Item2[i], GifQuality.Bit8);
 
-                    DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
+                DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
 
-                    foreach (Bitmap b in gif.Item1)
-                        b.Dispose();
-                }
+                foreach (Bitmap b in gif.Item1)
+                    b.Dispose();
 
+            }),
+            new PrintMethod(typeof(Color), (IMessage m, object o) => {
+                Color c = (o as Color?).Value;
+                using Bitmap b = new Bitmap(30, 30);
+                using Graphics g = Graphics.FromImage(b);
+                g.FillRectangle(new SolidBrush(c), 0, 0, 30, 30);
+                DiscordNETWrapper.SendBitmap(b, m.Channel, $"{c.R} {c.G} {c.B}").Wait();
             }),
             new PrintMethod(typeof(WaveStream), (IMessage m, object o) => {
                 Stream s = new MemoryStream();
