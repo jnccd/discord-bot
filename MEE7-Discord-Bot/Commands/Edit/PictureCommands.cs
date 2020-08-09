@@ -667,7 +667,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string transgroundHSVDesc = "Thereshold HSV values to transparency, note that the SV values are in [0, 100]";
-        public Bitmap TransgroundHSV(Bitmap b, IMessage m, float lowerH = 0, float higherH = 360, float lowerS = 0, float higherS = 100, float lowerV = 0, float higherV = 0)
+        public Bitmap TransgroundHSV(Bitmap b, IMessage m, Pipe thresholder)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -675,9 +675,7 @@ namespace MEE7.Commands.Edit
                     {
                         Color c = con.GetPixel(x, y);
                         c.ColorToHSV(out double h, out double s, out double v);
-                        if (h < lowerH || h > higherH || 
-                            s * 100 < lowerS || s * 100 > higherS || 
-                            v * 100 < lowerV || v * 100 > higherV)
+                        if ((bool)thresholder.Apply(m, null, new Dictionary<string, object>() { { "h", h }, { "s", s * 100 }, { "v", v * 100 } }))
                             con.SetPixel(x, y, Color.FromArgb(0, c));
                     }
 
@@ -762,9 +760,9 @@ namespace MEE7.Commands.Edit
         }
 
         public string cropDesc = "Crop the picture";
-        public Bitmap Crop(Bitmap b, IMessage m, float x, float y, float w, float h)
+        public Bitmap Crop(Bitmap b, IMessage m, int x, int y, int w, int h)
         {
-            return b.CropImage(new Rectangle((int)(x * b.Width), (int)(y * b.Height), (int)(w * b.Width), (int)(h * b.Height)));
+            return b.CropImage(new Rectangle(x,y,w,h));
         }
 
         public string splitDesc = "Split the picture into x * y pieces";
