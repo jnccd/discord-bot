@@ -23,7 +23,9 @@ namespace MEE7.Commands.Edit
         {
             new ArgumentParseMethod(typeof(string), (IMessage m, string s) => s),
             new ArgumentParseMethod(typeof(bool), (IMessage m, string s) => { if (s.ToLower() == "true" || s == "1") return true; else return false; }),
-            new ArgumentParseMethod(typeof(int), (IMessage m, string s) => (int)s.ConvertToDouble()),
+            new ArgumentParseMethod(typeof(byte), (IMessage m, string s) => Convert.ToByte(s)),
+            new ArgumentParseMethod(typeof(short), (IMessage m, string s) => Convert.ToInt16(s)),
+            new ArgumentParseMethod(typeof(int), (IMessage m, string s) => Convert.ToInt32(s)),
             new ArgumentParseMethod(typeof(long), (IMessage m, string s) => Convert.ToInt64(s)),
             new ArgumentParseMethod(typeof(ulong), (IMessage m, string s) => Convert.ToUInt64(s)),
             new ArgumentParseMethod(typeof(float), (IMessage m, string s) => (float)s.ConvertToDouble()),
