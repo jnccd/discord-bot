@@ -285,8 +285,10 @@ namespace MEE7.Commands.Edit
                 }
                 catch (Exception e)
                 {
-                    DiscordNETWrapper.SendText($"{e.Message} ||{e.InnerException.StackTrace.Split('\\').Last()}||",
-                        message.Channel).Wait();
+                    string text = e.Message;
+                    if (e.InnerException != null)
+                        text += $" ||{e.InnerException.StackTrace.Split('\\').Last()}||";
+                    DiscordNETWrapper.SendText(text, message.Channel).Wait();
                 }
             }
         }
