@@ -19,7 +19,7 @@ namespace MEE7.Backend.HelperFunctions
         public static a MaxElement<a>(this IEnumerable<a> xs, Func<a, double> f) { return xs.MaxElement(f, out double _); }
         public static a MaxElement<a>(this IEnumerable<a> xs, Func<a, double> f, out double max)
         {
-            max = 0; a maxE = default;
+            max = double.MinValue; a maxE = default;
             foreach (a x in xs)
             {
                 double res = f(x);
