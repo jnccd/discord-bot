@@ -96,9 +96,12 @@ namespace MEE7.Commands.Edit
         public string BakaMitaiDesc = "Picture goes Baka Mitai - using code from https://github.com/AliaksandrSiarohin/first-order-model";
         public void BakaMitai(Bitmap bmp, IMessage m)
         {
+            if (!Directory.Exists("Commands\\Edit\\first-order-model"))
+                throw new Exception("AI model is not set up on this bot instance");
+
             lock (firstOrderModelLock)
             {
-                string finalFile = "Commands\\Edit\\final.mp4";
+                string finalFile = "Commands\\Edit\\first-order-model\\content\\final.mp4";
                 string picFile = "Commands\\Edit\\first-order-model\\content\\gdrive\\My Drive\\first-order-motion-model\\02.png";
 
                 Bitmap resized = new Bitmap(bmp, new Size(256, 256));

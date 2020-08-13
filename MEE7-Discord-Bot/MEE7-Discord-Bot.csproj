@@ -55,7 +55,7 @@
     <None Update="BuildDate.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Commands\Edit\audio.mp3">
+    <None Update="Commands\Edit\first-order-model\content\audio.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\Edit\first-order-model\.gitignore">
