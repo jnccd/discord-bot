@@ -3,7 +3,6 @@ using MEE7.Backend.HelperFunctions;
 using System.Collections.Generic;
 using System.Compat.Web;
 using System.Linq;
-using System.Text.Encodings.Web;
 using TweetSharp;
 
 namespace MEE7.Backend

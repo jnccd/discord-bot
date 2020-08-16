@@ -1,21 +1,15 @@
 ﻿using AnimatedGif;
 using BumpKit;
 using Discord;
-using IronPython.Hosting;
 using MEE7.Backend.HelperFunctions;
-using Microsoft.Scripting.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
 using static MEE7.Commands.Edit.Edit;
 using Color = System.Drawing.Color;
-using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace MEE7.Commands.Edit
 {

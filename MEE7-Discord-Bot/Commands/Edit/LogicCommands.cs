@@ -1,7 +1,4 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using static MEE7.Commands.Edit.Edit;
 
 namespace MEE7.Commands.Edit
