@@ -254,7 +254,7 @@ namespace MEE7.Commands.MessageDB
             }
         }
 
-        DBGuild GetGuild(IMessage message)
+        public DBGuild GetGuild(IMessage message)
         {
             var curGuild = Program.GetGuildFromChannel(message.Channel);
             if (!File.Exists(GetFilePath(curGuild)))
