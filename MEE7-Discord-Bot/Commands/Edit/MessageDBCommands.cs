@@ -86,5 +86,8 @@ namespace MEE7.Commands.Edit
 
             return plt.GetBitmap();
         }
+
+        public string GetUserDesc = "Gets a user";
+        public IUser GetUser(EditNull n, IMessage m, IUser u) => u;
     }
 }
