@@ -856,11 +856,8 @@ namespace MEE7.Commands.Edit
             return new Gif(re.ToArray(), gif.Item2.Select(y => y / x > 0 ? y / x : 1).ToArray());
         }
 
-        public string getHTMLFromWebsiteDesc = "Get the websites html";
-        public string GetHTMLFromWebsite(string url, IMessage m)
-        {
-            return url.GetHTMLfromURL();
-        }
+        //public string getHTMLFromWebsiteDesc = "Get the websites html";
+        //public string GetHTMLFromWebsite(string url, IMessage m) => url.GetHTMLfromURL();
 
         public string getSizeDesc = "Get the size in byte of an image";
         public long GetSize(Bitmap b, IMessage m)
