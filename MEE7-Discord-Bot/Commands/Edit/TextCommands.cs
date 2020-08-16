@@ -57,6 +57,9 @@ namespace MEE7.Commands.Edit
             return s.Select(x => x == ' ' || x == '\n' ? x : (char)(x - '!' + '！')).Foldl("", (x, y) => x + y);
         }
 
+        //public string getHTMLFromWebsiteDesc = "Get the websites html";
+        //public string GetHTMLFromWebsite(string url, IMessage m) => url.GetHTMLfromURL();
+
         public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
         public string Japanify(string s, IMessage m)
         {
