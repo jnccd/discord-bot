@@ -385,7 +385,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\Edit\resources\" />
+    <Folder Include="Commands\Edit\Resources\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties commands_4messagedb_4db_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>

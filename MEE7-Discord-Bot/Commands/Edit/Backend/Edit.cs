@@ -268,7 +268,7 @@ namespace MEE7.Commands.Edit
                 else if ((command = Commands.FirstOrDefault(x => x.Command.ToLower() == split[2].ToLower())) != null)
                     DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder($"**{command.Command}**",
                         $"{command.Desc}\n{CommandToCommandTypeString(command)}"), message.Channel).Wait();
-                else if ((groupHelpMenu = groupHelpMenus.Where(x => x.Key.ToLower() == split[2].ToLower()).Select(x => x.Value).FirstOrDefault()) != null)
+                else if ((groupHelpMenu = groupHelpMenus.Where(x => x.Key.ToLower().StartsWith(split[2].ToLower())).Select(x => x.Value).FirstOrDefault()) != null)
                     DiscordNETWrapper.SendEmbed(groupHelpMenu, message.Channel).Wait();
             }
             else if (split[1] == "search" && split.Length == 3)
