@@ -1,9 +1,6 @@
 ﻿using Discord;
 using MEE7.Backend.HelperFunctions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MEE7.Commands.Edit
 {

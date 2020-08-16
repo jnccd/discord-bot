@@ -2,11 +2,9 @@
 using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace MEE7.Commands
 {

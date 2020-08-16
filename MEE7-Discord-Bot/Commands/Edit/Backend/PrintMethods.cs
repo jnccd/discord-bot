@@ -1,6 +1,5 @@
 ﻿using AnimatedGif;
 using Discord;
-using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using System;
