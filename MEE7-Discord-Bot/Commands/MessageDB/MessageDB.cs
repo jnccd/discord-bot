@@ -194,6 +194,37 @@ namespace MEE7.Commands.MessageDB
             },
             new WeirdCommandThingy()
             {
+                name = "getLeastUsedEmotes",
+                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
+                    var serverMessages = dbGuild.TextChannels.SelectMany(x => x.Messages);
+
+                    var emotes = Program.GetGuildFromID(dbGuild.Id).Emotes.
+                        Select(x => new EmoteCounter() { e=x }).ToArray();
+
+                    foreach (var m in serverMessages)
+                        foreach (var e in emotes)
+                        {
+                            var hits = m.Content.AllIndexesOf(e.e.Print()).Count;
+                            e.messageHits += hits;
+                            if (hits > 0)
+                                e.hitMessages++;
+
+                            DBReaction react;
+                            if (m.Reactions != null && (react = m.Reactions.FirstOrDefault(x => x.id == e.e.Id)) != null)
+                            {
+                                e.reactionHits += react.count;
+                                e.reactedMessages++;
+                            }
+                        }
+
+                    emotes = emotes.OrderBy(x => x.messageHits + x.reactionHits).Take(10).ToArray();
+
+                    DiscordNETWrapper.SendText(emotes.Select(x => $"{x.e.Name} - {x.e.Print()} used {x.messageHits} times in {x.hitMessages} " +
+                        $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
+                }
+            },
+            new WeirdCommandThingy()
+            {
                 name = "",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
 
