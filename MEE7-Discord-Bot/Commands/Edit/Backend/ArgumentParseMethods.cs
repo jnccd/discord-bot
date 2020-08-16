@@ -44,6 +44,9 @@ namespace MEE7.Commands.Edit
                 string[] sp = s.Split(':');
                 return new Vector2((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
             }),
+             new ArgumentParseMethod(typeof(IUser), (IMessage m, string s) => {
+                return DiscordNETWrapper.ParseUser(s, m.Channel);
+            }),
             new ArgumentParseMethod(typeof(Pipe), (IMessage m, string s) => Pipe.Parse(m, s)),
         };
     }

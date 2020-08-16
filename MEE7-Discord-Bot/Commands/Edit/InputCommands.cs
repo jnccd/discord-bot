@@ -125,19 +125,17 @@ namespace MEE7.Commands.Edit
         }
 
         public string profilePicDesc = "Gets a profile picture";
-        public Bitmap ProfilePic(EditNull n, IMessage m, string user)
+        public Bitmap ProfilePic(EditNull n, IMessage m, IUser user)
         {
-            IUser iuser = DiscordNETWrapper.ParseUser(user, m.Channel);
-            string avatarURL = iuser.GetAvatarUrl(ImageFormat.Png, 512);
-            return (string.IsNullOrWhiteSpace(avatarURL) ? iuser.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+            string avatarURL = user.GetAvatarUrl(ImageFormat.Png, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? user.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
         }
 
         public string profilePicGDesc = "Gets a profile picture gif";
-        public Gif ProfilePicG(EditNull n, IMessage m, string user)
+        public Gif ProfilePicG(EditNull n, IMessage m, IUser user)
         {
-            IUser iuser = DiscordNETWrapper.ParseUser(user, m.Channel);
-            string avatarURL = iuser.GetAvatarUrl(ImageFormat.Gif, 512);
-            return (string.IsNullOrWhiteSpace(avatarURL) ? iuser.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
+            string avatarURL = user.GetAvatarUrl(ImageFormat.Gif, 512);
+            return (string.IsNullOrWhiteSpace(avatarURL) ? user.GetDefaultAvatarUrl() : avatarURL).GetBitmapsAndTimingsFromGIFURL();
         }
 
         public string myProfilePicDesc = "Gets your profile picture";
