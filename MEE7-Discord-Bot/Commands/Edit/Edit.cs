@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using IronPython.Modules;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -145,6 +146,7 @@ namespace MEE7.Commands.Edit
         public class EditVariable { public string VarName; }
 
         private static IEnumerable<EditCommand> Commands;
+        private static Dictionary<string, EmbedBuilder> groupHelpMenus = new Dictionary<string, EmbedBuilder>();
 
         public Edit() : base("edit", "This is a little more advanced command which allows you to chain together functions that were made specific for this command. " +
             $"Shortcut: **{Program.Prefix}-**\nFor more information just type **{Program.Prefix}edit**.")
@@ -156,7 +158,8 @@ namespace MEE7.Commands.Edit
                 "() Let you add additional arguments for the command (optional unless the command requires arguments)\n" +
                 "\"\" Automatically choose a input function for your input\n" +
                $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
-                "\nEdit Commands:");
+               $"\nIf you want to find more commands you can write \"{PrefixAndCommand} help [groupName]\"" +
+                "The following command groups are currently loaded:");
 
             // Load Functions
             Type[] classesWithEditCommands = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
@@ -227,7 +230,8 @@ namespace MEE7.Commands.Edit
                 }
 
                 Commands = Commands.Union(curCommands);
-                AddToHelpmenu(t.Name, curCommands.ToArray());
+                HelpMenu.Description += $"\n{t.Name}";
+                AddToHelpmenus(t.Name, curCommands.ToArray());
             }
         }
         string CommandToCommandTypeString(EditCommand c) => $"**{c.Command}**" +
@@ -235,15 +239,17 @@ namespace MEE7.Commands.Edit
                   $"`{(c.InputType == null ? "_" : c.InputType.ToReadableString())}` -> " +
                   $"`{(c.OutputType == null ? "_" : c.OutputType.ToReadableString())}`" +
                 $"";
-        void AddToHelpmenu(string Name, EditCommand[] editCommands)
+        void AddToHelpmenus(string Name, EditCommand[] editCommands)
         {
+            EmbedBuilder helpMenu = DiscordNETWrapper.CreateEmbedBuilder(Name);
+            groupHelpMenus.Add(Name, helpMenu);
             if (editCommands.Length > 0)
             {
                 int maxlength = editCommands.
                     Select(CommandToCommandTypeString).
                     Select(x => x.Length).
                     Max();
-                HelpMenu.AddFieldDirectly(Name, "" + editCommands.
+                helpMenu.AddFieldDirectly(Name, "" + editCommands.
                     Select(c => CommandToCommandTypeString(c) +
                     $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
                     Combine() + "");
@@ -256,12 +262,14 @@ namespace MEE7.Commands.Edit
                 DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
             else if (split[1] == "help")
             {
-                EditCommand command;
+                EditCommand command; EmbedBuilder groupHelpMenu;
                 if (split.Length == 2)
                     DiscordNETWrapper.SendEmbed(HelpMenu, message.Channel).Wait();
                 else if ((command = Commands.FirstOrDefault(x => x.Command.ToLower() == split[2].ToLower())) != null)
                     DiscordNETWrapper.SendEmbed(DiscordNETWrapper.CreateEmbedBuilder($"**{command.Command}**",
                         $"{command.Desc}\n{CommandToCommandTypeString(command)}"), message.Channel).Wait();
+                else if ((groupHelpMenu = groupHelpMenus.Where(x => x.Key.ToLower() == split[2].ToLower()).Select(x => x.Value).FirstOrDefault()) != null)
+                    DiscordNETWrapper.SendEmbed(groupHelpMenu, message.Channel).Wait();
             }
             else if (split[1] == "search" && split.Length == 3)
             {
