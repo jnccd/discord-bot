@@ -3,7 +3,7 @@ using static MEE7.Commands.Edit.Edit;
 
 namespace MEE7.Commands.Edit
 {
-    class LogicCommands
+    class LogicCommands : EditCommandProvider
     {
         public string GtDesc = "Greater than";
         public bool Gt(EditNull n, IMessage m, double a, double b) => a > b;
