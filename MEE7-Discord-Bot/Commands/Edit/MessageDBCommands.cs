@@ -64,11 +64,39 @@ namespace MEE7.Commands.Edit
         public Bitmap PlotMessages(List<DBMessage> messages, IMessage m)
         {
             var messagesGroupedByDay = messages.
-                        OrderBy(x => x.Timestamp).
-                        Select(x => new Tuple<DBMessage, string>(x, x.Timestamp.ToShortDateString())).
-                        GroupBy(x => x.Item2).
-                        Select(x => new Tuple<string, int>(x.Key, x.Count())).
-                        ToArray();
+                OrderBy(x => x.Timestamp).
+                Select(x => new Tuple<DBMessage, string>(x, x.Timestamp.ToShortDateString())).
+                GroupBy(x => x.Item2).
+                Select(x => new Tuple<string, int>(x.Key, x.Count())).
+                ToArray();
+
+            Plot plt = new Plot();
+            plt.PlotScatter(
+                messagesGroupedByDay.
+                Select(x => DateTime.Parse(x.Item1).ToOADate()).
+                ToArray(),
+                messagesGroupedByDay.
+                Select(x => (double)x.Item2).
+                ToArray());
+            plt.Ticks(dateTimeX: true);
+            plt.Legend();
+            plt.Title("Activity over Time");
+            plt.YLabel("Messages send on that day");
+            plt.XLabel("Day");
+
+            return plt.GetBitmap();
+        }
+
+        public string PlotMessagesIntervalDesc = "Plot those messages over time";
+        public Bitmap PlotMessagesInterval(List<DBMessage> messages, IMessage m, DateTime intrStart, DateTime intrEnd)
+        {
+            var messagesGroupedByDay = messages.
+                Where(x => x.Timestamp > intrStart && x.Timestamp < intrEnd).
+                OrderBy(x => x.Timestamp).
+                Select(x => new Tuple<DBMessage, string>(x, x.Timestamp.ToShortDateString())).
+                GroupBy(x => x.Item2).
+                Select(x => new Tuple<string, int>(x.Key, x.Count())).
+                ToArray();
 
             Plot plt = new Plot();
             plt.PlotScatter(
