@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
 using MEE7.Backend;
 
-namespace MEE7.Commands
+namespace MEE7.Commands.CAUServerSpecific
 {
     public class AddLikeSpamRole : Command
     {

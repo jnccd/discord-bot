@@ -362,6 +362,21 @@ namespace MEE7.Backend.HelperFunctions
             }
             catch (Exception) { return null; }
         }
+        public static MemoryStream GetStreamFromUrl(this string url)
+        {
+            byte[] imageData = null;
+            MemoryStream ms = null;
+
+            try
+            {
+                using (var wc = new WebClient())
+                    imageData = wc.DownloadData(url);
+                ms = new MemoryStream(imageData);
+            }
+            catch { }
+
+            return ms;
+        }
         public static string RemoveLastGroup(this string s, char seperator)
         {
             string[] split = s.Split(seperator);
