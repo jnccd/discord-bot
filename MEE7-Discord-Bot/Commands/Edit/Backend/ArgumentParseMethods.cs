@@ -36,6 +36,10 @@ namespace MEE7.Commands.Edit
                 else
                     throw new Exception("no");
             }),
+            new ArgumentParseMethod(typeof(Point), (IMessage m, string s) => {
+                string[] sp = s.Split(':');
+                return new Point(Convert.ToInt32(sp[0]), Convert.ToInt32(sp[1]));
+            }),
             new ArgumentParseMethod(typeof(PointF), (IMessage m, string s) => {
                 string[] sp = s.Split(':');
                 return new PointF((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
@@ -44,9 +48,16 @@ namespace MEE7.Commands.Edit
                 string[] sp = s.Split(':');
                 return new Vector2((float)sp[0].ConvertToDouble(), (float)sp[1].ConvertToDouble());
             }),
-             new ArgumentParseMethod(typeof(IUser), (IMessage m, string s) => {
+            new ArgumentParseMethod(typeof(IUser), (IMessage m, string s) => {
                 return DiscordNETWrapper.ParseUser(s, m.Channel);
             }),
+            new ArgumentParseMethod(typeof(DateTime), (IMessage m, string s) => {
+                if (s.ToLower() == "now")
+                    return DateTime.Now;
+                else
+                    return DateTime.Parse(s);
+            }),
+            new ArgumentParseMethod(typeof(TimeSpan), (IMessage m, string s) => TimeSpan.Parse(s)),
             new ArgumentParseMethod(typeof(Pipe), (IMessage m, string s) => Pipe.Parse(m, s)),
         };
     }
