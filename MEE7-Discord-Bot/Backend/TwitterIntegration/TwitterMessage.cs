@@ -13,14 +13,7 @@ namespace MEE7.Backend
 
         public TwitterMessage(TwitterStatus s, TwitterChannel channel)
         {
-            this.Content = s.Text;
-            Content = HttpUtility.HtmlDecode(Content);
-            Content = Content.Split(' ').SkipWhile(x => x.StartsWith("@")).Combine(" ");
-            Content = Content.Replace("\\\"", "\"").Replace("\n", " ");
-            Content = Content.Trim(' ');
-
-            foreach (var v in s.Entities.Urls)
-                Content = Content.Replace(v.Value, v.ExpandedValue);
+            this.Content = s.GetContent();
 
             this.Author = new TwitterDiscordUser(s.Author as TwitterUser);
             this.Channel = channel;
