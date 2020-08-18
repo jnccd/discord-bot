@@ -117,5 +117,8 @@ namespace MEE7.Commands.Edit
 
         public string GetUserDesc = "Gets a user";
         public IUser GetUser(EditNull n, IMessage m, IUser u) => u;
+
+        public string GetDateDesc = "Gets a date";
+        public DateTime GetDate(EditNull n, IMessage m, DateTime d) => d;
     }
 }
