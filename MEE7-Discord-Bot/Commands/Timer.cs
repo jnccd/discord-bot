@@ -40,6 +40,13 @@ namespace MEE7.Commands
             Program.OnConnected += Program_OnConnected;
             Program.OnEmojiReactionAdded += Program_OnEmojiReactionAdded;
             Program.OnMessageDeleted += Program_OnMessageDeleted;
+
+            HelpMenu = DiscordNETWrapper.CreateEmbedBuilder("Timer", 
+                "Usage example: \n" +
+                "\"$timer in 02:59:00 ;pokemon\"\n" +
+                "\"$timer at 04:20:00 blaze it\"\n\n" +
+               $"Note that the bot currently runs in the `{TimeZone.CurrentTimeZone.StandardName}` time zone (GMT/UTC offset {TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now)})" +
+               $"when adding total times using the `at` keyword");
         }
 
         private void Program_OnConnected()
