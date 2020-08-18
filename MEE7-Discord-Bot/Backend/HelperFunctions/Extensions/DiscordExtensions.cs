@@ -1,7 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend.Configuration;
+using System.Compat.Web;
 using System.Linq;
+using TweetSharp;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -87,6 +89,24 @@ namespace MEE7.Backend.HelperFunctions
         public static string Print(this DiscordEmote e)
         {
             return e.ToIEmote().Print();
+        }
+
+        public static string GetContent(this TwitterStatus s)
+        {
+            string Content = s.Text;
+            Content = HttpUtility.HtmlDecode(Content);
+            Content = Content.Split(' ').SkipWhile(x => x.StartsWith("@")).Combine(" ");
+            Content = Content.Replace("\\\"", "\"").Replace("\n", " ");
+
+            foreach (var v in s.Entities.Urls)
+                Content = Content.Replace(v.Value, v.ExpandedValue);
+
+            foreach (var v in s.Entities.Media)
+                Content = Content.Replace(v.Url, "");
+
+            Content = Content.Trim(' ');
+
+            return Content;
         }
     }
 }
