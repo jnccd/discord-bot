@@ -34,14 +34,11 @@ namespace MEE7.Commands.CAUServerSpecific
                     var image = codeShitposts.Status.Entities.Media.First().MediaUrl;
                     var id = codeShitposts.Status.Id;
                     if (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId)
-                        arena.SendFileAsync(image.GetStreamFromUrl(), image.Split("/").Last(), text);
+                        arena.SendFileAsync(image.GetStreamFromUrl(), image.Split("/").Last(), text.Replace("http://redd.it", "redd.it"));
                     if (Config.Data.lastCodeMemeId == 0 || (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId))
                         Config.Data.lastCodeMemeId = id;
                 }
-                catch (Exception e)
-                {
-
-                }
+                catch { }
 
                 Thread.Sleep(1 * 60 * 60 * 1000);
             }
