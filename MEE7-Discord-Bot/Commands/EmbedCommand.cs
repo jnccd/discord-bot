@@ -38,7 +38,8 @@ namespace MEE7.Commands
                         fields.Add(new Tuple<string, string>(split[i++].Trim(' '), split[i++].Trim(' ')));
                 }
                 catch { }
-                var embed = DiscordNETWrapper.CreateEmbedBuilder(title, desc, imgURL, DiscordNETWrapper.ParseUser(author, message.Channel), thumbURL);
+                var iauthor = DiscordNETWrapper.ParseUser(author, message.Channel);
+                var embed = DiscordNETWrapper.CreateEmbedBuilder(title, desc, imgURL, iauthor, thumbURL);
                 foreach (var f in fields)
                     embed.AddFieldDirectly(f.Item1, f.Item2);
                 DiscordNETWrapper.SendEmbed(embed, message.Channel).Wait();
