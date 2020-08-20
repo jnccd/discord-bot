@@ -45,7 +45,7 @@ namespace MEE7.Configuration
             WarframeIDList = new List<string>();
             manageRoleByEmoteMessages = new List<ManageRoleByEmoteMessage>();
             timers = new List<ConfigTimer>();
-            lastCodeMemeId = 0;
+            lastCodeMemeId = 1295737876009955330;
         }
     }
 }
