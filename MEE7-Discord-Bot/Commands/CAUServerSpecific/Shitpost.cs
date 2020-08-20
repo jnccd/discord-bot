@@ -40,7 +40,7 @@ namespace MEE7.Commands.CAUServerSpecific
                 }
                 catch { }
 
-                Thread.Sleep(1 * 60 * 60 * 1000);
+                Thread.Sleep(10 * 60 * 1000);
             }
         }
 
