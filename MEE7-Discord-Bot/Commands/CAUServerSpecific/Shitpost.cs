@@ -25,22 +25,30 @@ namespace MEE7.Commands.CAUServerSpecific
         {
             arena = (IMessageChannel)Program.GetChannelFromID(552976757217820693);
 
-            while (Program.IsInReleaseMode())
+            while (true)
             {
                 try
                 {
-                    var codeShitposts = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions() { UserId = 1013576989020774400 });
-                    var text = codeShitposts.Status.GetContent();
-                    var image = codeShitposts.Status.Entities.Media.First().MediaUrl;
-                    var id = codeShitposts.Status.Id;
-                    if (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId)
-                        arena.SendFileAsync(image.GetStreamFromUrl(), image.Split("/").Last(), text.Replace("http://redd.it", "redd.it"));
-                    if (Config.Data.lastCodeMemeId == 0 || (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId))
-                        Config.Data.lastCodeMemeId = id;
+                    var newTweets = Program.twitterService.ListTweetsOnUserTimeline(new ListTweetsOnUserTimelineOptions() 
+                        { UserId = 1013576989020774400, Count = 10, SinceId = Config.Data.lastCodeMemeId });
+                    if (newTweets != null && newTweets.Count() > 0)
+                    {
+                        var codeShitpost = newTweets.MaxElement(x => x.FavoriteCount + x.RetweetCount * 3);
+                        var text = codeShitpost.GetContent();
+                        var image = codeShitpost.Entities.Media.First().MediaUrl;
+                        var id = codeShitpost.Id;
+                        var source = text.GetEverythingBetweenAll("(", ")").Last();
+                        var link = source.Replace("source: ", "").Trim(' ');
+                        var title = text.Replace($"({source})", "").Trim(' ');
+                        if (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId)
+                            arena.SendFileAsync(image.GetStreamFromUrl(), image.Split("/").Last(), $"<{link}> {title}");
+                        if (Config.Data.lastCodeMemeId == 0 || (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId))
+                            Config.Data.lastCodeMemeId = id;
+                    }
                 }
                 catch { }
 
-                Thread.Sleep(10 * 60 * 1000);
+                Thread.Sleep(30 * 60 * 1000);
             }
         }
 
