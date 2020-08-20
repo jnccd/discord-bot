@@ -25,7 +25,7 @@ namespace MEE7.Commands.CAUServerSpecific
         {
             arena = (IMessageChannel)Program.GetChannelFromID(552976757217820693);
 
-            while (true)
+            while (Program.IsInReleaseMode())
             {
                 try
                 {

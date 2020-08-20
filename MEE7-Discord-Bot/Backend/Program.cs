@@ -21,9 +21,9 @@ namespace MEE7
     public static partial class Program
     {
 #if DEBUG
-        public static readonly string runConfig = "Debug";
+        static readonly string runConfig = "Debug";
 #else
-        public static readonly string runConfig = "Release";
+        static readonly string runConfig = "Release";
 #endif
 
         static string buildDate;
@@ -810,7 +810,9 @@ namespace MEE7
                 return GetSelf().Id;
             }
         }
-
+        public static bool IsInDebugMode() => runConfig == "Debug";
+        public static bool IsInReleaseMode() => runConfig == "Release";
+    
         // Execute BeforeClose before closing
         static ConsoleEventDelegate handler;
         static bool ConsoleEventCallback(int eventType)

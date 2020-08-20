@@ -9,7 +9,8 @@ namespace MEE7.Commands.CAUServerSpecific
     {
         public UpdateGamingRole() : base("", "", false, true)
         {
-            Program.OnConnected += Program_OnConnected;
+            if (Program.IsInReleaseMode())
+                Program.OnConnected += Program_OnConnected;
         }
 
         private void Program_OnConnected()
