@@ -7,7 +7,7 @@ namespace MEE7.Commands
 {
     class Reacter : Command
     {
-        IEmote kenobi, padoru, hentai, eyes;
+        IEmote kenobi, padoru, hentai, eyes, sosig;
 
         public Reacter()
         {
@@ -21,6 +21,7 @@ namespace MEE7.Commands
             padoru = Emote.Parse("<a:padoru:744966861648560277>");
             hentai = Emote.Parse("<a:FeelsHentaiMan:744966841402916925>");
             eyes = new Emoji("👀");
+            sosig = Emote.Parse("<a:sosig:746026002119131308>");
         }
 
         private void OnNonCommandMessageRecieved(IMessage messageIn)
@@ -37,11 +38,10 @@ namespace MEE7.Commands
                 message.AddReactionAsync(hentai).Wait();
             if (message.Content.Contains("I saw that", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(eyes).Wait();
+            if (message.Content.Contains("the sauce", StringComparison.OrdinalIgnoreCase))
+                message.AddReactionAsync(sosig).Wait();
         }
 
-        public override void Execute(IMessage message)
-        {
-            return;
-        }
+        public override void Execute(IMessage message) { }
     }
 }
