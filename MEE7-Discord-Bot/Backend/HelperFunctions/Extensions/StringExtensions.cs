@@ -171,31 +171,7 @@ namespace MEE7.Backend.HelperFunctions
         public static Gif GetBitmapsAndTimingsFromGIFURL(this string url)
         {
             Image gif = Image.FromStream(WebRequest.Create(url).GetResponse().GetResponseStream());
-            FrameDimension dimension = new FrameDimension(gif.FrameDimensionsList[0]);
-            int[] timings = new int[gif.GetFrameCount(dimension)];
-            return new Gif(Enumerable.Range(0, gif.GetFrameCount(dimension)).
-                Select(x =>
-                {
-                    gif.SelectActiveFrame(dimension, x);
-                    try
-                    {
-                        timings[x] = BitConverter.ToInt32(gif.GetPropertyItem(20736).Value, x * 4) * 10; // this works on windows sometimes
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            var prop = gif.GetPropertyItem(20736);
-                            timings[x] = (prop.Value[0] + prop.Value[1] * 256) * 10; // this works according to https://stackoverflow.com/questions/3785031/getting-the-frame-duration-of-an-animated-gif
-                        }
-                        catch
-                        {
-                            timings[x] = 33; // just set it to 30fps lul, works for consoles
-                        }
-                    }
-                    return new Bitmap(gif);
-                }).
-                ToArray(), timings);
+            return MultiMediaHelper.ImageToGif(gif);
         }
         public static Mp3FileReader Getmp3AudioFromURL(this string url)
         {

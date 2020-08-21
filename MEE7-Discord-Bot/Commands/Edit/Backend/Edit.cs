@@ -138,6 +138,7 @@ namespace MEE7.Commands.Edit
                 return RunPipe(this, message, inputData, vars);
             }
         }
+        public class Video { public string filePath; public Video(string filePath) { this.filePath = filePath; } }
         public class Gif : Tuple<Bitmap[], int[]> { public Gif(Bitmap[] item1, int[] item2) : base(item1, item2) { } }
         public class EditNull { }
         public class EditVariable { public string VarName; }

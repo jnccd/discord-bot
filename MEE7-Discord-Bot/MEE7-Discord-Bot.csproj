@@ -211,6 +211,9 @@
     <None Update="Commands\Edit\first-order-model\train.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\Edit\Workspace\Hallo ich bin Marcel Davis von 1und1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\Latex\latex.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

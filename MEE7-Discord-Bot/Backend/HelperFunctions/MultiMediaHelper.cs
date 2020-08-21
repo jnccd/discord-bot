@@ -1,8 +1,14 @@
-﻿using Discord.Audio;
+﻿using Discord;
+using Discord.Audio;
 using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using static MEE7.Commands.Edit.Edit;
+using Image = System.Drawing.Image;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -113,6 +119,34 @@ namespace MEE7.Backend.HelperFunctions
 
             if (ex != null)
                 throw ex;
+        }
+        public static Gif ImageToGif(Image i)
+        {
+            FrameDimension dimension = new FrameDimension(i.FrameDimensionsList[0]);
+            int[] timings = new int[i.GetFrameCount(dimension)];
+            return new Gif(Enumerable.Range(0, i.GetFrameCount(dimension)).
+                Select(x =>
+                {
+                    i.SelectActiveFrame(dimension, x);
+                    try
+                    {
+                        timings[x] = BitConverter.ToInt32(i.GetPropertyItem(20736).Value, x * 4) * 10; // this works on windows sometimes
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            var prop = i.GetPropertyItem(20736);
+                            timings[x] = (prop.Value[0] + prop.Value[1] * 256) * 10; // this works according to https://stackoverflow.com/questions/3785031/getting-the-frame-duration-of-an-animated-gif
+                        }
+                        catch
+                        {
+                            timings[x] = 33; // just set it to 30fps lul, works for consoles
+                        }
+                    }
+                    return new Bitmap(i);
+                }).
+                ToArray(), timings);
         }
     }
 }
