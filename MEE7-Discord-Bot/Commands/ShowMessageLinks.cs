@@ -20,7 +20,7 @@ namespace MEE7.Commands
             {
                 string[] split = message.Content.Split(new char[] { ' ', '\n' });
                 foreach (string s in split)
-                    if (s.StartsWith("https://discordapp.com/channels/"))
+                    if (s.StartsWith("https://discord.com/channels/"))
                     {
                         try
                         {
