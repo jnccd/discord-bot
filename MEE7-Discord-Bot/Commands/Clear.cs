@@ -37,12 +37,19 @@ namespace MEE7.Commands
             }
             catch { }
 
-            ((ITextChannel)message.Channel).DeleteMessagesAsync(
+            try
+            {
+                ((ITextChannel)message.Channel).DeleteMessagesAsync(
                 new IMessage[] { message }.Concat(
                 DiscordNETWrapper.EnumerateMessages(message.Channel).
                 Where(x => x.Id != message.Id).
                 Skip(toSkip).
                 Take(toDelete))).Wait();
+            }
+            catch
+            {
+                DiscordNETWrapper.SendText("Could not do the deleeto :/", message.Channel).Wait();
+            }
         }
     }
 }
