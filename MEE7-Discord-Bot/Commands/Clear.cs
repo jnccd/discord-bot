@@ -20,23 +20,29 @@ namespace MEE7.Commands
 
             var split = message.Content.Split();
 
-            if (split.Length <= 1)
-            {
-                DiscordNETWrapper.SendText("I need an amount of messages to delete!", message.Channel).Wait();
-                return;
-            }
-
             var toDelete = 0;
             try
             {
-                toDelete = Convert.ToInt32(message.Content.Split()[1]) + 1;
+                toDelete = Convert.ToInt32(message.Content.Split()[1]);
             } 
             catch
             {
                 DiscordNETWrapper.SendText("I need an amount of messages to delete!", message.Channel).Wait();
             }
 
-            ((ITextChannel)message.Channel).DeleteMessagesAsync(DiscordNETWrapper.EnumerateMessages(message.Channel).Take(toDelete)).Wait();
+            var toSkip = 0;
+            try
+            {
+                toSkip = Convert.ToInt32(message.Content.Split()[2]);
+            }
+            catch { }
+
+            ((ITextChannel)message.Channel).DeleteMessagesAsync(
+                new IMessage[] { message }.Concat(
+                DiscordNETWrapper.EnumerateMessages(message.Channel).
+                Where(x => x.Id != message.Id).
+                Skip(toSkip).
+                Take(toDelete))).Wait();
         }
     }
 }
