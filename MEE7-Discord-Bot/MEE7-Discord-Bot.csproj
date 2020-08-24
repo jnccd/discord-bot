@@ -229,6 +229,12 @@
     <None Update="Commands\MemeTemplates\allah-5902994b388b9.jpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\batmans-despair-57b6b3c72f656-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\batmans-despair-57b6b3c72f656.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\branflakes-57f31c1b5ec6e-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
