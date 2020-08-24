@@ -341,8 +341,8 @@ namespace MEE7.Commands.Edit
         public Bitmap SobelEdges(Bitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
-                                                                   {  0,  0,  0 },
-                                                                   { -1, -2, -1 } }, 1, true);
+                                                    {  0,  0,  0 },
+                                                    { -1, -2, -1 } }, 1, true);
         }
 
         public string sobelEdgesColorDesc = "Highlights horizontal edges";
@@ -369,28 +369,56 @@ namespace MEE7.Commands.Edit
                                                     {  1,  1,  1 } }, 1, true);
         }
 
-        public string sharpenDesc = "well guess what it does [doesnt really work I think]";
+        public string sharpenDesc = "well guess what it does";
         public Bitmap Sharpen(Bitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0, -1,  0 },
-                                                               { -1,  5, -1 },
-                                                               {  0, -1,  0 } }, 1 / 5f);
+                                                    { -1,  5, -1 },
+                                                    {  0, -1,  0 } });
         }
 
-        public string boxBlurDesc = "blur owo [doesnt really work I think]";
+        public string boxBlurDesc = "blur owo";
         public Bitmap BoxBlur(Bitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
-                                                               {  1,  1,  1 },
-                                                               {  1,  1,  1 } }, 1 / 9f);
+                                                    {  1,  1,  1 },
+                                                    {  1,  1,  1 } }, 1 / 9f);
         }
 
-        public string gaussianBlurDesc = "more blur owo [doesnt really work I think]";
-        public Bitmap GaussianBlur(Bitmap bmp, IMessage m)
+        public string gaussianBlurDesc = "more blur owo";
+        public Bitmap GaussianBlur(Bitmap bmp, IMessage m, int size = 5)
         {
-            return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
-                                                                   {  2,  4,  2 },
-                                                                   {  1,  2,  1 } }, 1 / 16f);
+            var weights = Enumerable.Range(0, size).Select(x => gauss(x, size * 2f / 3f, size / 2)).ToArray();
+            var scalar = 1 / weights.Sum();
+
+            float[,] one = new float[size, 1], two = new float[1, size];
+            for (int i = 0; i < size; i++)
+            {
+                one[i, 0] = weights[i];
+                two[0, i] = weights[i];
+            }
+
+            var tmp = ApplyKernel(bmp, one, scalar);
+            return ApplyKernel(tmp, two, scalar);
+        }
+
+        public string UnsharpMaskingDesc = "Sharpening but cooler";
+        public Bitmap UnsharpMasking(Bitmap bmp, IMessage m, int size = 5)
+        {
+            var weights = Enumerable.Range(0, size).Select(x => gauss(x, size * 2f / 3f, size / 2)).ToArray();
+
+            float[,] kernel = new float[size, size]; float sum = 0;
+            for (int x = 0; x < size; x++)
+                for (int y = 0; y < size; y++)
+                {
+                    var n = weights[x] * weights[y];
+                    kernel[x, y] = -n;
+                    sum += n;
+                }
+
+            kernel[size / 2, size / 2] += sum * 2;
+
+            return ApplyKernel(bmp, kernel, 1 / sum);
         }
 
         public string gayPrideDesc = "Gay rights";
@@ -449,7 +477,7 @@ namespace MEE7.Commands.Edit
             return b;
         }
 
-        public string compressDesc = "JPEG Compress the image";
+        public string compressDesc = "JPEG Compress the image, lower compression level = more compression";
         public Bitmap Compress(Bitmap b, IMessage m, long compressionLevel)
         {
             ImageCodecInfo jpgEncoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -475,13 +503,13 @@ namespace MEE7.Commands.Edit
             return Color.White;
         }
 
-        public string colDesc = "Get my skin color";
+        public string colDesc = "Get a color from rgb";
         public Color Col(EditNull n, IMessage m, byte r, byte g, byte b)
         {
             return Color.FromArgb(r, g, b);
         }
 
-        public string lerpDesc = "Get my skin color";
+        public string lerpDesc = "Lerp two colors";
         public Color Lerp(EditNull n, IMessage m, Color a, Color b, float l)
         {
             return a.Lerp(b, l);
@@ -745,6 +773,9 @@ namespace MEE7.Commands.Edit
 
         static readonly object memifyLock = new object();
 
+        static float gcache = (float)Math.Sqrt(2 * Math.PI);
+        static float ecache = (float)Math.E;
+        static float gauss(float x, float sigma, float mu) => (float)Math.Pow(1 / (sigma * gcache) * ecache, 0.5 * (x - mu) * (x - mu) / sigma);
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
         {
             Bitmap output = new Bitmap(bmp.Width, bmp.Height);
@@ -813,56 +844,73 @@ namespace MEE7.Commands.Edit
         }
         static Bitmap ApplyKernel(Bitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
         {
+            float[,] fKernel = new float[kernel.GetLength(0), kernel.GetLength(1)];
+            for (int x = 0; x < kernel.GetLength(0); x++)
+                for (int y = 0; y < kernel.GetLength(1); y++)
+                    fKernel[x, y] = kernel[x, y];
+            return ApplyKernel(bmp, fKernel, factor, grayscale);
+        }
+        static Bitmap ApplyKernel(Bitmap bmp, float[,] kernel, float factor = 1, bool grayscale = false)
+        {
             int kernelW = kernel.GetLength(0);
             int kernelH = kernel.GetLength(1);
-            Bitmap output = new Bitmap(bmp.Width - kernel.GetLength(0) + 1, bmp.Height - kernel.GetLength(1) + 1);
+            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+
+            static int inBounds(int x, int bound)
+            {
+                if (x > bound - 1)
+                    x = bound - 1;
+                if (x < 0)
+                    x = 0;
+                return x;
+            }
 
             if (grayscale)
             {
-                using (UnsafeBitmapContext c = new UnsafeBitmapContext(output))
-                using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
-                    for (int x = 0; x < output.Width; x++)
-                        for (int y = 0; y < output.Height; y++)
-                        {
-                            int activation = 0;
-                            for (int xk = x; xk < x + kernelW; xk++)
-                                for (int yk = y; yk < y + kernelH; yk++)
-                                    activation += kernel[xk - x, yk - y] * cb.GetPixel(xk, yk).GetGrayScale();
-                            activation = (int)(activation * factor);
-                            activation += 255 / 2;
-                            if (activation > 255)
-                                activation = 255;
-                            if (activation < 0)
-                                activation = 0;
-                            c.SetPixel(x, y, Color.FromArgb(activation, activation, activation));
-                        }
+                using UnsafeBitmapContext c = new UnsafeBitmapContext(output);
+                using UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp);
+                for (int x = 0; x < output.Width; x++)
+                    for (int y = 0; y < output.Height; y++)
+                    {
+                        float activation = 0;
+                        for (int xk = 0; xk < kernelW; xk++)
+                            for (int yk = 0; yk < kernelH; yk++)
+                                activation += kernel[xk, yk] * cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).GetGrayScale();
+                        activation = (int)(activation * factor);
+                        if (activation > 255)
+                            activation = 255;
+                        if (activation < 0)
+                            activation = 0;
+                        c.SetPixel(x, y, Color.FromArgb((int)activation, (int)activation, (int)activation));
+                    }
             }
             else
             {
-                using (UnsafeBitmapContext c = new UnsafeBitmapContext(output))
-                using (UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp))
-                    for (int x = 0; x < output.Width; x++)
-                        for (int y = 0; y < output.Height; y++)
+                using UnsafeBitmapContext c = new UnsafeBitmapContext(output);
+                using UnsafeBitmapContext cb = new UnsafeBitmapContext(bmp);
+                for (int x = 0; x < output.Width; x++)
+                    for (int y = 0; y < output.Height; y++)
+                    {
+                        float[] activation = new float[3] { 0, 0, 0 };
+                        for (int i = 0; i < activation.Length; i++)
                         {
-                            int[] activation = new int[3] { 0, 0, 0 };
-                            for (int i = 0; i < activation.Length; i++)
-                            {
-                                for (int xk = x; xk < x + kernelW; xk++)
-                                    for (int yk = y; yk < y + kernelH; yk++)
-                                        activation[i] += kernel[xk - x, yk - y] * (i == 0 ?
-                                            cb.GetPixel(xk, yk).R : (i == 1 ?
-                                            cb.GetPixel(xk, yk).G : cb.GetPixel(xk, yk).B));
-                                activation[i] = (int)(activation[i] * factor);
-                                activation[i] += 255 / 2;
-                                if (activation[i] > 255)
-                                    activation[i] = 255;
-                                if (activation[i] < 0)
-                                    activation[i] = 0;
-                            }
-                            c.SetPixel(x, y, Color.FromArgb(activation[0], activation[1], activation[2]));
+                            for (int xk = 0; xk < kernelW; xk++)
+                                for (int yk = 0; yk < kernelH; yk++)
+                                    activation[i] += kernel[xk, yk] * (i == 0 ?
+                                        cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).R : (i == 1 ?
+                                        cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).G : 
+                                        cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).B));
+                            activation[i] = (int)(activation[i] * factor);
+                            if (activation[i] > 255)
+                                activation[i] = 255;
+                            if (activation[i] < 0)
+                                activation[i] = 0;
                         }
+                        c.SetPixel(x, y, Color.FromArgb((int)activation[0], (int)activation[1], (int)activation[2]));
+                    }
             }
 
+            bmp.Dispose();
             return output;
         }
         static Bitmap FlagColor(Color[] Cs, Bitmap P, bool Horz = false)

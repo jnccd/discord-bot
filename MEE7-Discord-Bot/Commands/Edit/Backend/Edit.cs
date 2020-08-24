@@ -193,8 +193,16 @@ namespace MEE7.Commands.Edit
                                     completeArgs.AddRange(args);
 
                                     for (int i = 0; i < completeArgs.Count; i++)
-                                        if (completeArgs[i] is IConvertible)
-                                            completeArgs[i] = Convert.ChangeType(completeArgs[i], param[i].ParameterType);
+                                        try
+                                        {
+                                            if (completeArgs[i] is IConvertible)
+                                                completeArgs[i] = Convert.ChangeType(completeArgs[i], param[i].ParameterType);
+                                        }
+                                        catch
+                                        {
+                                            throw new Exception($"The {i}th argument you gave me does not make any sense D:");
+                                        }
+
 
                                     if (method.IsGenericMethod)
                                     {
@@ -586,7 +594,10 @@ namespace MEE7.Commands.Edit
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"[{p.Item2.Command}] {e.InnerException.Message} ", e.InnerException);
+                    string text = e.Message;
+                    if (e.InnerException != null)
+                        text += $" ||{e.InnerException.StackTrace.Split('\\').Last()}||";
+                    throw new Exception($"[{p.Item2.Command}] {text} ", e.InnerException);
                 }
 
                 if ((p.Item2.OutputType != null && (currentData == null || !p.Item2.OutputType.IsAssignableFrom(currentData.GetType()))) &&
