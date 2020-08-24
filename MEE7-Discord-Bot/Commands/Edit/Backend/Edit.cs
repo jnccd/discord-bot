@@ -299,7 +299,7 @@ namespace MEE7.Commands.Edit
                 }
                 catch (Exception e)
                 {
-                    string text = e.Message;
+                    string text = e.Message.Contains("by the target of an invocation") && e.InnerException != null ? e.InnerException.Message : e.Message;
                     if (e.InnerException != null)
                         text += $" ||{e.InnerException.StackTrace.Split('\\').Last()}||";
                     DiscordNETWrapper.SendText(text, message.Channel).Wait();
