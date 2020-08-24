@@ -2,6 +2,7 @@
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
+using System.Linq;
 
 namespace MEE7.Commands
 {
@@ -27,7 +28,7 @@ namespace MEE7.Commands
                         sum += m.ToCharArray()[i] << i;
 
                     int answerIndex = Math.Abs((int)(sum % answers.Length));
-                    DiscordNETWrapper.SendText("9ball says: " + answers[answerIndex], commandmessage.Channel).Wait();
+                    DiscordNETWrapper.SendText(commandmessage.Content.Split(' ').First().Remove(0, Program.Prefix.Length) + " says: " + answers[answerIndex], commandmessage.Channel).Wait();
                 }
                 else
                     DiscordNETWrapper.SendText("I can only answer yes no questions!", commandmessage.Channel).Wait();
