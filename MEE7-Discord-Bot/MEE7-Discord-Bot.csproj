@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Remove="Commands\CAUServerSpecific\AddLikeSpamRole.cs" />
+    <Compile Remove="Commands\Csharp.cs" />
     <Compile Remove="Commands\Haskell\Haskell.cs" />
     <Compile Remove="Commands\Latex\Latex.cs" />
     <Compile Remove="Commands\Markow\Markow.cs" />
@@ -30,6 +31,7 @@
 
   <ItemGroup>
     <None Include="Commands\CAUServerSpecific\AddLikeSpamRole.cs" />
+    <None Include="Commands\Csharp.cs" />
     <None Include="Commands\Haskell\Haskell.cs" />
     <None Include="Commands\Latex\Latex.cs" />
     <None Include="Commands\Markow\Markow.cs" />
