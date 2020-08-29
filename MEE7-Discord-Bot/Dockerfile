@@ -5,7 +5,6 @@ WORKDIR /app
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends libgdiplus libc6-dev
 Run rm -rf /var/lib/apt/lists/*
-RUN echo $BotToken
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-focal AS build
 WORKDIR /src
