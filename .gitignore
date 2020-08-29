@@ -261,11 +261,5 @@ __pycache__/
 *.pyc
 /GitLab Push.bat
 
-# SoftwareProjekt
-SoSe19_HRS3_105b/
-
 # custom
 launchSettings.json
-/owo.txt
-/GitLab-Push.bat
-settings.env
