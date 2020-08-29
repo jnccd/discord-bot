@@ -11,12 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      
       - name: Push
         env:
           push: ${{ secrets.LOUIS_PUSH }}
         run: | 
-          git config pull.rebase false
-          git pull https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
+          git clone https://github.com/niklasCarstensen/Discord-Bot
           git push https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
