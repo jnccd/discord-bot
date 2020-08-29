@@ -16,4 +16,5 @@ jobs:
           push: ${{ secrets.LOUIS_PUSH }}
         run: | 
           git clone https://github.com/niklasCarstensen/Discord-Bot
+          cd Discord-Bot
           git push https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
