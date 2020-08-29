@@ -16,4 +16,6 @@ jobs:
       - name: Push
         env:
           push: ${{ secrets.LOUIS_PUSH }}
-        run: git push https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
+        run: | 
+          git pull https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
+          git push https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
