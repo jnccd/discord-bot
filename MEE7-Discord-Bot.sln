@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MEE7-Discord-Bot", "MEE7-Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows-Launcher", "Windows-Launcher\Windows-Launcher.csproj", "{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{66F3189D-E066-46A0-8005-073DE1A6F400}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1D1ED7D-A14B-47F9-9A53-BFE0A4353BB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66F3189D-E066-46A0-8005-073DE1A6F400}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F3189D-E066-46A0-8005-073DE1A6F400}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F3189D-E066-46A0-8005-073DE1A6F400}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F3189D-E066-46A0-8005-073DE1A6F400}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,8 @@
     <LangVersion>8.0</LangVersion>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <NoWarn>NU1701</NoWarn>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileRunEnvironmentFiles>settings.env</DockerfileRunEnvironmentFiles>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -43,6 +45,7 @@
     <PackageReference Include="IronPython" Version="2.7.10" />
     <PackageReference Include="IronPython.StdLib" Version="2.7.10" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.5.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="NAudio" Version="1.9.0" />
     <PackageReference Include="NAudio.Vorbis" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -379,16 +382,10 @@
     <None Update="Commands\Uno\UNO-Front.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="libsodium.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="opus.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="youtube-dl.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

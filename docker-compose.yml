@@ -1,10 +1,11 @@
-version: "3"
+version: '3.4'
 
 services:
-  mee7:
-    build: .
-    volumes:
-      - config:/bin/Release/netcoreapp3.1
+  mee7-discord-bot:
+    image: ${DOCKER_REGISTRY-}mee7discordbot
+    build:
+      context: .
+      dockerfile: MEE7-Discord-Bot/Dockerfile
     restart: on-failure
     environment:
       - BotToken
@@ -13,7 +14,3 @@ services:
       - customer_key
       - customer_key_secret
       - CI_SERVER
-      
-volumes:
-  config:
-    external: true

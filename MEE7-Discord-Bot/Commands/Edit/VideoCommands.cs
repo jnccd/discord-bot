@@ -17,7 +17,7 @@ namespace MEE7.Commands.Edit
         public Video GetVideo(string videoLink, IMessage m)
         {
             if (!videoLink.Contains("mp4"))
-                throw new Exception("Ew, give my mp4 pls");
+                throw new Exception("Ew, give me a mp4 pls");
 
             char s = Path.DirectorySeparatorChar;
             string path = $"Commands{s}Edit{s}Workspace{s}video.mp4";
