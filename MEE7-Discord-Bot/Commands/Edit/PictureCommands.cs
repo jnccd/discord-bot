@@ -87,6 +87,7 @@ namespace MEE7.Commands.Edit
             }
         }
 
+        static readonly object memifyLock = new object();
         public string memifyDesc = "Turn a picture into a meme, get a list of available templates with the argument -list";
         public Bitmap Memify(Bitmap bmp, IMessage m, string Meme)
         {
@@ -388,7 +389,7 @@ namespace MEE7.Commands.Edit
         public string gaussianBlurDesc = "more blur owo";
         public Bitmap GaussianBlur(Bitmap bmp, IMessage m, int size = 5)
         {
-            var weights = Enumerable.Range(0, size).Select(x => gauss(x, size * 2f / 3f, size / 2)).ToArray();
+            var weights = Enumerable.Range(0, size).Select(x => Gauss(x, size * 2f / 3f, size / 2)).ToArray();
             var scalar = 1 / weights.Sum();
 
             float[,] one = new float[size, 1], two = new float[1, size];
@@ -405,7 +406,7 @@ namespace MEE7.Commands.Edit
         public string UnsharpMaskingDesc = "Sharpening but cooler";
         public Bitmap UnsharpMasking(Bitmap bmp, IMessage m, int size = 5)
         {
-            var weights = Enumerable.Range(0, size).Select(x => gauss(x, size * 2f / 3f, size / 2)).ToArray();
+            var weights = Enumerable.Range(0, size).Select(x => Gauss(x, size * 2f / 3f, size / 2)).ToArray();
 
             float[,] kernel = new float[size, size]; float sum = 0;
             for (int x = 0; x < size; x++)
@@ -712,7 +713,7 @@ namespace MEE7.Commands.Edit
             return b;
         }
 
-        public string zoomDesc = "Zoom to a certain point, zoomlevel should be between 1 and 0";
+        public string ZoomDesc = "Zoom to a certain point, zoomlevel should be between 1 and 0";
         public Bitmap Zoom(Bitmap b, IMessage m, Vector2 point, float zoomLevel)
         {
             Vector2 bSize = new Vector2(b.Width, b.Height);
@@ -726,10 +727,16 @@ namespace MEE7.Commands.Edit
                 Stretch(new Size((int)bSize.X, (int)bSize.Y));
         }
 
-        public string stretchDesc = "Stretch the Image";
+        public string StretchDesc = "Stretch the Image";
         public Bitmap Stretch(Bitmap b, IMessage m, int w, int h)
         {
             return (Bitmap)b.Stretch(new Size(w, h));
+        }
+
+        public string StretchMDesc = "Stretch the Image by some multipliers";
+        public Bitmap StretchM(Bitmap b, IMessage m, float x, float y)
+        {
+            return (Bitmap)b.Stretch(new Size((int)(b.Width * x), (int)(b.Height * y)));
         }
 
         public string getSizeDesc = "Get the size in byte of an image";
@@ -771,11 +778,53 @@ namespace MEE7.Commands.Edit
             }
         }
 
-        static readonly object memifyLock = new object();
+        public string ShowSeamsXDesc = "Draw seams";
+        public Bitmap ShowSeamsX(Bitmap b, IMessage m)
+        {
+            var gradient = ApplyKernel((Bitmap)b.Clone(), new int[3, 3] { { 1, 0, -1 },
+                                                                          { 2, 0, -2 },
+                                                                          { 1, 0, -1 } }, 1, true);
 
-        static float gcache = (float)Math.Sqrt(2 * Math.PI);
-        static float ecache = (float)Math.E;
-        static float gauss(float x, float sigma, float mu) => (float)Math.Pow(1 / (sigma * gcache) * ecache, 0.5 * (x - mu) * (x - mu) / sigma);
+            using UnsafeBitmapContext c = new UnsafeBitmapContext(b);
+            using UnsafeBitmapContext g = new UnsafeBitmapContext(gradient);
+
+            var dynamicThingy = new Tuple<int, Point>[b.Width, b.Height];
+            for (int x = 0; x < b.Width; x++)
+                dynamicThingy[x, 0] = new Tuple<int, Point>(c.GetPixel(x, 0).R, new Point(-1, -1));
+            for (int y = 1; y < b.Height; y++)
+                for (int x = 0; x < b.Width; x++)
+                {
+                    var parents = new List<Tuple<int, Point, Point>>();
+                    if (x > 0) parents.Add(new Tuple<int, Point, Point>(dynamicThingy[x - 1, y - 1].Item1, dynamicThingy[x - 1, y - 1].Item2, new Point(x - 1, y - 1) ));
+                    parents.Add(new Tuple<int, Point, Point>(dynamicThingy[x, y - 1].Item1, dynamicThingy[x, y - 1].Item2, new Point(x, y - 1)));
+                    if (x < b.Width - 1) parents.Add(new Tuple<int, Point, Point>(dynamicThingy[x + 1, y - 1].Item1, dynamicThingy[x + 1, y - 1].Item2, new Point(x + 1, y - 1)));
+
+                    var min = parents.MinElement(x => x.Item1);
+
+                    dynamicThingy[x, y] = new Tuple<int, Point>(g.GetPixel(x, y).R + min.Item1, min.Item3);
+                }
+
+            for (int x = 0; x < b.Width; x++)
+            {
+                if (dynamicThingy[x, b.Height - 1].Item1 < 16000)
+                {
+                    var curThing = dynamicThingy[x, b.Height - 1];
+                    var col = Color.FromArgb((16000 - dynamicThingy[x, b.Height - 1].Item1) * 255 / 16000, 0, 0);
+                    while (curThing.Item2.Y > -1)
+                    {
+                        c.SetPixel(curThing.Item2.X, curThing.Item2.Y, col);
+
+                        curThing = dynamicThingy[curThing.Item2.X, curThing.Item2.Y];
+                    }
+                }
+            }
+
+            return b;
+        }
+
+        private static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
+        static readonly float ecache = (float)Math.E;
+        static float Gauss(float x, float sigma, float mu) => (float)Math.Pow(1 / (sigma * gcache) * ecache, 0.5 * (x - mu) * (x - mu) / sigma);
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
         {
             Bitmap output = new Bitmap(bmp.Width, bmp.Height);
