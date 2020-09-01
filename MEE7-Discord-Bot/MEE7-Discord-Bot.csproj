@@ -226,16 +226,43 @@
     <None Update="Commands\Markow\HarryPotterFanfictions.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\aaaargh-57c2ebb7cfba7-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\aaaargh-57c2ebb7cfba7.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\allah-5902994b388b9-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\allah-5902994b388b9.jpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\anime-girl-opens-the-door-5ac9f88646e17-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\anime-girl-opens-the-door-5ac9f88646e17-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\aurora-borealis-57c84cb06f9f8-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\aurora-borealis-57c84cb06f9f8-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\batmans-despair-57b6b3c72f656-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\batmans-despair-57b6b3c72f656-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\batmans-despair-57b6b3c72f656.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\body-pillow-57d03e1a360a9-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\body-pillow-57d03e1a360a9-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\branflakes-57f31c1b5ec6e-design.jpg">
@@ -244,10 +271,46 @@
     <None Update="Commands\MemeTemplates\branflakes-57f31c1b5ec6e.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\conspirasy-theary-58492218774f2-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\conspirasy-theary-58492218774f2-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\crush-57b1d20fbaf34-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\crush-57b1d20fbaf34.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\dear-lefties-5894d208f3ff5-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\dear-lefties-5894d208f3ff5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\deaths-57b289a93df82-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\deaths-57b289a93df82.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\delete-meme-57d491b8ae70a-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\delete-meme-57d491b8ae70a.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\every-human-whorships-a-god-5890d313eb0db-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\every-human-whorships-a-god-5890d313eb0db.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\failure-57b205dad5d38-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\failure-57b205dad5d38.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\fairly-odd-parents-57b5b6dea839f-design.jpg">
@@ -260,6 +323,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\girl-i-like-you-58d575b3b201b.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\he-monch-59700c6852ac7-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\he-monch-59700c6852ac7-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\hehehsameflork-583a3d05f2624-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\hehehsameflork-583a3d05f2624.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\heres-johnny-57b2091e78fe3-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\heres-johnny-57b2091e78fe3-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\how-i-sit-58cfd7de7c0b8-design.jpg">
@@ -286,10 +367,58 @@
     <None Update="Commands\MemeTemplates\i-had-to-grind-for-this-view-58dc68aec7acc-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\i-r-r-e-s-i-s-t-a-b-l-e-57f14c9d2cf81-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\i-r-r-e-s-i-s-t-a-b-l-e-57f14c9d2cf81.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\idols-58c6c43f6ecd3-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\idols-58c6c43f6ecd3.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\its-time-to-duel-57e539aa8fa96-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\its-time-to-duel-57e539aa8fa96.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\jotaro-with-a-picture-58484c447d442-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\jotaro-with-a-picture-58484c447d442.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\mario-64-57b2e17accfad-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\mario-64-57b2e17accfad-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\meemay-57b1ddc7ae86a-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\meemay-57b1ddc7ae86a.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\menacing-58dd0b32bb9a4-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\menacing-58dd0b32bb9a4-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\music-57fb08948d3a4-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\music-57fb08948d3a4-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\neptune-57b2c8c976ef3-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\neptune-57b2c8c976ef3-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\nintendo-switch-580a9a9704047-design.jpg">
@@ -310,6 +439,36 @@
     <None Update="Commands\MemeTemplates\pass-the-note-57c62e239c7ce.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\physical-return-of-meme-57c3857d0e3e5-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\physical-return-of-meme-57c3857d0e3e5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\pope-holding-57b6ce7a3578d-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\pope-holding-57b6ce7a3578d-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\pregnancy-test-anime-58994f7c1068a-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\pregnancy-test-anime-58994f7c1068a-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\press-f-57c3cfd4c3d83-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\press-f-57c3cfd4c3d83-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\psychic-57b45ec35c290-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\psychic-57b45ec35c290.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\pucci-58783971b94f0-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -320,6 +479,30 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\russian-hacker-586e4ffbc9d4a-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\scared-kira-57e81cc35a984-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\scared-kira-57e81cc35a984.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\see-57b1c5b21e076-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\see-57b1c5b21e076.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\see-what-we-most-want-5e3b427b3091d-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\see-what-we-most-want-5e3b427b3091d-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\shitpost-person-59da696f3f8f3-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\shitpost-person-59da696f3f8f3-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\some-body-once-told-me-58d2edf2e6554-design.jpg">
@@ -334,10 +517,34 @@
     <None Update="Commands\MemeTemplates\thank-you-kanye-very-cool-5ae1d0be61b5b.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\three-faces-57fd2631c29c0-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\three-faces-57fd2631c29c0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\tips-57c0d946bbb31-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\tips-57c0d946bbb31-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\top-10-anime-girls-57f3904c656bf-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\top-10-anime-girls-57f3904c656bf.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\torture-57b1c79dad761-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\torture-57b1c79dad761.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\trump-learns-watching-tv-59cf2303c2454-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\trump-learns-watching-tv-59cf2303c2454.jpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\truth-58daa03077c86-design.jpg">
@@ -346,10 +553,40 @@
     <None Update="Commands\MemeTemplates\truth-58daa03077c86.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\whatareyoudrawing-585027e39554b-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\whatareyoudrawing-585027e39554b.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\when-youre-home-alone-5974f258024c3-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTemplates\when-youre-home-alone-5974f258024c3.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\yeah-mom-57b1d717c6a31-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\yeah-mom-57b1d717c6a31-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\yes-roundabout-585bf25726ba6-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\yes-roundabout-585bf25726ba6-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\your-world-my-world-57da10328369e-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\your-world-my-world-57da10328369e-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\yugis-best-card-57fccc0856178-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\yugis-best-card-57fccc0856178-overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\MemeTextTemplates\i-diagnose-you-with-design.png">
