@@ -799,7 +799,24 @@ namespace MEE7.Commands.Edit
             return SeamCarve(b, m, (int)(b.Width * newWidthMult), (int)(b.Height * newHeightMult));
         }
 
-        
+        public string ForSeamCarveMDesc = "Carve seams multiple times by multiplier";
+        public Bitmap[] ForSeamCarveM(Bitmap b, IMessage m, float endValue, int numFrames, bool stretch = true)
+        {
+            if (endValue > 1)
+                throw new Exception("I cant make larger >:(");
+
+            float getVal(int i) => 1 + (endValue - 1) * (i / (float)numFrames);
+
+            Bitmap[] frames = new Bitmap[numFrames];
+            frames[0] = b;
+            for (int i = 1; i < numFrames; i++)
+                frames[i] = new ImageScaler(frames[i - 1], (int)(b.Width * getVal(i)), (int)(b.Height * getVal(i))).commitScale();
+
+            if (stretch)
+                frames = frames.Select(x => (Bitmap)x.Stretch(new Size(b.Width, b.Height), false)).ToArray();
+
+            return frames;
+        }
 
         private static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
         static readonly float ecache = (float)Math.E;
