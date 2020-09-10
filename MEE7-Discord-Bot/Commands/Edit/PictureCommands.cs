@@ -1,5 +1,7 @@
 ﻿using BumpKit;
 using Discord;
+using Emgu.CV;
+using Emgu.CV.Structure;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Commands.Edit.Resources;
 using System;
@@ -818,7 +820,31 @@ namespace MEE7.Commands.Edit
             return frames;
         }
 
-        private static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
+        public string FaceDetecDesc = "Detect faces";
+        CascadeClassifier cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}haarcascade_eye_tree_eyeglasses.xml");
+        public Bitmap FaceDetec(Bitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
+        {
+            if (!string.IsNullOrWhiteSpace(classifier) && classifier.All(x => char.IsLetterOrDigit(x) || x == '_'))
+                cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}{classifier}.xml");
+            else
+                throw new Exception("no");
+
+            BitmapData bdata = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), ImageLockMode.ReadOnly, b.PixelFormat);
+            Image<Bgr, byte> grayImage = new Image<Bgr, byte>(b.Width, b.Height, bdata.Stride, bdata.Scan0);
+            b.UnlockBits(bdata);
+            Rectangle[] faces = cascadeClassifier.DetectMultiScale(grayImage, scaleFactor, 0);
+
+            using Graphics g = Graphics.FromImage(b);
+            using Pen p = new Pen(Color.Red);
+                
+            foreach (var face in faces)
+                g.DrawRectangle(p, face);
+
+            return b;
+        }
+
+        static readonly char s = Path.DirectorySeparatorChar;
+        static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
         static readonly float ecache = (float)Math.E;
         static float Gauss(float x, float sigma, float mu) => (float)Math.Pow(1 / (sigma * gcache) * ecache, 0.5 * (x - mu) * (x - mu) / sigma);
         static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
