@@ -21,6 +21,8 @@ namespace MEE7.Commands.Edit
 {
     public class InputCommands : EditCommandProvider
     {
+        readonly int maxImagePixelSize = 1_200_000;
+
         public string lastTDesc = "Gets the last messages text";
         public string LastT(EditNull n, IMessage m, int messagesToSkip = 0)
         {
@@ -50,7 +52,13 @@ namespace MEE7.Commands.Edit
                     string picLink = lm.Content.GetPictureLinkInMessage();
                     if (string.IsNullOrWhiteSpace(pic) && picLink != null)
                         pic = picLink;
-                    return pic.GetBitmapFromURL();
+                    var b = pic.GetBitmapFromURL();
+                    if ((long)b.Width * b.Height > maxImagePixelSize)
+                    {
+                        var mult = Math.Sqrt(maxImagePixelSize / ((double)b.Width * b.Height));
+                        b = PictureCommands.StretchM(b, m, (float)mult, (float)mult);
+                    }
+                    return b;
                 }
                 catch { }
             throw new Exception("Didn't find any");
@@ -89,7 +97,13 @@ namespace MEE7.Commands.Edit
         public string thisPDesc = "Gets attached picture / picture from url argument";
         public Bitmap ThisP(EditNull n, IMessage m, string PictureURL = "")
         {
-            return GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
+            var b = GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
+            if ((long)b.Width * b.Height > maxImagePixelSize)
+            {
+                var mult = Math.Sqrt(maxImagePixelSize / ((double)b.Width * b.Height));
+                b = PictureCommands.StretchM(b, m, (float)mult, (float)mult);
+            }
+            return b;
         }
 
         public string thisGDesc = "Gets attached gif / gif from url argument";
