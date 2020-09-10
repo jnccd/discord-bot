@@ -41,6 +41,8 @@
     <PackageReference Include="AnimatedGif" Version="1.0.5" />
     <PackageReference Include="Bumpkit" Version="1.0.2" />
     <PackageReference Include="Discord.Net" Version="2.2.0" />
+    <PackageReference Include="Emgu.CV" Version="4.4.0.4061" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.4.0.4061" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
     <PackageReference Include="IronPython" Version="2.7.10" />
     <PackageReference Include="IronPython.StdLib" Version="2.7.10" />
@@ -212,6 +214,75 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\Edit\first-order-model\train.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_eye.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_eye_tree_eyeglasses.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_frontalcatface.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_frontalcatface_extended.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_frontalface_alt.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_frontalface_alt2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_frontalface_alt_tree.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_frontalface_default.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_fullbody.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_lefteye_2splits.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_licence_plate_rus_16stages.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_lowerbody.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_profileface.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_righteye_2splits.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_russian_plate_number.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_smile.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\haarcascade_upperbody.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\hogcascade_pedestrians.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\lbpcascade_frontalcatface.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\lbpcascade_frontalface.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\lbpcascade_frontalface_improved.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\lbpcascade_profileface.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\Edit\Resources\opencv-cascades\lbpcascade_silverware.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\Edit\Workspace\Hallo ich bin Marcel Davis von 1und1.txt">
@@ -625,6 +696,10 @@
     <None Update="opus.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\Edit\Resources\opencv-cascades\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties commands_4messagedb_4db_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
