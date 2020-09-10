@@ -803,8 +803,8 @@ namespace MEE7.Commands.Edit
         public Bitmap[] ForSeamCarveM(Bitmap b, IMessage m, float endValue, int numFrames, bool stretch = true)
         {
             if (endValue > 1)
-                throw new Exception("I cant make larger >:(");
-
+                throw new Exception("I cant make larger >:("); 
+            
             float getVal(int i) => 1 + (endValue - 1) * (i / (float)numFrames);
 
             Bitmap[] frames = new Bitmap[numFrames];
