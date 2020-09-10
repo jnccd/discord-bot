@@ -36,15 +36,15 @@ namespace MEE7.Commands.Edit
             for (int i = 0; i < steps; i++)
             {
                 re[i] = new Bitmap(b.Width, b.Height);
-                using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(re[i]))
-                    for (int x = 0; x < b.Width; x++)
-                        for (int y = 0; y < b.Height; y++)
-                        {
-                            c.SetPixel(x, y, Color.FromArgb(Alphas[x, y], HSVimage[x, y].HsvToRgb()));
-                            HSVimage[x, y].X += stepWidth;
-                            while (HSVimage[x, y].X > 360)
-                                HSVimage[x, y].X -= 360;
-                        }
+                using UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(re[i]);
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        c.SetPixel(x, y, Color.FromArgb(Alphas[x, y], HSVimage[x, y].HsvToRgb()));
+                        HSVimage[x, y].X += stepWidth;
+                        while (HSVimage[x, y].X > 360)
+                            HSVimage[x, y].X -= 360;
+                    }
             }
 
             return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
@@ -141,19 +141,17 @@ namespace MEE7.Commands.Edit
             if (!guildUser.GuildPermissions.AddReactions)
                 throw new Exception("U no have permission for dis :c");
 
-            using (MemoryStream s = new MemoryStream())
-            {
-                int maxWidth = gif.Item1.Select(x => x.Width).Max();
-                int maxHeight = gif.Item1.Select(x => x.Height).Max();
-                using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
-                    for (int i = 0; i < gif.Item1.Length; i++)
-                        c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
+            using MemoryStream s = new MemoryStream();
+            int maxWidth = gif.Item1.Select(x => x.Width).Max();
+            int maxHeight = gif.Item1.Select(x => x.Height).Max();
+            using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
+                for (int i = 0; i < gif.Item1.Length; i++)
+                    c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
 
-                guild.CreateEmoteAsync(name, new Discord.Image(s)).Wait();
+            guild.CreateEmoteAsync(name, new Discord.Image(s)).Wait();
 
-                foreach (Bitmap b in gif.Item1)
-                    b.Dispose();
-            }
+            foreach (Bitmap b in gif.Item1)
+                b.Dispose();
         }
 
         public string MapGDesc = "Map for gifs, because gifs are special now";
