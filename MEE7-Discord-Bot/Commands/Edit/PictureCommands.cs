@@ -1,6 +1,7 @@
 ﻿using BumpKit;
 using Discord;
 using MEE7.Backend.HelperFunctions;
+using MEE7.Commands.Edit.Resources;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -734,7 +735,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string StretchMDesc = "Stretch the Image by some multipliers";
-        public Bitmap StretchM(Bitmap b, IMessage m, float x, float y)
+        public static Bitmap StretchM(Bitmap b, IMessage m, float x, float y)
         {
             return (Bitmap)b.Stretch(new Size((int)(b.Width * x), (int)(b.Height * y)));
         }
@@ -778,49 +779,27 @@ namespace MEE7.Commands.Edit
             }
         }
 
-        public string ShowSeamsXDesc = "Draw seams";
-        public Bitmap ShowSeamsX(Bitmap b, IMessage m)
+        public string SeamCarveDesc = "Carve seams";
+        public Bitmap SeamCarve(Bitmap b, IMessage m, int newWidth, int newHeight)
         {
-            var gradient = ApplyKernel((Bitmap)b.Clone(), new int[3, 3] { { 1, 0, -1 },
-                                                                          { 2, 0, -2 },
-                                                                          { 1, 0, -1 } }, 1, true);
+            if (newWidth > b.Width || newHeight > b.Height)
+                throw new Exception("I can only make images smaller!");
+            if (newWidth < 15 || newHeight < 15)
+                throw new Exception("Thats a little too small");
 
-            using UnsafeBitmapContext c = new UnsafeBitmapContext(b);
-            using UnsafeBitmapContext g = new UnsafeBitmapContext(gradient);
-
-            var dynamicThingy = new Tuple<int, Point>[b.Width, b.Height];
-            for (int x = 0; x < b.Width; x++)
-                dynamicThingy[x, 0] = new Tuple<int, Point>(c.GetPixel(x, 0).R, new Point(-1, -1));
-            for (int y = 1; y < b.Height; y++)
-                for (int x = 0; x < b.Width; x++)
-                {
-                    var parents = new List<Tuple<int, Point, Point>>();
-                    if (x > 0) parents.Add(new Tuple<int, Point, Point>(dynamicThingy[x - 1, y - 1].Item1, dynamicThingy[x - 1, y - 1].Item2, new Point(x - 1, y - 1) ));
-                    parents.Add(new Tuple<int, Point, Point>(dynamicThingy[x, y - 1].Item1, dynamicThingy[x, y - 1].Item2, new Point(x, y - 1)));
-                    if (x < b.Width - 1) parents.Add(new Tuple<int, Point, Point>(dynamicThingy[x + 1, y - 1].Item1, dynamicThingy[x + 1, y - 1].Item2, new Point(x + 1, y - 1)));
-
-                    var min = parents.MinElement(x => x.Item1);
-
-                    dynamicThingy[x, y] = new Tuple<int, Point>(g.GetPixel(x, y).R + min.Item1, min.Item3);
-                }
-
-            for (int x = 0; x < b.Width; x++)
-            {
-                if (dynamicThingy[x, b.Height - 1].Item1 < 16000)
-                {
-                    var curThing = dynamicThingy[x, b.Height - 1];
-                    var col = Color.FromArgb((16000 - dynamicThingy[x, b.Height - 1].Item1) * 255 / 16000, 0, 0);
-                    while (curThing.Item2.Y > -1)
-                    {
-                        c.SetPixel(curThing.Item2.X, curThing.Item2.Y, col);
-
-                        curThing = dynamicThingy[curThing.Item2.X, curThing.Item2.Y];
-                    }
-                }
-            }
-
-            return b;
+            return new ImageScaler(b, newWidth, newHeight).commitScale();
         }
+
+        public string SeamCarveMDesc = "Carve seams by multiplier";
+        public Bitmap SeamCarveM(Bitmap b, IMessage m, float newWidthMult, float newHeightMult)
+        {
+            if (newWidthMult > 1 || newHeightMult > 1)
+                throw new Exception("I can only make images smaller!");
+
+            return SeamCarve(b, m, (int)(b.Width * newWidthMult), (int)(b.Height * newHeightMult));
+        }
+
+        
 
         private static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
         static readonly float ecache = (float)Math.E;
@@ -925,7 +904,7 @@ namespace MEE7.Commands.Edit
                         for (int xk = 0; xk < kernelW; xk++)
                             for (int yk = 0; yk < kernelH; yk++)
                                 activation += kernel[xk, yk] * cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).GetGrayScale();
-                        activation = (int)(activation * factor);
+                        activation = (int)Math.Abs(activation * factor);
                         if (activation > 255)
                             activation = 255;
                         if (activation < 0)
@@ -949,7 +928,7 @@ namespace MEE7.Commands.Edit
                                         cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).R : (i == 1 ?
                                         cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).G : 
                                         cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).B));
-                            activation[i] = (int)(activation[i] * factor);
+                            activation[i] = (int)Math.Abs(activation[i] * factor);
                             if (activation[i] > 255)
                                 activation[i] = 255;
                             if (activation[i] < 0)
