@@ -820,6 +820,7 @@ namespace MEE7.Commands.Edit
             return frames;
         }
 
+#if DEBUG
         public string FaceDetecDesc = "Detect faces";
         CascadeClassifier cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}haarcascade_eye_tree_eyeglasses.xml");
         public Bitmap FaceDetec(Bitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
@@ -836,12 +837,13 @@ namespace MEE7.Commands.Edit
 
             using Graphics g = Graphics.FromImage(b);
             using Pen p = new Pen(Color.Red);
-                
+
             foreach (var face in faces)
                 g.DrawRectangle(p, face);
 
             return b;
         }
+#endif
 
         static readonly char s = Path.DirectorySeparatorChar;
         static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
