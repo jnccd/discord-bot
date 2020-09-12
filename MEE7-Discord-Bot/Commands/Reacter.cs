@@ -8,6 +8,7 @@ namespace MEE7.Commands
 {
     class Reacter : Command
     {
+        bool loaded = false;
         readonly Dictionary<string, IEmote> emoteDict = new Dictionary<string, IEmote>();
 
         public Reacter()
@@ -19,18 +20,22 @@ namespace MEE7.Commands
         private void Program_OnConnected()
         {
             emoteDict.Add("kenobi", Emote.Parse("<a:general_kenobi:729800823239999498>"));
-            emoteDict.Add("padoru", Emote.Parse("<a:padoru:744966861648560277>"));
-            emoteDict.Add("hentai", Emote.Parse("<a:FeelsHentaiMan:744966841402916925>"));
-            emoteDict.Add("sosig", Emote.Parse("<a:sosig:746026002119131308>"));
+            emoteDict.Add("padoru", Emote.Parse("<a:padoru:744966713778372778>"));
+            emoteDict.Add("hentai", Emote.Parse("<a:FeelsHentaiMan:744966726848086168>"));
+            emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
 
             for (int i = 'A'; i <= 'Z'; i++)
                 emoteDict.Add(((char)i).ToString(), new Emoji(char.ConvertFromUtf32(0x1F1E6 + i - 'A')));
+
+            loaded = true;
         }
 
         private void OnNonCommandMessageRecieved(IMessage messageIn)
         {
+            if (!loaded)
+                return;
             if (!(messageIn is SocketMessage))
                 return;
             var message = messageIn as SocketMessage;
