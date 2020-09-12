@@ -54,6 +54,15 @@ namespace MEE7.Commands
                     emoteDict.GetValueOrDefault("A"),
                     emoteDict.GetValueOrDefault("G"),
                     emoteDict.GetValueOrDefault("O"), }).Wait();
+            if (message.Content.Contains("Brille", StringComparison.OrdinalIgnoreCase))
+                (message as IUserMessage).AddReactionsAsync(new IEmote[] {
+                    emoteDict.GetValueOrDefault("F"),
+                    emoteDict.GetValueOrDefault("I"),
+                    emoteDict.GetValueOrDefault("E"),
+                    emoteDict.GetValueOrDefault("L"),
+                    emoteDict.GetValueOrDefault("M"),
+                    emoteDict.GetValueOrDefault("A"),
+                    emoteDict.GetValueOrDefault("N"), }).Wait();
         }
 
         public override void Execute(IMessage message) { }
