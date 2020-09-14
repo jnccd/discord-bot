@@ -23,8 +23,8 @@ namespace MEE7.Commands
             emoteDict.Add("padoru", Emote.Parse("<a:padoru:744966713778372778>"));
             emoteDict.Add("hentai", Emote.Parse("<a:FeelsHentaiMan:744966726848086168>"));
             emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
-            emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856358066520066>"));
-            emoteDict.Add("dance", Emote.Parse("<a:smugDance:754856467982450758>"));
+            emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856306476580965>"));
+            emoteDict.Add("dance", Emote.Parse("<a:smugDance:751092793669189682>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
 
