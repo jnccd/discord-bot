@@ -23,6 +23,8 @@ namespace MEE7.Commands
             emoteDict.Add("padoru", Emote.Parse("<a:padoru:744966713778372778>"));
             emoteDict.Add("hentai", Emote.Parse("<a:FeelsHentaiMan:744966726848086168>"));
             emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
+            emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856358066520066>"));
+            emoteDict.Add("dance", Emote.Parse("<a:smugDance:754856467982450758>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
 
@@ -50,6 +52,10 @@ namespace MEE7.Commands
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("eyes")).Wait();
             if (message.Content.Contains("the sauce", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("sosig")).Wait();
+            if (message.Content.Contains("spooky", StringComparison.OrdinalIgnoreCase))
+                message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
+            if (message.Content.Contains("dance", StringComparison.OrdinalIgnoreCase))
+                message.AddReactionAsync(emoteDict.GetValueOrDefault("dance")).Wait();
             if (message.Content.Contains("Hotel", StringComparison.OrdinalIgnoreCase))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
                     emoteDict.GetValueOrDefault("T"),
