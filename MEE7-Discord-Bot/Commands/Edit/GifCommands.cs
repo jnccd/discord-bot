@@ -159,7 +159,9 @@ namespace MEE7.Commands.Edit
         {
             if (endValue == int.MinValue) endValue = gif.Item1.Length;
             for (int i = 0; i < gif.Item1.Length; i++)
-                gif.Item1[i] = (Bitmap)Pipe.Parse(m, pipe.Replace("%" + varName, ((i / (float)gif.Item1.Length) * endValue).ToString().Replace(",", "."))).Apply(m, gif.Item1[i]);
+                gif.Item1[i] = (Bitmap)Pipe.Parse(m, pipe.Replace("%" + varName, 
+                    (i / (float)gif.Item1.Length * endValue + (1 - (i / (float)gif.Item1.Length)) * startValue).ToString().Replace(",", "."))).
+                    Apply(m, gif.Item1[i]);
             return gif;
         }
     }
