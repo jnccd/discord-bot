@@ -41,30 +41,27 @@ namespace MEE7.Commands.Edit
 
             }),
             new PrintMethod(typeof(Bitmap[]), (IMessage m, object o) => {
-                using (MemoryStream s = new MemoryStream())
-                {
-                    Bitmap[] bs = o as Bitmap[];
-                    int maxWidth = bs.Select(x => x.Width).Max();
-                    int maxHeight = bs.Select(x => x.Height).Max();
-                    using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
-                        foreach (Bitmap b in bs)
-                            c.AddFrame(b.CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), -1, GifQuality.Bit8);
-
-                    DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
-
+                using MemoryStream s = new MemoryStream(); Bitmap[] bs = o as Bitmap[];
+                int maxWidth = bs.Select(x => x.Width).Max();
+                int maxHeight = bs.Select(x => x.Height).Max();
+                using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
                     foreach (Bitmap b in bs)
-                        b.Dispose();
-                }
+                        c.AddFrame(b.CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), -1, GifQuality.Bit8);
+
+                DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
+
+                foreach (Bitmap b in bs)
+                    b.Dispose();
 
             }),
             new PrintMethod(typeof(Gif), (IMessage m, object o) => {
                 using MemoryStream s = new MemoryStream(); Gif gif = o as Gif;
                 int maxWidth = gif.Item1.Select(x => x.Width).Max();
                 int maxHeight = gif.Item1.Select(x => x.Height).Max();
-                using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
+                using (AnimatedGifCreator c = new AnimatedGifCreator(s))
                     for (int i = 0; i < gif.Item1.Length; i++)
                         c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)),
-                            gif.Item2[i], GifQuality.Bit8);
+                            gif.Item2[i] < 20 ? 20 : gif.Item2[i], GifQuality.Bit8);
 
                 DiscordNETWrapper.SendFile(s, m.Channel, "gif").Wait();
 
