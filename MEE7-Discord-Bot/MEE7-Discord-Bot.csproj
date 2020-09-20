@@ -588,6 +588,12 @@
     <None Update="Commands\MemeTemplates\thank-you-kanye-very-cool-5ae1d0be61b5b.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Commands\MemeTemplates\thommo-in-a-lift-59c01f541b7c7-design.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Commands\MemeTemplates\thommo-in-a-lift-59c01f541b7c7-overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Commands\MemeTemplates\three-faces-57fd2631c29c0-design.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
