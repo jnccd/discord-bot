@@ -43,28 +43,28 @@ namespace MEE7.Commands
                 return;
             var message = messageIn as SocketMessage;
 
-            if (message.Content.Contains("Hello there", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("Hello there"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("kenobi")).Wait();
 
-            if (message.Content.Contains("Padoru", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("Padoru"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("padoru")).Wait();
 
-            if (message.Content.Contains("Hentai", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("Hentai"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("hentai")).Wait();
 
-            if (message.Content.Contains("I saw that", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("I saw that"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("eyes")).Wait();
 
-            if (message.Content.Contains("the sauce", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("the sauce"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("sosig")).Wait();
 
-            if (message.Content.Contains("spooky", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("spooky"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
 
             if (Regex.IsMatch(message.Content, "\\b[a-zA-Z]uten [a-zA-Z]orgen\\b") || Regex.IsMatch(message.Content, "\\b[a-zA-Z]ood [a-zA-Z]orning\\b"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
-            if (message.Content.Contains("Hotel", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("Hotel"))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
                     emoteDict.GetValueOrDefault("T"),
                     emoteDict.GetValueOrDefault("R"),
@@ -74,7 +74,7 @@ namespace MEE7.Commands
                     emoteDict.GetValueOrDefault("G"),
                     emoteDict.GetValueOrDefault("O"), }).Wait();
 
-            if (message.Content.Contains("Brille", StringComparison.OrdinalIgnoreCase))
+            if (message.Content.ToLower().Contains("Brille"))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] {
                     emoteDict.GetValueOrDefault("F"),
                     emoteDict.GetValueOrDefault("I"),
