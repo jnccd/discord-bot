@@ -54,8 +54,6 @@ namespace MEE7.Commands
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("sosig")).Wait();
             if (message.Content.Contains("spooky", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
-            if (message.Content.Contains("dance", StringComparison.OrdinalIgnoreCase))
-                message.AddReactionAsync(emoteDict.GetValueOrDefault("dance")).Wait();
             if (message.Content.Contains("Hotel", StringComparison.OrdinalIgnoreCase))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
                     emoteDict.GetValueOrDefault("T"),
