@@ -24,7 +24,7 @@ namespace MEE7.Commands
             emoteDict.Add("hentai", Emote.Parse("<a:FeelsHentaiMan:744966726848086168>"));
             emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
             emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856306476580965>"));
-            emoteDict.Add("dance", Emote.Parse("<a:smugDance:751092793669189682>"));
+            emoteDict.Add("goodMorning", Emote.Parse("<a:GoodMorning:757939668221427742>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
 
@@ -44,16 +44,29 @@ namespace MEE7.Commands
 
             if (message.Content.Contains("Hello there", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("kenobi")).Wait();
+
             if (message.Content.Contains("Padoru", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("padoru")).Wait();
+
             if (message.Content.Contains("Hentai", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("hentai")).Wait();
+
             if (message.Content.Contains("I saw that", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("eyes")).Wait();
+
             if (message.Content.Contains("the sauce", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("sosig")).Wait();
+
             if (message.Content.Contains("spooky", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
+
+            if ( (message.Content.Contains("ood ", StringComparison.OrdinalIgnoreCase) && 
+                 (message.Content.Contains("orning ", StringComparison.OrdinalIgnoreCase) || message.Content.EndsWith("orning"))) 
+                 ||
+                 (message.Content.Contains("uten ", StringComparison.OrdinalIgnoreCase) &&
+                 (message.Content.Contains("orgen ", StringComparison.OrdinalIgnoreCase) || message.Content.EndsWith("orgen"))) )
+                message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
+
             if (message.Content.Contains("Hotel", StringComparison.OrdinalIgnoreCase))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
                     emoteDict.GetValueOrDefault("T"),
@@ -63,6 +76,7 @@ namespace MEE7.Commands
                     emoteDict.GetValueOrDefault("A"),
                     emoteDict.GetValueOrDefault("G"),
                     emoteDict.GetValueOrDefault("O"), }).Wait();
+
             if (message.Content.Contains("Brille", StringComparison.OrdinalIgnoreCase))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] {
                     emoteDict.GetValueOrDefault("F"),
