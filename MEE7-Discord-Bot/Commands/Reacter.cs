@@ -61,7 +61,7 @@ namespace MEE7.Commands
             if (message.Content.Contains("spooky", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
 
-            if (Regex.IsMatch(message.Content, "^[a-zA-Z]uten [a-zA-Z]orgen") || Regex.IsMatch(message.Content, "^[a-zA-Z]ood [a-zA-Z]orning"))
+            if (Regex.IsMatch(message.Content, "\\b[a-zA-Z]uten [a-zA-Z]orgen\\b") || Regex.IsMatch(message.Content, "\\b[a-zA-Z]ood [a-zA-Z]orning\\b"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
             if (message.Content.Contains("Hotel", StringComparison.OrdinalIgnoreCase))
