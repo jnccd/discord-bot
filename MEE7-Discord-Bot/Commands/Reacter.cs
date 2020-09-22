@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using MEE7.Backend;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace MEE7.Commands
 {
@@ -60,11 +61,7 @@ namespace MEE7.Commands
             if (message.Content.Contains("spooky", StringComparison.OrdinalIgnoreCase))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
 
-            if ( (message.Content.Contains("ood ", StringComparison.OrdinalIgnoreCase) && 
-                 (message.Content.Contains("orning ", StringComparison.OrdinalIgnoreCase) || message.Content.EndsWith("orning"))) 
-                 ||
-                 (message.Content.Contains("uten ", StringComparison.OrdinalIgnoreCase) &&
-                 (message.Content.Contains("orgen ", StringComparison.OrdinalIgnoreCase) || message.Content.EndsWith("orgen"))) )
+            if (Regex.IsMatch(message.Content, "^[a-zA-Z]uten [a-zA-Z]orgen") || Regex.IsMatch(message.Content, "^[a-zA-Z]ood [a-zA-Z]orning"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
             if (message.Content.Contains("Hotel", StringComparison.OrdinalIgnoreCase))
