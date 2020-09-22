@@ -33,7 +33,10 @@ namespace MEE7.Commands.CAUServerSpecific
                         { UserId = 1013576989020774400, Count = 10, SinceId = Config.Data.lastCodeMemeId });
                     if (newTweets != null && newTweets.Count() > 0)
                     {
-                        var codeShitpost = newTweets.MaxElement(x => x.FavoriteCount + x.RetweetCount * 3);
+                        var codeShitpost = newTweets.MaxElement(x => x.FavoriteCount + x.RetweetCount * 2);
+                        if (codeShitpost.FavoriteCount + codeShitpost.RetweetCount * 2 < 100)
+                            return;
+
                         var text = codeShitpost.GetContent();
                         var image = codeShitpost.Entities.Media.First().MediaUrl;
                         var id = codeShitpost.Id;
@@ -48,7 +51,7 @@ namespace MEE7.Commands.CAUServerSpecific
                 }
                 catch { }
 
-                Thread.Sleep(2 * 60 * 60 * 1000);
+                Thread.Sleep(30 * 60 * 1000);
             }
         }
 
