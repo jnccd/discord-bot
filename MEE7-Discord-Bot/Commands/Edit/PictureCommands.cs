@@ -820,11 +820,12 @@ namespace MEE7.Commands.Edit
             return frames;
         }
 
-#if DEBUG
+        CascadeClassifier cascadeClassifier = null;
         public string FaceDetecDesc = "Detect faces";
-        CascadeClassifier cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}haarcascade_eye_tree_eyeglasses.xml");
         public Bitmap FaceDetec(Bitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
         {
+            if (cascadeClassifier == null)
+                cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}haarcascade_frontalface_alt_tree.xml");
             if (!string.IsNullOrWhiteSpace(classifier) && classifier.All(x => char.IsLetterOrDigit(x) || x == '_'))
                 cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}{classifier}.xml");
             else
@@ -843,7 +844,7 @@ namespace MEE7.Commands.Edit
 
             return b;
         }
-#endif
+
 
         static readonly char s = Path.DirectorySeparatorChar;
         static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
