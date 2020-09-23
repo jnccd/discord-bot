@@ -1,7 +1,6 @@
 ﻿using Discord;
 using MEE7.Backend.HelperFunctions;
 using System.Collections.Generic;
-using System.Compat.Web;
 using System.Linq;
 using TweetSharp;
 

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using static MEE7.Commands.Edit.Edit;
 
 namespace MEE7.Commands.Edit
