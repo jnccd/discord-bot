@@ -22,7 +22,7 @@ namespace MEE7.Commands.CAUServerSpecific
                 {
                     var gamingRole = uniServer.Roles.First(x => x.Id == 539810100173471744);
                     int gamingPos = gamingRole.Position;
-                    int aboveGamingPos = uniServer.Roles.First(x => x.Id == 479952941827096578).Position; // Using Fachschaftler*in role pos as the pos above gaming roles
+                    int aboveGamingPos = uniServer.Roles.First(x => x.Id == 689861135264120894).Position; // Using Hackathon role pos as the pos above gaming roles
                     if (arg2.Roles.Any(x => x.Position > gamingPos && x.Position < aboveGamingPos))
                         arg2.AddRoleAsync(gamingRole);
                 }
