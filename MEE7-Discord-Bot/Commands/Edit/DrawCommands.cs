@@ -1,8 +1,5 @@
 ﻿using Discord;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using Color = System.Drawing.Color;
 
 namespace MEE7.Commands.Edit

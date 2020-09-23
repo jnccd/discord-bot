@@ -1,19 +1,13 @@
 ﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis.Scripting.Hosting;
 using Newtonsoft.Json;
 using System;
 using System.Compat.Web;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Threading;
 
 namespace MEE7.Commands
 {

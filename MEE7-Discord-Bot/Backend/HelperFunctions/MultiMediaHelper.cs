@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.Audio;
+﻿using Discord.Audio;
 using System;
 using System.Diagnostics;
 using System.Drawing;

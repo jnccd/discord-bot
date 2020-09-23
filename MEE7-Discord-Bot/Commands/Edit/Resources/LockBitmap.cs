@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.IO;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
