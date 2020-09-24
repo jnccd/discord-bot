@@ -6,11 +6,13 @@ using MEE7.Backend.HelperFunctions;
 using MEE7.Commands.Edit.Resources;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using Tesseract;
 using static MEE7.Commands.Edit.Edit;
 using Color = System.Drawing.Color;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
@@ -843,6 +845,26 @@ namespace MEE7.Commands.Edit
                 g.DrawRectangle(p, face);
 
             return b;
+        }
+
+        public string ReadDesc = "Reads text";
+        public string Read(Bitmap b, IMessage m, bool getLargestBlock = false)
+        {
+            var imgPath = $"Commands{s}Edit{s}Workspace{s}uwu.png";
+            if (File.Exists(imgPath))
+                File.Delete(imgPath);
+            b.Save(imgPath);
+
+            using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
+            using var img = Pix.LoadFromFile(imgPath);
+            using var page = engine.Process(img);
+            var text = page.GetText();
+
+            if (getLargestBlock)
+                return text.Split("\n\n").MaxElement(x => x.Length);
+
+            return $"Confidence: {page.GetMeanConfidence()}\n\n" +
+                $"{text}";
         }
 
 
