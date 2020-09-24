@@ -44,9 +44,9 @@ namespace MEE7.Commands.Edit
                     string pic = null;
                     if (lm.Attachments.Count > 0 && lm.Attachments.ElementAt(0).Size > 0)
                     {
-                        if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                            pic = lm.Attachments.ElementAt(0).Url;
-                        else if (lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
+                        if (lm.Attachments.ElementAt(0).Filename.EndsWith(".png") ||
+                            lm.Attachments.ElementAt(0).Filename.EndsWith(".jpeg") ||
+                            lm.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
                             pic = lm.Attachments.ElementAt(0).Url;
                     }
                     string picLink = lm.Content.GetPictureLinkInMessage();
