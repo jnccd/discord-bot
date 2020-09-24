@@ -3,6 +3,7 @@ using MEE7.Backend.HelperFunctions;
 using System;
 using System.Linq;
 using System.Text;
+using TweetSharp;
 
 namespace MEE7.Commands.Edit
 {
@@ -59,6 +60,15 @@ namespace MEE7.Commands.Edit
 
         //public string getHTMLFromWebsiteDesc = "Get the websites html";
         //public string GetHTMLFromWebsite(string url, IMessage m) => url.GetHTMLfromURL();
+
+        public string SearchTweetDesc = "Search for a tweet with that text";
+        public string SearchTweet(string s, IMessage m)
+        {
+            var res = Program.twitterService.Search(new SearchOptions() { Q = s }).Statuses;
+            if (res.FirstOrDefault() == null)
+                throw new Exception("Didn't find anything");
+            return res.First().ToTwitterUrl().AbsoluteUri;
+        }
 
         public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
         public string Japanify(string s, IMessage m)
