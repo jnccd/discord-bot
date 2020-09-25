@@ -852,8 +852,8 @@ namespace MEE7.Commands.Edit
             return n;
         }
 
-        public string DuplikateDesc = "Duplikate picture into gif";
-        public static Gif Duplikate(Bitmap b, IMessage m, int amount)
+        public string DuplicateDesc = "Duplicate picture into gif";
+        public static Gif Duplicate(Bitmap b, IMessage m, int amount)
         {
             if (amount > 100)
                 throw new Exception("no");
