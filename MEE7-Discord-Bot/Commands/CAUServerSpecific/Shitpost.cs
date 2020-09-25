@@ -30,7 +30,7 @@ namespace MEE7.Commands.CAUServerSpecific
                     if (newTweets != null && newTweets.Count() > 0)
                     {
                         var codeShitpost = newTweets.MaxElement(x => x.FavoriteCount + x.RetweetCount * 2);
-                        if (codeShitpost.FavoriteCount + codeShitpost.RetweetCount * 2 < 100)
+                        if (codeShitpost.FavoriteCount + codeShitpost.RetweetCount * 2 < 120)
                             return;
 
                         var text = codeShitpost.GetContent();
@@ -47,7 +47,7 @@ namespace MEE7.Commands.CAUServerSpecific
                 }
                 catch { }
 
-                Thread.Sleep(30 * 60 * 1000);
+                Thread.Sleep(10 * 60 * 1000);
             }
         }
 
