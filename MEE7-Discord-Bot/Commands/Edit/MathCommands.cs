@@ -38,5 +38,13 @@ namespace MEE7.Commands.Edit
 
         public string EDesc = "E";
         public double E(EditNull n, IMessage m) => Math.E;
+
+        public string RdmDesc = "Get random integer number";
+        public double Rdm(EditNull n, IMessage m, int l = 0, int h = int.MaxValue) => rdm.Next(l, h);
+
+        public string RdmDoubleDesc = "Get random number between 0 and 1";
+        public double RdmDouble(EditNull n, IMessage m) => rdm.NextDouble();
+
+        readonly Random rdm = new Random();
     }
 }
