@@ -842,6 +842,28 @@ namespace MEE7.Commands.Edit
             return design;
         }
 
+        public string TranslateDesc = "Translate picture";
+        public static Bitmap Translate(Bitmap b, IMessage m, int deltaX, int deltaY)
+        {
+            Bitmap n = new Bitmap(b.Width, b.Height);
+            using (Graphics graphics = Graphics.FromImage(n))
+                graphics.DrawImage(b, deltaX, deltaY);
+            b.Dispose();
+            return n;
+        }
+
+        public string DuplikateDesc = "Duplikate picture into gif";
+        public static Gif Duplikate(Bitmap b, IMessage m, int amount)
+        {
+            if (amount > 100)
+                throw new Exception("no");
+
+            Bitmap[] pics = Enumerable.Range(0, amount).Select(x => (Bitmap)b.Clone()).ToArray();
+            int[] timings = Enumerable.Repeat(33, amount).ToArray();
+
+            return new Gif(pics, timings);
+        }
+
         public string CircleTransDesc = "Add circular transparency to the picture";
         public static Bitmap CircleTrans(Bitmap b, IMessage m)
         {
