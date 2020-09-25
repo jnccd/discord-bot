@@ -843,6 +843,23 @@ namespace MEE7.Commands.Edit
                 $"{text}";
         }
 
+        public string InsertDesc = "Inserts picture into the red rectangle of another picture";
+        public static Bitmap Insert(Bitmap insertion, Bitmap design, Bitmap overlay = null)
+        {
+            Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
+            if (redRekt.Width == 0)
+                redRekt = FindRectangle(design, Color.FromArgb(254, 34, 34), 20);
+            using (Graphics graphics = Graphics.FromImage(design))
+            {
+                graphics.DrawImage(insertion, IncreaseSize(redRekt, 1, 1));
+                if (overlay != null)
+                    graphics.DrawImage(overlay, new Point(0, 0));
+            }
+            if (overlay != null)
+                overlay.Dispose();
+            return design;
+        }
+
 
         static readonly char s = Path.DirectorySeparatorChar;
         static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
@@ -1005,21 +1022,6 @@ namespace MEE7.Commands.Edit
                     }
             }
             return P;
-        }
-        public static Bitmap Insert(Bitmap insertion, Bitmap design, Bitmap overlay = null)
-        {
-            Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
-            if (redRekt.Width == 0)
-                redRekt = FindRectangle(design, Color.FromArgb(254, 34, 34), 20);
-            using (Graphics graphics = Graphics.FromImage(design))
-            {
-                graphics.DrawImage(insertion, IncreaseSize(redRekt, 1, 1));
-                if (overlay != null)
-                    graphics.DrawImage(overlay, new Point(0, 0));
-            }
-            if (overlay != null)
-                overlay.Dispose();
-            return design;
         }
         static Rectangle IncreaseSize(Rectangle r, int x, int y)
         {
