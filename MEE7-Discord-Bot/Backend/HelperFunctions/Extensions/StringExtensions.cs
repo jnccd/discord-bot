@@ -11,6 +11,8 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using NAudio.Wave;
+using NLayer.NAudioSupport;
 using static MEE7.Commands.Edit.Edit;
 
 namespace MEE7.Backend.HelperFunctions
@@ -173,14 +175,20 @@ namespace MEE7.Backend.HelperFunctions
             Image gif = Image.FromStream(WebRequest.Create(url).GetResponse().GetResponseStream());
             return MultiMediaHelper.ImageToGif(gif);
         }
-        public static Mp3FileReader Getmp3AudioFromURL(this string url)
+        public static Mp3FileReader GetMp3AudioFromURL(this string url)
         {
             Stream ms = new MemoryStream();
             using (Stream stream = WebRequest.Create(url).GetResponse().GetResponseStream())
                 stream.CopyTo(ms);
 
             ms.Position = 0;
-            return new Mp3FileReader(ms);
+            if (Program.RunningOnLinux)
+                return new Mp3FileReader(ms);
+            else
+            {
+                var builder = new Mp3FileReader.FrameDecompressorBuilder(wf => new Mp3FrameDecompressor(wf));
+                return new Mp3FileReader(ms, builder);
+            }
         }
         public static WaveFileReader GetwavAudioFromURL(this string url) => new WaveFileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
         public static VorbisReader GetoggAudioFromURL(this string url) => new VorbisReader(WebRequest.Create(url).GetResponse().GetResponseStream(), true);
