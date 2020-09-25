@@ -120,9 +120,9 @@ namespace MEE7.Commands.Edit
                 string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
                 if (File.Exists(memeTemplateOverlay))
-                    return Insert(bmp, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
+                    return Insert(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
                 else if (File.Exists(memeTemplate))
-                    return Insert(bmp, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
+                    return Insert(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
                 else
                     throw new Exception("Something went wrong :thinking:");
             }
@@ -844,7 +844,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string InsertDesc = "Inserts picture into the red rectangle of another picture";
-        public static Bitmap Insert(Bitmap insertion, Bitmap design, Bitmap overlay = null)
+        public static Bitmap Insert(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null)
         {
             Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
             if (redRekt.Width == 0)
@@ -861,10 +861,17 @@ namespace MEE7.Commands.Edit
         }
 
         public string CircleTransDesc = "Add circular transparency to the picture";
-        public static Bitmap CircleTrans(Bitmap b)
+        public static Bitmap CircleTrans(Bitmap b, IMessage m)
         {
-            
-            
+            using UnsafeBitmapContext c = new UnsafeBitmapContext(b);
+            for (int x = 0; x < b.Width; x++)
+                for (int y = 0; y < b.Height; y++)
+                {
+                    float sx = x / (float)b.Width - 0.5f, 
+                          sy = y / (float)b.Height - 0.5f;
+                    if (sx * sx + sy * sy > 0.25)
+                        c.SetPixel(x, y, Color.FromArgb(0, 0, 0, 0));
+                }
 
             return b;
         }
