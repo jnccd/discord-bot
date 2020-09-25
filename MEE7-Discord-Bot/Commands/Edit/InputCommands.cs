@@ -115,13 +115,21 @@ namespace MEE7.Commands.Edit
         public string thisADesc = "Gets mp3 or wav audio files attached to this message";
         public WaveStream ThisA(EditNull n, IMessage m)
         {
-            string url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
-            if (!string.IsNullOrWhiteSpace(url))
-                return url.Getmp3AudioFromURL();
+            string url;
+            try
+            {
+                url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".mp3")).Url;
+                if (!string.IsNullOrWhiteSpace(url))
+                    return url.GetMp3AudioFromURL();
+            }
+            catch { }
 
-            url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".wav")).Url;
-            if (!string.IsNullOrWhiteSpace(url))
-                return url.GetwavAudioFromURL();
+            try
+            {
+                url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".wav")).Url;
+                if (!string.IsNullOrWhiteSpace(url))
+                    return url.GetwavAudioFromURL();
+            } catch { }
 
             //url = m.Attachments.FirstOrDefault(x => x.Url.EndsWith(".ogg")).Url;
             //if (!string.IsNullOrWhiteSpace(url))
