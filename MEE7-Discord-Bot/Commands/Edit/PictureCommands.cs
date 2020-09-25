@@ -120,9 +120,9 @@ namespace MEE7.Commands.Edit
                 string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
                 if (File.Exists(memeTemplateOverlay))
-                    return Insert(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
+                    return InsertIntoRect(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
                 else if (File.Exists(memeTemplate))
-                    return Insert(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
+                    return InsertIntoRect(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
                 else
                     throw new Exception("Something went wrong :thinking:");
             }
@@ -825,8 +825,8 @@ namespace MEE7.Commands.Edit
                 $"{text}";
         }
 
-        public string InsertDesc = "Inserts picture into the red rectangle of another picture";
-        public static Bitmap Insert(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null)
+        public string InsertIntoRectDesc = "Inserts picture into the red rectangle of another picture";
+        public static Bitmap InsertIntoRect(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null)
         {
             Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
             if (redRekt.Width == 0)
@@ -840,6 +840,15 @@ namespace MEE7.Commands.Edit
             if (overlay != null)
                 overlay.Dispose();
             return design;
+        }
+
+        public string InsertDesc = "Inserts picture into the rectangle of another picture";
+        public static Bitmap Insert(Bitmap backGround, IMessage m, Bitmap insertion, Rectangle r)
+        {
+            using (Graphics graphics = Graphics.FromImage(backGround))
+                graphics.DrawImage(insertion, r);
+            insertion.Dispose();
+            return backGround;
         }
 
         public string TranslateDesc = "Translate picture";
