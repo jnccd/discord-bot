@@ -479,24 +479,6 @@ namespace MEE7.Commands.Edit
             return output;
         }
 
-        public string whiteDesc = "Get my skin color";
-        public Color White(EditNull n, IMessage m)
-        {
-            return Color.White;
-        }
-
-        public string colDesc = "Get a color from rgb";
-        public Color Col(EditNull n, IMessage m, byte r, byte g, byte b)
-        {
-            return Color.FromArgb(r, g, b);
-        }
-
-        public string lerpDesc = "Lerp two colors";
-        public Color Lerp(EditNull n, IMessage m, Color a, Color b, float l)
-        {
-            return a.Lerp(b, l);
-        }
-
         public string transgroundDesc = "Make the background transparent";
         public Bitmap Transground(Bitmap b, IMessage m, Vector2 BackgroundCoords = new Vector2(), int threshold = 10)
         {
