@@ -120,33 +120,9 @@ namespace MEE7.Commands.Edit
                 string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
                 if (File.Exists(memeTemplateOverlay))
-                {
-                    Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
-                    Bitmap overlay;
-                    using (FileStream stream = new FileStream(memeTemplateOverlay, FileMode.Open))
-                        overlay = (Bitmap)Bitmap.FromStream(stream);
-                    Bitmap output = new Bitmap(overlay.Width, overlay.Height);
-                    using (Graphics graphics = Graphics.FromImage(output))
-                    {
-                        graphics.DrawImage(bmp, redRekt);
-                        graphics.DrawImage(overlay, new Point(0, 0));
-                    }
-
-                    return output;
-                }
+                    return Insert(bmp, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
                 else if (File.Exists(memeTemplate))
-                {
-                    Rectangle redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(254, 34, 34), 20);
-                    if (redRekt.Width == 0)
-                        redRekt = FindRectangle((Bitmap)Bitmap.FromFile(memeTemplateDesign), Color.FromArgb(255, 0, 0), 20);
-                    Bitmap template;
-                    using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-                        template = (Bitmap)Bitmap.FromStream(stream);
-                    using (Graphics graphics = Graphics.FromImage(template))
-                        graphics.DrawImage(bmp, redRekt);
-
-                    return template;
-                }
+                    return Insert(bmp, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
                 else
                     throw new Exception("Something went wrong :thinking:");
             }
@@ -920,8 +896,8 @@ namespace MEE7.Commands.Edit
                 return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
             }
 
-            for (int x = 1; x < Pic.Width; x++)
-                for (int y = 1; y < Pic.Height; y++)
+            for (int x = 0; x < Pic.Width; x++)
+                for (int y = 0; y < Pic.Height; y++)
                     if (IsSameColor(Pic.GetPixel(x, y), C))
                     {
                         int a = x;
@@ -1029,6 +1005,27 @@ namespace MEE7.Commands.Edit
                     }
             }
             return P;
+        }
+        public static Bitmap Insert(Bitmap insertion, Bitmap design, Bitmap overlay = null)
+        {
+            Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
+            if (redRekt.Width == 0)
+                redRekt = FindRectangle(design, Color.FromArgb(254, 34, 34), 20);
+            using (Graphics graphics = Graphics.FromImage(design))
+            {
+                graphics.DrawImage(insertion, IncreaseSize(redRekt, 1, 1));
+                if (overlay != null)
+                    graphics.DrawImage(overlay, new Point(0, 0));
+            }
+            if (overlay != null)
+                overlay.Dispose();
+            return design;
+        }
+        static Rectangle IncreaseSize(Rectangle r, int x, int y)
+        {
+            r.Width += x;
+            r.Height += y;
+            return r;
         }
     }
 }

@@ -64,6 +64,23 @@ namespace MEE7.Commands.Edit
             return new Gif(re, Enumerable.Repeat(33, re.Length).ToArray());
         }
 
+        public string PatDesc = "Pat the picture";
+        public Gif Pat(Bitmap b, IMessage m)
+        {
+            Bitmap[] pats = new Bitmap[5];
+            for (int i = 1; i <= 5; i++)
+            {
+                var patDesignPath = $"Commands{s}Edit{s}Resources{s}pat{s}{i}d.png";
+                var patOverlayPath = $"Commands{s}Edit{s}Resources{s}pat{s}{i}o.png";
+                pats[i - 1] = PictureCommands.Insert(b, (Bitmap)Bitmap.FromFile(patDesignPath), (Bitmap)Bitmap.FromFile(patOverlayPath));
+            }
+            int[] patTimings = new int[] { 40, 40, 40, 40, 40 };
+
+            pats = pats.Select(x => (Bitmap)x.Stretch(new Size(512, 512))).ToArray();
+
+            return new Gif(pats, patTimings);
+        }
+
         public string backAndForthDesc = "Make the gif go backward after it went forward and " +
                 "then it goes forward again because it loops and its all very fancy n stuff";
         public Gif BackAndForth(Gif gif, IMessage m)
@@ -164,5 +181,7 @@ namespace MEE7.Commands.Edit
                     Apply(m, gif.Item1[i]);
             return gif;
         }
+
+        static readonly char s = Path.DirectorySeparatorChar;
     }
 }
