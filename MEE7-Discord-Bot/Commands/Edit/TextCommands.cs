@@ -64,10 +64,23 @@ namespace MEE7.Commands.Edit
         public string SearchTweetDesc = "Search for a tweet with that text";
         public string SearchTweet(string s, IMessage m)
         {
-            var res = Program.twitterService.Search(new SearchOptions() { Q = s }).Statuses;
-            if (res.FirstOrDefault() == null)
+            string re = "";
+            foreach (string block in s.Split("\n\n"))
+            {
+                if (block.StartsWith("Confidence: "))
+                    continue;
+                var res = Program.twitterService.Search(new SearchOptions() { Q = block }).Statuses;
+                if (res.FirstOrDefault() != null)
+                {
+                    re = res.First().ToTwitterUrl().AbsoluteUri;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(re))
                 throw new Exception("Didn't find anything");
-            return res.First().ToTwitterUrl().AbsoluteUri;
+
+            return re;
         }
 
         public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
