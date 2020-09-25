@@ -180,15 +180,10 @@ namespace MEE7.Backend.HelperFunctions
             Stream ms = new MemoryStream();
             using (Stream stream = WebRequest.Create(url).GetResponse().GetResponseStream())
                 stream.CopyTo(ms);
-
             ms.Position = 0;
-            if (Program.RunningOnLinux)
-                return new Mp3FileReader(ms);
-            else
-            {
-                var builder = new Mp3FileReader.FrameDecompressorBuilder(wf => new Mp3FrameDecompressor(wf));
-                return new Mp3FileReader(ms, builder);
-            }
+
+            var builder = new Mp3FileReader.FrameDecompressorBuilder(wf => new Mp3FrameDecompressor(wf));
+            return new Mp3FileReader(ms, builder);
         }
         public static WaveFileReader GetwavAudioFromURL(this string url) => new WaveFileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
         public static VorbisReader GetoggAudioFromURL(this string url) => new VorbisReader(WebRequest.Create(url).GetResponse().GetResponseStream(), true);

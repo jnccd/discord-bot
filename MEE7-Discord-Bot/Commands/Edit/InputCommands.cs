@@ -139,9 +139,11 @@ namespace MEE7.Commands.Edit
         }
 
         public string GetTweetDesc = "Gets a tweet by id";
-        public IMessage GetTweet(EditNull n, IMessage m, long tweetID)
+        public IMessage GetTweet(EditNull n, IMessage m, string tweetID)
         {
-            var channel = new TwitterChannel(Program.twitterService.GetTweet(new GetTweetOptions() { Id = tweetID, IncludeEntities = true }), Program.twitterService);
+            long id = Convert.ToInt64(tweetID.Split('/').Last());
+
+            var channel = new TwitterChannel(Program.twitterService.GetTweet(new GetTweetOptions() { Id = id, IncludeEntities = true }), Program.twitterService);
 
             return channel.InitialMessage;
         }
