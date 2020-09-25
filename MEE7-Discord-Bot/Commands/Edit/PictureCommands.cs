@@ -44,7 +44,7 @@ namespace MEE7.Commands.Edit
                     for (int y = 0; y < bmp.Height; y++)
                     {
                         Color c = con.GetPixel(x, y);
-                        c = Color.FromArgb(c.R, 0, 0, 255);
+                        c = Color.FromArgb(255, c.R, 0, 0);
                         con.SetPixel(x, y, c);
                     }
 
@@ -858,6 +858,15 @@ namespace MEE7.Commands.Edit
             if (overlay != null)
                 overlay.Dispose();
             return design;
+        }
+
+        public string CircleTransDesc = "Add circular transparency to the picture";
+        public static Bitmap CircleTrans(Bitmap b)
+        {
+            
+            
+
+            return b;
         }
 
 
