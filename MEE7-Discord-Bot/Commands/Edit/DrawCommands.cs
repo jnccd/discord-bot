@@ -18,6 +18,16 @@ namespace MEE7.Commands.Edit
             return b;
         }
 
+        public string DrawCircleDesc = "Draw Circle into pic";
+        public Bitmap DrawCircle(Bitmap b, IMessage m, Rectangle r, Color c)
+        {
+            using Graphics g = Graphics.FromImage(b);
+
+            g.DrawEllipse(new Pen(c), r);
+
+            return b;
+        }
+
         public string DrawRectDesc = "Draw Rect into pic";
         public Bitmap DrawRect(Bitmap b, IMessage m, Rectangle r, Color c)
         {
@@ -26,6 +36,12 @@ namespace MEE7.Commands.Edit
             g.DrawRectangle(new Pen(c), r);
 
             return b;
+        }
+
+        public string RectDesc = "Get Rect";
+        public Rectangle Rect(EditNull n, IMessage m, int x, int y, int w, int h)
+        {
+            return new Rectangle(x, y, w, h);
         }
 
         public string WhiteDesc = "Get my skin color";
