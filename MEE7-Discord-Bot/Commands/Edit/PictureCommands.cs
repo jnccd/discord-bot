@@ -826,11 +826,16 @@ namespace MEE7.Commands.Edit
         }
 
         public string InsertIntoRectDesc = "Inserts picture into the red rectangle of another picture";
-        public static Bitmap InsertIntoRect(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null)
+        public static Bitmap InsertIntoRect(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null, bool drawDesign = true)
         {
             Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
             if (redRekt.Width == 0)
                 redRekt = FindRectangle(design, Color.FromArgb(254, 34, 34), 20);
+            if (!drawDesign)
+                using (UnsafeBitmapContext con = new UnsafeBitmapContext(design))
+                    for (int x = 0; x < design.Width; x++)
+                        for (int y = 0; y < design.Height; y++)
+                            con.SetPixel(x, y, Color.Transparent);
             using (Graphics graphics = Graphics.FromImage(design))
             {
                 graphics.DrawImage(insertion, IncreaseSize(redRekt, 1, 1));
