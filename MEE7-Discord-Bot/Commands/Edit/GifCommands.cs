@@ -76,7 +76,7 @@ namespace MEE7.Commands.Edit
             }
             int[] patTimings = new int[] { 40, 40, 40, 40, 40 };
 
-            pats = pats.Select(x => (Bitmap)x.Stretch(new Size(512, 512))).ToArray();
+            pats = pats.Select(x => (Bitmap)x.Stretch(new Size(128, 128))).ToArray();
 
             return new Gif(pats, patTimings);
         }
