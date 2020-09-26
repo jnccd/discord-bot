@@ -72,7 +72,7 @@ namespace MEE7.Commands.Edit
             {
                 var patDesignPath = $"Commands{s}Edit{s}Resources{s}pat{s}{i}d.png";
                 var patOverlayPath = $"Commands{s}Edit{s}Resources{s}pat{s}{i}o.png";
-                pats[i - 1] = PictureCommands.InsertIntoRect(b, m, (Bitmap)Bitmap.FromFile(patDesignPath), (Bitmap)Bitmap.FromFile(patOverlayPath));
+                pats[i - 1] = PictureCommands.InsertIntoRect(b, m, (Bitmap)Bitmap.FromFile(patDesignPath), (Bitmap)Bitmap.FromFile(patOverlayPath), false);
             }
             int[] patTimings = new int[] { 40, 40, 40, 40, 40 };
 
