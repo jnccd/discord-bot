@@ -21,6 +21,12 @@ namespace MEE7.Commands.Edit
 {
     public class PictureCommands : EditCommandProvider
     {
+        public string GetColorDesc = "Get the color of a pixel";
+        public Color GetColor(Bitmap b, IMessage m, int x, int y)
+        {
+            return b.GetPixel(x, y);
+        }
+
         public string colorChannelSwapDesc = "Swap the rgb color channels for each pixel";
         public Bitmap ColorChannelSwap(Bitmap bmp, IMessage m)
         {
