@@ -74,7 +74,9 @@ namespace MEE7.Commands.Edit
                 using Bitmap b = new Bitmap(30, 30);
                 using Graphics g = Graphics.FromImage(b);
                 g.FillRectangle(new SolidBrush(c), 0, 0, 30, 30);
-                DiscordNETWrapper.SendBitmap(b, m.Channel, $"{c.R} {c.G} {c.B}").Wait();
+                DiscordNETWrapper.SendBitmap(b, m.Channel, $"R:{c.R} G:{c.G} B:{c.B}\n" +
+                    $"H:{c.GetHue()} S:{c.GetSaturation()} B:{c.GetBrightness()}\n" +
+                    $"{ColorTranslator.ToHtml(c)}").Wait();
             }),
             new PrintMethod(typeof(WaveStream), (IMessage m, object o) => {
                 Stream s = new MemoryStream();
