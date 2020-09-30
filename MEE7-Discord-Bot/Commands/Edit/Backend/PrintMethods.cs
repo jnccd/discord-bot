@@ -78,6 +78,9 @@ namespace MEE7.Commands.Edit
                     $"H:{c.GetHue()} S:{c.GetSaturation()} B:{c.GetBrightness()}\n" +
                     $"{ColorTranslator.ToHtml(c)}").Wait();
             }),
+            new PrintMethod(typeof(Video), (IMessage m, object o) => {
+                DiscordNETWrapper.SendFile((o as Video).filePath, m.Channel).Wait();
+            }),
             new PrintMethod(typeof(WaveStream), (IMessage m, object o) => {
                 Stream s = new MemoryStream();
                 WaveFileWriter.WriteWavFileToStream(s, o as WaveStream);

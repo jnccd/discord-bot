@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using static MEE7.Commands.Edit.Edit;
 using Image = System.Drawing.Image;
@@ -12,17 +13,15 @@ namespace MEE7.Commands.Edit
 {
     class VideoCommands : EditCommandProvider
     {
-        public object workspaceLock = new object();
         public string GetVideoDesc = "Gets video from link";
         public Video GetVideo(string videoLink, IMessage m)
         {
-            if (m.Author.Id == Program.Master.Id)
+            if (m.Author.Id != Program.Master.Id)
                 throw new Exception("u r not allowed");
 
             if (!videoLink.Contains("mp4"))
                 throw new Exception("Ew, give me a mp4 pls");
 
-            char s = Path.DirectorySeparatorChar;
             string path = $"Commands{s}Edit{s}Workspace{s}video.mp4";
 
             lock (workspaceLock)
@@ -33,12 +32,44 @@ namespace MEE7.Commands.Edit
             }
         }
 
+        public string GetVideoFromYTDesc = "Gets video from yt link";
+        public Video GetVideoFromYT(string videoLink, IMessage m)
+        {
+            if (m.Author.Id != Program.Master.Id)
+                throw new Exception("u r not allowed");
+
+            string path = $"Commands{s}Edit{s}Workspace{s}videoYT.mp4";
+
+            lock (workspaceLock)
+            {
+                FileStream f = new FileStream(path, FileMode.Create);
+                Process p = MultiMediaHelper.GetStreamFromYouTubeVideo(videoLink);
+                p.StandardOutput.BaseStream.CopyTo(f);
+                return new Video(path);
+            }
+        }
+
+        public string CutDesc = "Cut a video";
+        public Video Cut(Video video, IMessage m, TimeSpan startTime, TimeSpan endTime)
+        {
+            lock (workspaceLock)
+            {
+                TimeSpan dureation = endTime - startTime;
+                string targetPath = video.filePath.Split('.').SkipLast(1).Combine(".") + "-cut." + video.filePath.Split('.').Last();
+
+                string args = $"-ss {startTime} -i {video.filePath} -to {dureation} {targetPath}";
+                Process runner = Process.Start("ffmpeg.exe", args);
+                runner.WaitForExit();
+
+                return new Video(targetPath);
+            }
+        }
+
         public string ConvertToGifDesc = "Convert video to gif";
         public Gif ConvertToGif(Video videoLink, IMessage m)
         {
             lock (workspaceLock)
             {
-                char s = Path.DirectorySeparatorChar;
                 string outPath = $"Commands{s}Edit{s}Workspace{s}output.gif";
                 string args = $"-t 5 -y -i {videoLink.filePath} -vf \"fps = 10, scale = 420:-1:" +
                         $"flags = lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 {outPath}";
@@ -86,5 +117,8 @@ namespace MEE7.Commands.Edit
                     return new Video(finalFile);
             }
         }
+
+        readonly char s = Path.DirectorySeparatorChar;
+        public object workspaceLock = new object();
     }
 }

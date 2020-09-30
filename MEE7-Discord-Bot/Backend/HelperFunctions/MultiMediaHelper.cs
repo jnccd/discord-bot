@@ -59,6 +59,24 @@ namespace MEE7.Backend.HelperFunctions
                     return "";
             }
         }
+        public static Process GetStreamFromYouTubeVideo(string YoutubeURL, string arguments = "")
+        {
+            if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
+                return null;
+
+            string filename;
+            if (Program.RunningOnLinux) filename = "./youtube-dl";
+            else filename = "youtube-dl";
+
+            return Process.Start(new ProcessStartInfo()
+            {
+                FileName = filename,
+                Arguments = $"{arguments} -o - {YoutubeURL}",
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true
+            });
+        }
         public static Process GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat)
         {
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
