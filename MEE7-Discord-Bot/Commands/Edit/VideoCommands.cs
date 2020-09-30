@@ -16,6 +16,9 @@ namespace MEE7.Commands.Edit
         public string GetVideoDesc = "Gets video from link";
         public Video GetVideo(string videoLink, IMessage m)
         {
+            if (m.Author.Id == Program.Master.Id)
+                throw new Exception("u r not allowed");
+
             if (!videoLink.Contains("mp4"))
                 throw new Exception("Ew, give me a mp4 pls");
 
