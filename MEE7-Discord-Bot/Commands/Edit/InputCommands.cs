@@ -264,12 +264,13 @@ namespace MEE7.Commands.Edit
         public string audioFromYTDesc = "Gets the mp3 of an youtube video";
         public WaveStream AudioFromYT(EditNull n, IMessage m, string YouTubeVideoURL)
         {
+            if (m.Author.Id == Program.Master.Id)
+                throw new Exception("u r not allowed");
+
             MemoryStream mem = new MemoryStream();
-            using (Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(YouTubeVideoURL, "mp3"))
-            {
-                P.StandardOutput.BaseStream.CopyTo(mem);
-                return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
-            }
+            using Process P = MultiMediaHelper.GetAudioStreamFromYouTubeVideo(YouTubeVideoURL, "mp3");
+            P.StandardOutput.BaseStream.CopyTo(mem);
+            return WaveFormatConversionStream.CreatePcmStream(new StreamMediaFoundationReader(mem));
         }
 
         public string audioFromVoiceDesc = "Records audio from the voice chat you are currently in";
