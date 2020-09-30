@@ -135,7 +135,7 @@
     <None Update="Commands\Edit\first-order-model\Dockerfile">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Commands\Edit\first-order-model\executer.py">
+    <None Update="Commands\Edit\Resources\first-order-model-executer.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Commands\Edit\first-order-model\frames_dataset.py">

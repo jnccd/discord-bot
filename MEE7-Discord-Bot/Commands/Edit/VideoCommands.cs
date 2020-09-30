@@ -49,7 +49,7 @@ namespace MEE7.Commands.Edit
 
         public object firstOrderModelLock = new object();
         public string BakaMitaiDesc = "Picture goes Baka Mitai - using code from https://github.com/AliaksandrSiarohin/first-order-model - needs vram";
-        public void BakaMitai(Bitmap bmp, IMessage m)
+        public Video BakaMitai(Bitmap bmp, IMessage m)
         {
             if (!Directory.Exists("Commands\\Edit\\first-order-model"))
                 throw new Exception("AI model is not set up on this bot instance");
@@ -70,7 +70,7 @@ namespace MEE7.Commands.Edit
                     File.Delete(finalFile);
 
                 Process runner = Process.Start("python.exe",
-                    "Commands\\Edit\\first-order-model\\executer.py");
+                    "Commands\\Edit\\Resources\\first-order-model-executer.py");
 
                 bmp.Dispose();
                 resized.Dispose();
@@ -80,7 +80,7 @@ namespace MEE7.Commands.Edit
                 if (!File.Exists(finalFile))
                     throw new Exception("Couldn't get enough VRAM to run the model D:");
                 else
-                    DiscordNETWrapper.SendFile(finalFile, m.Channel).Wait();
+                    return new Video(finalFile);
             }
         }
     }
