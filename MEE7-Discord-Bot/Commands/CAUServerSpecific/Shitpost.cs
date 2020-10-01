@@ -43,6 +43,7 @@ namespace MEE7.Commands.CAUServerSpecific
                             arena.SendFileAsync(image.GetStreamFromUrl(), image.Split("/").Last(), $"<{link}> {title}");
                         if (Config.Data.lastCodeMemeId == 0 || (Config.Data.lastCodeMemeId != 0 && id != Config.Data.lastCodeMemeId))
                             Config.Data.lastCodeMemeId = id;
+                        Config.Save();
                     }
                 }
                 catch { }
