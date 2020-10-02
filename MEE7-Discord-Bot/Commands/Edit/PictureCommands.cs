@@ -863,7 +863,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string TranslateDesc = "Translate picture";
-        public static Bitmap Translate(Bitmap b, IMessage m, int deltaX, int deltaY)
+        public Bitmap Translate(Bitmap b, IMessage m, int deltaX, int deltaY)
         {
             Bitmap n = new Bitmap(b.Width, b.Height);
             using (Graphics graphics = Graphics.FromImage(n))
@@ -873,7 +873,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string DuplicateDesc = "Duplicate picture into gif";
-        public static Gif Duplicate(Bitmap b, IMessage m, int amount)
+        public Gif Duplicate(Bitmap b, IMessage m, int amount)
         {
             if (amount > 100)
                 throw new Exception("no");
@@ -885,7 +885,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string CircleTransDesc = "Add circular transparency to the picture";
-        public static Bitmap CircleTrans(Bitmap b, IMessage m)
+        public Bitmap CircleTrans(Bitmap b, IMessage m)
         {
             using UnsafeBitmapContext c = new UnsafeBitmapContext(b);
             for (int x = 0; x < b.Width; x++)
