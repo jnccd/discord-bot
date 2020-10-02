@@ -13,14 +13,15 @@ namespace MEE7.Commands.Edit
         public Vector2 Vector(EditNull n, IMessage m, double a, double b) => new Vector2((float)a, (float)b);
 
         public string ForFuncDesc = "foori foori";
-        public a[] ForFunc<a>(a o, IMessage m, string pipe, string varName, float startValue, float endValue, float stepWidth)
+        public a[] ForFunc<a>(a o, IMessage m, Pipe p, string varName, float startValue, float endValue, int steps)
         {
-            List<a> results = new List<a>();
+            if (steps > 150)
+                throw new Exception("Too many steps >:(");
 
-            for (float f = startValue; f < endValue; f += stepWidth)
-                results.Add((a)Pipe.Parse(m, pipe.Replace("%" + varName, f.ToString().Replace(",", "."))).Apply(m, o));
-
-            return results.ToArray();
+            float mul = (endValue - startValue) / steps;
+            int i = 0;
+            return Enumerable.Repeat(o, steps).
+                Select(x => (a)p.Apply(m, o, new Dictionary<string, object>() { { varName, startValue + (i++ * mul) } })).ToArray();
         }
 
         public string MapDesc = "'tis map from haskel";

@@ -57,7 +57,7 @@ namespace MEE7.Commands.Edit
                 TimeSpan dureation = endTime - startTime;
                 string targetPath = video.filePath.Split('.').SkipLast(1).Combine(".") + "-cut." + video.filePath.Split('.').Last();
 
-                string args = $"-ss {startTime} -i {video.filePath} -to {dureation} {targetPath}";
+                string args = $"-ss {startTime} -i {video.filePath} -to {dureation} -y {targetPath}";
                 Process runner = Process.Start("ffmpeg.exe", args);
                 runner.WaitForExit();
 
