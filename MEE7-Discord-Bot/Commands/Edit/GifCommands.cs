@@ -171,6 +171,30 @@ namespace MEE7.Commands.Edit
                 b.Dispose();
         }
 
+        public string ForBDesc = "foori foori for bitmaps, requires a color to color lambda pipe p";
+        public Bitmap[] ForB(Bitmap b, IMessage m, Pipe thresholder, Pipe col, string varName, float startValue, float endValue, int steps)
+        {
+            if (steps > 150)
+                throw new Exception("Too many steps >:(");
+
+            float mul = (endValue - startValue) / steps;
+            int i = 0;
+            return Enumerable.Repeat(b, steps).
+                Select(a =>
+                {
+                    using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                        for (int x = 0; x < b.Width; x++)
+                            for (int y = 0; y < b.Height; y++)
+                            {
+                                Color c = con.GetPixel(x, y);
+                                c.ColorToHSV(out double h, out double s, out double v);
+                                if ((bool)thresholder.Apply(m, null, new Dictionary<string, object>() { { "h", h }, { "s", s * 100 }, { "v", v * 100 } }))
+                                    con.SetPixel(x, y, (Color)col.Apply(m, c, new Dictionary<string, object>() { { "i", i++ } }));
+                            }
+                    return a;
+                }).ToArray();
+        }
+
         public string MapGDesc = "Map for gifs, because gifs are special now";
         public Gif MapG(Gif gif, IMessage m, string pipe, string varName = "i", float startValue = 0, float endValue = int.MinValue)
         {

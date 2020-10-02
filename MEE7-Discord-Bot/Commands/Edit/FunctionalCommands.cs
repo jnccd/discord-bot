@@ -21,7 +21,7 @@ namespace MEE7.Commands.Edit
             float mul = (endValue - startValue) / steps;
             int i = 0;
             return Enumerable.Repeat(o, steps).
-                Select(x => (a)p.Apply(m, o, new Dictionary<string, object>() { { varName, startValue + (i++ * mul) } })).ToArray();
+                Select(x => (a)p.Apply(m, x, new Dictionary<string, object>() { { varName, startValue + (i++ * mul) } })).ToArray();
         }
 
         public string MapDesc = "'tis map from haskel";
