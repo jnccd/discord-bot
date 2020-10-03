@@ -78,36 +78,52 @@ namespace MEE7.Commands
 
             var roles = Program.GetGuildFromChannel(message.Channel).Roles;
 
-            List<Tuple<DiscordEmote, ulong>> emoteRoleTuples = message.Content.
-                Remove(0, PrefixAndCommand.Length + 1).
-                Split('|').
-                Select(x => x.Trim(' ')).
-                Select(x => x.Split(' ')).
-                Select(s =>
-                {
-                    IEmote e = null;
-                    SocketRole r = null;
-
-                    if (s.Length != 2)
-                        throw new Exception(s.Combine(" "));
-
-                    try
+            List<Tuple<DiscordEmote, ulong>> emoteRoleTuples;
+            try
+            {
+                emoteRoleTuples = message.Content.
+                    Remove(0, PrefixAndCommand.Length + 1).
+                    Split('|').
+                    Select(x => x.Trim(' ')).
+                    Select(x => x.Split(' ')).
+                    Select(s =>
                     {
-                        if (Emote.TryParse(s[0], out Emote et))
-                            e = et;
-                        else
-                            e = new Emoji(s[0]);
+                        IEmote e = null;
+                        SocketRole r = null;
 
-                        r = roles.First(x => x.Name == s[1] || x.Id.ToString() == s[1]);
-                    } 
-                    catch
-                    {
-                        DiscordNETWrapper.SendText("Can't find role and/or emote " + s.Combine(" "), message.Channel).Wait();
-                        return null;
-                    }
+                        s = s.Where(x => x.Length > 0).ToArray();
 
-                    return new Tuple<DiscordEmote, ulong>(DiscordEmote.FromIEmote(e), r.Id);
-                }).ToList();
+                        if (s.Length != 2)
+                            throw new Exception(s.Combine(" "));
+
+                        try
+                        {
+                            if (Emote.TryParse(s[0], out Emote et))
+                                e = et;
+                            else
+                                e = new Emoji(s[0]);
+
+                            r = roles.First(x => x.Name == s[1] || x.Id.ToString() == s[1]);
+                        }
+                        catch
+                        {
+                            DiscordNETWrapper.SendText("Can't find role and/or emote " + s.Combine(" "), message.Channel).Wait();
+                            return null;
+                        }
+
+                        return new Tuple<DiscordEmote, ulong>(DiscordEmote.FromIEmote(e), r.Id);
+                    }).ToList();
+            }
+            catch
+            {
+                DiscordNETWrapper.SendText("I couldnt read what you wanted to tell me, try using proper syntax, such as\n" +
+                    "```[emote1] [role name/id]|[emote2] {[role name/id]...```\n" +
+                    "Roles with a space in their name need to be imported using thier role id. You can get that id using the dev mode of discord\n" +
+                    "\n" +
+                    "Example:\n" +
+                   $"{Program.Prefix}sendRoleEmojiMessage <:fingergun_L:619206752516309005> test1 | <a:padoru:744966713778372778> test2", message.Channel).Wait();
+                return;
+            }
 
             if (emoteRoleTuples.Contains(null))
                 return;
