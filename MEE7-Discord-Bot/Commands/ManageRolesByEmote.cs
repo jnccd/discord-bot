@@ -23,7 +23,7 @@ namespace MEE7.Commands
 
     public class ManageRolesByEmote : Command
     {
-        public ManageRolesByEmote() : base("sendRoleEmojiMessage", "", isExperimental: false, isHidden: false)
+        public ManageRolesByEmote() : base("sendRoleEmojiMessage", "Let users of your server get roles from emote reactions", isExperimental: false, isHidden: false)
         {
             Program.OnEmojiReactionAdded += OnEmojiReactionAdded;
             Program.OnEmojiReactionRemoved += OnEmojiReactionRemoved;
