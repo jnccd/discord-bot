@@ -7,7 +7,7 @@ namespace MEE7.Commands
 {
     class Nice : Command
     {
-        public Nice() : base("nice", "Check if a user is nice", isHidden: false)
+        public Nice() : base("nice", "Check if a user is nice", isHidden: true)
         {
 
         }
