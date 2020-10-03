@@ -13,7 +13,7 @@ namespace MEE7.Commands
 {
     public class PatchNotes : Command
     {
-        public PatchNotes() : base("togglePatchNotes", "Get annoying messages", false)
+        public PatchNotes() : base("togglePatchNotes", "Get annoying messages", false, true)
         {
             Program.OnConnected += OnConnected;
         }
