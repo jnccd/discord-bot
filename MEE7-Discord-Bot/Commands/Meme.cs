@@ -16,7 +16,7 @@ namespace MEE7.Commands
             "https://www.reddit.com/r/SequelMemes/",
             "https://www.reddit.com/r/starterpacks/", "https://www.reddit.com/r/memeframe/" };
 
-        public Meme() : base("meme", "Posts a random meme", false)
+        public Meme() : base("meme", "Automatically steals a meme from reddit", false)
         {
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
