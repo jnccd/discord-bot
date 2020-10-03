@@ -82,10 +82,7 @@ namespace MEE7.Backend.HelperFunctions
         public static string Print(this IEmote e)
         {
             if (e is Emote)
-                if ((e as Emote).Animated)
-                    return $"<a:{(e as Emote).Name}:{(e as Emote).Id}>"; // ToString() doesnt work for animated emotes for some reason
-                else
-                    return e.ToString();
+                return e.ToString();
             else
                 return e.Name;
         }
