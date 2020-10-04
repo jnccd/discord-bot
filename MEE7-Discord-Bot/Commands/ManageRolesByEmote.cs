@@ -78,11 +78,18 @@ namespace MEE7.Commands
 
             var roles = Program.GetGuildFromChannel(message.Channel).Roles;
 
+            var args = message.Content.Remove(0, PrefixAndCommand.Length + 1);
+            var customMes = "";
+            if (args.Contains("\""))
+            {
+                customMes = args.GetEverythingBetween("\"", "\"");
+                args = args.Remove(0, args.IndexOf(customMes + "\"") + customMes.Length + 1);
+            }
+
             List<Tuple<DiscordEmote, ulong>> emoteRoleTuples;
             try
             {
-                emoteRoleTuples = message.Content.
-                    Remove(0, PrefixAndCommand.Length + 1).
+                emoteRoleTuples = args.
                     Split('|').
                     Select(x => x.Trim(' ')).
                     Select(x => x.Split(' ')).
@@ -128,10 +135,14 @@ namespace MEE7.Commands
             if (emoteRoleTuples.Contains(null))
                 return;
 
-            var roleMessage = DiscordNETWrapper.SendText("To get a role simply react to this message with the corresponding emote,\n" +
-                "to remove a role simply remove your reaction to this message.\n\n Emotes are mapped as follows:\n" +
-                emoteRoleTuples.Select(x => $"{x.Item1.Print()} - {g.Roles.First(y => y.Id == x.Item2).Name}").
-                Aggregate((x, y) => $"{x}\n{y}"), message.Channel).Result.Last();
+            IUserMessage roleMessage;
+            if (string.IsNullOrWhiteSpace(customMes))
+                roleMessage = DiscordNETWrapper.SendText("To get a role simply react to this message with the corresponding emote,\n" +
+                    "to remove a role simply remove your reaction to this message.\n\n Emotes are mapped as follows:\n" +
+                    emoteRoleTuples.Select(x => $"{x.Item1.Print()} - {g.Roles.First(y => y.Id == x.Item2).Name}").
+                    Aggregate((x, y) => $"{x}\n{y}"), message.Channel).Result.Last();
+            else
+                roleMessage = DiscordNETWrapper.SendText(customMes, message.Channel).Result.Last();
 
             roleMessage.AddReactionsAsync(emoteRoleTuples.Select(x => x.Item1.ToIEmote()).ToArray()).Wait();
             Config.Data.manageRoleByEmoteMessages.Add(new ManageRoleByEmoteMessage()
