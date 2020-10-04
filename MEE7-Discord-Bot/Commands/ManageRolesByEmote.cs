@@ -138,7 +138,7 @@ namespace MEE7.Commands
             IUserMessage roleMessage;
             if (string.IsNullOrWhiteSpace(customMes))
                 roleMessage = DiscordNETWrapper.SendText("To get a role simply react to this message with the corresponding emote,\n" +
-                    "to remove a role simply remove your reaction to this message.\n\n Emotes are mapped as follows:\n" +
+                    "to remove a role simply remove your reaction to this message.\n\nEmotes are mapped as follows:\n" +
                     emoteRoleTuples.Select(x => $"{x.Item1.Print()} - {g.Roles.First(y => y.Id == x.Item2).Name}").
                     Aggregate((x, y) => $"{x}\n{y}"), message.Channel).Result.Last();
             else
