@@ -41,7 +41,7 @@ namespace MEE7.Commands
                 info.AddFieldDirectly("Splash Url", g.SplashUrl, true);
 
             info.AddFieldDirectly("Roles:", g.Roles.OrderByDescending(x => x.Position).
-                Select(x => $"[{x.Members.Count()}]{x.Name}").Aggregate((x, y) => x + "\n" + y), true);
+                Select(x => $"[{x.Members.Count()}]{x.Name.Replace("*", "\\*")}").Aggregate((x, y) => x + "\n" + y), true);
 
             info.AddFieldDirectly("Verification Level", g.VerificationLevel, true);
             info.AddFieldDirectly("Voice Region Id", g.VoiceRegionId, true);
