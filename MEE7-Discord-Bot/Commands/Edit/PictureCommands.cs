@@ -819,15 +819,27 @@ namespace MEE7.Commands.Edit
                 File.Delete(imgPath);
             b.Save(imgPath);
 
-            using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
-            using var img = Pix.LoadFromFile(imgPath);
-            using var page = engine.Process(img);
-            var text = page.GetText();
+            string conf, text;
+            if (Program.RunningOnLinux) 
+            {
+                Process P = Process.Start(new ProcessStartInfo("tesseract", $"{imgPath} stdout") {
+                    RedirectStandardOutput = true
+                });
+                P.WaitForExit();
+                text = P.StandardOutput.ReadToEnd();
+                conf = "x";
+            } else {
+                using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
+                using var img = Pix.LoadFromFile(imgPath);
+                using var page = engine.Process(img);
+                text = page.GetText();
+                conf = page.GetMeanConfidence().ToString();
+            }
 
             if (getLargestBlock)
                 return text.Split("\n\n").MaxElement(x => x.Length);
 
-            return $"Confidence: {page.GetMeanConfidence()}\n\n" +
+            return $"Confidence: {conf}\n\n" +
                 $"{text}";
         }
 
