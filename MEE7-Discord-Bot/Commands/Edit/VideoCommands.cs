@@ -58,7 +58,7 @@ namespace MEE7.Commands.Edit
                 string targetPath = video.filePath.Split('.').SkipLast(1).Combine(".") + "-cut." + video.filePath.Split('.').Last();
 
                 string args = $"-ss {startTime} -i {video.filePath} -to {dureation} -y {targetPath}";
-                Process runner = Process.Start("ffmpeg.exe", args);
+                Process runner = Process.Start("ffmpeg", args);
                 runner.WaitForExit();
 
                 return new Video(targetPath);
@@ -73,7 +73,7 @@ namespace MEE7.Commands.Edit
                 string outPath = $"Commands{s}Edit{s}Workspace{s}output.gif";
                 string args = $"-t 5 -y -i {videoLink.filePath} -vf \"fps = 10, scale = 420:-1:" +
                         $"flags = lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 {outPath}";
-                Process runner = Process.Start("ffmpeg.exe", args);
+                Process runner = Process.Start("ffmpeg", args);
                 runner.WaitForExit();
 
                 Image i = Image.FromFile(outPath);
