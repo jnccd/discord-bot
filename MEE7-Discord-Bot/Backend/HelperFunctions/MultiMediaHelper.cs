@@ -64,13 +64,9 @@ namespace MEE7.Backend.HelperFunctions
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
 
-            string filename;
-            if (Program.RunningOnLinux) filename = "./youtube-dl";
-            else filename = "youtube-dl";
-
             return Process.Start(new ProcessStartInfo()
             {
-                FileName = filename,
+                FileName = "youtube-dl",
                 Arguments = $"{arguments} -o - {YoutubeURL}",
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
