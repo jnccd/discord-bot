@@ -2,6 +2,7 @@
 using MEE7.Backend.HelperFunctions;
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Numerics;
 using static MEE7.Commands.Edit.Edit;
 
@@ -57,7 +58,12 @@ namespace MEE7.Commands.Edit
                 else
                     return DateTime.Parse(s);
             }),
-            new ArgumentParseMethod(typeof(TimeSpan), (IMessage m, string s) => TimeSpan.Parse(s)),
+            new ArgumentParseMethod(typeof(TimeSpan), (IMessage m, string s) => {
+                while (s.Count(x => x == ':') < 2)
+                    s = "00:" + s;
+
+                return TimeSpan.Parse(s);
+            }),
             new ArgumentParseMethod(typeof(Pipe), (IMessage m, string s) => Pipe.Parse(m, s)),
         };
     }
