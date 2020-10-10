@@ -69,7 +69,10 @@ namespace MEE7.Commands.Edit
             {
                 if (block.StartsWith("Confidence: "))
                     continue;
-                var res = Program.twitterService.Search(new SearchOptions() { Q = block }).Statuses;
+                var modBlock = block.
+                    Split(' ').Where(x => !x.Contains('@')).Combine(" ").
+                    Replace("|", "I");
+                var res = Program.twitterService.Search(new SearchOptions() { Q = modBlock }).Statuses;
                 if (res.FirstOrDefault() != null)
                 {
                     re = res.First().ToTwitterUrl().AbsoluteUri;
