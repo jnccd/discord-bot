@@ -310,6 +310,18 @@ namespace MEE7.Backend.HelperFunctions
                 }
             }
         }
+        public static string GetShellOut(this string command)
+        {
+            string[] split = command.Split(' ');
+
+            Process P = Process.Start(new ProcessStartInfo(split.First(), split.Skip(1).Foldl("", (x, y) => x + " " + y).Trim(' '))
+            {
+                RedirectStandardOutput = true
+            });
+            P.WaitForExit();
+
+            return P.StandardOutput.ReadToEnd();
+        }
         public static string GetHTMLfromURL(this string URL)
         {
             try

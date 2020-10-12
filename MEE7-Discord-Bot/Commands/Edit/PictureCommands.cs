@@ -822,11 +822,7 @@ namespace MEE7.Commands.Edit
             string conf, text;
             if (Program.RunningOnLinux) 
             {
-                Process P = Process.Start(new ProcessStartInfo("tesseract", $"{imgPath} stdout") {
-                    RedirectStandardOutput = true
-                });
-                P.WaitForExit();
-                text = P.StandardOutput.ReadToEnd();
+                text = $"tesseract {imgPath} stdout".GetShellOut();
                 conf = "x";
             } else {
                 using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
