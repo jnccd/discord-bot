@@ -319,24 +319,25 @@ namespace MEE7.Commands.Edit
 
             string input = rawPipe.Trim(' ');
             int k = 0, j = 0;
-            string[] commands = new string(input.Select(x =>
-            {
-                if (x == '(')
-                    k++;
-                if (x == '{')
-                    j++;
-                if (x == ')')
-                    k--;
-                if (x == '}')
-                    j--;
-                if (k == 0 && j == 0 && x == '>')
-                    x = '';
-                return x;
-            }).
-            ToArray()).
-            Split('').
-            Select(x => x.Trim(' ')).
-            ToArray();
+            string[] commands = new string(input.
+                Select(x =>
+                {
+                    if (x == '(')
+                        k++;
+                    if (x == '{')
+                        j++;
+                    if (x == ')')
+                        k--;
+                    if (x == '}')
+                        j--;
+                    if (k == 0 && j == 0 && x == '>')
+                        x = '';
+                    return x;
+                }).
+                ToArray()).
+                Split('').
+                Select(x => x.Trim(' ')).
+                ToArray();
 
             if (input[0] == '"')
             {
@@ -470,8 +471,6 @@ namespace MEE7.Commands.Edit
                 throw new Exception($"Only 100 instructions are allowed per pipe.");
 
             var type = pipe.First().Item2.InputType;
-            var test = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-
             if (type != null &&       // In type not null
                 !type.IsNullable() && // In type not nullable
                 !subPipe)             // Not part of subpipe
