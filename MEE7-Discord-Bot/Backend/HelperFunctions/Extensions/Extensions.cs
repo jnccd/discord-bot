@@ -66,5 +66,11 @@ namespace MEE7.Backend.HelperFunctions
         {
             return i < 0 ? 0 : i;
         }
+        public static bool IsNullable(this Type type)
+        {
+            if (!type.IsValueType) return true; // ref-type
+            if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
+            return false;
+        }
     }
 }
