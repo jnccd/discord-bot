@@ -33,15 +33,18 @@ namespace MEE7.Commands.Edit
         }
 
         public string GetVideoFromYTDesc = "Gets video from yt link";
-        public Video GetVideoFromYT(string videoLink, IMessage m)
+        public Video GetVideoFromYT(string videoLink, IMessage m, string videoLink2)
         {
             if (m.Author.Id != Program.Master.Id)
                 throw new Exception("u r not allowed");
 
+            if (string.IsNullOrWhiteSpace(videoLink))
+                videoLink = videoLink2;
+
+            videoLink = videoLink.Trim('<', '>');
             if (!videoLink.StartsWith("https://www.youtube.com/watch?v="))
                 throw new Exception("that no yt link D:");
 
-            videoLink = videoLink.Trim('<', '>');
             //string videoName = $"youtube-dl --skip-download --get-title --no-warnings {videoLink}".GetShellOut();
             string videoName = "videoYT";
             string path = $"Commands{s}Edit{s}Workspace{s}{new string(videoName.Where(x => char.IsLetterOrDigit(x) || x == ' ').ToArray())}.mp4";
