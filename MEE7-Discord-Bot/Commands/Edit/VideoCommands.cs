@@ -46,14 +46,12 @@ namespace MEE7.Commands.Edit
                 throw new Exception("that no yt link D:");
 
             string videoName = $"youtube-dl --skip-download --get-title --no-warnings {videoLink}".GetShellOut();
-            string path = $"Commands{s}Edit{s}Workspace{s}{new string(videoName.Where(x => char.IsLetterOrDigit(x) || x == ' ').ToArray())}.mp4";
+            string path = $"Commands{s}Edit{s}Workspace{s}videoYT.mp4";
 
             lock (workspaceLock)
             {
-                FileStream f = new FileStream(path, FileMode.Create);
-                Process p = MultiMediaHelper.GetStreamFromYouTubeVideo(videoLink);
-                p.StandardOutput.BaseStream.CopyTo(f);
-                return new Video(path);
+                var o = $"youtube-dl -f mp4 --output \"{path}\" {videoLink}".GetShellOut();
+                return new Video(path, videoName);
             }
         }
 
@@ -62,14 +60,14 @@ namespace MEE7.Commands.Edit
         {
             lock (workspaceLock)
             {
-                TimeSpan dureation = endTime - startTime;
+                TimeSpan duration = endTime - startTime;
                 string targetPath = video.filePath.Split('.').SkipLast(1).Combine(".") + "-cut." + video.filePath.Split('.').Last();
 
-                string args = $"-ss {startTime} -i {video.filePath} -to {dureation} -y {targetPath}";
+                string args = $"-ss {startTime} -i {video.filePath} -to {duration} -y {targetPath}";
                 Process runner = Process.Start("ffmpeg", args);
-                runner.WaitForExit();
+                runner.WaitForExit(30_000);
 
-                return new Video(targetPath);
+                return video.ChangePath(targetPath);
             }
         }
 
