@@ -325,7 +325,7 @@ namespace MEE7.Backend.HelperFunctions
             if (!P.WaitForExit(timeout))
                 P.Kill();
 
-            return P.StandardOutput.ReadToEnd();
+            return P.StandardOutput.ReadToEnd() + P.StandardError.ReadToEnd();
         }
         public static string GetHTMLfromURL(this string URL)
         {
