@@ -45,8 +45,7 @@ namespace MEE7.Commands.Edit
             if (!videoLink.StartsWith("https://www.youtube.com/watch?v="))
                 throw new Exception("that no yt link D:");
 
-            //string videoName = $"youtube-dl --skip-download --get-title --no-warnings {videoLink}".GetShellOut();
-            string videoName = "videoYT";
+            string videoName = $"youtube-dl --skip-download --get-title --no-warnings {videoLink}".GetShellOut();
             string path = $"Commands{s}Edit{s}Workspace{s}{new string(videoName.Where(x => char.IsLetterOrDigit(x) || x == ' ').ToArray())}.mp4";
 
             lock (workspaceLock)
