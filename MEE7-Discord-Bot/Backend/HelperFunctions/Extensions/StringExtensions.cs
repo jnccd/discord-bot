@@ -310,15 +310,20 @@ namespace MEE7.Backend.HelperFunctions
                 }
             }
         }
-        public static string GetShellOut(this string command)
+        public static string GetShellOut(this string command, int timeout = 10000)
         {
             string[] split = command.Split(' ');
 
-            Process P = Process.Start(new ProcessStartInfo(split.First(), split.Skip(1).Foldl("", (x, y) => x + " " + y).Trim(' '))
+            Process P = Process.Start(new ProcessStartInfo()
             {
-                RedirectStandardOutput = true
+                FileName = split.First(),
+                Arguments = split.Skip(1).Combine(" "),
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true
             });
-            P.WaitForExit();
+            if (!P.WaitForExit(timeout))
+                P.Kill();
 
             return P.StandardOutput.ReadToEnd();
         }
