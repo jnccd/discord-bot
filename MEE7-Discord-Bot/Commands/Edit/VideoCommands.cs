@@ -67,21 +67,23 @@ namespace MEE7.Commands.Edit
                 Process runner = Process.Start("ffmpeg", args);
                 runner.WaitForExit(30_000);
 
+                File.Delete(video.filePath);
                 return video.ChangePath(targetPath);
             }
         }
 
         public string ConvertToGifDesc = "Convert video to gif";
-        public Gif ConvertToGif(Video videoLink, IMessage m)
+        public Gif ConvertToGif(Video video, IMessage m)
         {
             lock (workspaceLock)
             {
                 string outPath = $"Commands{s}Edit{s}Workspace{s}output.gif";
-                string args = $"-t 5 -y -i {videoLink.filePath} -vf \"fps = 10, scale = 420:-1:" +
+                string args = $"-t 5 -y -i {video.filePath} -vf \"fps = 10, scale = 420:-1:" +
                         $"flags = lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse\" -loop 0 {outPath}";
                 Process runner = Process.Start("ffmpeg", args);
                 runner.WaitForExit();
 
+                File.Delete(video.filePath);
                 Image i = Image.FromFile(outPath);
                 return MultiMediaHelper.ImageToGif(i);
             }

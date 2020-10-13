@@ -87,6 +87,7 @@ namespace MEE7.Commands.Edit
                     FileInfo file = new FileInfo(Path.Combine(Program.ExePath, v.filePath));
                     file.Rename(new string(v.name.Where(x => char.IsLetterOrDigit(x) || x == ' ').ToArray()) + ".mp4");
                     DiscordNETWrapper.SendFile(file.FullName, m.Channel).Wait();
+                    File.Delete(file.FullName);
                 }
             }),
             new PrintMethod(typeof(WaveStream), (IMessage m, object o) => {
