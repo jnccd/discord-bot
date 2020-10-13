@@ -469,7 +469,12 @@ namespace MEE7.Commands.Edit
             if (pipe.Select(x => x.Item2.FunctionCalls()).Sum() >= 100)
                 throw new Exception($"Only 100 instructions are allowed per pipe.");
 
-            if (pipe.First().Item2.InputType != null && !subPipe)
+            var type = pipe.First().Item2.InputType;
+            var test = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+
+            if (type != null &&       // In type not null
+                !type.IsNullable() && // In type not nullable
+                !subPipe)             // Not part of subpipe
                 throw new Exception($"The first function has to be a input function");
 
             for (int i = 1; i < pipe.Count; i++)
