@@ -79,7 +79,15 @@ namespace MEE7.Commands.Edit
                     $"{ColorTranslator.ToHtml(c)}").Wait();
             }),
             new PrintMethod(typeof(Video), (IMessage m, object o) => {
-                DiscordNETWrapper.SendFile((o as Video).filePath, m.Channel).Wait();
+                Video v = o as Video;
+                if (string.IsNullOrWhiteSpace(v.name))
+                    DiscordNETWrapper.SendFile(v.filePath, m.Channel).Wait();
+                else
+                {
+                    FileInfo file = new FileInfo(Path.Combine(Program.ExePath, v.filePath));
+                    file.Rename(new string(v.name.Where(x => char.IsLetterOrDigit(x) || x == ' ').ToArray()) + ".mp4");
+                    DiscordNETWrapper.SendFile(file.FullName, m.Channel).Wait();
+                }
             }),
             new PrintMethod(typeof(WaveStream), (IMessage m, object o) => {
                 Stream s = new MemoryStream();

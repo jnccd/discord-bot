@@ -72,5 +72,9 @@ namespace MEE7.Backend.HelperFunctions
             if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
             return false;
         }
+        public static void Rename(this FileInfo fileInfo, string newName)
+        {
+            fileInfo.MoveTo(Path.Combine(fileInfo.Directory.FullName, newName));
+        }
     }
 }
