@@ -6,7 +6,6 @@
     <RootNamespace>MEE7</RootNamespace>
     <AssemblyName>MEE7</AssemblyName>
     <StartupObject>MEE7.Program</StartupObject>
-    <LangVersion>8.0</LangVersion>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <NoWarn>NU1701</NoWarn>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
