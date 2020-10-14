@@ -669,7 +669,18 @@ namespace MEE7
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
-                    else if (input.StartsWith("/modify")) // ChannelID
+                    else if (input.StartsWith("/modifyto")) // ChannelID MessageID ChannelID MessageID
+                    {
+                        string[] split = input.Split(' ');
+                        try
+                        {
+                            var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
+                            var messageTo = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[3])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[4])).Result;
+                            message.ModifyAsync(m => m.Content = messageTo.Content);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                    }
+                    else if (input.StartsWith("/modify")) // ChannelID MessageID
                     {
                         string[] split = input.Split(' ');
                         try
