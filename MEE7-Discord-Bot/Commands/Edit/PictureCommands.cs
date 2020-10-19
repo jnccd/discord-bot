@@ -1,6 +1,7 @@
 ﻿using BumpKit;
 using Discord;
 using Emgu.CV;
+using Emgu.CV.Stitching;
 using Emgu.CV.Structure;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Commands.Edit.Resources;
@@ -812,17 +813,20 @@ namespace MEE7.Commands.Edit
         }
 
         public string ReadDesc = "Reads text";
-        public string Read(Bitmap b, IMessage m, bool getLargestBlock = false)
+        public string Read(Bitmap b, IMessage m, bool getLargestBlock = false, string language = "eng")
         {
             var imgPath = $"Commands{s}Edit{s}Workspace{s}uwu.png";
             if (File.Exists(imgPath))
                 File.Delete(imgPath);
             b.Save(imgPath);
 
+            if (!language.All(x => char.IsLetter(x) || x == '_'))
+                throw new Exception("nope, thats not a language");
+
             string conf, text;
             if (Program.RunningOnLinux) 
             {
-                text = $"tesseract {imgPath} stdout".GetShellOut();
+                text = $"tesseract {imgPath} stdout -l {language}".GetShellOut();
                 conf = "x";
             } else {
                 using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
