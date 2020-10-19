@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/core/runtime:3.1-focal AS base
 WORKDIR /app
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends libgdiplus libc6-dev ffmpeg youtube-dl
-RUN apt-get install -y tesseract-ocr tesseract-ocr-eng 
+RUN apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-chi-sim
 Run rm -rf /var/lib/apt/lists/*
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-focal AS build
