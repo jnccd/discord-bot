@@ -820,13 +820,13 @@ namespace MEE7.Commands.Edit
                 File.Delete(imgPath);
             b.Save(imgPath);
 
-            if (!language.All(x => char.IsLetter(x) || x == '_'))
+            if (!language.All(x => char.IsLetter(x) || x == '_' || x == '+'))
                 throw new Exception("nope, thats not a language");
 
             string conf, text;
             if (Program.RunningOnLinux) 
             {
-                text = $"tesseract {imgPath} stdout -l {language}".GetShellOut();
+                text = $"tesseract {imgPath} - quiet -l {language}".GetShellOut();
                 conf = "x";
             } else {
                 using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
@@ -839,8 +839,7 @@ namespace MEE7.Commands.Edit
             if (getLargestBlock)
                 return text.Split("\n\n").MaxElement(x => x.Length);
 
-            return $"Confidence: {conf}\n\n" +
-                $"{text}";
+            return $"{text}";
         }
 
         public string InsertIntoRectDesc = "Inserts picture into the red rectangle of another picture";
