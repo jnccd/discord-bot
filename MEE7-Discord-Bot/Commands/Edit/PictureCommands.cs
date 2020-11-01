@@ -813,7 +813,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string ReadDesc = "Reads text";
-        public string Read(Bitmap b, IMessage m, bool getLargestBlock = false, string language = "eng")
+        public string Read(Bitmap b, IMessage m, bool getLargestBlock = false, string language = "eng+jpn+chi_sim")
         {
             var imgPath = $"Commands{s}Edit{s}Workspace{s}uwu.png";
             if (File.Exists(imgPath))
@@ -873,8 +873,8 @@ namespace MEE7.Commands.Edit
             return backGround;
         }
 
-        public string TranslateDesc = "Translate picture";
-        public Bitmap Translate(Bitmap b, IMessage m, int deltaX, int deltaY)
+        public string TranslatePDesc = "Translate picture";
+        public Bitmap TranslateP(Bitmap b, IMessage m, int deltaX, int deltaY)
         {
             Bitmap n = new Bitmap(b.Width, b.Height);
             using (Graphics graphics = Graphics.FromImage(n))

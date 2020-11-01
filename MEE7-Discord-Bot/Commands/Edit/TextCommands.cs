@@ -1,4 +1,5 @@
 ﻿using Discord;
+using GoogleTranslateFreeApi;
 using MEE7.Backend.HelperFunctions;
 using System;
 using System.Linq;
@@ -87,6 +88,18 @@ namespace MEE7.Commands.Edit
                 throw new Exception("Didn't find anything");
 
             return re;
+        }
+
+        readonly GoogleTranslator translator = new GoogleTranslator();
+        public string TranslateDesc = "Translate the text to another language";
+        public string Translate(string s, IMessage m, string targetLanguage = "English", string sourceLanguage = "")
+        {
+            Language from = string.IsNullOrWhiteSpace(sourceLanguage) ? Language.Auto : GoogleTranslator.GetLanguageByName(sourceLanguage);
+            Language to = GoogleTranslator.GetLanguageByName(targetLanguage);
+
+            TranslationResult result = translator.TranslateLiteAsync(s, from, to).Result;
+
+            return result.MergedTranslation;
         }
 
         public string japanifyDesc = "Convert the text into katakana symbols, doesnt actually translate";
