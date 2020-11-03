@@ -96,7 +96,7 @@ namespace MEE7.Commands.Edit
         {
             Language from = string.IsNullOrWhiteSpace(sourceLanguage) ? Language.Auto : GoogleTranslator.GetLanguageByName(sourceLanguage);
             Language to = GoogleTranslator.GetLanguageByName(targetLanguage);
-
+            
             TranslationResult result = translator.TranslateLiteAsync(s, from, to).Result;
 
             return result.MergedTranslation;
