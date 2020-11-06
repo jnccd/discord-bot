@@ -42,16 +42,16 @@ namespace MEE7.Commands
                 return;
             var message = messageIn as SocketMessage;
 
-            if (message.Content.ToLower().Contains("Hello there"))
+            if (message.Content.ToLower().Contains("hello there"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("kenobi")).Wait();
 
-            if (message.Content.ToLower().Contains("Padoru"))
+            if (message.Content.ToLower().Contains("padoru"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("padoru")).Wait();
 
-            if (message.Content.ToLower().Contains("Hentai"))
+            if (message.Content.ToLower().Contains("hentai"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("hentai")).Wait();
 
-            if (message.Content.ToLower().Contains("I saw that") || message.Content.ToLower().Contains("peek"))
+            if (message.Content.ToLower().Contains("i saw that") || message.Content.ToLower().Contains("peek"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("eyes")).Wait();
 
             if (message.Content.ToLower().Contains("the sauce"))
