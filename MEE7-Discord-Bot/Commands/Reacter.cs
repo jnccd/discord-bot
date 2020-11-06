@@ -63,7 +63,7 @@ namespace MEE7.Commands
             if (Regex.IsMatch(message.Content, "\\b[a-zA-Z]u+ten [a-zA-Z]orgen\\b") || Regex.IsMatch(message.Content, "\\b[a-zA-Z]oo+d [a-zA-Z]orning\\b"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
-            if (message.Content.ToLower().Contains("Hotel"))
+            if (message.Content.ToLower().Contains("hotel"))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
                     emoteDict.GetValueOrDefault("T"),
                     emoteDict.GetValueOrDefault("R"),
@@ -73,7 +73,7 @@ namespace MEE7.Commands
                     emoteDict.GetValueOrDefault("G"),
                     emoteDict.GetValueOrDefault("O"), }).Wait();
 
-            if (message.Content.ToLower().Contains("Brille"))
+            if (message.Content.ToLower().Contains("brille"))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] {
                     emoteDict.GetValueOrDefault("F"),
                     emoteDict.GetValueOrDefault("I"),
