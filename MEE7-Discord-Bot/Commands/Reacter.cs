@@ -51,7 +51,7 @@ namespace MEE7.Commands
             if (message.Content.ToLower().Contains("Hentai"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("hentai")).Wait();
 
-            if (message.Content.ToLower().Contains("I saw that"))
+            if (message.Content.ToLower().Contains("I saw that") || message.Content.ToLower().Contains("peek"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("eyes")).Wait();
 
             if (message.Content.ToLower().Contains("the sauce"))
