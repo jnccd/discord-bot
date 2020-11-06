@@ -55,11 +55,15 @@ namespace MEE7.Commands
                 $"\nbut they share thier first place with: {g.Users.Where(x => x.GetDisplayName().Length == max).Skip(1).Select(x => x.ToString()).Combine(", ")}" :
                 ""), true);
 
-            info.AddFieldDirectly("Played Games: ", (from user in g.Users
-                                                     where user.Activity != null && user.Activity.Type == ActivityType.Playing
-                                                     group user by user.Activity.Name into x
-                                                     select $"[{x.Count()}]{x.Key}").
+            try
+            {
+                info.AddFieldDirectly("Played Games: ", (from user in g.Users
+                                                         where user.Activity != null && user.Activity.Type == ActivityType.Playing
+                                                         group user by user.Activity.Name into x
+                                                         select $"[{x.Count()}]{x.Key}").
                                                     Aggregate((x, y) => x + "\n" + y), true);
+            }
+            catch { }
 
             DiscordNETWrapper.SendEmbed(info, message.Channel).Wait();
 
