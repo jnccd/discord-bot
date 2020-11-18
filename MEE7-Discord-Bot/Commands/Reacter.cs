@@ -25,6 +25,7 @@ namespace MEE7.Commands
             emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
             emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856306476580965>"));
             emoteDict.Add("goodMorning", Emote.Parse("<a:GoodMorning:757939668221427742>"));
+            emoteDict.Add("no", Emote.Parse("<:no:778447862735568916>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
 
@@ -59,6 +60,9 @@ namespace MEE7.Commands
 
             if (message.Content.ToLower().Contains("spooky"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
+
+            if (message.Content == "Please call it maymay.")
+                message.AddReactionAsync(emoteDict.GetValueOrDefault("no")).Wait();
 
             if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]n\\b") || Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d mo+rning\\b"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
