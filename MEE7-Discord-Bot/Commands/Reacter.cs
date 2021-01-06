@@ -42,6 +42,8 @@ namespace MEE7.Commands
             if (!(messageIn is SocketMessage))
                 return;
             var message = messageIn as SocketMessage;
+            if (message.Author.IsBot)
+                return;
 
             if (message.Content.ToLower().Contains("hello there"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("kenobi")).Wait();
