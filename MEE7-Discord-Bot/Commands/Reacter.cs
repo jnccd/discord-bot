@@ -64,7 +64,7 @@ namespace MEE7.Commands
             if (message.Content.ToLower().Contains("spooky"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
 
-            if (message.Content == "Please call it maymay.")
+            if (message.Author.Id == 501691245790232596)
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("no")).Wait();
 
             if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]n\\b") || 
