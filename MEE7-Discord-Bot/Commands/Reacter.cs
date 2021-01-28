@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using MEE7.Backend;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -43,8 +44,6 @@ namespace MEE7.Commands
             if (!(messageIn is SocketMessage))
                 return;
             var message = messageIn as SocketMessage;
-            if (message.Author.IsBot)
-                return;
 
             if (message.Content.ToLower().Contains("hello there"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("kenobi")).Wait();
@@ -64,6 +63,7 @@ namespace MEE7.Commands
             if (message.Content.ToLower().Contains("spooky"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
 
+            Console.WriteLine(message.Id);
             if (message.Author.Id == 501691245790232596)
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("no")).Wait();
 
