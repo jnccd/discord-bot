@@ -41,7 +41,8 @@ namespace MEE7.Commands.Edit
 
             }),
             new PrintMethod(typeof(Bitmap[]), (IMessage m, object o) => {
-                using MemoryStream s = new MemoryStream(); Bitmap[] bs = o as Bitmap[];
+                using MemoryStream s = new MemoryStream(); 
+                Bitmap[] bs = o as Bitmap[];
                 int maxWidth = bs.Select(x => x.Width).Max();
                 int maxHeight = bs.Select(x => x.Height).Max();
                 using (AnimatedGifCreator c = new AnimatedGifCreator(s, 33))
@@ -55,7 +56,8 @@ namespace MEE7.Commands.Edit
 
             }),
             new PrintMethod(typeof(Gif), (IMessage m, object o) => {
-                using MemoryStream s = new MemoryStream(); Gif gif = o as Gif;
+                using MemoryStream s = new MemoryStream(); 
+                Gif gif = o as Gif;
                 int maxWidth = gif.Item1.Select(x => x.Width).Max();
                 int maxHeight = gif.Item1.Select(x => x.Height).Max();
                 using (AnimatedGifCreator c = new AnimatedGifCreator(s))
