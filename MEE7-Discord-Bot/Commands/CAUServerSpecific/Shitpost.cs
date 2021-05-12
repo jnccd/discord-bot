@@ -30,7 +30,7 @@ namespace MEE7.Commands.CAUServerSpecific
                     if (newTweets != null && newTweets.Count() > 0)
                     {
                         var codeShitpost = newTweets.MaxElement(x => x.FavoriteCount + x.RetweetCount * 2);
-                        if (codeShitpost.FavoriteCount + codeShitpost.RetweetCount * 2 < 120)
+                        if (codeShitpost.FavoriteCount + codeShitpost.RetweetCount * 2 < 80)
                             return;
 
                         var text = codeShitpost.GetContent();
@@ -45,10 +45,10 @@ namespace MEE7.Commands.CAUServerSpecific
                             Config.Data.lastCodeMemeId = id;
                         Config.Save();
                     }
+
+                    Thread.Sleep(10 * 60 * 1000);
                 }
                 catch { }
-
-                Thread.Sleep(10 * 60 * 1000);
             }
         }
 
