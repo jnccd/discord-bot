@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace MEE7.Commands
 {
-    public class ManageRoleByEmoteMessage
+    public class ManageRoleByEmoteMessage // uwu
     {
         public ulong MessageID;
         public ulong ChannelID;
