@@ -30,6 +30,7 @@ namespace MEE7.Commands
             emoteDict.Add("no", Emote.Parse("<:no:778447862735568916>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
+            emoteDict.Add("wave", new Emoji("👋"));
 
             for (int i = 'A'; i <= 'Z'; i++)
                 emoteDict.Add(((char)i).ToString(), new Emoji(char.ConvertFromUtf32(0x1F1E6 + i - 'A')));
@@ -76,6 +77,9 @@ namespace MEE7.Commands
                 Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d night\\b"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodNight")).Wait();
 
+            if (Regex.IsMatch(message.Content.ToLower(), "\\bhi+\\b"))
+                message.AddReactionAsync(emoteDict.GetValueOrDefault("wave")).Wait();
+
             if (message.Content.ToLower().Contains("hotel"))
                 (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
                     emoteDict.GetValueOrDefault("T"),
@@ -95,6 +99,7 @@ namespace MEE7.Commands
                     emoteDict.GetValueOrDefault("M"),
                     emoteDict.GetValueOrDefault("A"),
                     emoteDict.GetValueOrDefault("N"), }).Wait();
+
         }
 
         public override void Execute(IMessage message) { }
