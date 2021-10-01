@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MEE7.Backend.HelperFunctions
 {
-    public static class Extensions
+    public static class Extensions // uwu
     {
         public static bool IsFileLocked(this FileInfo file) // from https://stackoverflow.com/questions/876473/is-there-a-way-to-check-if-a-file-is-in-use
         {
