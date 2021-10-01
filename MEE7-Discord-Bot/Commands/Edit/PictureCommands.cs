@@ -567,6 +567,22 @@ namespace MEE7.Commands.Edit
             return b;
         }
 
+        public string layerHSVDesc = "Split image into two layers ";
+        public Bitmap LayerHSV(Bitmap b, IMessage m, Pipe thresholder)
+        {
+            using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
+                for (int x = 0; x < b.Width; x++)
+                    for (int y = 0; y < b.Height; y++)
+                    {
+                        Color c = con.GetPixel(x, y);
+                        c.ColorToHSV(out double h, out double s, out double v);
+                        if ((bool)thresholder.Apply(m, null, new Dictionary<string, object>() { { "h", h }, { "s", s * 100 }, { "v", v * 100 } }))
+                            con.SetPixel(x, y, Color.FromArgb(0, c));
+                    }
+
+            return b;
+        }
+
         public string hueScaleDesc = "Grayscaled Hue channel of the image";
         public Bitmap HueScale(Bitmap b, IMessage m)
         {
