@@ -28,7 +28,7 @@ namespace MEE7.Commands
             HtmlWeb web = new HtmlWeb();
             var searchDoc = web.Load("https://github.com/niklasCarstensen/Discord-Bot/commits/master");
 
-            var commits = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'link-gray-dark text-bold js-navigation-open')]");
+            var commits = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'Link--primary text-bold js-navigation-open markdown-title')]");
 
             foreach (var commit in commits)
             {
