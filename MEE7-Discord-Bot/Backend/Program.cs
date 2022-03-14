@@ -131,26 +131,32 @@ namespace MEE7
             }
 
             LoadBuildDate();
-            UpdateYTDL();
+            //UpdateYTDL();
 
-            client = new DiscordSocketClient();
+            var config = new DiscordSocketConfig()
+            {
+                GatewayIntents = GatewayIntents.All,
+                AlwaysDownloadUsers = true,
+            };
+            client = new DiscordSocketClient(config);
             SetClientEvents();
 
             Login();
 
             CreateCommandInstances();
 
-            while (!ClientReady) { Thread.Sleep(20); }
-
+            while (!ClientReady || client.ConnectionState != ConnectionState.Connected) { Thread.Sleep(50); }
+            
             SetState();
-            Master = client.GetUser(300699566041202699);
-
-            BuildHelpMenu();
-
+            
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
+            Thread.Sleep(1000);
+            Master = client.GetUser(300699566041202699);
 
             DiscordNETWrapper.SendText(logStartupMessage, (IMessageChannel)GetChannelFromID(logChannel)).Wait();
             Config.Load();
+
+            BuildHelpMenu();
 
             StartAutosaveLoop();
 
@@ -234,7 +240,7 @@ namespace MEE7
                 OnGuildMembersDownloaded?.InvokeParallel(arg);
                 return Task.FromResult(default(object));
             };
-            client.GuildMemberUpdated += (SocketGuildUser arg1, SocketGuildUser arg2) =>
+            client.GuildMemberUpdated += (Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser arg2) =>
             {
                 OnGuildMemberUpdated?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
@@ -267,14 +273,14 @@ namespace MEE7
             client.LoggedOut += () =>
             {
                 OnLoggedOut?.InvokeParallel();
-                return Task.FromResult(default(object));
+                return Task.FromResult(default(object)); 
             };
-            client.MessageDeleted += (Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2) =>
+            client.MessageDeleted += (Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2) =>
             {
                 OnMessageDeleted?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
             };
-            client.MessagesBulkDeleted += (IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, ISocketMessageChannel arg2) =>
+            client.MessagesBulkDeleted += (IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, Cacheable<IMessageChannel, ulong> arg2) =>
             {
                 OnMessagesBulkDeleted?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
@@ -284,7 +290,7 @@ namespace MEE7
                 OnMessageUpdated?.InvokeParallel(arg1, arg2, arg3);
                 return Task.FromResult(default(object));
             };
-            client.ReactionsCleared += (Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2) =>
+            client.ReactionsCleared += (Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2) =>
             {
                 OnReactionsCleared?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
@@ -319,7 +325,7 @@ namespace MEE7
                 OnUserBanned?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
             };
-            client.UserIsTyping += (SocketUser arg1, ISocketMessageChannel arg2) =>
+            client.UserIsTyping += (Cacheable<IUser, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2) =>
             {
                 OnUserIsTyping?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
@@ -329,9 +335,9 @@ namespace MEE7
                 OnUserJoined?.InvokeParallel(arg);
                 return Task.FromResult(default(object));
             };
-            client.UserLeft += (SocketGuildUser arg) =>
+            client.UserLeft += (SocketGuild arg1, SocketUser arg2) =>
             {
-                OnUserLeft?.InvokeParallel(arg);
+                OnUserLeft?.InvokeParallel(arg1, arg2);
                 return Task.FromResult(default(object));
             };
             client.UserUnbanned += (SocketUser arg1, SocketGuild arg2) =>
@@ -359,7 +365,9 @@ namespace MEE7
         {
             try
             {
-                client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BotToken")).Wait();
+                var token = Environment.GetEnvironmentVariable("BotToken");
+                if (String.IsNullOrWhiteSpace(token)) throw new ArgumentException();
+                client.LoginAsync(TokenType.Bot, token).Wait();
                 client.StartAsync().Wait();
             }
             catch (Exception e1)

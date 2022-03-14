@@ -34,7 +34,7 @@ namespace MEE7.Commands
             info.AddFieldDirectly("Bot Count", g.Users.Where(x => x.IsBot).Count(), true);
 
             info.AddFieldDirectly("Emotes", g.Emotes.Count, true);
-            info.AddFieldDirectly("Features", g.Features.Count, true);
+            info.AddFieldDirectly("Features", g.Features.Value, true);
             info.AddFieldDirectly("Mfa Level", g.MfaLevel, true);
             info.AddFieldDirectly("Icon Url", g.IconUrl, true);
             if (g.SplashUrl != null)
@@ -57,9 +57,10 @@ namespace MEE7.Commands
 
             try
             {
+                // TODO: Many activities many confoos
                 info.AddFieldDirectly("Played Games: ", (from user in g.Users
-                                                         where user.Activity != null && user.Activity.Type == ActivityType.Playing
-                                                         group user by user.Activity.Name into x
+                                                         where user.Activities.Count > 0 && user.Activities.First().Type == ActivityType.Playing
+                                                         group user by user.Activities.First().Name into x
                                                          select $"[{x.Count()}]{x.Key}").
                                                     Aggregate((x, y) => x + "\n" + y), true);
             }

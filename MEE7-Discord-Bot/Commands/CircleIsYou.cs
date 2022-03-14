@@ -48,7 +48,7 @@ namespace MEE7.Commands
             Program.OnExit += OnExit;
         }
 
-        public void OnEmojiReactionUpdated(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        public void OnEmojiReactionUpdated(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3)
         {
             lock (this)
             {

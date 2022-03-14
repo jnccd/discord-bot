@@ -175,7 +175,7 @@ namespace MEE7.Commands
             }
             public void SendDeck(Tuple<SocketUser, List<UnoCard>> player)
             {
-                DiscordNETWrapper.SendBitmap(RenderDeck(player.Item2), player.Item1.GetOrCreateDMChannelAsync().Result).Wait();
+                DiscordNETWrapper.SendBitmap(RenderDeck(player.Item2), player.Item1.CreateDMChannelAsync().Result).Wait();
             }
         }
         class UnoCard

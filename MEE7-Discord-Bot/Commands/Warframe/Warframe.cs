@@ -333,7 +333,7 @@ namespace MEE7.Commands
                 foreach (DiscordUser user in Config.Data.UserList)
                     foreach (string filter in user.WarframeFilters)
                         if (BooleanContainsAllOf(line, filter))
-                            Program.GetUserFromId(user.UserID).GetOrCreateDMChannelAsync().Result.SendMessageAsync(line).Wait();
+                            Program.GetUserFromId(user.UserID).CreateDMChannelAsync().Result.SendMessageAsync(line).Wait();
         }
         bool BooleanContainsAllOf(string s, string match)
         {

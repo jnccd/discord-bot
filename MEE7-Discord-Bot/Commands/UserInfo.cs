@@ -21,7 +21,7 @@ namespace MEE7.Commands
             catch { DiscordNETWrapper.SendText("That's not a valid user id", message.Channel).Wait(); return; }
 
             EmbedBuilder embed = DiscordNETWrapper.CreateEmbedBuilder(u.Username, "", u.GetAvatarUrl(), u, u.GetDefaultAvatarUrl());
-            embed.AddFieldDirectly("Activity", $"{u.Activity}, {u.Activity.Type}");
+            embed.AddFieldDirectly("Activities", u.Activities.Select(x => $"{x.Name}, {x.Type}").Combine(" - "));
             embed.AddFieldDirectly("AvatarId", u.AvatarId);
             embed.AddFieldDirectly("CreatedAt", u.CreatedAt);
             embed.AddFieldDirectly("Discriminator", u.Discriminator);
