@@ -68,8 +68,9 @@ namespace MEE7.Commands
             if (message.Author.Id == 501691245790232596)
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("no")).Wait();
 
-            if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]n\\b") || 
-                Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d mo+rning\\b"))
+            if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]n\\b") ||
+                Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d mo+rning\\b") ||
+                message.Content == "早上好" || message.Content == "早好")
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
             if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+te nacht\\b") ||
