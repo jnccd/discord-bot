@@ -74,8 +74,11 @@ namespace MEE7.Configuration
                 try
                 {
                     var tmp_channel = Program.GetChannelFromID(DiscordConfigChannelID);
-                    var tmp_res = ((IMessageChannel)tmp_channel).GetMessagesAsync().FlattenAsync().Result;
-                    url = tmp_res.First(x => x.Content.StartsWith(DiscordConfigMessage) && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
+                    if (tmp_channel == null)
+                        return;
+
+                    url = ((IMessageChannel)tmp_channel).GetMessagesAsync().FlattenAsync().Result.
+                        First(x => x.Content.StartsWith(DiscordConfigMessage) && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
                     using (var wc = new System.Net.WebClient())
                         discordConfig = wc.DownloadString(url);
                 }
