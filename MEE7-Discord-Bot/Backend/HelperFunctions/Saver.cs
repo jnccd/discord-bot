@@ -14,6 +14,8 @@ namespace MEE7.Backend.HelperFunctions
 
         public static void SaveChannel(IChannel Channel)
         {
+            if (Channel == null)
+                return;
             if (Config.Data.ChannelsWrittenOn == null)
                 Config.Data.ChannelsWrittenOn = new List<ulong>();
             if (!Config.Data.ChannelsWrittenOn.Contains(Channel.Id))

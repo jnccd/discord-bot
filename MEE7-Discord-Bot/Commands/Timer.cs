@@ -102,7 +102,7 @@ namespace MEE7.Commands
                 }
             });
         }
-        private void Program_OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        private void Program_OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3)
         {
             if (arg3.Emote.Name == CancelEmote.Name)
             {
@@ -116,7 +116,7 @@ namespace MEE7.Commands
                 }
             }
         }
-        private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+        private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
         {
             for (int i = 0; i < Config.Data.timers.Count; i++)
                 if (Config.Data.timers[i].MessageId == arg1.Id)

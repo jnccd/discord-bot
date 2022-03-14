@@ -1,5 +1,6 @@
 ﻿using Discord;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using TweetSharp;
@@ -39,6 +40,12 @@ namespace MEE7.Backend
 
         public IImmutableSet<ClientType> ActiveClients => ImmutableSortedSet.Create<ClientType>();
 
+        UserProperties? IUser.PublicFlags => throw new NotImplementedException();
+
+        IReadOnlyCollection<ClientType> IPresence.ActiveClients => throw new NotImplementedException();
+
+        IReadOnlyCollection<IActivity> IPresence.Activities => throw new NotImplementedException();
+
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
         {
             return user.ProfileImageUrl.Replace("_normal", "_400x400");
@@ -52,6 +59,11 @@ namespace MEE7.Backend
         public Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
         {
             return Task.FromResult<IDMChannel>(null);
+        }
+
+        Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
+        {
+            throw new NotImplementedException();
         }
     }
 }

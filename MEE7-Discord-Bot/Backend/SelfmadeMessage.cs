@@ -84,11 +84,28 @@ namespace MEE7.Backend
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds;
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds;
 
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => throw new NotImplementedException();
+        bool IMessage.MentionedEveryone => throw new NotImplementedException();
+
+        string IMessage.CleanContent => throw new NotImplementedException();
+
+        IReadOnlyCollection<IMessageComponent> IMessage.Components => throw new NotImplementedException();
+
+        IReadOnlyCollection<IStickerItem> IMessage.Stickers => throw new NotImplementedException();
+
+        MessageFlags? IMessage.Flags => throw new NotImplementedException();
+
+        IMessageInteraction IMessage.Interaction => throw new NotImplementedException();
+
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => Task.FromResult("");
         public Task DeleteAsync(RequestOptions options = null) => DeleteFunc(options);
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => throw new NotImplementedException();
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => (IAsyncEnumerable<IReadOnlyCollection<IUser>>)null;
         public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => Task.FromResult("");
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => Task.FromResult("");
+
+        Task IMessage.RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

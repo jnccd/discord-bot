@@ -36,11 +36,11 @@ namespace MEE7
 
         public delegate void NonCommandMessageRecievedHandler(IMessage message);
         public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
-        public delegate void EmojiReactionAddedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
+        public delegate void EmojiReactionAddedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3);
         public static event EmojiReactionAddedHandler OnEmojiReactionAdded;
-        public delegate void EmojiReactionRemovedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
+        public delegate void EmojiReactionRemovedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3);
         public static event EmojiReactionRemovedHandler OnEmojiReactionRemoved;
-        public delegate void EmojiReactionUpdatedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3);
+        public delegate void EmojiReactionUpdatedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3);
         public static event EmojiReactionUpdatedHandler OnEmojiReactionUpdated;
         public delegate void UserJoinedHandler(SocketGuildUser arg);
         public static event UserJoinedHandler OnUserJoined;
@@ -70,13 +70,13 @@ namespace MEE7
         public static event LoggedInHandler OnLoggedIn;
         public delegate void LoggedOutHandler();
         public static event LoggedOutHandler OnLoggedOut;
-        public delegate void MessageDeletedHandler(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2);
+        public delegate void MessageDeletedHandler(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2);
         public static event MessageDeletedHandler OnMessageDeleted;
-        public delegate void MessagesBulkDeletedHandler(IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, ISocketMessageChannel arg2);
+        public delegate void MessagesBulkDeletedHandler(IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, Cacheable<IMessageChannel, ulong> arg2);
         public static event MessagesBulkDeletedHandler OnMessagesBulkDeleted;
-        public delegate void MessageUpdatedHandler(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3);
+        public delegate void MessageUpdatedHandler(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, Cacheable<IMessageChannel, ulong> arg3);
         public static event MessageUpdatedHandler OnMessageUpdated;
-        public delegate void ReactionsClearedHandler(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2);
+        public delegate void ReactionsClearedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2);
         public static event ReactionsClearedHandler OnReactionsCleared;
         public delegate void RecipientAddedHandler(SocketGroupUser arg1);
         public static event RecipientAddedHandler OnRecipientAdded;
@@ -157,7 +157,7 @@ namespace MEE7
 
                 if (!hasWrite)
                 {
-                    IDMChannel c = g.Owner.GetOrCreateDMChannelAsync().Result;
+                    IDMChannel c = g.Owner.CreateDMChannelAsync().Result;
                     await c.SendMessageAsync("How can one be on your server and not have the right to write messages!? This is outrageous, its unfair!");
                     return;
                 }
@@ -170,7 +170,7 @@ namespace MEE7
             }
             catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
         }
-        private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        private static Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3)
         {
             Task.Run(async () =>
             {
@@ -195,7 +195,7 @@ namespace MEE7
 
             return Task.FromResult(default(object));
         }
-        private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        private static Task Client_ReactionRemoved(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3)
         {
             Task.Run(() =>
             {

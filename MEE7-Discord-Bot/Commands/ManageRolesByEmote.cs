@@ -30,7 +30,7 @@ namespace MEE7.Commands
             Program.OnMessageDeleted += Program_OnMessageDeleted;
         }
 
-        private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+        private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
         {
             for (int i = 0; i < Config.Data.manageRoleByEmoteMessages.Count; i++)
                 if (Config.Data.manageRoleByEmoteMessages[i].MessageID == arg1.Id &&
@@ -38,7 +38,7 @@ namespace MEE7.Commands
                     Config.Data.manageRoleByEmoteMessages.RemoveAt(i--);
         }
 
-        private void OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        private void OnEmojiReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3)
         {
             foreach (var m in Config.Data.manageRoleByEmoteMessages)
                 if (arg1.Id == m.MessageID)
@@ -46,12 +46,12 @@ namespace MEE7.Commands
                         if (arg3.Emote.Name == t.Item1.Name)
                         {
                             var u = arg3.User.GetValueOrDefault();
-                            var g = Program.GetGuildFromChannel(arg2);
+                            var g = Program.GetGuildFromChannel(arg2.Value);
                             g.Users.First(x => x.Id == u.Id).AddRoleAsync(g.Roles.First(x => x.Id == t.Item2));
                         }
         }
 
-        private void OnEmojiReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        private void OnEmojiReactionRemoved(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3)
         {
             foreach (var m in Config.Data.manageRoleByEmoteMessages)
                 if (arg1.Id == m.MessageID)
@@ -59,7 +59,7 @@ namespace MEE7.Commands
                         if (arg3.Emote.Name == t.Item1.Name)
                         {
                             var u = arg3.User.GetValueOrDefault();
-                            var g = Program.GetGuildFromChannel(arg2);
+                            var g = Program.GetGuildFromChannel(arg2.Value);
                             g.Users.First(x => x.Id == u.Id).RemoveRoleAsync(g.Roles.First(x => x.Id == t.Item2));
                         }
         }

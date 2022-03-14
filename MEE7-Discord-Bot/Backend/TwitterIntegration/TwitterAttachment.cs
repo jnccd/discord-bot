@@ -32,5 +32,11 @@ namespace MEE7.Backend
         public int? Height => 10;
 
         public int? Width => 10;
+
+        public bool Ephemeral => false;
+
+        public string Description => "";
+
+        public string ContentType => "";
     }
 }
