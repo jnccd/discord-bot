@@ -161,9 +161,12 @@ namespace MEE7
             Master = client.GetUser(masterId);
 
             var logMessageChannel = (IMessageChannel)GetChannelFromID(logChannel);
-            if (logMessageChannel != null) {
+            if (logMessageChannel != null)
+            {
                 DiscordNETWrapper.SendText(logStartupMessage, logMessageChannel).Wait();
-            } else {
+            }
+            else
+            {
                 Console.WriteLine($"Cannot access log channel {logChannel} (you can set the environment variable {logChannelEnvVar} to change it!)");
                 Exit(1);
             }
