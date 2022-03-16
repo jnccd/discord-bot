@@ -1,9 +1,7 @@
-name: CI
+name: Deploy
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
     branches: [ master ]
 
 jobs:
@@ -11,11 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
       - name: Push
         env:
           push: ${{ secrets.LOUIS_PUSH }}
         run: | 
           echo "uwu"
-          #git clone https://github.com/niklasCarstensen/Discord-Bot
-          #cd Discord-Bot
           #git push https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
