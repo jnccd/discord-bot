@@ -37,10 +37,11 @@ namespace MEE7
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
 
+        public static readonly ulong logChannel = (ulong.TryParse(Environment.GetEnvironmentVariable("BotLogChannel"), out ulong tmp) ? (ulong?) tmp : null) ??
 #if DEBUG
-        public static readonly ulong logChannel = 714100318656397334;
+            714100318656397334UL;
 #else
-        public static readonly ulong logChannel = 665219921692852271;
+            665219921692852271UL;
 #endif
         public static readonly bool logToDiscord = true;
         public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
