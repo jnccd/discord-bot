@@ -117,7 +117,7 @@ namespace MEE7.Backend.HelperFunctions
             if (Program.logToDiscord)
                 try
                 {
-                    _ = DiscordNETWrapper.SendText(msg.ToString(), Program.logChannel);
+                    _ = DiscordNETWrapper.SendText($"```\n{msg.ToString()}\n```", Program.logChannel);
                 }
                 catch { }
         }
