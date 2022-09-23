@@ -1,5 +1,8 @@
 # Discord-Bot
 
+[![Build](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml)
+[![Deploy](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml)
+
 This is quite a large discord bot with a weird name. The commands are split into two groups, simple commands that entirely depend on side effects and edit commands that get data from other edit commands and output data that other edit commands can use. Those pipes of edit comands can for example be used for image editing.
 
 Example pipe for a mandelbrot zoom with rotating colors: `$- for(i:0:20:0.2) { mandelbrot(%i, 1.01:0.28, 100) } > foreach(i:0:360) { rotateColors(%i) }` resulting in this gif:
