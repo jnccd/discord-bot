@@ -26,8 +26,9 @@ namespace MEE7.Commands
             emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
             emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856306476580965>"));
             emoteDict.Add("goodMorning", Emote.Parse("<a:GoodMorning:757939668221427742>"));
-            emoteDict.Add("goodNight", Emote.Parse("<a:GoodNight:801591068571336705>"));
+            emoteDict.Add("goodNight", Emote.Parse("<a:GoodNight:801591068571336705>")); 
             emoteDict.Add("no", Emote.Parse("<:no:778447862735568916>"));
+            emoteDict.Add("sus", Emote.Parse("<:sussy_baka:1022741633923551232>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
             emoteDict.Add("wave", new Emoji("👋"));
@@ -64,7 +65,6 @@ namespace MEE7.Commands
             if (message.Content.ToLower().Contains("spooky"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("spooky")).Wait();
 
-            Console.WriteLine(message.Id);
             if (message.Author.Id == 501691245790232596)
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("no")).Wait();
 
@@ -100,6 +100,9 @@ namespace MEE7.Commands
                     emoteDict.GetValueOrDefault("M"),
                     emoteDict.GetValueOrDefault("A"),
                     emoteDict.GetValueOrDefault("N"), }).Wait();
+
+            if (message.Content.ToLower().Contains("sus"))
+                message.AddReactionAsync(emoteDict.GetValueOrDefault("sus")).Wait();
 
         }
 
