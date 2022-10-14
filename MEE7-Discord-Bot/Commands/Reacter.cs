@@ -70,6 +70,7 @@ namespace MEE7.Commands
 
             if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]n\\b") ||
                 Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d mo+rning\\b") ||
+                Regex.IsMatch(message.Content.ToLower(), "\\bmo+in\\b") ||
                 message.Content == "早上好" || message.Content == "早好")
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
