@@ -437,7 +437,7 @@ namespace MEE7
                 }
             }
             helpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code " +
-                $"[here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+                $"[here](https://github.com/jnccd/discord-bot).\n\nCommands:");
             helpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             helpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");

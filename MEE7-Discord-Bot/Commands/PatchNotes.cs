@@ -26,7 +26,7 @@ namespace MEE7.Commands
             List<string> PatchNotes = new List<string>();
 
             HtmlWeb web = new HtmlWeb();
-            var searchDoc = web.Load("https://github.com/niklasCarstensen/Discord-Bot/commits/master");
+            var searchDoc = web.Load("https://github.com/jnccd/discord-bot/commits/master");
 
             var commits = searchDoc.DocumentNode.SelectNodes("//a[contains(@class, 'Link--primary text-bold js-navigation-open markdown-title')]");
 
