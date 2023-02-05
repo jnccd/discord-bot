@@ -1,18 +1,30 @@
 name: Deploy
 
 on:
-  push:
-    branches: [ master ]
+  workflow_run:
+    workflows:
+    - Docker
+    types:
+    - completed
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - name: Push
-        env:
-          push: ${{ secrets.LOUIS_PUSH }}
-        run: | 
-          echo "uwu"
-          #git push https://$push@git.bre4k3r.de/dev-bre4k3r/Discord-Bot
+    - uses: actions/checkout@v3
+    - name: Set up Kubernetes CLI
+      uses: azure/setup-kubectl@v3
+    - name: Configure Kubernetes context
+      run: |
+        mkdir ~/.kube
+        echo "${{ secrets.PROD_KUBECTL }}" | base64 --decode > ~/.kube/config
+    - name: Set up values
+      run: |
+        mkdir local
+        cat << EOF > local/values.yaml
+        mee7:
+          token: '${{ secrets.BOT_TOKEN }}'
+        EOF
+    - name: Deploy Helm chart
+      run: helm upgrade --install -f local/values.yaml mee7 Helm/mee7
