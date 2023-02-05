@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mee7.fullname" . }}
+  labels:
+    {{- include "mee7.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "mee7.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        # Make sure that the pods are recreated automatically
+        timestamp: {{ now | quote }}
+      labels:
+        {{- include "mee7.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: "{{ include "mee7.fullname" . }}-secret"
+          env:
+            - name: BotLogChannel
+              value: "{{ .Values.mee7.logChannel }}"
+            - name: BotMaster
+              value: "{{ .Values.mee7.master }}"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
