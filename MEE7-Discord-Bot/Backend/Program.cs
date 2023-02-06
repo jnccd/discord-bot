@@ -37,10 +37,14 @@ namespace MEE7
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
 
+        private static readonly string logChannelEnvVar = "BotLogChannel";
+        private static readonly string masterEnvVar = "BotMaster";
+
+        public static readonly ulong logChannel = (ulong.TryParse(Environment.GetEnvironmentVariable(logChannelEnvVar), out ulong tmp) ? (ulong?) tmp : null) ??
 #if DEBUG
-        public static readonly ulong logChannel = 714100318656397334;
+            714100318656397334UL;
 #else
-        public static readonly ulong logChannel = 665219921692852271;
+            665219921692852271UL;
 #endif
         public static readonly bool logToDiscord = true;
         public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
@@ -151,9 +155,22 @@ namespace MEE7
             
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Thread.Sleep(1000);
-            Master = client.GetUser(300699566041202699);
 
-            DiscordNETWrapper.SendText(logStartupMessage, (IMessageChannel)GetChannelFromID(logChannel)).Wait();
+            ulong masterId = 300699566041202699;
+            ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out masterId);
+            Master = client.GetUser(masterId);
+
+            var logMessageChannel = (IMessageChannel)GetChannelFromID(logChannel);
+            if (logMessageChannel != null)
+            {
+                DiscordNETWrapper.SendText(logStartupMessage, logMessageChannel).Wait();
+            }
+            else
+            {
+                Console.WriteLine($"Cannot access log channel {logChannel} (you can set the environment variable {logChannelEnvVar} to change it!)");
+                Exit(1);
+            }
+
             Config.Load();
 
             BuildHelpMenu();
