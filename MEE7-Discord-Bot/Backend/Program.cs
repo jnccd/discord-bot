@@ -157,7 +157,10 @@ namespace MEE7
             Thread.Sleep(1000);
 
             ulong masterId = 300699566041202699;
-            ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out masterId);
+            ulong parsedMasterId = 0;
+            ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out parsedMasterId);
+            if (parsedMasterId != 0)
+                masterId = parsedMasterId;
             Master = client.GetUser(masterId);
 
             var logMessageChannel = (IMessageChannel)GetChannelFromID(logChannel);
