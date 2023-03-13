@@ -68,7 +68,7 @@ namespace MEE7.Commands
             if (message.Author.Id == 501691245790232596)
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("no")).Wait();
 
-            if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]n\\b") ||
+            if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten mo+rg[e,ä]+n\\b") ||
                 Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d mo+rning\\b") ||
                 Regex.IsMatch(message.Content.ToLower(), "\\bmo+in\\b") ||
                 message.Content == "早上好" || message.Content == "早好")
