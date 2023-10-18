@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>MEE7</RootNamespace>
     <AssemblyName>MEE7</AssemblyName>
     <StartupObject>MEE7.Program</StartupObject>
