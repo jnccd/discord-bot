@@ -8,4 +8,4 @@ git pull
 cd ./MEE7-Discord-Bot
 
 dotnet restore
-dotnet run #-c Release
+dotnet run -c Release
