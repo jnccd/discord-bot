@@ -20,6 +20,13 @@ while [[ $# -gt 0 ]]; do
 done
 sleep $SLEEP_TIME
 
+# Wait for connection
+while ! ping -c 4 google.com > /dev/null; 
+do 
+echo "The network is not up yet"
+sleep 1 
+done
+
 # Get to the right place
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR/MEE7-Discord-Bot
