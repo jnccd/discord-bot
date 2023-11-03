@@ -21,10 +21,9 @@ done
 sleep $SLEEP_TIME
 
 # Wait for connection
-while ! ping -c 4 google.com > /dev/null; 
-do 
-echo "The network is not up yet"
-sleep 1 
+while ! ping -c 4 google.com > /dev/null; do 
+  echo "The network is not up yet"
+  sleep 1
 done
 
 # Get to the right place
@@ -35,3 +34,9 @@ cd $SCRIPT_DIR/MEE7-Discord-Bot
 git pull
 dotnet restore
 dotnet run -c Release
+
+# Keep process alive
+echo "Keeping process alive.."
+while true; do
+	sleep 1000
+done
