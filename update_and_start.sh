@@ -2,10 +2,16 @@
 
 # Get some sleepy time c:
 SLEEP_TIME=0
+DOTNET_PATH=dotnet
 while [[ $# -gt 0 ]]; do
   case $1 in
     -s|--sleep)
       SLEEP_TIME=$2
+      shift
+      shift
+      ;;
+	-dp|--dotnet-path)
+      DOTNET_PATH=$2
       shift
       shift
       ;;
@@ -32,8 +38,8 @@ cd $SCRIPT_DIR/MEE7-Discord-Bot
 
 # Work
 git pull
-dotnet restore
-dotnet run -c Release
+$DOTNET_PATH restore
+$DOTNET_PATH run -c Release
 
 # Keep process alive
 echo "Keeping process alive.."
