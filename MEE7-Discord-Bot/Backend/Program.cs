@@ -382,7 +382,7 @@ namespace MEE7
         }
         static void Login()
         {
-            Saver.SaveToLog($"Got tokens {Environment.GetEnvironmentVariable("BotToken")} {Config.Data.BotToken}");
+            //Saver.SaveToLog($"Got tokens {Environment.GetEnvironmentVariable("BotToken")} {Config.Data.BotToken}");
 
             try
             {
