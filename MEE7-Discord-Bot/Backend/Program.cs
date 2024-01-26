@@ -382,8 +382,7 @@ namespace MEE7
         }
         static void Login()
         {
-            ConsoleWrapper.WriteLine($"Wrong token: {Environment.GetEnvironmentVariable("BotToken")}");
-            ConsoleWrapper.WriteLine($"Wrong token: {Config.Data.BotToken}");
+            Saver.SaveToLog($"Got tokens {Environment.GetEnvironmentVariable("BotToken")} {Config.Data.BotToken}");
 
             try
             {
@@ -403,7 +402,7 @@ namespace MEE7
                 catch (Exception e2)
                 {
                     ConsoleWrapper.WriteLine($"Wrong token: {Config.Data.BotToken}");
-                    Console.WriteLine($"Wrong Bot Tokens!\n\n{e1}\n{e2}");
+                    ConsoleWrapper.WriteLine($"Wrong Bot Tokens!\n\n{e1}\n{e2}");
                     Environment.Exit(0);
                 }
             }
