@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -413,7 +414,7 @@ namespace MEE7
             {
                 try
                 {
-                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]);
+                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]); 
                     if (commandInstance.CommandLine.Contains(" ") || commandInstance.Prefix.Contains(" "))
                         throw new IllegalCommandException($"Commands and Prefixes mustn't contain spaces!\n" +
                             $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
@@ -713,6 +714,17 @@ namespace MEE7
                         {
                             var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
                             message.ModifyAsync(m => m.Content = split.Skip(3).Combine(" "));
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                    }
+                    else if (input.StartsWith("/printCommands"))
+                    {
+                        try
+                        {
+                            //ConsoleWrapper.WriteLine(commandTypes[0].GetConstructor(new Type[] { typeof(string), typeof(string), typeof(bool), typeof(bool) }).GetCustomAttributes(true).Length , ConsoleColor.Cyan);
+                            ConsoleWrapper.WriteLine("Command        | Description\n" +
+                                                     "---------------|--------------\n" +
+                                                     commands.Select(x => $"{x.CommandLine} | {x.Desc}").Combine("\n"), ConsoleColor.Cyan);
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
