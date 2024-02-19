@@ -156,8 +156,7 @@ namespace MEE7
             Thread.Sleep(1000);
 
             ulong masterId = 300699566041202699;
-            ulong parsedMasterId = 0;
-            ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out parsedMasterId);
+            ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out ulong parsedMasterId);
             if (parsedMasterId != 0)
                 masterId = parsedMasterId;
             Master = client.GetUser(masterId);
@@ -180,7 +179,7 @@ namespace MEE7
             StartAutosaveLoop();
 
             Task.Run(() => BootTwitterModule());
-            CallOnConnected();
+            OnConnected.InvokeParallel();
         }
         static void LoadBuildDate()
         {
@@ -464,10 +463,6 @@ namespace MEE7
             helpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             helpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
-        }
-        static void CallOnConnected()
-        {
-            OnConnected.InvokeParallel();
         }
         static void StartAutosaveLoop()
         {
