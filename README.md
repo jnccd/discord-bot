@@ -9,13 +9,13 @@ This is discord chatbot. Its commands are split into two groups, simple commands
 
 Command        | Description
 ---------------|--------------
-edit | This is a little more advanced command which allows you to chain together functions that were made specific for this command. For more information type **°edit**.
 9ball | Decides your fate
 animalCrossing | Finds an animal crossing npc
 bf | Brainfuck Interpreter
 c# | Run csharp code
 chess | Play chess
 circleIsYou | You are a circle :0
+edit | This is a more advanced command which allows you to chain together functions that were made specific for this command. For more information type **°edit**.
 embed | Posts an embed
 emojiUsage | Which emojis are actually used on this server?
 environment | Prints bot environment info
