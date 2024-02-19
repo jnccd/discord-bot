@@ -12,21 +12,15 @@ Command        | Description
 edit | This is a little more advanced command which allows you to chain together functions that were made specific for this command. Shortcut: **°-**
 For more information just type **°edit**.
 9ball | Decides your fate
-AC | -
 animalCrossing | Finds an animal crossing npc
 bf | Brainfuck Interpreter
 c# | Run csharp code
 chess | Play chess
 circleIsYou | You are a circle :0
-Clear | -
-close | Closes the bot
-del | Deletes n past messages
 embed | Posts an embed
 emojiUsage | Which emojis are actually used on this server?
 environment | Prints bot environment info
-exception |
 Explain | -
-getScreenshot |
 GetVideoLink | -
 loadConfig | loads the attached config
 meme | Automatically steals a meme from reddit
@@ -44,7 +38,6 @@ Reacter | -
 reaction | Post reaction images
 sendRoleEmojiMessage | Let users of your server get roles from emote reactions
 serverInfo | Posts server information
-shitpost |
 tictactoe | Play TicTacToe against other people!
 timer | Posts a updating message for some event
 toggleMessageLinkPreviews | Preview message links on this server
