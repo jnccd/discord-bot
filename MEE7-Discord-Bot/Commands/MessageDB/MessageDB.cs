@@ -232,7 +232,7 @@ namespace MEE7.Commands.MessageDB
             },
         };
 
-        public MessageDB() : base("messageDB", "makes database stuff without databases because no", false, true)
+        public MessageDB() : base("messageDB", "Builds all messages of a server into a database (large json file) and implements operations on it such as generating an activity plot", false, true)
         {
 
         }
