@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using MEE7.Commands.Edit;
 using MEE7.Configuration;
 using NAudio.Wave;
 using System;
@@ -523,7 +524,7 @@ namespace MEE7
                             {
                                 ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
                             }
-                    } 
+                    }
                     else if (!input.StartsWith("/"))
                     {
                         if (CurrentChannel == null)
@@ -721,10 +722,17 @@ namespace MEE7
                     {
                         try
                         {
-                            //ConsoleWrapper.WriteLine(commandTypes[0].GetConstructor(new Type[] { typeof(string), typeof(string), typeof(bool), typeof(bool) }).GetCustomAttributes(true).Length , ConsoleColor.Cyan);
                             ConsoleWrapper.WriteLine("Command        | Description\n" +
                                                      "---------------|--------------\n" +
                                                      commands.Select(x => $"{x.CommandLine} | {x.Desc}").Combine("\n"), ConsoleColor.Cyan);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                    }
+                    else if (input.StartsWith("/printEditCommands"))
+                    {
+                        try
+                        {
+                            ConsoleWrapper.WriteLine(Edit.EditCommandsOverview, ConsoleColor.Cyan);
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
