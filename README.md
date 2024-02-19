@@ -3,7 +3,7 @@
 [![Build](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml)
 <!--- [![Deploy](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml) -->
 
-This is discord chatbot. Its commands are split into two groups, simple commands that entirely depend on side effects and commands that can be chained. Those pipes of comands can for example be used for image editing.
+This is a discord chatbot. Its commands are split into two groups, simple commands that entirely depend on side effects and commands that can be chained. Those pipes of comands can for example be used for image editing.
 Some of the commands may use deprecated APIs that are now offline.
 
 ## List of Commands
