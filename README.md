@@ -1,7 +1,7 @@
 # Discord-Bot
 
 [![Build](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml)
-[![Deploy](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml)
+<!--- [![Deploy](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml) -->
 
 This is discord chatbot. Its commands are split into two groups, simple commands that entirely depend on side effects and edit commands that can be chained. Those pipes of edit comands can for example be used for image editing.
 
