@@ -12,7 +12,7 @@ namespace MEE7.Commands
 {
     public class Uno : Command
     {
-        public Uno() : base("uno", "Play uno with other humanoids", false)
+        public Uno() : base("uno", "Play uno with other humans", false)
         {
             HelpMenu = new EmbedBuilder();
             HelpMenu.WithColor(0, 128, 255);
