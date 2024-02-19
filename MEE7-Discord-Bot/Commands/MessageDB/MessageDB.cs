@@ -17,7 +17,7 @@ namespace MEE7.Commands.MessageDB
         readonly string dbPath = $"Commands{Path.DirectorySeparatorChar}MessageDB{Path.DirectorySeparatorChar}db.json";
         readonly object dbLock = new object();
 
-        class WeirdCommandThingy
+        class DbCommand
         {
             public string name;
             public Action<DBGuild, IMessage, string[]> doStuffLul;
@@ -30,9 +30,9 @@ namespace MEE7.Commands.MessageDB
             public int reactionHits;
             public int reactedMessages;
         }
-        readonly WeirdCommandThingy[] commands = new WeirdCommandThingy[]
+        readonly DbCommand[] commands = new DbCommand[]
         {
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "countMessages",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -42,7 +42,7 @@ namespace MEE7.Commands.MessageDB
                     DiscordNETWrapper.SendText(allGuildMessages.Count.ToString(), message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "countChannelMessages",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -52,7 +52,7 @@ namespace MEE7.Commands.MessageDB
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "countUserMessages",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -70,7 +70,7 @@ namespace MEE7.Commands.MessageDB
                     DiscordNETWrapper.SendText(re, message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "getMostReactedToMessages",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -83,7 +83,7 @@ namespace MEE7.Commands.MessageDB
                     DiscordNETWrapper.SendText(top5.Select(x => $"{x.Reactions.Sum(y => y.count)}: {x.Link}").Combine("\n"), message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "plotActivityOverTime",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -130,7 +130,7 @@ namespace MEE7.Commands.MessageDB
                     DiscordNETWrapper.SendBitmap(plt.GetBitmap(), message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "getMostUsedEmotes",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -160,7 +160,7 @@ namespace MEE7.Commands.MessageDB
                         $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "getLeastUsedNoGifEmotes",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -192,7 +192,7 @@ namespace MEE7.Commands.MessageDB
                         $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "getLeastUsedEmotes",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
@@ -223,7 +223,7 @@ namespace MEE7.Commands.MessageDB
                         $"messages and used as a reaction {x.reactionHits} times under {x.reactedMessages} messages").Combine("\n"), message.Channel).Wait();
                 }
             },
-            new WeirdCommandThingy()
+            new DbCommand()
             {
                 name = "",
                 doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
