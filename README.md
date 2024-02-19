@@ -9,8 +9,7 @@ This is discord chatbot. Its commands are split into two groups, simple commands
 
 Command        | Description
 ---------------|--------------
-edit | This is a little more advanced command which allows you to chain together functions that were made specific for this command. Shortcut: **°-**
-For more information just type **°edit**.
+edit | This is a little more advanced command which allows you to chain together functions that were made specific for this command. For more information type **°edit**.
 9ball | Decides your fate
 animalCrossing | Finds an animal crossing npc
 bf | Brainfuck Interpreter
