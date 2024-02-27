@@ -249,16 +249,22 @@ BakaMitai | Picture goes Baka Mitai - using code from https://github.com/Aliaksa
 
 ## Examples
 
-An example pipe for a mandelbrot zoom with rotating colors: `$- for(i:0:20:0.2) { mandelbrot(%i, 1.01:0.28, 100) } > foreach(i:0:360) { rotateColors(%i) }` resulting in this gif:
-![alt text](https://cdn.discordapp.com/attachments/630515207608729640/652122985108471828/-8586260583075901868.gif)
+An example pipe for a mandelbrot zoom with rotating colors: `$edit for(i:0:20:0.2) { mandelbrot(%i, 1.01:0.28, 100) } > foreach(i:0:360) { rotateColors(%i) }` resulting in this gif:
+![-8586260583075901868](https://github.com/jnccd/discord-bot/assets/19777592/16d05789-b00e-46d7-a89f-4e24cde1b128)
 
-Another example of an edit pipe would be this: `$edit "https://cdn.discordapp.com/attachments/491277915015610389/666212145179918337/image.png" > invert > for(i:-0.9:1.9:0.02) { fall(%i:0.5, 0.5)}` resulting in:![alt text](https://cdn.discordapp.com/attachments/500759857205346304/749076750054719498/-8586029426713066715.gif)
+Another example of an edit pipe would be this: `$edit "https://cdn.discordapp.com/attachments/491277915015610389/666212145179918337/image.png" > for(i:0.1:4:0.2) {liq(Stir, 0.3:0.5, %i) > liq(Stir, 0.7:0.5, %i) }` resulting in:
+![-8586226961372338786](https://github.com/jnccd/discord-bot/assets/19777592/57087870-5429-43bd-8115-524ba755a3b5)
+
+or this: `$edit profilePicture(300699566041202699) > for(i:0:10:0.2){ liq(Inpand, 0.68:0.43, %i) }`
+![-8586306923669760946](https://github.com/jnccd/discord-bot/assets/19777592/bb2163a9-0765-4bd6-8be6-6e1d36e8b27c)
 
 ## Deployment
 
-If you have a dotnet core 3 runtime installed you can just type `dotnet run` in the command line and it will run. If you want to run him on a server or you like running applications as docker containers for no reason you can type `docker-compose build` and it will start as a ubuntu docker container. Alternatively if you have Visual Studio installed you can also run him there and even observe the execution in debug mode. If that is not enough for you you can also put him in a gitlab and the gitlab yml will tell the runner what to do.
+If .NET 7 or later is installed this project can be run by executing `dotnet restore` and `dotnet run` in the cli in the MEE7 project folder. 
+For server compatability the bon can also be run using docker compose like so `docker-compose build`. 
+The simplest way to try out the bot is to open the .sln solution file ine visual studio which will handle all commands automatically.
 
-However, if you only do this the bot will tell you that it can't log in. That's because it needs a discord bot token to work. If you got one you can feed it to the bot as an environment variable called `BotToken`. <!--- Set it in the console, add it to the visual studio environment variables, add them to your gitlab runner or find some other way. If you want to use the bot to its full potential you also have to set the FOUR other twitter tokens named: `customer_key`, `customer_key_secret`, `access_token` and of course the `access_token_secret`. Why four? Idk. -->
+In any case the environemnt variable `BotToken` must be set to a valid discord bot token of any bot account before the bot can start successfully.
 
 Have fun ^^
 
