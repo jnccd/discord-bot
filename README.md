@@ -250,6 +250,7 @@ BakaMitai | Picture goes Baka Mitai - using code from https://github.com/Aliaksa
 ## Examples
 
 An example pipe for a mandelbrot zoom with rotating colors: `$edit for(i:0:20:0.2) { mandelbrot(%i, 1.01:0.28, 100) } > foreach(i:0:360) { rotateColors(%i) }` resulting in this gif:
+
 ![-8586260583075901868](https://github.com/jnccd/discord-bot/assets/19777592/16d05789-b00e-46d7-a89f-4e24cde1b128)
 
 Another example of an edit pipe would be this: `$edit "https://cdn.discordapp.com/attachments/491277915015610389/666212145179918337/image.png" > for(i:0.1:4:0.2) { liq(Stir, 0.3:0.5, %i) > liq(Stir, 0.7:0.5, %i) }` resulting in:
