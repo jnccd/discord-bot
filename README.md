@@ -252,7 +252,7 @@ BakaMitai | Picture goes Baka Mitai - using code from https://github.com/Aliaksa
 An example pipe for a mandelbrot zoom with rotating colors: `$edit for(i:0:20:0.2) { mandelbrot(%i, 1.01:0.28, 100) } > foreach(i:0:360) { rotateColors(%i) }` resulting in this gif:
 ![-8586260583075901868](https://github.com/jnccd/discord-bot/assets/19777592/16d05789-b00e-46d7-a89f-4e24cde1b128)
 
-Another example of an edit pipe would be this: `$edit "https://cdn.discordapp.com/attachments/491277915015610389/666212145179918337/image.png" > for(i:0.1:4:0.2) {liq(Stir, 0.3:0.5, %i) > liq(Stir, 0.7:0.5, %i) }` resulting in:
+Another example of an edit pipe would be this: `$edit "https://cdn.discordapp.com/attachments/491277915015610389/666212145179918337/image.png" > for(i:0.1:4:0.2) { liq(Stir, 0.3:0.5, %i) > liq(Stir, 0.7:0.5, %i) }` resulting in:
 ![-8586226961372338786](https://github.com/jnccd/discord-bot/assets/19777592/57087870-5429-43bd-8115-524ba755a3b5)
 
 or this: `$edit profilePicture(300699566041202699) > for(i:0:10:0.2){ liq(Inpand, 0.68:0.43, %i) }`
@@ -261,7 +261,7 @@ or this: `$edit profilePicture(300699566041202699) > for(i:0:10:0.2){ liq(Inpand
 ## Deployment
 
 If .NET 7 or later is installed this project can be run by executing `dotnet restore` and `dotnet run` in the cli in the MEE7 project folder. 
-For server compatability the bon can also be run using docker compose like so `docker-compose build`. 
+For server compatability the bot can also be run using docker compose like so `docker-compose build`. 
 The simplest way to try out the bot is to open the .sln solution file ine visual studio which will handle all commands automatically.
 
 In any case the environemnt variable `BotToken` must be set to a valid discord bot token of any bot account before the bot can start successfully.
