@@ -16,7 +16,7 @@ bf | Brainfuck Interpreter
 c# | Run csharp code
 chess | Play chess
 circleIsYou | You are a circle :0
-edit | This is a more advanced command which allows you to chain together functions that were made specific for this command. For more information type **°edit**.
+edit | This is a more advanced command which allows you to chain together functions that were made specific for this command
 embed | Posts an embed
 emojiUsage | Which emojis are actually used on this server?
 environment | Prints bot environment info
