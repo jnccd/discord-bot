@@ -15,7 +15,7 @@ animalCrossing | Finds an animal crossing npc
 bf | Brainfuck Interpreter
 c# | Run csharp code
 chess | Play chess
-circleIsYou | You are a circle :0
+circleIsYou | Basic Baba Is You movement implementation in a discord message, with movement being implemented through reaction events on the message
 edit | This is a more advanced command which allows you to chain together functions that were made specific for this command
 embed | Posts an embed
 emojiUsage | Which emojis are actually used on this server?
