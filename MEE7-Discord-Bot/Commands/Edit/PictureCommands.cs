@@ -8,28 +8,32 @@ using MEE7.Commands.Edit.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
+using IronSoftware.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using Tesseract;
 using static MEE7.Commands.Edit.Edit;
-using Color = System.Drawing.Color;
+using Color = IronSoftware.Drawing.Color;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using System.Drawing;
+using Rectangle = IronSoftware.Drawing.Rectangle;
+using Point = IronSoftware.Drawing.Point;
+using Size = IronSoftware.Drawing.Size;
 
 namespace MEE7.Commands.Edit
 {
     public class PictureCommands : EditCommandProvider
     {
         public string GetColorDesc = "Get the color of a pixel";
-        public Color GetColor(Bitmap b, IMessage m, int x, int y)
+        public Color GetColor(AnyBitmap b, IMessage m, int x, int y)
         {
             return b.GetPixel(x, y);
         }
 
         public string colorChannelSwapDesc = "Swap the rgb color channels for each pixel";
-        public Bitmap ColorChannelSwap(Bitmap bmp, IMessage m)
+        public AnyBitmap ColorChannelSwap(AnyBitmap bmp, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -44,7 +48,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string reddifyDesc = "Make it red af";
-        public Bitmap Reddify(Bitmap bmp, IMessage m)
+        public AnyBitmap Reddify(AnyBitmap bmp, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -59,7 +63,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string invertDesc = "Invert the color of each pixel";
-        public Bitmap Invert(Bitmap bmp, IMessage m)
+        public AnyBitmap Invert(AnyBitmap bmp, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -74,9 +78,9 @@ namespace MEE7.Commands.Edit
         }
 
         public string RektDesc = "Finds colored rectangles in pictures";
-        public Bitmap Rekt(Bitmap bmp, IMessage m, string color)
+        public AnyBitmap Rekt(AnyBitmap bmp, IMessage m, string color)
         {
-            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            AnyBitmap output = new AnyBitmap(bmp.Width, bmp.Height);
 
             Color c;
             if (string.IsNullOrWhiteSpace(color))
@@ -101,7 +105,7 @@ namespace MEE7.Commands.Edit
 
         static readonly object memifyLock = new object();
         public string memifyDesc = "Turn a picture into a meme, get a list of available templates with the argument -list";
-        public Bitmap Memify(Bitmap bmp, IMessage m, string Meme)
+        public AnyBitmap Memify(AnyBitmap bmp, IMessage m, string Meme)
         {
             lock (memifyLock)
             {
@@ -127,9 +131,9 @@ namespace MEE7.Commands.Edit
                 string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
                 if (File.Exists(memeTemplateOverlay))
-                    return InsertIntoRect(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
+                    return InsertIntoRect(bmp, m, (AnyBitmap)AnyBitmap.FromFile(memeTemplateDesign), (AnyBitmap)AnyBitmap.FromFile(memeTemplateOverlay));
                 else if (File.Exists(memeTemplate))
-                    return InsertIntoRect(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
+                    return InsertIntoRect(bmp, m, (AnyBitmap)AnyBitmap.FromFile(memeTemplateDesign));
                 else
                     throw new Exception("Something went wrong :thinking:");
             }
@@ -137,7 +141,7 @@ namespace MEE7.Commands.Edit
 
         public string textMemifyDesc = "Put text into a meme template, input -list as Meme and get a list templates\n" +
                 "The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox";
-        public Bitmap TextMemify(string memeName, IMessage m, string Meme, string Font = "Arial", float FontSize = 1)
+        public AnyBitmap TextMemify(string memeName, IMessage m, string Meme, string Font = "Arial", float FontSize = 1)
         {
             string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTextTemplates");
 
@@ -168,17 +172,17 @@ namespace MEE7.Commands.Edit
 
             if (File.Exists(memeTemplate))
             {
-                Bitmap template, design;
+                AnyBitmap template, design;
                 using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-                    template = (Bitmap)Bitmap.FromStream(stream);
+                    template = (AnyBitmap)AnyBitmap.FromStream(stream);
                 using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
-                    design = (Bitmap)Bitmap.FromStream(stream);
-                Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
+                    design = (AnyBitmap)AnyBitmap.FromStream(stream);
+                System.Drawing.Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
                 if (redRekt.Width == 0)
                     throw new Exception("Error, couldn't find a rectangle to write in!");
                 float fontSize = redRekt.Height / 5f / FontSize;
                 using (Graphics graphics = Graphics.FromImage(template))
-                    graphics.DrawString(memeName, new Font(Font, fontSize), Brushes.Black, redRekt);
+                    graphics.DrawString(memeName, new System.Drawing.Font(Font, fontSize), Brushes.Black, redRekt);
 
                 return template;
             }
@@ -187,7 +191,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string expandDesc = "Expand the pixels";
-        public Bitmap Expand(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public AnyBitmap Expand(AnyBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -205,7 +209,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string stirDesc = "Stir the pixels";
-        public Bitmap Stir(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public AnyBitmap Stir(AnyBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -227,7 +231,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string fallDesc = "Fall the pixels";
-        public Bitmap Fall(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public AnyBitmap Fall(AnyBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -249,7 +253,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string wubbleDesc = "Wubble the pixels";
-        public Bitmap Wubble(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public AnyBitmap Wubble(AnyBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -266,7 +270,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string cyaDesc = "Cya the pixels";
-        public Bitmap Cya(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public AnyBitmap Cya(AnyBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -283,7 +287,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string inpandDesc = "Inpand the pixels";
-        public Bitmap Inpand(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public AnyBitmap Inpand(AnyBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -300,7 +304,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string blockifyDesc = "Blockify the pixels";
-        public Bitmap Blockify(Bitmap bmp, IMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
+        public AnyBitmap Blockify(AnyBitmap bmp, IMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
         {
             return ApplyTransformation(bmp,
                     (x, y) => new Vector2(x + (float)Math.Cos(x / frequenzy + offsetX) * strength,
@@ -308,7 +312,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string SquiggleDesc = "Squiggle the pixels";
-        public Bitmap Squiggle(Bitmap bmp, IMessage m, float percent = 1, float scale = 1, int offsetX = 1, int offsetY = 1)
+        public AnyBitmap Squiggle(AnyBitmap bmp, IMessage m, float percent = 1, float scale = 1, int offsetX = 1, int offsetY = 1)
         {
             return ApplyTransformation(bmp,
                     (x, y) => new Vector2(x + percent * (float)Math.Sin((y + offsetY) / scale),
@@ -316,7 +320,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string TransformPictureDesc = "Perform a liqidify transformation on the image using a custom function";
-        public Bitmap TransformPicture(Bitmap bmp, IMessage m, Pipe transformationFunction)
+        public AnyBitmap TransformPicture(AnyBitmap bmp, IMessage m, Pipe transformationFunction)
         {
             if (transformationFunction.OutputType() != typeof(Vector2))
                 throw new Exception("Boi I need sum vectors!");
@@ -327,7 +331,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sobelEdgesDesc = "Highlights horizontal edges";
-        public Bitmap SobelEdges(Bitmap bmp, IMessage m)
+        public AnyBitmap SobelEdges(AnyBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                     {  0,  0,  0 },
@@ -335,7 +339,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sobelEdgesColorDesc = "Highlights horizontal edges";
-        public Bitmap SobelEdgesColor(Bitmap bmp, IMessage m)
+        public AnyBitmap SobelEdgesColor(AnyBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                                    {  0,  0,  0 },
@@ -343,7 +347,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string laplaceEdgesDesc = "https://de.wikipedia.org/wiki/Laplace-Filter";
-        public Bitmap LaplaceEdges(Bitmap bmp, IMessage m)
+        public AnyBitmap LaplaceEdges(AnyBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0,  1,  0 },
                                                     {  1, -4,  1 },
@@ -351,7 +355,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string laplace45EdgesDesc = "https://de.wikipedia.org/wiki/Laplace-Filter";
-        public Bitmap Laplace45Edges(Bitmap bmp, IMessage m)
+        public AnyBitmap Laplace45Edges(AnyBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
                                                     {  1, -8,  1 },
@@ -359,7 +363,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sharpenDesc = "well guess what it does";
-        public Bitmap Sharpen(Bitmap bmp, IMessage m)
+        public AnyBitmap Sharpen(AnyBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0, -1,  0 },
                                                     { -1,  5, -1 },
@@ -367,7 +371,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string boxBlurDesc = "blur owo";
-        public Bitmap BoxBlur(Bitmap bmp, IMessage m)
+        public AnyBitmap BoxBlur(AnyBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
                                                     {  1,  1,  1 },
@@ -375,7 +379,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string gaussianBlurDesc = "more blur owo";
-        public Bitmap GaussianBlur(Bitmap bmp, IMessage m, int size = 5)
+        public AnyBitmap GaussianBlur(AnyBitmap bmp, IMessage m, int size = 5)
         {
             var weights = Enumerable.Range(0, size).Select(x => Gauss(x, size * 2f / 3f, size / 2)).ToArray();
             var scalar = 1 / weights.Sum();
@@ -392,7 +396,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string UnsharpMaskingDesc = "Sharpening but cooler";
-        public Bitmap UnsharpMasking(Bitmap bmp, IMessage m, int size = 5)
+        public AnyBitmap UnsharpMasking(AnyBitmap bmp, IMessage m, int size = 5)
         {
             var weights = Enumerable.Range(0, size).Select(x => Gauss(x, size * 2f / 3f, size / 2)).ToArray();
 
@@ -411,25 +415,25 @@ namespace MEE7.Commands.Edit
         }
 
         public string gayPrideDesc = "Gay rights";
-        public Bitmap GayPride(Bitmap bmp, IMessage m)
+        public AnyBitmap GayPride(AnyBitmap bmp, IMessage m)
         {
             return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
         }
 
         public string transRightsDesc = "The input image says trans rights";
-        public Bitmap TransRights(Bitmap bmp, IMessage m)
+        public AnyBitmap TransRights(AnyBitmap bmp, IMessage m)
         {
             return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, bmp);
         }
 
         public string merkelDesc = "Add a german flag to the background of your image";
-        public Bitmap Merkel(Bitmap bmp, IMessage m)
+        public AnyBitmap Merkel(AnyBitmap bmp, IMessage m)
         {
             return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
         }
 
         public string chromaticAbberationDesc = "Shifts the color spaces";
-        public Bitmap ChromaticAbberation(Bitmap bmp, IMessage m, int intensity = 4)
+        public AnyBitmap ChromaticAbberation(AnyBitmap bmp, IMessage m, int intensity = 4)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -452,7 +456,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string rotateColorsDesc = "Rotate the color spaces of each pixel";
-        public Bitmap RotateColors(Bitmap b, IMessage m, float AngleInDegrees = 0)
+        public AnyBitmap RotateColors(AnyBitmap b, IMessage m, float AngleInDegrees = 0)
         {
             using (UnsafeBitmapContext c = ImageExtensions.CreateUnsafeContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -467,7 +471,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string compressDesc = "JPEG Compress the image, lower compression level = more compression";
-        public Bitmap Compress(Bitmap b, IMessage m, long compressionLevel)
+        public AnyBitmap Compress(Bitmap b, IMessage m, long compressionLevel)
         {
             ImageCodecInfo jpgEncoder = GetEncoder(System.Drawing.Imaging.ImageFormat.Jpeg);
             Encoder myEncoder = Encoder.Quality;
@@ -478,7 +482,7 @@ namespace MEE7.Commands.Edit
             myEncoderParameters.Param[0] = myEncoderParameter;
             b.Save(tmp, jpgEncoder, myEncoderParameters);
 
-            Bitmap output = new Bitmap(System.Drawing.Image.FromStream(tmp));
+            AnyBitmap output = new Bitmap(System.Drawing.Image.FromStream(tmp));
 
             b.Dispose();
             tmp.Dispose();
@@ -487,9 +491,9 @@ namespace MEE7.Commands.Edit
         }
 
         public string transgroundDesc = "Make the background transparent";
-        public Bitmap Transground(Bitmap b, IMessage m, Vector2 BackgroundCoords = new Vector2(), int threshold = 10)
+        public AnyBitmap Transground(AnyBitmap b, IMessage m, Vector2 BackgroundCoords = new Vector2(), int threshold = 10)
         {
-            Bitmap reB = new Bitmap(b);
+            AnyBitmap reB = new AnyBitmap(b.ExportBytes());
             Vector2 coords = BackgroundCoords;
             List<Point> OpenList = new List<Point>(new Point[] { new Point((int)(coords.X * (b.Width - 1)), (int)(coords.Y * (b.Height - 1))) });
 
@@ -533,7 +537,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string transgroundColorDesc = "Make the background color transparent";
-        public Bitmap TransgroundColor(Bitmap b, IMessage m, Color backColor, int threshold = 50, float alphaMult = 1)
+        public AnyBitmap TransgroundColor(AnyBitmap b, IMessage m, Color backColor, int threshold = 50, float alphaMult = 1)
         {
             int dist = 0;
             Color c;
@@ -552,7 +556,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string transgroundHSVDesc = "Thereshold HSV values to transparency, note that the SV values are in [0, 100]";
-        public Bitmap TransgroundHSV(Bitmap b, IMessage m, Pipe thresholder)
+        public AnyBitmap TransgroundHSV(AnyBitmap b, IMessage m, Pipe thresholder)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -568,7 +572,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string layerHSVDesc = "Split image into two layers ";
-        public Bitmap LayerHSV(Bitmap b, IMessage m, Pipe thresholder)
+        public AnyBitmap LayerHSV(AnyBitmap b, IMessage m, Pipe thresholder)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -584,7 +588,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string hueScaleDesc = "Grayscaled Hue channel of the image";
-        public Bitmap HueScale(Bitmap b, IMessage m)
+        public AnyBitmap HueScale(AnyBitmap b, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -600,7 +604,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string satScaleDesc = "Grayscaled Saturation channel of the image";
-        public Bitmap SatScale(Bitmap b, IMessage m)
+        public AnyBitmap SatScale(AnyBitmap b, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -616,7 +620,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string valScaleDesc = "Grayscaled Value channel of the image";
-        public Bitmap ValScale(Bitmap b, IMessage m)
+        public AnyBitmap ValScale(AnyBitmap b, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(b))
                 for (int x = 0; x < b.Width; x++)
@@ -656,45 +660,45 @@ namespace MEE7.Commands.Edit
                     H--;
             }
 
-            Bitmap re = b.CropImage(new Rectangle(X, Y, W - X, H - Y));
+            AnyBitmap re = b.CropImage(new Rectangle(X, Y, W - X, H - Y));
             return re;
         }
 
         public string cropDesc = "Crop the picture";
-        public Bitmap Crop(Bitmap b, IMessage m, int x, int y, int w, int h)
+        public AnyBitmap Crop(AnyBitmap b, IMessage m, int x, int y, int w, int h)
         {
-            return b.CropImage(new Rectangle(x,y,w,h));
+            return ((Bitmap)b).CropImage(new Rectangle(x,y,w,h));
         }
 
         public string splitDesc = "Split the picture into x * y pieces";
-        public void Split(Bitmap b, IMessage m, int x = 2, int y = 2)
+        public void Split(AnyBitmap b, IMessage m, int x = 2, int y = 2)
         {
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
-                    DiscordNETWrapper.SendBitmap(b.CropImage(new Rectangle((int)(b.Width * (i / (float)x)), (int)(b.Height * (j / (float)y)),
+                    DiscordNETWrapper.SendBitmap(((Bitmap)b).CropImage(new Rectangle((int)(b.Width * (i / (float)x)), (int)(b.Height * (j / (float)y)),
                         (int)(b.Width / (float)x), (int)(b.Height / (float)y)), false), m.Channel, (i + 1) + " " + (j + 1)).Wait();
 
             b.Dispose();
         }
 
         public string rotateWholeDesc = "Rotate the image including the bounds";
-        public Bitmap RotateWhole(Bitmap b, IMessage m, bool left = true)
+        public AnyBitmap RotateWhole(AnyBitmap b, IMessage m, bool left = true)
         {
             if (left)
-                b.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                b.RotateFlip((AnyBitmap.RotateFlipType)RotateFlipType.Rotate270FlipNone);
             else
-                b.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                b.RotateFlip((AnyBitmap.RotateFlipType)RotateFlipType.Rotate90FlipNone);
 
             return b;
         }
 
         public string flipDesc = "Flip the image";
-        public Bitmap Flip(Bitmap b, IMessage m, bool x = true)
+        public AnyBitmap Flip(AnyBitmap b, IMessage m, bool x = true)
         {
             if (x)
-                b.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                b.RotateFlip((AnyBitmap.RotateFlipType)RotateFlipType.RotateNoneFlipX);
             else
-                b.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                b.RotateFlip((AnyBitmap.RotateFlipType)RotateFlipType.RotateNoneFlipY);
 
             return b;
         }
@@ -736,19 +740,19 @@ namespace MEE7.Commands.Edit
         }
 
         public string GetDimensionsDesc = "Get the width and height";
-        public string GetDimensions(Bitmap b, IMessage m)
+        public string GetDimensions(AnyBitmap b, IMessage m)
         {
             return $"{b.Width}w {b.Height}h";
         }
 
         public string ResizeDesc = "Resize an image by some multiplier";
-        public Bitmap Resize(Bitmap b, IMessage m, float multiplier)
+        public AnyBitmap Resize(AnyBitmap b, IMessage m, float multiplier)
         {
             return Stretch(b, m, (int)(b.Width * multiplier), (int)(b.Height * multiplier));
         }
 
         public string EmoteResizeDesc = "Resize an image to 48x48px which is the highest resolution discord currently displays an emote at";
-        public Bitmap EmoteResize(Bitmap b, IMessage m)
+        public AnyBitmap EmoteResize(AnyBitmap b, IMessage m)
         {
             if (b.Width > b.Height)
             {
@@ -765,7 +769,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string SeamCarveDesc = "Carve seams";
-        public Bitmap SeamCarve(Bitmap b, IMessage m, int newWidth, int newHeight)
+        public AnyBitmap SeamCarve(AnyBitmap b, IMessage m, int newWidth, int newHeight)
         {
             if (newWidth > b.Width || newHeight > b.Height)
                 throw new Exception("I can only make images smaller!");
@@ -776,7 +780,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string SeamCarveMDesc = "Carve seams by multiplier";
-        public Bitmap SeamCarveM(Bitmap b, IMessage m, float newWidthMult, float newHeightMult)
+        public Bitmap SeamCarveM(AnyBitmap b, IMessage m, float newWidthMult, float newHeightMult)
         {
             if (newWidthMult > 1 || newHeightMult > 1)
                 throw new Exception("I can only make images smaller!");
@@ -785,7 +789,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string ForSeamCarveMDesc = "Carve seams multiple times by multiplier";
-        public Bitmap[] ForSeamCarveM(Bitmap b, IMessage m, float endValue, int numFrames, bool stretch = true)
+        public Bitmap[] ForSeamCarveM(AnyBitmap b, IMessage m, float endValue, int numFrames, bool stretch = true)
         {
             if (endValue > 1)
                 throw new Exception("I cant make larger >:("); 
@@ -805,7 +809,7 @@ namespace MEE7.Commands.Edit
 
         CascadeClassifier cascadeClassifier = null;
         public string FaceDetecDesc = "Detect faces";
-        public Bitmap FaceDetec(Bitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
+        public AnyBitmap FaceDetec(Bitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
         {
             if (cascadeClassifier == null)
                 cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}haarcascade_frontalface_alt_tree.xml");
@@ -817,7 +821,7 @@ namespace MEE7.Commands.Edit
             BitmapData bdata = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), ImageLockMode.ReadOnly, b.PixelFormat);
             Image<Bgr, byte> grayImage = new Image<Bgr, byte>(b.Width, b.Height, bdata.Stride, bdata.Scan0);
             b.UnlockBits(bdata);
-            Rectangle[] faces = cascadeClassifier.DetectMultiScale(grayImage, scaleFactor, 0);
+            System.Drawing.Rectangle[] faces = cascadeClassifier.DetectMultiScale(grayImage, scaleFactor, 0);
 
             using Graphics g = Graphics.FromImage(b);
             using Pen p = new Pen(Color.Red);
@@ -859,7 +863,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string InsertIntoRectDesc = "Inserts picture into the red rectangle of another picture";
-        public static Bitmap InsertIntoRect(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null, bool drawDesign = true)
+        public static AnyBitmap InsertIntoRect(AnyBitmap insertion, IMessage m, AnyBitmap design, AnyBitmap overlay = null, bool drawDesign = true)
         {
             Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
             if (redRekt.Width == 0)
@@ -881,7 +885,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string InsertDesc = "Inserts picture into the rectangle of another picture";
-        public static Bitmap Insert(Bitmap backGround, IMessage m, Bitmap insertion, Rectangle r)
+        public static AnyBitmap Insert(AnyBitmap backGround, IMessage m, AnyBitmap insertion, Rectangle r)
         {
             using (Graphics graphics = Graphics.FromImage(backGround))
                 graphics.DrawImage(insertion, r);
@@ -890,9 +894,9 @@ namespace MEE7.Commands.Edit
         }
 
         public string TranslatePDesc = "Translate picture";
-        public Bitmap TranslateP(Bitmap b, IMessage m, int deltaX, int deltaY)
+        public AnyBitmap TranslateP(AnyBitmap b, IMessage m, int deltaX, int deltaY)
         {
-            Bitmap n = new Bitmap(b.Width, b.Height);
+            AnyBitmap n = new AnyBitmap(b.Width, b.Height);
             using (Graphics graphics = Graphics.FromImage(n))
                 graphics.DrawImage(b, deltaX, deltaY);
             b.Dispose();
@@ -900,19 +904,19 @@ namespace MEE7.Commands.Edit
         }
 
         public string DuplicateDesc = "Duplicate picture into gif";
-        public Gif Duplicate(Bitmap b, IMessage m, int amount)
+        public Gif Duplicate(AnyBitmap b, IMessage m, int amount)
         {
             if (amount > 100)
                 throw new Exception("no");
 
-            Bitmap[] pics = Enumerable.Range(0, amount).Select(x => (Bitmap)b.Clone()).ToArray();
+            AnyBitmap[] pics = Enumerable.Range(0, amount).Select(x => (AnyBitmap)b.Clone()).ToArray();
             int[] timings = Enumerable.Repeat(33, amount).ToArray();
 
             return new Gif(pics, timings);
         }
 
         public string CircleTransDesc = "Add circular transparency to the picture";
-        public Bitmap CircleTrans(Bitmap b, IMessage m)
+        public AnyBitmap CircleTrans(AnyBitmap b, IMessage m)
         {
             using UnsafeBitmapContext c = new UnsafeBitmapContext(b);
             for (int x = 0; x < b.Width; x++)
@@ -932,9 +936,9 @@ namespace MEE7.Commands.Edit
         static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
         static readonly float ecache = (float)Math.E;
         static float Gauss(float x, float sigma, float mu) => (float)Math.Pow(1 / (sigma * gcache) * ecache, 0.5 * (x - mu) * (x - mu) / sigma);
-        static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
+        static AnyBitmap ApplyTransformation(AnyBitmap bmp, Func<int, int, Vector2> trans)
         {
-            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            AnyBitmap output = new AnyBitmap(bmp.Width, bmp.Height);
 
             using (UnsafeBitmapContext ocon = new UnsafeBitmapContext(output))
             using (UnsafeBitmapContext bcon = new UnsafeBitmapContext(bmp))
@@ -973,7 +977,7 @@ namespace MEE7.Commands.Edit
             }
             return null;
         }
-        static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
+        static Rectangle FindRectangle(AnyBitmap Pic, Color C, int MinSize)
         {
             bool IsSameColor(Color C1, Color C2)
             {
@@ -998,7 +1002,7 @@ namespace MEE7.Commands.Edit
 
             return new Rectangle();
         }
-        static Bitmap ApplyKernel(Bitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
+        static AnyBitmap ApplyKernel(AnyBitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
         {
             float[,] fKernel = new float[kernel.GetLength(0), kernel.GetLength(1)];
             for (int x = 0; x < kernel.GetLength(0); x++)
@@ -1006,11 +1010,11 @@ namespace MEE7.Commands.Edit
                     fKernel[x, y] = kernel[x, y];
             return ApplyKernel(bmp, fKernel, factor, grayscale);
         }
-        static Bitmap ApplyKernel(Bitmap bmp, float[,] kernel, float factor = 1, bool grayscale = false)
+        static AnyBitmap ApplyKernel(AnyBitmap bmp, float[,] kernel, float factor = 1, bool grayscale = false)
         {
             int kernelW = kernel.GetLength(0);
             int kernelH = kernel.GetLength(1);
-            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            AnyBitmap output = new AnyBitmap(bmp.Width, bmp.Height);
 
             static int inBounds(int x, int bound)
             {
@@ -1031,7 +1035,7 @@ namespace MEE7.Commands.Edit
                         float activation = 0;
                         for (int xk = 0; xk < kernelW; xk++)
                             for (int yk = 0; yk < kernelH; yk++)
-                                activation += kernel[xk, yk] * cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).GetGrayScale();
+                                activation += kernel[xk, yk] * ((Color) cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height))).GetGrayScale();
                         activation = (int)Math.Abs(activation * factor);
                         if (activation > 255)
                             activation = 255;
@@ -1069,7 +1073,7 @@ namespace MEE7.Commands.Edit
             bmp.Dispose();
             return output;
         }
-        static Bitmap FlagColor(Color[] Cs, Bitmap P, bool Horz = false)
+        static AnyBitmap FlagColor(Color[] Cs, AnyBitmap P, bool Horz = false)
         {
             using (UnsafeBitmapContext c = new UnsafeBitmapContext(P))
             {

@@ -1,6 +1,7 @@
 ﻿using AnimatedGif;
 using BumpKit;
 using Discord;
+using IronSoftware.Drawing;
 using MEE7.Backend.HelperFunctions;
 using System;
 using System.Collections.Generic;
@@ -9,14 +10,16 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using static MEE7.Commands.Edit.Edit;
-using Color = System.Drawing.Color;
+using Color = IronSoftware.Drawing.Color;
+using Rectangle = IronSoftware.Drawing.Rectangle;
+using Size = IronSoftware.Drawing.Size;
 
 namespace MEE7.Commands.Edit
 {
     class GifCommands : EditCommandProvider
     {
         public string rainbowDesc = "I'll try spinning colors that's a good trick";
-        public Gif Rainbow(Bitmap b, IMessage m)
+        public Gif Rainbow(AnyBitmap b, IMessage m)
         {
             Vector3[,] HSVimage = new Vector3[b.Width, b.Height];
             int[,] Alphas = new int[b.Width, b.Height];
@@ -32,7 +35,7 @@ namespace MEE7.Commands.Edit
 
             int steps = 20;
             int stepWidth = 360 / steps;
-            Bitmap[] re = new Bitmap[steps];
+            AnyBitmap[] re = new AnyBitmap[steps];
             for (int i = 0; i < steps; i++)
             {
                 re[i] = new Bitmap(b.Width, b.Height);
@@ -57,7 +60,7 @@ namespace MEE7.Commands.Edit
 
             int steps = 20;
             int stepWidth = 360 / steps;
-            Bitmap[] re = new Bitmap[steps];
+            AnyBitmap[] re = new AnyBitmap[steps];
             for (int i = 0; i < steps; i++)
                 re[i] = b.RotateImage(-stepWidth * i, middle);
 
@@ -76,7 +79,7 @@ namespace MEE7.Commands.Edit
             }
             int[] patTimings = new int[] { 40, 40, 40, 40, 40 };
 
-            pats = pats.Select(x => (Bitmap)x.Stretch(new Size(128, 128))).ToArray();
+            pats = pats.Select(x => (Bitmap)x.Stretch(new System.Drawing.Size(128, 128))).ToArray();
 
             return new Gif(pats, patTimings);
         }
@@ -85,7 +88,7 @@ namespace MEE7.Commands.Edit
                 "then it goes forward again because it loops and its all very fancy n stuff";
         public Gif BackAndForth(Gif gif, IMessage m)
         {
-            return new Gif(gif.Item1.Concat(gif.Item1.Skip(1).Reverse().Select(x => (Bitmap)x.Clone())).ToArray(),
+            return new Gif(gif.Item1.AsParallel().Concat(gif.Item1.Skip(1).Reverse().Select(x => (AnyBitmap)x.Clone())).ToArray(),
                            gif.Item2.Concat(gif.Item2.Skip(1).Reverse()).ToArray());
         }
 
@@ -108,13 +111,13 @@ namespace MEE7.Commands.Edit
         }
 
         public string toGifDesc = "Converts a bitmap array to a gif";
-        public Gif ToGif(Bitmap[] input, IMessage m)
+        public Gif ToGif(AnyBitmap[] input, IMessage m)
         {
             return new Gif(input, Enumerable.Repeat(33, input.Length).ToArray());
         }
 
         public string toBitmapArrayDesc = "Converts a gif to a bitmap array";
-        public Bitmap[] ToBitmapArray(Gif input, IMessage m)
+        public AnyBitmap[] ToBitmapArray(Gif input, IMessage m)
         {
             return input.Item1;
         }
@@ -163,7 +166,7 @@ namespace MEE7.Commands.Edit
             int maxHeight = gif.Item1.Select(x => x.Height).Max();
             using (AnimatedGifCreator c = new AnimatedGifCreator(s, -1))
                 for (int i = 0; i < gif.Item1.Length; i++)
-                    c.AddFrame(gif.Item1[i].CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
+                    c.AddFrame(((Bitmap)gif.Item1[i]).CropImage(new Rectangle(0, 0, maxWidth, maxHeight)), gif.Item2[i], GifQuality.Bit8);
 
             guild.CreateEmoteAsync(name, new Discord.Image(s)).Wait();
 
@@ -212,7 +215,7 @@ namespace MEE7.Commands.Edit
             if (m.Author.Id != Program.Master.Id)
                 throw new Exception("ApplyToLighthouse is admin only :P");
 
-            var smallerImgs = gif.Item1.Select(b => (Bitmap)b.Stretch(new Size(28, 14))).ToArray();
+            var smallerImgs = gif.Item1.Select(b => (Bitmap)((Bitmap)b).Stretch(new Size(28, 14))).ToArray();
             var timings = gif.Item2;
 
             List<byte[,,]> smallerByteArrays = new();

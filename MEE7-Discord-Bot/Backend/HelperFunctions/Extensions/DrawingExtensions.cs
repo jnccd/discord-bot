@@ -1,8 +1,11 @@
-﻿using System;
+﻿using IronSoftware.Drawing;
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
-using Color = System.Drawing.Color;
+using Color = IronSoftware.Drawing.Color;
+using Point = IronSoftware.Drawing.Point;
+using Rectangle = IronSoftware.Drawing.Rectangle;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -10,7 +13,7 @@ namespace MEE7.Backend.HelperFunctions
     {
         public static Bitmap CropImage(this Bitmap source, Rectangle section, bool dispose = true)
         {
-            Bitmap bmp = new Bitmap(section.Width, section.Height);
+            Bitmap bmp = new(section.Width, section.Height);
 
             using (Graphics g = Graphics.FromImage(bmp))
                 g.DrawImage(source, 0, 0, section, GraphicsUnit.Pixel);
@@ -130,13 +133,13 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static Bitmap RotateImage(this Bitmap b, float AngleInDegrees, Vector2 RotationOrigin)
         {
-            Bitmap re = new Bitmap(b.Width, b.Height);
+            AnyBitmap re = new Bitmap(b.Width, b.Height);
             using (Graphics g = Graphics.FromImage(re))
             {
                 g.TranslateTransform(RotationOrigin.X, RotationOrigin.Y);
                 g.RotateTransform(AngleInDegrees);
                 g.TranslateTransform(-RotationOrigin.X, -RotationOrigin.Y);
-                g.DrawImage(b, Point.Empty);
+                g.DrawImage(b, new Point(0,0));
             }
             return re;
         }
@@ -166,6 +169,67 @@ namespace MEE7.Backend.HelperFunctions
             g = keepInIntv(g);
             b = keepInIntv(b);
             return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
+        }
+        private static void MinMaxRgb(out int min, out int max, int r, int g, int b)
+        {
+            if (r > g)
+            {
+                max = r;
+                min = g;
+            }
+            else
+            {
+                max = g;
+                min = r;
+            }
+            if (b > max)
+            {
+                max = b;
+            }
+            else if (b < min)
+            {
+                min = b;
+            }
+        }
+        public static float GetHue(this Color color)
+        {
+            int r = color.R, g = color.G, b = color.B;
+
+            if (r == g && g == b)
+                return 0f;
+
+            MinMaxRgb(out int min, out int max, r, g, b);
+
+            float delta = max - min;
+            float hue;
+
+            if (r == max)
+                hue = (g - b) / delta;
+            else if (g == max)
+                hue = (b - r) / delta + 2f;
+            else
+                hue = (r - g) / delta + 4f;
+
+            hue *= 60f;
+            if (hue < 0f)
+                hue += 360f;
+
+            return hue;
+        }
+        public static float GetSaturation(this Color color)
+        {
+            int r = color.R, g = color.G, b = color.B;
+
+            if (r == g && g == b)
+                return 0f;
+
+            MinMaxRgb(out int min, out int max, r, g, b);
+
+            int div = max + min;
+            if (div > byte.MaxValue)
+                div = byte.MaxValue * 2 - max - min;
+
+            return (max - min) / (float)div;
         }
         public static void ColorToHSV(this Color color, out double hue, out double saturation, out double value)
         {

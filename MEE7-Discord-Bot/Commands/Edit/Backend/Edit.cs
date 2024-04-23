@@ -1,4 +1,5 @@
 ﻿using Discord;
+using IronSoftware.Drawing;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using System;
@@ -153,12 +154,16 @@ namespace MEE7.Commands.Edit
                 return this;
             }
         }
-        public class Gif : Tuple<Bitmap[], int[]> { public Gif(Bitmap[] item1, int[] item2) : base(item1, item2) { } }
+        public class Gif : Tuple<AnyBitmap[], int[]> 
+        { 
+            public Gif(AnyBitmap[] item1, int[] item2) : base(item1, item2) { }
+            public Gif(Bitmap[] item1, int[] item2) : base(item1.Select(x => (AnyBitmap)x).ToArray(), item2) { }
+        }
         public class EditNull { }
         public class EditVariable { public string VarName; }
 
         private static IEnumerable<EditCommand> Commands;
-        private static Dictionary<string, EmbedBuilder> groupHelpMenus = new Dictionary<string, EmbedBuilder>();
+        private static Dictionary<string, EmbedBuilder> groupHelpMenus = new();
         public static string EditCommandsOverview { get; private set; }
 
         public Edit() : base("edit", "This is a more advanced command which allows you to chain together functions that were made specific for this command. " +

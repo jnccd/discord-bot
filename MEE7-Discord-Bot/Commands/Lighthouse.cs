@@ -11,7 +11,7 @@ using Discord.Net.WebSockets;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
-using System.Drawing;
+using IronSoftware.Drawing;
 
 namespace MEE7.Commands
 {
@@ -88,7 +88,7 @@ namespace MEE7.Commands
 
             foreach (var image in images)
             {
-                Bitmap b = new(28, 14);
+                AnyBitmap b = new(28, 14);
                 for (var y = 0; y < image.Item1.GetLength(0); y++) 
                 {
                     for (var x = 0; x < image.Item1.GetLength(1); x++)

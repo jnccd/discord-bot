@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>MEE7</RootNamespace>
     <AssemblyName>MEE7</AssemblyName>
     <StartupObject>MEE7.Program</StartupObject>
@@ -46,6 +46,7 @@
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.4.0.4061" />
     <PackageReference Include="GoogleTranslateFreeApi" Version="1.1.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
+    <PackageReference Include="IronSoftware.System.Drawing" Version="2024.4.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="MPack" Version="2.1.1" />
     <PackageReference Include="NAudio" Version="1.9.0" />
@@ -55,6 +56,7 @@
     <PackageReference Include="NLayer.NAudioSupport" Version="1.1.0" />
     <PackageReference Include="ScottPlot" Version="4.0.40" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
     <PackageReference Include="Tesseract" Version="3.3.0" />
     <PackageReference Include="TweetMoaSharp" Version="6.0.2" />
   </ItemGroup>

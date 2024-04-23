@@ -8,14 +8,14 @@ using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using System;
 using System.Diagnostics;
-using System.Drawing;
+using IronSoftware.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
 using TweetSharp;
 using static MEE7.Commands.Edit.Edit;
-using Color = System.Drawing.Color;
+using Color = IronSoftware.Drawing.Color;
 
 namespace MEE7.Commands.Edit
 {
@@ -35,7 +35,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string lastPDesc = "Gets the last messages picture";
-        public Bitmap LastP(EditNull n, IMessage m, int messagesToSkip = 0)
+        public AnyBitmap LastP(EditNull n, IMessage m, int messagesToSkip = 0)
         {
             var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1 + messagesToSkip);
             foreach (var lm in messages)
@@ -95,7 +95,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string thisPDesc = "Gets attached picture / picture from url argument";
-        public Bitmap ThisP(EditNull n, IMessage m, string PictureURL = "")
+        public AnyBitmap ThisP(EditNull n, IMessage m, string PictureURL = "")
         {
             var b = GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
             if ((long)b.Width * b.Height > maxImagePixelSize)
@@ -149,7 +149,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string profilePicDesc = "Gets a profile picture";
-        public Bitmap ProfilePic(EditNull n, IMessage m, IUser user)
+        public AnyBitmap ProfilePic(EditNull n, IMessage m, IUser user)
         {
             string avatarURL = user.GetAvatarUrl(ImageFormat.Png, 512);
             return (string.IsNullOrWhiteSpace(avatarURL) ? user.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
@@ -163,7 +163,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string myProfilePicDesc = "Gets your profile picture";
-        public Bitmap MyProfilePic(EditNull n, IMessage m)
+        public AnyBitmap MyProfilePic(EditNull n, IMessage m)
         {
             if (m is TwitterMessage)
             {
@@ -178,7 +178,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string serverPicDesc = "Gets the server picture from a server id";
-        public Bitmap ServerPic(EditNull n, IMessage m, string ServerID)
+        public AnyBitmap ServerPic(EditNull n, IMessage m, string ServerID)
         {
             if (ServerID == "")
                 return Program.GetGuildFromChannel(m.Channel).IconUrl.GetBitmapFromURL();
@@ -187,7 +187,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string emoteDesc = "Gets the picture of the emote";
-        public Bitmap Emote(EditNull n, IMessage m, string emote)
+        public AnyBitmap Emote(EditNull n, IMessage m, string emote)
         {
             Discord.Emote.TryParse(emote.Trim(' '), out Emote res);
             if (res != null) return res.Url.GetBitmapFromURL();
@@ -225,9 +225,9 @@ namespace MEE7.Commands.Edit
         }
 
         public string mandelbrotDesc = "Render a mandelbrot";
-        public Bitmap Mandelbrot(EditNull n, IMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
+        public AnyBitmap Mandelbrot(EditNull n, IMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
         {
-            Bitmap bmp = new Bitmap(500, 500);
+            AnyBitmap bmp = new AnyBitmap(500, 500);
 
             if (passes > 200)
                 throw new Exception("200 passes should be enough, everything else would be spam and you dont wanna spam");
