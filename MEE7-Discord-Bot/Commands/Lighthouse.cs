@@ -11,6 +11,7 @@ using Discord.Net.WebSockets;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
+using System.Drawing;
 
 namespace MEE7.Commands
 {
@@ -85,8 +86,18 @@ namespace MEE7.Commands
                 return;
             }
 
-
-            // <Insert command code here>
+            foreach (var image in images)
+            {
+                Bitmap b = new(28, 14);
+                for (var y = 0; y < image.Item1.GetLength(0); y++) 
+                {
+                    for (var x = 0; x < image.Item1.GetLength(1); x++)
+                    {
+                        b.SetPixel(x, y, System.Drawing.Color.FromArgb(image.Item1[y, x, 0], image.Item1[y, x, 1], image.Item1[y, x, 2]));
+                    }
+                }
+                DiscordNETWrapper.SendBitmap(b, message.Channel).Wait();
+            }
         }
 
         public ReadOnlyMemory<byte> PackMessage(int imageIndex)
