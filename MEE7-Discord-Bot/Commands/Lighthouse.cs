@@ -23,6 +23,7 @@ namespace MEE7.Commands
         string username = System.Environment.GetEnvironmentVariable("LIGHTHOUSE_USERNAME");
         string token = System.Environment.GetEnvironmentVariable("LIGHTHOUSE_TOKEN");
         bool gotCreds;
+        Exception ex;
 
         public Lighthouse() : base("lighthouse", "Put media on the lighthouse", isExperimental: false, isHidden: true)
         {
@@ -70,6 +71,7 @@ namespace MEE7.Commands
                         }
                         catch (Exception ex)
                         {
+                            this.ex = ex;
                             Debug.WriteLine("Lighthouse fail");
                             Debug.WriteLine(ex);
                         }
@@ -110,6 +112,14 @@ namespace MEE7.Commands
                     }
                     DiscordNETWrapper.SendBitmap(b, message.Channel).Wait();
                 }
+            }
+
+            if (split.Length >= 2 && split[1] == "print-except")
+            {
+                if (ex != null)
+                    throw ex;
+                else
+                    DiscordNETWrapper.SendText("Ne exceptions yet", message.Channel);
             }
         }
 
