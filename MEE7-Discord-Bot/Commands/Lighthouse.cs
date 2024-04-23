@@ -87,17 +87,29 @@ namespace MEE7.Commands
                 return;
             }
 
-            foreach (var image in images)
+            var split = message.Content.Split(' ');
+            if (split.Length >= 3 && split[1] == "set-token") 
             {
-                Bitmap b = new(28, 14);
-                for (var y = 0; y < image.Item1.GetLength(0); y++) 
+                lock (images)
                 {
-                    for (var x = 0; x < image.Item1.GetLength(1); x++)
-                    {
-                        b.SetPixel(x, y, System.Drawing.Color.FromArgb(image.Item1[y, x, 0], image.Item1[y, x, 1], image.Item1[y, x, 2]));
-                    }
+                    token = split[2];
                 }
-                DiscordNETWrapper.SendBitmap(b, message.Channel).Wait();
+            }
+
+            if (split.Length >= 2 && split[1] == "print-tensor")
+            {
+                foreach (var image in images)
+                {
+                    Bitmap b = new(28, 14);
+                    for (var y = 0; y < image.Item1.GetLength(0); y++)
+                    {
+                        for (var x = 0; x < image.Item1.GetLength(1); x++)
+                        {
+                            b.SetPixel(x, y, System.Drawing.Color.FromArgb(image.Item1[y, x, 0], image.Item1[y, x, 1], image.Item1[y, x, 2]));
+                        }
+                    }
+                    DiscordNETWrapper.SendBitmap(b, message.Channel).Wait();
+                }
             }
         }
 
