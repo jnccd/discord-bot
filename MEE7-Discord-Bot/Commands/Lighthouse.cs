@@ -152,7 +152,7 @@ namespace MEE7.Commands
             {
                 var msgpackDict = new MDict
                 {
-                    {"REID", MToken.From(0)},
+                    {"REID", MToken.From(msgCounter++)},
                     {"AUTH", MToken.From(new MDict {
                             {"USER", username},
                             {"TOKEN", token},
