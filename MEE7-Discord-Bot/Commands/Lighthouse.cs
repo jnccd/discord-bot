@@ -53,12 +53,13 @@ namespace MEE7.Commands
             var split = message.Content.Split(' ');
             if (split.Length >= 3 && split[1] == "set-token") 
             {
+                cancelTokenSource.Cancel();
+                lighthouseThread.Wait();
+
                 lock (images)
                 {
-                    cancelTokenSource.Cancel();
-                    lighthouseThread.Wait();
                     token = split[2];
-                    cancelTokenSource.TryReset();
+                    cancelTokenSource = new();
                     cancelToken = cancelTokenSource.Token;
                     StartSenderLoop();
                 }
@@ -106,6 +107,9 @@ namespace MEE7.Commands
                         while (true)
                         {
                             sw.Restart();
+
+                            if (cancelToken.IsCancellationRequested)
+                                break;
 
                             lock (images)
                             {
