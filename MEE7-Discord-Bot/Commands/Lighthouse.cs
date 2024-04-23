@@ -24,61 +24,22 @@ namespace MEE7.Commands
         string token = System.Environment.GetEnvironmentVariable("LIGHTHOUSE_TOKEN");
         bool gotCreds;
         Exception ex;
+        Task lighthouseThread = null;
+        CancellationTokenSource cancelTokenSource = new();
+        CancellationToken cancelToken;
 
         public Lighthouse() : base("lighthouse", "Put media on the lighthouse", isExperimental: false, isHidden: true)
         {
             gotCreds = !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(token);
             images.Add(new Tuple<byte[,,], int>(new byte[14, 28, 3], 100));
+            cancelToken = cancelTokenSource.Token;
             Program.OnConnected += Program_OnConnected;
         }
 
         private void Program_OnConnected()
         {
             if (gotCreds)
-                _ = Task.Run(async () =>
-                {
-                    Thread.CurrentThread.Name = "Lighthouse Thread";
-                    while (true)
-                    {
-                        using ClientWebSocket webSocketClient = new();
-                        try
-                        {
-                            int imageCounter = 0, waitTime = 0;
-                            Stopwatch sw = new();
-                            await webSocketClient.ConnectAsync(uri, default);
-
-                            while (true)
-                            {
-                                sw.Restart();
-
-                                lock (images)
-                                {
-                                    webSocketClient.SendAsync(PackMessage(imageCounter), WebSocketMessageType.Binary, true, default)
-                                                   .GetAwaiter()
-                                                   .GetResult();
-                                    imageCounter = (imageCounter + 1) % images.Count;
-
-                                    var bytes = new byte[1024];
-                                    var result = webSocketClient.ReceiveAsync(bytes, default).Result;
-                                    //Debug.WriteLine($"Got lighthouse res: {Encoding.UTF8.GetString(bytes, 0, result.Count)}");
-
-                                    sw.Stop();
-                                    waitTime = images[imageCounter].Item2 - (int)sw.ElapsedMilliseconds;
-                                }
-
-                                await Task.Delay(waitTime > 0 ? waitTime : 1);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            this.ex = ex;
-                            Debug.WriteLine("Lighthouse fail");
-                            Debug.WriteLine(ex);
-                        }
-                        try { await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", default); } catch { }
-                        await Task.Delay(1000);
-                    }
-                });
+                StartSenderLoop();
         }
 
         public override void Execute(IMessage message)
@@ -94,7 +55,12 @@ namespace MEE7.Commands
             {
                 lock (images)
                 {
+                    cancelTokenSource.Cancel();
+                    lighthouseThread.Wait();
                     token = split[2];
+                    cancelTokenSource.TryReset();
+                    cancelToken = cancelTokenSource.Token;
+                    StartSenderLoop();
                 }
             }
 
@@ -121,6 +87,59 @@ namespace MEE7.Commands
                 else
                     DiscordNETWrapper.SendText("Ne exceptions yet", message.Channel);
             }
+        }
+
+        public void StartSenderLoop()
+        {
+            lighthouseThread = Task.Run(async () =>
+            {
+                Thread.CurrentThread.Name = "Lighthouse Thread";
+                while (true)
+                {
+                    using ClientWebSocket webSocketClient = new();
+                    try
+                    {
+                        int imageCounter = 0, waitTime = 0;
+                        Stopwatch sw = new();
+                        await webSocketClient.ConnectAsync(uri, default);
+
+                        while (true)
+                        {
+                            sw.Restart();
+
+                            lock (images)
+                            {
+                                webSocketClient.SendAsync(PackMessage(imageCounter), WebSocketMessageType.Binary, true, default)
+                                               .GetAwaiter()
+                                               .GetResult();
+                                imageCounter = (imageCounter + 1) % images.Count;
+
+                                var bytes = new byte[1024];
+                                var result = webSocketClient.ReceiveAsync(bytes, default).Result;
+                                //Debug.WriteLine($"Got lighthouse res: {Encoding.UTF8.GetString(bytes, 0, result.Count)}");
+
+                                sw.Stop();
+                                waitTime = images[imageCounter].Item2 - (int)sw.ElapsedMilliseconds;
+                            }
+
+                            if (cancelToken.IsCancellationRequested)
+                                break;
+
+                            await Task.Delay(waitTime > 0 ? waitTime : 1);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.ex = ex;
+                        Debug.WriteLine("Lighthouse fail");
+                        Debug.WriteLine(ex);
+                    }
+                    try { await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", default); } catch { }
+                    if (cancelToken.IsCancellationRequested)
+                        break;
+                    await Task.Delay(1000);
+                }
+            });
         }
 
         public ReadOnlyMemory<byte> PackMessage(int imageIndex)
