@@ -71,7 +71,7 @@ namespace MEE7.Commands.Edit
             foreach (var lm in messages)
                 try
                 {
-                    return GetPictureLinkFromMessage(lm, "").GetBitmapsAndTimingsFromGIFURL();
+                    return GetPictureLinkFromMessage(lm, lm.Content).GetBitmapsAndTimingsFromGIFURL();
                 }
                 catch { }
             throw new Exception("Didn't find any");
@@ -467,11 +467,9 @@ namespace MEE7.Commands.Edit
             string pic = null;
             if (m.Attachments.Count > 0 && m.Attachments.ElementAt(0).Size > 0)
             {
-                if (m.Attachments.ElementAt(0).Filename.EndsWith(".png"))
-                    pic = m.Attachments.ElementAt(0).Url;
-                else if (m.Attachments.ElementAt(0).Filename.EndsWith(".jpg"))
-                    pic = m.Attachments.ElementAt(0).Url;
-                else if (m.Attachments.ElementAt(0).Filename.EndsWith(".gif"))
+                if (m.Attachments.ElementAt(0).Filename.EndsWith(".png") ||
+                    m.Attachments.ElementAt(0).Filename.EndsWith(".jpg") ||
+                    m.Attachments.ElementAt(0).Filename.EndsWith(".gif"))
                     pic = m.Attachments.ElementAt(0).Url;
             }
             string picLink = arguments.GetPictureLinkInMessage();
