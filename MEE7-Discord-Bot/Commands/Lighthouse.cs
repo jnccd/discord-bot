@@ -74,6 +74,7 @@ namespace MEE7.Commands
                             Debug.WriteLine(ex);
                         }
                         try { await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", default); } catch { }
+                        await Task.Delay(500);
                     }
                 });
         }
