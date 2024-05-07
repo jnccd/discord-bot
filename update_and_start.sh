@@ -36,13 +36,12 @@ done
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR/MEE7-Discord-Bot
 
-# Work
-git pull
-$DOTNET_PATH restore
-$DOTNET_PATH run -c Release
-
-# Keep process alive
-echo "Keeping process alive.."
+echo "Work until the end of time..."
 while true; do
-	sleep 1000
+	echo "Pull me baby one more time"
+	git pull
+	echo "Restore me baby one more time"
+	$DOTNET_PATH restore
+	echo "Run me baby one more time"
+	$DOTNET_PATH run -c Release
 done
