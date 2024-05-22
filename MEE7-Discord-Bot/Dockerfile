@@ -7,7 +7,7 @@ RUN apt-get install -y --no-install-recommends libgdiplus libc6-dev ffmpeg youtu
 RUN apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-chi-sim tesseract-ocr-chi-tra tesseract-ocr-jpn
 RUN rm -rf /var/lib/apt/lists/*
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["MEE7-Discord-Bot/MEE7-Discord-Bot.csproj", "MEE7-Discord-Bot/"]
 RUN dotnet restore "MEE7-Discord-Bot/MEE7-Discord-Bot.csproj"
