@@ -72,7 +72,8 @@ namespace MEE7.Commands
                 }
                 UnoCard newCard = UnoCards.FirstOrDefault(x => (HasColor(t) ? x.Color == c : x.Color == UnoColor.none) && x.Type == t);
                 Tuple<SocketUser, List<UnoCard>> player = Players.Find(x => x.Item1.Id == PlayerID);
-                if (!player.Item2.Exists(x => x.Type == t && x.Color == c))
+                if (!player.Item2.Exists(x => (x.Type == t && x.Color == c) || 
+                        (x.Type == t && (x.Type == UnoCardType.changecolor || x.Type == UnoCardType.plus4))))
                 {
                     DiscordNETWrapper.SendText("You don't even have that card :thinking:", channel).Wait();
                     return;
