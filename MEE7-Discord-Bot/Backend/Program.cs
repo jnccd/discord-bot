@@ -54,6 +54,7 @@ namespace MEE7
 
         // Client 
         static DiscordSocketClient client;
+        public static DiscordSocketClient Client { get { return client; } }
         public static bool ClientReady { get; private set; }
 
         static readonly string exitlock = "";
