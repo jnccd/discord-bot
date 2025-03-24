@@ -65,6 +65,12 @@ namespace MEE7.Commands
                 }
             }
 
+            if (split.Length >= 2 && split[1] == "stop")
+            {
+                cancelTokenSource.Cancel();
+                lighthouseThread.Wait();
+            }
+
             if (split.Length >= 2 && split[1] == "print-tensor")
             {
                 foreach (var image in images)
@@ -95,31 +101,28 @@ namespace MEE7.Commands
             lighthouseThread = Task.Run(async () =>
             {
                 Thread.CurrentThread.Name = "Lighthouse Thread";
-                while (true)
+                while (!cancelToken.IsCancellationRequested)
                 {
                     using ClientWebSocket webSocketClient = new();
                     try
                     {
                         int imageCounter = 0, waitTime = 0;
                         Stopwatch sw = new();
-                        await webSocketClient.ConnectAsync(uri, default);
+                        await webSocketClient.ConnectAsync(uri, cancelToken);
 
-                        while (true)
+                        while (!cancelToken.IsCancellationRequested)
                         {
                             sw.Restart();
 
-                            if (cancelToken.IsCancellationRequested)
-                                break;
-
                             lock (images)
                             {
-                                webSocketClient.SendAsync(PackMessage(imageCounter), WebSocketMessageType.Binary, true, default)
+                                webSocketClient.SendAsync(PackMessage(imageCounter), WebSocketMessageType.Binary, true, cancelToken)
                                                .GetAwaiter()
                                                .GetResult();
                                 imageCounter = (imageCounter + 1) % images.Count;
 
                                 var bytes = new byte[1024];
-                                var result = webSocketClient.ReceiveAsync(bytes, default).Result;
+                                var result = webSocketClient.ReceiveAsync(bytes, cancelToken).Result;
                                 //Debug.WriteLine($"Got lighthouse res: {Encoding.UTF8.GetString(bytes, 0, result.Count)}");
 
                                 sw.Stop();
@@ -138,10 +141,9 @@ namespace MEE7.Commands
                         Debug.WriteLine("Lighthouse fail");
                         Debug.WriteLine(ex);
                     }
-                    try { await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", default); } catch { }
-                    if (cancelToken.IsCancellationRequested)
-                        break;
-                    await Task.Delay(1000);
+                    try { await webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client closed", cancelToken); } catch { }
+
+                    Task.Delay(1000).Wait();
                 }
             });
         }
