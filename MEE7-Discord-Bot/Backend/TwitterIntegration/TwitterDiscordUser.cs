@@ -40,11 +40,22 @@ namespace MEE7.Backend
 
         public IImmutableSet<ClientType> ActiveClients => ImmutableSortedSet.Create<ClientType>();
 
+        public string GlobalName => throw new NotImplementedException();
+
+        public string AvatarDecorationHash => throw new NotImplementedException();
+
+        public ulong? AvatarDecorationSkuId => throw new NotImplementedException();
+
         UserProperties? IUser.PublicFlags => throw new NotImplementedException();
 
         IReadOnlyCollection<ClientType> IPresence.ActiveClients => throw new NotImplementedException();
 
         IReadOnlyCollection<IActivity> IPresence.Activities => throw new NotImplementedException();
+
+        public string GetAvatarDecorationUrl()
+        {
+            throw new NotImplementedException();
+        }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
         {
@@ -54,6 +65,11 @@ namespace MEE7.Backend
         public string GetDefaultAvatarUrl()
         {
             return user.ProfileImageUrl.Replace("_normal", "_400x400");
+        }
+
+        public string GetDisplayAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
