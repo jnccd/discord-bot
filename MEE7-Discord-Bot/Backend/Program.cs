@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using MEE7.Commands.Edit;
 using MEE7.Configuration;
 using NAudio.Wave;
 using System;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -37,10 +39,13 @@ namespace MEE7
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
 
+        private static readonly string logChannelEnvVar = "BotLogChannel";
+        private static readonly string masterEnvVar = "BotMaster";
+
 #if DEBUG
-        public static readonly ulong logChannel = 714100318656397334;
+        public static readonly ulong logChannel = 714100318656397334UL;
 #else
-        public static readonly ulong logChannel = 665219921692852271;
+        public static readonly ulong logChannel = 665219921692852271UL;
 #endif
         public static readonly bool logToDiscord = true;
         public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
@@ -49,6 +54,7 @@ namespace MEE7
 
         // Client 
         static DiscordSocketClient client;
+        public static DiscordSocketClient Client { get { return client; } }
         public static bool ClientReady { get; private set; }
 
         static readonly string exitlock = "";
@@ -113,7 +119,7 @@ namespace MEE7
 
             if (RunningOnCI)
                 ConsoleWrapper.WriteLine("CI Environment detected!");
-            else
+            else if (!RunningOnLinux)
             {
                 if (runConfig == "Debug")
                     Console.Title = "MEE7 - DEBUG";
@@ -151,9 +157,24 @@ namespace MEE7
             
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Thread.Sleep(1000);
-            Master = client.GetUser(300699566041202699);
 
-            DiscordNETWrapper.SendText(logStartupMessage, (IMessageChannel)GetChannelFromID(logChannel)).Wait();
+            ulong masterId = 300699566041202699;
+            ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out ulong parsedMasterId);
+            if (parsedMasterId != 0)
+                masterId = parsedMasterId;
+            Master = client.GetUser(masterId);
+
+            var logMessageChannel = (IMessageChannel)GetChannelFromID(logChannel);
+            if (logMessageChannel != null)
+            {
+                DiscordNETWrapper.SendText(logStartupMessage, logMessageChannel).Wait();
+            }
+            else
+            {
+                Console.WriteLine($"Cannot access log channel {logChannel} (you can set the environment variable {logChannelEnvVar} to change it!)");
+                Exit(1);
+            }
+
             Config.Load();
 
             BuildHelpMenu();
@@ -161,7 +182,7 @@ namespace MEE7
             StartAutosaveLoop();
 
             Task.Run(() => BootTwitterModule());
-            CallOnConnected();
+            OnConnected.InvokeParallel();
         }
         static void LoadBuildDate()
         {
@@ -363,6 +384,8 @@ namespace MEE7
         }
         static void Login()
         {
+            //Saver.SaveToLog($"Got tokens {Environment.GetEnvironmentVariable("BotToken")} {Config.Data.BotToken}");
+
             try
             {
                 var token = Environment.GetEnvironmentVariable("BotToken");
@@ -374,12 +397,14 @@ namespace MEE7
             {
                 try
                 {
+                    ConsoleWrapper.WriteLine($"Wrong token: {Environment.GetEnvironmentVariable("BotToken")}");
                     client.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
                     client.StartAsync().Wait();
                 }
                 catch (Exception e2)
                 {
-                    Console.WriteLine($"Wrong Bot Tokens!\n\n{e1}\n{e2}");
+                    ConsoleWrapper.WriteLine($"Wrong token: {Config.Data.BotToken}");
+                    ConsoleWrapper.WriteLine($"Wrong Bot Tokens!\n\n{e1}\n{e2}");
                     Environment.Exit(0);
                 }
             }
@@ -391,7 +416,7 @@ namespace MEE7
             {
                 try
                 {
-                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]);
+                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]); 
                     if (commandInstance.CommandLine.Contains(" ") || commandInstance.Prefix.Contains(" "))
                         throw new IllegalCommandException($"Commands and Prefixes mustn't contain spaces!\n" +
                             $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
@@ -437,14 +462,10 @@ namespace MEE7
                 }
             }
             helpMenu.WithDescription($"I was made by {Master.Mention}\nYou can find my source-code " +
-                $"[here](https://github.com/niklasCarstensen/Discord-Bot).\n\nCommands:");
+                $"[here](https://github.com/jnccd/discord-bot).\n\nCommands:");
             helpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
             helpMenu.WithThumbnailUrl("https://openclipart.org/image/2400px/svg_to_png/280959/1496637751.png");
-        }
-        static void CallOnConnected()
-        {
-            OnConnected.InvokeParallel();
         }
         static void StartAutosaveLoop()
         {
@@ -504,7 +525,7 @@ namespace MEE7
                             {
                                 ConsoleWrapper.WriteLine(e, ConsoleColor.Red);
                             }
-                    } 
+                    }
                     else if (!input.StartsWith("/"))
                     {
                         if (CurrentChannel == null)
@@ -695,6 +716,24 @@ namespace MEE7
                         {
                             var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
                             message.ModifyAsync(m => m.Content = split.Skip(3).Combine(" "));
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                    }
+                    else if (input.StartsWith("/printCommands"))
+                    {
+                        try
+                        {
+                            ConsoleWrapper.WriteLine("Command        | Description\n" +
+                                                     "---------------|--------------\n" +
+                                                     commands.Select(x => $"{x.CommandLine} | {x.Desc}").Combine("\n"), ConsoleColor.Cyan);
+                        }
+                        catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
+                    }
+                    else if (input.StartsWith("/printEditCommands"))
+                    {
+                        try
+                        {
+                            ConsoleWrapper.WriteLine(Edit.EditCommandsOverview, ConsoleColor.Cyan);
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }

@@ -1,4 +1,6 @@
 ﻿using Discord;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using TweetSharp;
 
@@ -38,5 +40,21 @@ namespace MEE7.Backend
         public string Description => "";
 
         public string ContentType => "";
+
+        public double? Duration => throw new NotImplementedException();
+
+        public string Waveform => throw new NotImplementedException();
+
+        public byte[] WaveformBytes => throw new NotImplementedException();
+
+        public AttachmentFlags Flags => throw new NotImplementedException();
+
+        public IReadOnlyCollection<IUser> ClipParticipants => throw new NotImplementedException();
+
+        public string Title => throw new NotImplementedException();
+
+        public DateTimeOffset? ClipCreatedAt => throw new NotImplementedException();
+
+        public DateTimeOffset CreatedAt => throw new NotImplementedException();
     }
 }
