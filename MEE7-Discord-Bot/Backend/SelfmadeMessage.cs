@@ -63,6 +63,14 @@ namespace MEE7.Backend
         public MessageReference Reference => throw new NotImplementedException();
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => throw new NotImplementedException();
 
+        public IThreadChannel Thread => throw new NotImplementedException();
+
+        public MessageRoleSubscriptionData RoleSubscriptionData => throw new NotImplementedException();
+
+        public PurchaseNotification PurchaseNotification => throw new NotImplementedException();
+
+        public MessageCallData? CallData => throw new NotImplementedException();
+
         string IMessage.Content => Content;
         DateTimeOffset IMessage.Timestamp => Timestamp;
         DateTimeOffset? IMessage.EditedTimestamp => EditedTimestamp;
@@ -99,6 +107,12 @@ namespace MEE7.Backend
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => Task.FromResult("");
         public Task DeleteAsync(RequestOptions options = null) => DeleteFunc(options);
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => (IAsyncEnumerable<IReadOnlyCollection<IUser>>)null;
+
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null, ReactionType type = ReactionType.Normal)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
         public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => Task.FromResult("");
         public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => Task.FromResult("");
