@@ -40,6 +40,8 @@ namespace MEE7.Commands
         {
             if (gotCreds)
                 StartSenderLoop();
+            else
+                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Got no lighthouse creds, not starting module :(");
         }
 
         public override void Execute(IMessage message)
