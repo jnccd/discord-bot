@@ -159,8 +159,9 @@ namespace MEE7.Commands.Edit
 
         private static IEnumerable<EditCommand> Commands;
         private static Dictionary<string, EmbedBuilder> groupHelpMenus = new Dictionary<string, EmbedBuilder>();
+        public static string EditCommandsOverview { get; private set; }
 
-        public Edit() : base("edit", "This is a little more advanced command which allows you to chain together functions that were made specific for this command. " +
+        public Edit() : base("edit", "This is a more advanced command which allows you to chain together functions that were made specific for this command. " +
             $"Shortcut: **{Program.Prefix}-**\nFor more information just type **{Program.Prefix}edit**.")
         {
             Commands = new List<EditCommand>();
@@ -172,6 +173,7 @@ namespace MEE7.Commands.Edit
                $"\neg. {PrefixAndCommand} \"omegaLUL\" > swedish > Aestheticify\n" +
                $"\nIf you want to find more commands you can write \"{PrefixAndCommand} help [groupName]\"" +
                 "The following command groups are currently loaded:");
+            EditCommandsOverview = "";
 
             // Load Functions
             Type[] classesWithEditCommands = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
@@ -274,6 +276,10 @@ namespace MEE7.Commands.Edit
                     $"{new string(Enumerable.Repeat(' ', maxlength - c.Command.Length - 1).ToArray())}{c.Desc}\n").
                     Combine() + "");
             }
+            EditCommandsOverview += $"{Name} | Description\n" +
+                                    $"-------|--------------\n" +
+                                    editCommands.Select(x => $"{x.Command} | {x.Desc}").Combine("\n") +
+                                    "\n\n";
         }
         public override void Execute(IMessage message)
         {

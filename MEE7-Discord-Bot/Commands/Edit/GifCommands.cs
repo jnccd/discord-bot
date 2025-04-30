@@ -206,6 +206,40 @@ namespace MEE7.Commands.Edit
             return gif;
         }
 
+        public string ApplyToLighthouseDesc = "";
+        public void ApplyToLighthouse(Gif gif, IMessage m)
+        {
+            if (m.Author.Id != Program.Master.Id)
+                throw new Exception("ApplyToLighthouse is admin only :P");
+
+            var smallerImgs = gif.Item1.Select(b => (Bitmap)b.Stretch(new Size(28, 14))).ToArray();
+            var timings = gif.Item2;
+
+            List<byte[,,]> smallerByteArrays = new();
+            for (int i = 0; i < smallerImgs.Length; i++)
+            {
+                smallerByteArrays.Add(new byte[14, 28, 3]);
+                for (int x = 0; x < smallerImgs[i].Width; x++)
+                {
+                    for (int y = 0; y < smallerImgs[i].Height; y++)
+                    {
+                        var c = smallerImgs[i].GetPixel(x, y);
+                        smallerByteArrays[i][y, x, 0] = c.R;
+                        smallerByteArrays[i][y, x, 1] = c.G;
+                        smallerByteArrays[i][y, x, 2] = c.B;
+                    }
+                }
+            }
+
+            lock (Lighthouse.images)
+            {
+                Lighthouse.images = Enumerable.
+                    Zip(smallerByteArrays, timings).
+                    Select(x => new Tuple<byte[,,], int>(x.First, x.Second)).
+                    ToList();
+            }
+        }
+
         static readonly char s = Path.DirectorySeparatorChar;
     }
 }
