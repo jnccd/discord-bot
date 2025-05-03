@@ -45,7 +45,7 @@ namespace MEE7.Commands
             List<string> PatchNotes = new List<string>();
 
             var maxResults = 20;
-            var request = WebRequest.Create($"https://api.github.com/repos/niklasCarstensen/Discord-Bot/commits?per_page={maxResults}");
+            var request = WebRequest.Create($"https://api.github.com/repos/jnccd/Discord-Bot/commits?per_page={maxResults}");
             request.Headers.Add("User-Agent", "MEE7 Discord-Bot");
             var response = request.GetResponse();
             var commitInfos = new List<GitHubCommitInfo>();
@@ -82,7 +82,7 @@ namespace MEE7.Commands
 #endif
             }
         }
-        bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification, 
+        bool AcceptAllCertifications(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certification,
             System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
         {
             return true;
