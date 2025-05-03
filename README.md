@@ -1,174 +1,176 @@
 # Discord-Bot
 
-[![Build](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/build.yml)
-<!--- [![Deploy](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/niklasCarstensen/Discord-Bot/actions/workflows/deploy.yml) -->
+[![Build](https://github.com/jnccd/Discord-Bot/actions/workflows/build.yml/badge.svg)](https://github.com/jnccd/Discord-Bot/actions/workflows/build.yml)
+
+<!--- [![Deploy](https://github.com/jnccd/Discord-Bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/jnccd/Discord-Bot/actions/workflows/deploy.yml) -->
 
 This is a discord chatbot. Its commands are split into two groups, simple commands that entirely depend on side effects and commands that can be chained. Those pipes of comands can for example be used for image editing.
 Some of the commands may use deprecated APIs that are now offline.
 
 ## List of Commands
 
-Command        | Description
----------------|--------------
-9ball | Decides your fate
-animalCrossing | Finds an animal crossing npc
-bf | Brainfuck Interpreter
-c# | Run csharp code
-chess | Play chess
-circleIsYou | Basic Baba Is You movement implementation in a discord message, with movement being implemented through reaction events on the message
-edit | This is a more advanced command which allows you to chain together functions that were made specific for this command
-embed | Posts an embed
-emojiUsage | Which emojis are actually used on this server?
-environment | Prints bot environment info
-Explain | -
-GetVideoLink | -
-loadConfig | loads the attached config
-meme | Automatically steals a meme from reddit
-messageDB | Builds all messages of a server into a database (large json file) and implements operations on it such as generating an activity plot
-messageInfo | Posts message information, takes message ID as argument
-nice | Check if a user is nice
-overwatch | Prints todays overwatch arcade game modes
-Padoru | -
-Ping | -
-place | Basically just r/place
-play | Plays youtube videos in voice chats
-poll | Creates a poll
-profile | Prints your bot profile (GDPR?-Style)
-Reacter | -
-reaction | Post reaction images
-sendRoleEmojiMessage | Let users of your server get roles from emote reactions
-serverInfo | Posts server information
-tictactoe | Play TicTacToe against other people!
-timer | Posts a updating message for some event
-toggleMessageLinkPreviews | Preview message links on this server
-togglePatchNotes | Get annoying messages
-uno | Play uno with other humans
-userInfo | Posts user information, takes message ID as argument
-warframe | Get notifications for warframe rewards or check the world state
+| Command                   | Description                                                                                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 9ball                     | Decides your fate                                                                                                                      |
+| animalCrossing            | Finds an animal crossing npc                                                                                                           |
+| bf                        | Brainfuck Interpreter                                                                                                                  |
+| c#                        | Run csharp code                                                                                                                        |
+| chess                     | Play chess                                                                                                                             |
+| circleIsYou               | Basic Baba Is You movement implementation in a discord message, with movement being implemented through reaction events on the message |
+| edit                      | This is a more advanced command which allows you to chain together functions that were made specific for this command                  |
+| embed                     | Posts an embed                                                                                                                         |
+| emojiUsage                | Which emojis are actually used on this server?                                                                                         |
+| environment               | Prints bot environment info                                                                                                            |
+| Explain                   | -                                                                                                                                      |
+| GetVideoLink              | -                                                                                                                                      |
+| loadConfig                | loads the attached config                                                                                                              |
+| meme                      | Automatically steals a meme from reddit                                                                                                |
+| messageDB                 | Builds all messages of a server into a database (large json file) and implements operations on it such as generating an activity plot  |
+| messageInfo               | Posts message information, takes message ID as argument                                                                                |
+| nice                      | Check if a user is nice                                                                                                                |
+| overwatch                 | Prints todays overwatch arcade game modes                                                                                              |
+| Padoru                    | -                                                                                                                                      |
+| Ping                      | -                                                                                                                                      |
+| place                     | Basically just r/place                                                                                                                 |
+| play                      | Plays youtube videos in voice chats                                                                                                    |
+| poll                      | Creates a poll                                                                                                                         |
+| profile                   | Prints your bot profile (GDPR?-Style)                                                                                                  |
+| Reacter                   | -                                                                                                                                      |
+| reaction                  | Post reaction images                                                                                                                   |
+| sendRoleEmojiMessage      | Let users of your server get roles from emote reactions                                                                                |
+| serverInfo                | Posts server information                                                                                                               |
+| tictactoe                 | Play TicTacToe against other people!                                                                                                   |
+| timer                     | Posts a updating message for some event                                                                                                |
+| toggleMessageLinkPreviews | Preview message links on this server                                                                                                   |
+| togglePatchNotes          | Get annoying messages                                                                                                                  |
+| uno                       | Play uno with other humans                                                                                                             |
+| userInfo                  | Posts user information, takes message ID as argument                                                                                   |
+| warframe                  | Get notifications for warframe rewards or check the world state                                                                        |
 
 ## List of chainable commands
 
-AudioCommands | Description
--------|--------------
-Speak | Let's a fictional character narrate the text you input using the fifteen.ai api. Working characters include GLaDOS (Emotions: Homicidal), Twilight Sparkle (Emotions: Happy, Neutral), Fluttershy (Emotions: Neutral), Rarity (Emotions: Neutral), Applejack (Emotions: Neutral), Rainbow Dash (Emotions: Neutral), Pinkie Pie (Emotions: Neutral), Derpy Hooves (Emotions: Neutral), Solider (Emotions: Neutral), Miss Pauling (Emotions: Neutral), Rise Kujikawa (Emotions: Neutral). Default Voice is GLaDOS. Available voices last updated: 03.05.2020
-PlayAudio | Plays audio in voicechat
-DrawAudio | Draw the samples
-Pitch | Adds a Pitch to the sound
-Volume | Adds Volume to the sound
+| AudioCommands | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Speak         | Let's a fictional character narrate the text you input using the fifteen.ai api. Working characters include GLaDOS (Emotions: Homicidal), Twilight Sparkle (Emotions: Happy, Neutral), Fluttershy (Emotions: Neutral), Rarity (Emotions: Neutral), Applejack (Emotions: Neutral), Rainbow Dash (Emotions: Neutral), Pinkie Pie (Emotions: Neutral), Derpy Hooves (Emotions: Neutral), Solider (Emotions: Neutral), Miss Pauling (Emotions: Neutral), Rise Kujikawa (Emotions: Neutral). Default Voice is GLaDOS. Available voices last updated: 03.05.2020 |
+| PlayAudio     | Plays audio in voicechat                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| DrawAudio     | Draw the samples                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Pitch         | Adds a Pitch to the sound                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Volume        | Adds Volume to the sound                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
-DrawCommands | Description
--------|--------------
-DrawText | Draw Text into pic
-DrawCircle | Draw Circle into pic
-DrawRect | Draw Rect into pic
-Rect | Get Rect
-White | Get white
-Red | Get red
-Col | Get a color from rgb
-ColName | Get a color from name
-Lerp | Lerp two colors
+| DrawCommands | Description           |
+| ------------ | --------------------- |
+| DrawText     | Draw Text into pic    |
+| DrawCircle   | Draw Circle into pic  |
+| DrawRect     | Draw Rect into pic    |
+| Rect         | Get Rect              |
+| White        | Get white             |
+| Red          | Get red               |
+| Col          | Get a color from rgb  |
+| ColName      | Get a color from name |
+| Lerp         | Lerp two colors       |
 
-FunctionalCommands | Description
--------|--------------
-Vector | Creates a new Vector object
-ForFunc | Traverses through a for loop and creates a new object of the resulting array in each iteration
-Map | 'tis map from haskel
-Error | Throws an error
+| FunctionalCommands | Description                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| Vector             | Creates a new Vector object                                                                    |
+| ForFunc            | Traverses through a for loop and creates a new object of the resulting array in each iteration |
+| Map                | 'tis map from haskel                                                                           |
+| Error              | Throws an error                                                                                |
 
-GifCommands | Description
--------|--------------
-Rainbow | I'll try spinning colors that's a good trick
-SpinToWin | I'll try spinning that's a good trick
-Pat | Pat the picture
-BackAndForth | Mirror the gif in time around the axis of the end time
-GetPic | Get single picture from a gif
-GetNumFrames | Get the number of gif frames
-ToGif | Converts a bitmap array to a gif
-ToBitmapArray | Converts a gif to a bitmap array
-ChangeSpeed | Change the gifs playback speed
-SetDelay | Change the gifs playback speed
-MultiplyFrames | Copy each frame x times
-Reverse | Make the gif go backwards
-ForB | ForFunc for bitmaps, requires a color to color lambda pipe
-MapG | Map for gifs
+| GifCommands    | Description                                                |
+| -------------- | ---------------------------------------------------------- |
+| Rainbow        | I'll try spinning colors that's a good trick               |
+| SpinToWin      | I'll try spinning that's a good trick                      |
+| Pat            | Pat the picture                                            |
+| BackAndForth   | Mirror the gif in time around the axis of the end time     |
+| GetPic         | Get single picture from a gif                              |
+| GetNumFrames   | Get the number of gif frames                               |
+| ToGif          | Converts a bitmap array to a gif                           |
+| ToBitmapArray  | Converts a gif to a bitmap array                           |
+| ChangeSpeed    | Change the gifs playback speed                             |
+| SetDelay       | Change the gifs playback speed                             |
+| MultiplyFrames | Copy each frame x times                                    |
+| Reverse        | Make the gif go backwards                                  |
+| ForB           | ForFunc for bitmaps, requires a color to color lambda pipe |
+| MapG           | Map for gifs                                               |
 
-InputCommands | Description
--------|--------------
-LastT | Gets the last messages text
-LastP | Gets the last messages picture
-LastG | Gets the last messages gif
-LastM | Gets the last message
-ThisT | Outputs the given text
-ThisP | Gets attached picture / picture from url argument
-ThisG | Gets attached gif / gif from url argument
-ThisA | Gets mp3 or wav audio files attached to this message
-GetTweet | Gets a tweet by id
-ProfilePic | Gets a profile picture
-ProfilePicG | Gets a profile picture gif
-MyProfilePic | Gets your profile picture
-ServerPic | Gets the server picture from a server id
-Emote | Gets the picture of the emote
-EmoteG | Gets the pictures of the emote
-StringArray | Returns an string array from the argument
-IntArray | Returns an int array from the argument
-Range | Returns an int array with numbers from start to start + count
-Mandelbrot | Render a mandelbrot
-AudioFromYT | Gets the mp3 of an youtube video
-AudioFromVoice | Records audio from the voice chat you are currently in
+| InputCommands  | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| LastT          | Gets the last messages text                                   |
+| LastP          | Gets the last messages picture                                |
+| LastG          | Gets the last messages gif                                    |
+| LastM          | Gets the last message                                         |
+| ThisT          | Outputs the given text                                        |
+| ThisP          | Gets attached picture / picture from url argument             |
+| ThisG          | Gets attached gif / gif from url argument                     |
+| ThisA          | Gets mp3 or wav audio files attached to this message          |
+| GetTweet       | Gets a tweet by id                                            |
+| ProfilePic     | Gets a profile picture                                        |
+| ProfilePicG    | Gets a profile picture gif                                    |
+| MyProfilePic   | Gets your profile picture                                     |
+| ServerPic      | Gets the server picture from a server id                      |
+| Emote          | Gets the picture of the emote                                 |
+| EmoteG         | Gets the pictures of the emote                                |
+| StringArray    | Returns an string array from the argument                     |
+| IntArray       | Returns an int array from the argument                        |
+| Range          | Returns an int array with numbers from start to start + count |
+| Mandelbrot     | Render a mandelbrot                                           |
+| AudioFromYT    | Gets the mp3 of an youtube video                              |
+| AudioFromVoice | Records audio from the voice chat you are currently in        |
 
-LogicCommands | Description
--------|--------------
-Gt | Greater than
-Lt | Less than
-Geq | Greater than or equal
-Leq | Less than or equal
-Eq | Equal
-And | And
-Or | Or
+| LogicCommands | Description           |
+| ------------- | --------------------- |
+| Gt            | Greater than          |
+| Lt            | Less than             |
+| Geq           | Greater than or equal |
+| Leq           | Less than or equal    |
+| Eq            | Equal                 |
+| And           | And                   |
+| Or            | Or                    |
 
-MathCommands | Description
--------|--------------
-Add | Addition
-Sub | Subtraction
-Mult | Multiplication
-Div | Dividing
-Pow | Powification
-Sqrt | Sqrtification
-Log | Logification
-Sin | Sinification
-Cos | Cosification
-Pi | Pi
-E | E
-Rdm | Get random integer number
-RdmDouble | Get random number between 0 and 1
+| MathCommands | Description                       |
+| ------------ | --------------------------------- |
+| Add          | Addition                          |
+| Sub          | Subtraction                       |
+| Mult         | Multiplication                    |
+| Div          | Dividing                          |
+| Pow          | Powification                      |
+| Sqrt         | Sqrtification                     |
+| Log          | Logification                      |
+| Sin          | Sinification                      |
+| Cos          | Cosification                      |
+| Pi           | Pi                                |
+| E            | E                                 |
+| Rdm          | Get random integer number         |
+| RdmDouble    | Get random number between 0 and 1 |
 
-MessageCommands | Description
--------|--------------
-GetContent | Gets the messages text
-GetMediaLinks | Gets the messages attachment links
-GetVideoLinks | Gets the messages video links
+| MessageCommands | Description                        |
+| --------------- | ---------------------------------- |
+| GetContent      | Gets the messages text             |
+| GetMediaLinks   | Gets the messages attachment links |
+| GetVideoLinks   | Gets the messages video links      |
 
-MessageDBCommands | Description
--------|--------------
-GetDB | Get the DB
-GetAllMessages | Get those messages
-FilterMessagesFrom | Get those messages
-GetMessagesFromChannel | Get those messages
-CountMessages | Plot those messages over time
-PlotMessages | Plot those messages over time
-PlotMessagesInterval | Plot those messages over time
-GetUser | Gets a user
-GetDate | Gets a date
+| MessageDBCommands      | Description                   |
+| ---------------------- | ----------------------------- |
+| GetDB                  | Get the DB                    |
+| GetAllMessages         | Get those messages            |
+| FilterMessagesFrom     | Get those messages            |
+| GetMessagesFromChannel | Get those messages            |
+| CountMessages          | Plot those messages over time |
+| PlotMessages           | Plot those messages over time |
+| PlotMessagesInterval   | Plot those messages over time |
+| GetUser                | Gets a user                   |
+| GetDate                | Gets a date                   |
 
-PictureCommands | Description
--------|--------------
-GetColor | Get the color of a pixel
-ColorChannelSwap | Swap the rgb color channels for each pixel
-Reddify | Make it red af
-Invert | Invert the color of each pixel
-Rekt | Finds colored rectangles in pictures
-Memify | Turn a picture into a meme, get a list of available templates with the argument -list
-TextMemify | Put text into a meme template, input -list as Meme and get a list templates
+| PictureCommands  | Description                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| GetColor         | Get the color of a pixel                                                              |
+| ColorChannelSwap | Swap the rgb color channels for each pixel                                            |
+| Reddify          | Make it red af                                                                        |
+| Invert           | Invert the color of each pixel                                                        |
+| Rekt             | Finds colored rectangles in pictures                                                  |
+| Memify           | Turn a picture into a meme, get a list of available templates with the argument -list |
+| TextMemify       | Put text into a meme template, input -list as Meme and get a list templates           |
+
 The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox
 Expand | Expand the pixels
 Stir | Stir the pixels
@@ -203,7 +205,7 @@ SatScale | Grayscaled Saturation channel of the image
 ValScale | Grayscaled Value channel of the image
 Transcrop | Crop the transparency
 Crop | Crop the picture
-Split | Split the picture into x * y pieces
+Split | Split the picture into x \* y pieces
 RotateWhole | Rotate the image including the bounds
 Flip | Flip the image
 Zoom | Zoom to a certain point, zoomlevel should be between 1 and 0
@@ -224,28 +226,28 @@ TranslateP | Translate picture
 Duplicate | Duplicate picture into gif
 CircleTrans | Add circular transparency to the picture
 
-TextCommands | Description
--------|--------------
-Mock | Mock the text
-Crab | Crab the text
-CAPS | Convert text to CAPS
-SUPERCAPS | Convert text to SUPER CAPS
-CopySpoilerify | Convert text to a spoiler
-Spoilerify | Convert text to a spoiler
-Unspoilerify | Convert spoiler text to readable text
-Aestheticify | Convert text to Aesthetic text
-SearchTweet | Search for a tweet with that text
-Translate | Translate the text to another language
-Japanify | Convert the text into katakana symbols, doesnt actually translate
-Unjapanify | Convert katakana into readable stuff
+| TextCommands   | Description                                                       |
+| -------------- | ----------------------------------------------------------------- |
+| Mock           | Mock the text                                                     |
+| Crab           | Crab the text                                                     |
+| CAPS           | Convert text to CAPS                                              |
+| SUPERCAPS      | Convert text to SUPER CAPS                                        |
+| CopySpoilerify | Convert text to a spoiler                                         |
+| Spoilerify     | Convert text to a spoiler                                         |
+| Unspoilerify   | Convert spoiler text to readable text                             |
+| Aestheticify   | Convert text to Aesthetic text                                    |
+| SearchTweet    | Search for a tweet with that text                                 |
+| Translate      | Translate the text to another language                            |
+| Japanify       | Convert the text into katakana symbols, doesnt actually translate |
+| Unjapanify     | Convert katakana into readable stuff                              |
 
-VideoCommands | Description
--------|--------------
-GetVideo | Gets video from link
-GetVideoFromYT | Gets video from yt link
-Cut | Cut a video
-ConvertToGif | Convert video to gif
-BakaMitai | Picture goes Baka Mitai - using code from https://github.com/AliaksandrSiarohin/first-order-model - needs vram
+| VideoCommands  | Description                                                                                                    |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| GetVideo       | Gets video from link                                                                                           |
+| GetVideoFromYT | Gets video from yt link                                                                                        |
+| Cut            | Cut a video                                                                                                    |
+| ConvertToGif   | Convert video to gif                                                                                           |
+| BakaMitai      | Picture goes Baka Mitai - using code from https://github.com/AliaksandrSiarohin/first-order-model - needs vram |
 
 ## Examples
 
@@ -261,8 +263,8 @@ or this: `$edit profilePicture(300699566041202699) > for(i:0:10:0.2){ liq(Inpand
 
 ## Deployment
 
-If .NET 7 or later is installed this project can be run by executing `dotnet restore` and `dotnet run` in the cli in the MEE7 project folder. 
-For server compatability the bot can also be run using docker compose like so `docker-compose build`. 
+If .NET 7 or later is installed this project can be run by executing `dotnet restore` and `dotnet run` in the cli in the MEE7 project folder.
+For server compatability the bot can also be run using docker compose like so `docker-compose build`.
 The simplest way to try out the bot is to open the .sln solution file ine visual studio which will handle all commands automatically.
 
 In any case the environemnt variable `BotToken` must be set to a valid discord bot token of any bot account before the bot can start successfully.
