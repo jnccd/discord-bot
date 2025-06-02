@@ -169,62 +169,60 @@ Some of the commands may use deprecated APIs that are now offline.
 | Invert           | Invert the color of each pixel                                                        |
 | Rekt             | Finds colored rectangles in pictures                                                  |
 | Memify           | Turn a picture into a meme, get a list of available templates with the argument -list |
-| TextMemify       | Put text into a meme template, input -list as Meme and get a list templates           |
-
-The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox
-Expand | Expand the pixels
-Stir | Stir the pixels
-Fall | Fall the pixels
-Wubble | Wubble the pixels
-Cya | Cya the pixels
-Inpand | Inpand the pixels
-Blockify | Blockify the pixels
-Squiggle | Squiggle the pixels
-TransformPicture | Perform a liqidify transformation on the image using a custom function
-SobelEdges | Highlights horizontal edges
-SobelEdgesColor | Highlights horizontal edges
-LaplaceEdges | https://de.wikipedia.org/wiki/Laplace-Filter
-Laplace45Edges | https://de.wikipedia.org/wiki/Laplace-Filter
-Sharpen | Unblur
-BoxBlur | Basic Blur
-GaussianBlur | more blur owo
-UnsharpMasking | Sharpening but cooler
-GayPride | Gay rights
-TransRights | The input image says trans rights
-Merkel | Add a german flag to the background of your image
-ChromaticAbberation | Shifts the color spaces
-Rotate | Rotate the image
-RotateColors | Rotate the color spaces of each pixel
-Compress | JPEG Compress the image, lower compression level = more compression
-Transground | Make the background transparent
-TransgroundColor | Make the background color transparent
-TransgroundHSV | Thereshold HSV values to transparency, note that the SV values are in [0, 100]
-LayerHSV | Split image into two layers
-HueScale | Grayscaled Hue channel of the image
-SatScale | Grayscaled Saturation channel of the image
-ValScale | Grayscaled Value channel of the image
-Transcrop | Crop the transparency
-Crop | Crop the picture
-Split | Split the picture into x \* y pieces
-RotateWhole | Rotate the image including the bounds
-Flip | Flip the image
-Zoom | Zoom to a certain point, zoomlevel should be between 1 and 0
-Stretch | Stretch the Image
-StretchM | Stretch the Image by some multipliers
-GetSize | Get the size in byte of an image
-GetDimensions | Get the width and height
-Resize | Resize an image by some multiplier
-EmoteResize | Resize an image to 48x48px which is the highest resolution discord currently displays an emote at
-SeamCarve | Carve seams
-SeamCarveM | Carve seams by multiplier
-ForSeamCarveM | Carve seams multiple times by multiplier
-FaceDetec | Detect faces
-Read | Reads text
-InsertIntoRect | Inserts picture into the red rectangle of another picture
-Insert | Inserts picture into the rectangle of another picture
-TranslateP | Translate picture
-Duplicate | Duplicate picture into gif
-CircleTrans | Add circular transparency to the picture
+| TextMemify       | Put text into a meme template, input -list as Meme and get a list templates, The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox           |
+| Expand | Expand the pixels |
+| Stir | Stir the pixels |
+| Fall | Fall the pixels |
+| Wubble | Wubble the pixels |
+| Cya | Cya the pixels |
+| Inpand | Inpand the pixels |
+| Blockify | Blockify the pixels |
+| Squiggle | Squiggle the pixels |
+| TransformPicture | Perform a liqidify transformation on the image using a custom function |
+| SobelEdges | Highlights horizontal edges |
+| SobelEdgesColor | Highlights horizontal edges |
+| LaplaceEdges | https://de.wikipedia.org/wiki/Laplace-Filter |
+| Laplace45Edges | https://de.wikipedia.org/wiki/Laplace-Filter |
+| Sharpen | Unblur |
+| BoxBlur | Basic Blur |
+| GaussianBlur | more blur owo |
+| UnsharpMasking | Sharpening but cooler |
+| GayPride | Gay rights |
+| TransRights | The input image says trans rights |
+| Merkel | Add a german flag to the background of your image |
+| ChromaticAbberation | Shifts the color spaces |
+| Rotate | Rotate the image |
+| RotateColors | Rotate the color spaces of each pixel |
+| Compress | JPEG Compress the image, lower compression level = more compression |
+| Transground | Make the background transparent |
+| TransgroundColor | Make the background color transparent |
+| TransgroundHSV | Thereshold HSV values to transparency, note that the SV values are in [0, 100] |
+| LayerHSV | Split image into two layers |
+| HueScale | Grayscaled Hue channel of the image |
+| SatScale | Grayscaled Saturation channel of the image |
+| ValScale | Grayscaled Value channel of the image |
+| Transcrop | Crop the transparency |
+| Crop | Crop the picture |
+| Split | Split the picture into x \* y pieces |
+| RotateWhole | Rotate the image including the bounds |
+| Flip | Flip the image |
+| Zoom | Zoom to a certain point, zoomlevel should be between 1 and 0 |
+| Stretch | Stretch the Image |
+| StretchM | Stretch the Image by some multipliers |
+| GetSize | Get the size in byte of an image |
+| GetDimensions | Get the width and height |
+| Resize | Resize an image by some multiplier |
+| EmoteResize | Resize an image to 48x48px which is the highest resolution discord currently displays an emote at |
+| SeamCarve | Carve seams |
+| SeamCarveM | Carve seams by multiplier |
+| ForSeamCarveM | Carve seams multiple times by multiplier |
+| FaceDetec | Detect faces |
+| Read | Reads text |
+| InsertIntoRect | Inserts picture into the red rectangle of another picture |
+| Insert | Inserts picture into the rectangle of another picture |
+| TranslateP | Translate picture |
+| Duplicate | Duplicate picture into gif |
+| CircleTrans | Add circular transparency to the picture |
 
 | TextCommands   | Description                                                       |
 | -------------- | ----------------------------------------------------------------- |
@@ -263,9 +261,8 @@ or this: `$edit profilePicture(300699566041202699) > for(i:0:10:0.2){ liq(Inpand
 
 ## Deployment
 
-If .NET 7 or later is installed this project can be run by executing `dotnet restore` and `dotnet run` in the cli in the MEE7 project folder.
+If .NET 6 is installed this project can be run by executing `dotnet restore` and `dotnet run` in the cli in the MEE7 project folder.
 For server compatability the bot can also be run using docker compose like so `docker-compose build`.
-The simplest way to try out the bot is to open the .sln solution file ine visual studio which will handle all commands automatically.
 
 In any case the environemnt variable `BotToken` must be set to a valid discord bot token of any bot account before the bot can start successfully.
 
