@@ -154,6 +154,29 @@ namespace MEE7.Commands
 
                 return;
             }
+            if (argSplit[0] == "remove")
+            {
+                var newEmojiRole = ParseEmojiRoleTuple(argSplit.Skip(2).Combine(" "), roles, message.Channel);
+                var messageID = Convert.ToUInt64(argSplit[1]);
+                var oldMessage = message.Channel.GetMessageAsync(messageID).Result;
+                if (oldMessage is IUserMessage oldUserMessage)
+                {
+                    var manageRoleByEmoteMessage = Config.Data.manageRoleByEmoteMessages.Where(x => x.MessageID == messageID).FirstOrDefault();
+                    if (manageRoleByEmoteMessage == null)
+                    {
+                        DiscordNETWrapper.SendText("I couldnt find that message in my database :(", message.Channel).Wait();
+                        return;
+                    }
+
+                    manageRoleByEmoteMessage.EmoteRoleTuples = manageRoleByEmoteMessage.EmoteRoleTuples.Where(x => x.Item2 != newEmojiRole.Item2).ToList();
+                    oldUserMessage.RemoveAllReactionsForEmoteAsync(newEmojiRole.Item1.ToIEmote()).Wait();
+                    oldUserMessage.ModifyAsync(p => { 
+                        p.Content = oldUserMessage.Content.Split("\n").Where(x => !x.Contains(newEmojiRole.Item1.Name)).Combine("\n"); 
+                    });
+                }
+
+                return;
+            }
 
             List<Tuple<DiscordEmote, ulong>> emoteRoleTuples;
             try
