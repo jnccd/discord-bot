@@ -33,7 +33,7 @@ namespace MEE7.Commands
 
         private void Program_OnConnected()
         {
-            for (int i = 0; i < Config.Data.manageRoleByEmoteMessages.Count; i++)
+            /*for (int i = 0; i < Config.Data.manageRoleByEmoteMessages.Count; i++)
             {
                 var messageID = Config.Data.manageRoleByEmoteMessages[i].MessageID;
                 var oldChannel = (IMessageChannel)Program.Client.GetChannel(Config.Data.manageRoleByEmoteMessages[i].ChannelID);
@@ -45,7 +45,7 @@ namespace MEE7.Commands
                     Config.Data.manageRoleByEmoteMessages.RemoveAt(i);
                     i--;
                 }
-            }
+            }*/
         }
 
         private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
