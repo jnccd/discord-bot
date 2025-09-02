@@ -553,6 +553,10 @@ namespace MEE7
                             DiscordNETWrapper.SendFile(path.Trim('\"'), CurrentChannel).Wait();
                         }
                     }
+                    else if (input.StartsWith("/manualsave"))
+                    {
+                        Config.Save();
+                    }
                     else if (input.StartsWith("/setchannel ") || input.StartsWith("/set "))
                     {
                         #region set channel code
