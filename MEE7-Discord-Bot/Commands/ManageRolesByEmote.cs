@@ -28,6 +28,24 @@ namespace MEE7.Commands
             Program.OnEmojiReactionAdded += OnEmojiReactionAdded;
             Program.OnEmojiReactionRemoved += OnEmojiReactionRemoved;
             Program.OnMessageDeleted += Program_OnMessageDeleted;
+            Program.OnConnected += Program_OnConnected;
+        }
+
+        private void Program_OnConnected()
+        {
+            for (int i = 0; i < Config.Data.manageRoleByEmoteMessages.Count; i++)
+            {
+                var messageID = Config.Data.manageRoleByEmoteMessages[i].MessageID;
+                var oldChannel = (IMessageChannel)Program.Client.GetChannel(Config.Data.manageRoleByEmoteMessages[i].ChannelID);
+                var oldMessage = oldChannel.GetMessageAsync(messageID).Result;
+
+                if (oldMessage == null)
+                {
+                    ConsoleWrapper.WriteLine($"Removing manageRoleByEmoteMessage {Config.Data.manageRoleByEmoteMessages[i].MessageID}");
+                    Config.Data.manageRoleByEmoteMessages.RemoveAt(i);
+                    i--;
+                }
+            }
         }
 
         private void Program_OnMessageDeleted(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
@@ -64,6 +82,34 @@ namespace MEE7.Commands
                         }
         }
 
+        private Tuple<DiscordEmote, ulong> ParseEmojiRoleTuple(string rawText, IEnumerable<SocketRole> roles, IMessageChannel channel)
+        {
+            IEmote e = null;
+            SocketRole r = null;
+
+            var s = rawText.Split(' ').Where(x => x.Length > 0).ToArray();
+
+            if (s.Length != 2)
+                throw new Exception(s.Combine(" "));
+
+            try
+            {
+                if (Emote.TryParse(s[0], out Emote et))
+                    e = et;
+                else
+                    e = new Emoji(s[0]);
+
+                r = roles.First(x => x.Name == s[1] || x.Id.ToString() == s[1]);
+            }
+            catch
+            {
+                DiscordNETWrapper.SendText("Can't find role and/or emote " + s.Combine(" "), channel).Wait();
+                return null;
+            }
+
+            return new Tuple<DiscordEmote, ulong>(DiscordEmote.FromIEmote(e), r.Id);
+        }
+
         public override void Execute(IMessage message)
         {
             var g = Program.GetGuildFromChannel(message.Channel);
@@ -86,40 +132,36 @@ namespace MEE7.Commands
                 args = args.Remove(0, args.IndexOf(customMes + "\"") + customMes.Length + 1);
             }
 
+            var argSplit = args.Split(" ");
+            if (argSplit[0] == "append")
+            {
+                var newEmojiRole = ParseEmojiRoleTuple(argSplit.Skip(2).Combine(" "), roles, message.Channel);
+                var messageID = Convert.ToUInt64(argSplit[1]);
+                var oldMessage = message.Channel.GetMessageAsync(messageID).Result;
+                if (oldMessage is IUserMessage oldUserMessage)
+                {
+                    var manageRoleByEmoteMessage = Config.Data.manageRoleByEmoteMessages.Where(x => x.MessageID == messageID).FirstOrDefault();
+                    if (manageRoleByEmoteMessage == null)
+                    {
+                        DiscordNETWrapper.SendText("I couldnt find that message in my database :(", message.Channel).Wait();
+                        return;
+                    }
+
+                    manageRoleByEmoteMessage.EmoteRoleTuples.Add(newEmojiRole);
+                    oldUserMessage.AddReactionAsync(newEmojiRole.Item1.ToIEmote()).Wait();
+                    oldUserMessage.ModifyAsync(p => p.Content = oldUserMessage.Content + $"\n{newEmojiRole.Item1.Print()} - {g.Roles.First(y => y.Id == newEmojiRole.Item2).Name}");
+                }
+
+                return;
+            }
+
             List<Tuple<DiscordEmote, ulong>> emoteRoleTuples;
             try
             {
                 emoteRoleTuples = args.
                     Split('|').
                     Select(x => x.Trim(' ')).
-                    Select(x => x.Split(' ')).
-                    Select(s =>
-                    {
-                        IEmote e = null;
-                        SocketRole r = null;
-
-                        s = s.Where(x => x.Length > 0).ToArray();
-
-                        if (s.Length != 2)
-                            throw new Exception(s.Combine(" "));
-
-                        try
-                        {
-                            if (Emote.TryParse(s[0], out Emote et))
-                                e = et;
-                            else
-                                e = new Emoji(s[0]);
-
-                            r = roles.First(x => x.Name == s[1] || x.Id.ToString() == s[1]);
-                        }
-                        catch
-                        {
-                            DiscordNETWrapper.SendText("Can't find role and/or emote " + s.Combine(" "), message.Channel).Wait();
-                            return null;
-                        }
-
-                        return new Tuple<DiscordEmote, ulong>(DiscordEmote.FromIEmote(e), r.Id);
-                    }).ToList();
+                    Select(s => ParseEmojiRoleTuple(s, roles, message.Channel)).ToList();
             }
             catch
             {
