@@ -461,7 +461,7 @@ namespace MEE7
                         string.IsNullOrWhiteSpace(desc) ? "-" : desc, string.IsNullOrWhiteSpace(desc) || desc.Length < 100 ? true : false);
                 }
             }
-            helpMenu.WithDescription($"My source-code is is " +
+            helpMenu.WithDescription($"My source-code is " +
                 $"[here](https://github.com/jnccd/discord-bot).\n\nCommands:");
             helpMenu.WithFooter($"Running {runConfig} build from {buildDate} on {Environment.OSVersion.VersionString} / " +
                 $"{Assembly.GetEntryAssembly()?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName}\n");
