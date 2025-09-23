@@ -75,6 +75,7 @@ namespace MEE7.Commands
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
 
             if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+te nacht\\b") ||
+                Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten abend\\b") ||
                 Regex.IsMatch(message.Content.ToLower(), "\\bschlaft gut\\b") ||
                 Regex.IsMatch(message.Content.ToLower(), "\\bgoo+d night\\b"))
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodNight")).Wait();
