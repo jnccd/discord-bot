@@ -44,7 +44,7 @@ namespace MEE7.Commands
         {
             if (!loaded)
                 return;
-            if (!(messageIn is SocketMessage))
+            if (messageIn is not SocketMessage)
                 return;
             var message = messageIn as SocketMessage;
 
