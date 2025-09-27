@@ -29,6 +29,7 @@ namespace MEE7.Commands
             emoteDict.Add("goodNight", Emote.Parse("<a:GoodNight:801591068571336705>")); 
             emoteDict.Add("no", Emote.Parse("<:no:778447862735568916>"));
             emoteDict.Add("sus", Emote.Parse("<:sussy_baka:1022741633923551232>"));
+            emoteDict.Add("bright_lain", Emote.Parse("<:bright_lain:1421504967876939988>")); 
 
             emoteDict.Add("eyes", new Emoji("👀"));
             emoteDict.Add("wave", new Emoji("👋"));
@@ -75,6 +76,12 @@ namespace MEE7.Commands
                 Regex.IsMatch(message.Content, "\\bGoMo\\b") ||
                 message.Content == "早上好" || message.Content == "早好")
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("goodMorning")).Wait();
+
+            if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten[^\\p{L}]+tag\\b"))
+                if (Random.Shared.NextDouble() < 0.1)
+                    message.AddReactionAsync(emoteDict.GetValueOrDefault("bright_lain")).Wait();
+                else
+                    message.AddReactionAsync(emoteDict.GetValueOrDefault("wave")).Wait();
 
             if (Regex.IsMatch(message.Content.ToLower(), "\\bgu+te nacht\\b") ||
                 Regex.IsMatch(message.Content.ToLower(), "\\bgu+ten abend\\b") ||
