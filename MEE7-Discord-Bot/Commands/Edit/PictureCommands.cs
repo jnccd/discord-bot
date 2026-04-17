@@ -1,6 +1,13 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Numerics;
 using Discord;
+using Emgu.CV;
+using MEE7.Backend.HelperFunctions;
 using SkiaSharp;
+using static MEE7.Commands.Edit.Edit;
 
 namespace MEE7.Commands.Edit
 {
@@ -13,70 +20,79 @@ namespace MEE7.Commands.Edit
         }
 
         public string colorChannelSwapDesc = "Swap the rgb color channels for each pixel";
-        public SKBitmap ColorChannelSwap(SKBitmap bmp, IMessage m)
+        public SKBitmap ColorChannelSwap(SKBitmap bitmap, IMessage m)
         {
-            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
+            using (var pixmap = bitmap.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int y = 0; y < bitmap.Height; y++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
-                        Color c = con.GetPixel(x, y);
-                        c = Color.FromArgb(c.B, c.R, c.G);
-                        con.SetPixel(x, y, c);
+                        SKColor c = pixels.GetPixel(x, y, pixmap.RowBytes);
+                        c = new SKColor(c.Blue, c.Red, c.Green);
+                        pixels.SetPixel(x, y, pixmap.RowBytes, c);
                     }
+            }
 
-            return bmp;
+            return bitmap;
         }
 
         public string reddifyDesc = "Make it red af";
-        public SKBitmap Reddify(SKBitmap bmp, IMessage m)
+        public SKBitmap Reddify(SKBitmap bitmap, IMessage m)
         {
-            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
+            using (var pixmap = bitmap.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int y = 0; y < bitmap.Height; y++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
-                        Color c = con.GetPixel(x, y);
-                        c = Color.FromArgb(255, c.R, 0, 0);
-                        con.SetPixel(x, y, c);
+                        SKColor c = pixels.GetPixel(x, y, pixmap.RowBytes);
+                        c = new SKColor(255, c.Red, 0, 0);
+                        pixels.SetPixel(x, y, pixmap.RowBytes, c);
                     }
+            }
 
-            return bmp;
+            return bitmap;
         }
 
         public string invertDesc = "Invert the color of each pixel";
-        public SKBitmap Invert(SKBitmap bmp, IMessage m)
+        public SKBitmap Invert(SKBitmap bitmap, IMessage m)
         {
-            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
+            using (var pixmap = bitmap.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int y = 0; y < bitmap.Height; y++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
-                        Color c = con.GetPixel(x, y);
-                        c = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
-                        con.SetPixel(x, y, c);
+                        SKColor c = pixels.GetPixel(x, y, pixmap.RowBytes);
+                        c = new SKColor((byte)(255 - c.Red), (byte)(255 - c.Green), (byte)(255 - c.Blue), c.Alpha);
+                        pixels.SetPixel(x, y, pixmap.RowBytes, c);
                     }
+            }
 
-            return bmp;
+            return bitmap;
         }
 
         public string RektDesc = "Finds colored rectangles in pictures";
-        public Bitmap Rekt(Bitmap bmp, IMessage m, string color)
+        public SKBitmap Rekt(SKBitmap bmp, IMessage m, string color)
         {
-            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            SKBitmap output = new SKBitmap(bmp.Width, bmp.Height);
 
-            Color c;
+            SKColor c;
             if (string.IsNullOrWhiteSpace(color))
-                c = Color.FromArgb(254, 34, 34);
+                c = SKColor.Parse("#FE2222");
             else
-                c = Color.FromName(color);
-            Rectangle redRekt = FindRectangle(bmp, c, 20);
+                c = SKColor.Parse(color);
+            SKRect redRekt = FindRectangle(bmp, c, 20);
 
             if (redRekt.Width == 0)
                 throw new Exception("No rekt!");
             else
             {
-                using (Graphics graphics = Graphics.FromImage(output))
+                using (SKCanvas canvas = new(output))
                 {
-                    graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, bmp.Width, bmp.Height));
-                    graphics.DrawRectangle(Pens.Red, redRekt);
+                    canvas.Clear(SKColors.White);
+                    canvas.DrawRect(redRekt, new SKPaint { Color = SKColors.Red });
                 }
 
                 return output;
@@ -85,7 +101,7 @@ namespace MEE7.Commands.Edit
 
         static readonly object memifyLock = new object();
         public string memifyDesc = "Turn a picture into a meme, get a list of available templates with the argument -list";
-        public Bitmap Memify(Bitmap bmp, IMessage m, string Meme)
+        public SKBitmap Memify(SKBitmap bmp, IMessage m, string Meme)
         {
             lock (memifyLock)
             {
@@ -111,9 +127,9 @@ namespace MEE7.Commands.Edit
                 string memeTemplateOverlay = files.FirstOrDefault(x => x.StartsWith(memeName) && Path.GetFileNameWithoutExtension(x).EndsWith("overlay"));
 
                 if (File.Exists(memeTemplateOverlay))
-                    return InsertIntoRect(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign), (Bitmap)Bitmap.FromFile(memeTemplateOverlay));
+                    return InsertIntoRect(bmp, m, SKBitmap.Decode(memeTemplateDesign), SKBitmap.Decode(memeTemplateOverlay));
                 else if (File.Exists(memeTemplate))
-                    return InsertIntoRect(bmp, m, (Bitmap)Bitmap.FromFile(memeTemplateDesign));
+                    return InsertIntoRect(bmp, m, SKBitmap.Decode(memeTemplateDesign));
                 else
                     throw new Exception("Something went wrong :thinking:");
             }
@@ -121,7 +137,7 @@ namespace MEE7.Commands.Edit
 
         public string textMemifyDesc = "Put text into a meme template, input -list as Meme and get a list templates\n" +
                 "The default Font is Arial and the fontsize refers to the number of rows of text that are supposed to fit into the textbox";
-        public Bitmap TextMemify(string memeName, IMessage m, string Meme, string Font = "Arial", float FontSize = 1)
+        public SKBitmap TextMemify(string memeName, IMessage m, string Meme, string Font = "Arial", float FontSize = 1)
         {
             string[] files = Directory.GetFiles($"Commands{Path.DirectorySeparatorChar}MemeTextTemplates");
 
@@ -152,17 +168,19 @@ namespace MEE7.Commands.Edit
 
             if (File.Exists(memeTemplate))
             {
-                Bitmap template, design;
+                SKBitmap template, design;
                 using (FileStream stream = new FileStream(memeTemplate, FileMode.Open))
-                    template = (Bitmap)Bitmap.FromStream(stream);
+                    template = SKBitmap.Decode(stream);
                 using (FileStream stream = new FileStream(memeDesign, FileMode.Open))
-                    design = (Bitmap)Bitmap.FromStream(stream);
-                Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 20);
+                    design = SKBitmap.Decode(stream);
+                SKRect redRekt = FindRectangle(design, SKColor.Parse("#FE2222"), 20);
                 if (redRekt.Width == 0)
                     throw new Exception("Error, couldn't find a rectangle to write in!");
                 float fontSize = redRekt.Height / 5f / FontSize;
-                using (Graphics graphics = Graphics.FromImage(template))
-                    graphics.DrawString(memeName, new Font(Font, fontSize), Brushes.Black, redRekt);
+                using (SKCanvas canvas = new SKCanvas(template))
+                {
+                    canvas.DrawText(memeName, redRekt.Left, redRekt.Top, new SKPaint { Color = SKColors.Black, TextSize = fontSize });
+                }
 
                 return template;
             }
@@ -171,7 +189,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string expandDesc = "Expand the pixels";
-        public Bitmap Expand(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public SKBitmap Expand(SKBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -189,7 +207,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string stirDesc = "Stir the pixels";
-        public Bitmap Stir(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public SKBitmap Stir(SKBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -211,7 +229,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string fallDesc = "Fall the pixels";
-        public Bitmap Fall(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public SKBitmap Fall(SKBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -233,7 +251,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string wubbleDesc = "Wubble the pixels";
-        public Bitmap Wubble(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public SKBitmap Wubble(SKBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -250,7 +268,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string cyaDesc = "Cya the pixels";
-        public Bitmap Cya(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public SKBitmap Cya(SKBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -267,7 +285,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string inpandDesc = "Inpand the pixels";
-        public Bitmap Inpand(Bitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
+        public SKBitmap Inpand(SKBitmap bmp, IMessage m, Vector2 position = new Vector2(), float strength = 1)
         {
             Vector2 center = new Vector2(position.X * bmp.Width, position.Y * bmp.Height);
 
@@ -284,7 +302,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string blockifyDesc = "Blockify the pixels";
-        public Bitmap Blockify(Bitmap bmp, IMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
+        public SKBitmap Blockify(SKBitmap bmp, IMessage m, float frequenzy = 1, float strength = 1, int offsetX = 1, int offsetY = 1)
         {
             return ApplyTransformation(bmp,
                     (x, y) => new Vector2(x + (float)Math.Cos(x / frequenzy + offsetX) * strength,
@@ -292,7 +310,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string SquiggleDesc = "Squiggle the pixels";
-        public Bitmap Squiggle(Bitmap bmp, IMessage m, float percent = 1, float scale = 1, int offsetX = 1, int offsetY = 1)
+        public SKBitmap Squiggle(SKBitmap bmp, IMessage m, float percent = 1, float scale = 1, int offsetX = 1, int offsetY = 1)
         {
             return ApplyTransformation(bmp,
                     (x, y) => new Vector2(x + percent * (float)Math.Sin((y + offsetY) / scale),
@@ -300,7 +318,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string TransformPictureDesc = "Perform a liqidify transformation on the image using a custom function";
-        public Bitmap TransformPicture(Bitmap bmp, IMessage m, Pipe transformationFunction)
+        public SKBitmap TransformPicture(SKBitmap bmp, IMessage m, Pipe transformationFunction)
         {
             if (transformationFunction.OutputType() != typeof(Vector2))
                 throw new Exception("Boi I need sum vectors!");
@@ -311,7 +329,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sobelEdgesDesc = "Highlights horizontal edges";
-        public Bitmap SobelEdges(Bitmap bmp, IMessage m)
+        public SKBitmap SobelEdges(SKBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                     {  0,  0,  0 },
@@ -319,7 +337,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sobelEdgesColorDesc = "Highlights horizontal edges";
-        public Bitmap SobelEdgesColor(Bitmap bmp, IMessage m)
+        public SKBitmap SobelEdgesColor(SKBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  2,  1 },
                                                                    {  0,  0,  0 },
@@ -327,7 +345,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string laplaceEdgesDesc = "https://de.wikipedia.org/wiki/Laplace-Filter";
-        public Bitmap LaplaceEdges(Bitmap bmp, IMessage m)
+        public SKBitmap LaplaceEdges(SKBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0,  1,  0 },
                                                     {  1, -4,  1 },
@@ -335,7 +353,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string laplace45EdgesDesc = "https://de.wikipedia.org/wiki/Laplace-Filter";
-        public Bitmap Laplace45Edges(Bitmap bmp, IMessage m)
+        public SKBitmap Laplace45Edges(SKBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
                                                     {  1, -8,  1 },
@@ -343,7 +361,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string sharpenDesc = "well guess what it does";
-        public Bitmap Sharpen(Bitmap bmp, IMessage m)
+        public SKBitmap Sharpen(SKBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  0, -1,  0 },
                                                     { -1,  5, -1 },
@@ -351,7 +369,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string boxBlurDesc = "blur owo";
-        public Bitmap BoxBlur(Bitmap bmp, IMessage m)
+        public SKBitmap BoxBlur(SKBitmap bmp, IMessage m)
         {
             return ApplyKernel(bmp, new int[3, 3] { {  1,  1,  1 },
                                                     {  1,  1,  1 },
@@ -359,7 +377,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string gaussianBlurDesc = "more blur owo";
-        public Bitmap GaussianBlur(Bitmap bmp, IMessage m, int size = 5)
+        public SKBitmap GaussianBlur(SKBitmap bmp, IMessage m, int size = 5)
         {
             var weights = Enumerable.Range(0, size).Select(x => Gauss(x, size * 2f / 3f, size / 2)).ToArray();
             var scalar = 1 / weights.Sum();
@@ -376,7 +394,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string UnsharpMaskingDesc = "Sharpening but cooler";
-        public Bitmap UnsharpMasking(Bitmap bmp, IMessage m, int size = 5)
+        public SKBitmap UnsharpMasking(SKBitmap bmp, IMessage m, int size = 5)
         {
             var weights = Enumerable.Range(0, size).Select(x => Gauss(x, size * 2f / 3f, size / 2)).ToArray();
 
@@ -395,37 +413,40 @@ namespace MEE7.Commands.Edit
         }
 
         public string gayPrideDesc = "Gay rights";
-        public Bitmap GayPride(Bitmap bmp, IMessage m)
+        public SKBitmap GayPride(SKBitmap bmp, IMessage m)
         {
-            return FlagColor(new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Purple }, bmp);
+            return FlagColor(new SKColor[] { SKColor.Parse("#EE3124"), SKColor.Parse("#F57F29"), SKColor.Parse("#FFF000"), SKColor.Parse("#58B947"), SKColor.Parse("#0054A6"), SKColor.Parse("#9F248F") }, bmp);
         }
 
         public string transRightsDesc = "The input image says trans rights";
-        public Bitmap TransRights(Bitmap bmp, IMessage m)
+        public SKBitmap TransRights(SKBitmap bmp, IMessage m)
         {
-            return FlagColor(new Color[] { Color.LightBlue, Color.Pink, Color.White, Color.Pink, Color.LightBlue }, bmp);
+            return FlagColor(new SKColor[] { SKColor.Parse("#7CC0EA"), SKColor.Parse("#F498C0"), SKColor.Parse("#FFFFFF"), SKColor.Parse("#F498C0"), SKColor.Parse("#7CC0EA"), }, bmp);
         }
 
         public string merkelDesc = "Add a german flag to the background of your image";
-        public Bitmap Merkel(Bitmap bmp, IMessage m)
+        public SKBitmap Merkel(SKBitmap bmp, IMessage m)
         {
-            return FlagColor(new Color[] { Color.Black, Color.Red, Color.Yellow }, bmp);
+            return FlagColor(new SKColor[] { SKColor.Parse("#000000"), SKColor.Parse("#DE0000"), SKColor.Parse("#FFCF00"), }, bmp);
         }
 
         public string chromaticAbberationDesc = "Shifts the color spaces";
-        public Bitmap ChromaticAbberation(Bitmap bmp, IMessage m, int intensity = 4)
+        public SKBitmap ChromaticAbberation(SKBitmap bitmap, IMessage m, int intensity = 4)
         {
-            using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
+            using (var pixmap = bitmap.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int y = 0; y < bitmap.Height; y++)
+                    for (int x = 0; x < bitmap.Width; x++)
                     {
-                        Color r = con.GetPixel(x + intensity > bmp.Width - 1 ? bmp.Width - 1 : x + intensity, y);
-                        Color g = con.GetPixel(x, y);
-                        Color b = con.GetPixel(x - intensity < 0 ? 0 : x - intensity, y);
-                        con.SetPixel(x, y, Color.FromArgb(g.A, r.R, g.G, b.B));
+                        SKColor r = pixels.GetPixel(x + intensity > bitmap.Width - 1 ? bitmap.Width - 1 : x + intensity, y, pixmap.RowBytes);
+                        SKColor g = pixels.GetPixel(x, y, pixmap.RowBytes);
+                        SKColor b = pixels.GetPixel(x - intensity < 0 ? 0 : x - intensity, y, pixmap.RowBytes);
+                        pixels.SetPixel(x, y, pixmap.RowBytes, new SKColor(r.Red, g.Green, b.Blue, g.Alpha));
                     }
+            }
 
-            return bmp;
+            return bitmap;
         }
 
         public string rotateDesc = "Rotate the image";
@@ -789,7 +810,7 @@ namespace MEE7.Commands.Edit
 
         CascadeClassifier cascadeClassifier = null;
         public string FaceDetecDesc = "Detect faces";
-        public Bitmap FaceDetec(Bitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
+        public SKBitmap FaceDetec(SKBitmap b, IMessage m, string classifier = "", double scaleFactor = 1.1)
         {
             if (cascadeClassifier == null)
                 cascadeClassifier = new CascadeClassifier($"Commands{s}Edit{s}Resources{s}opencv-cascades{s}haarcascade_frontalface_alt_tree.xml");
@@ -918,46 +939,40 @@ namespace MEE7.Commands.Edit
         static readonly float gcache = (float)Math.Sqrt(2 * Math.PI);
         static readonly float ecache = (float)Math.E;
         static float Gauss(float x, float sigma, float mu) => (float)Math.Pow(1 / (sigma * gcache) * ecache, 0.5 * (x - mu) * (x - mu) / sigma);
-        static Bitmap ApplyTransformation(Bitmap bmp, Func<int, int, Vector2> trans)
+        static SKBitmap ApplyTransformation(SKBitmap input, Func<int, int, Vector2> trans)
         {
-            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            SKBitmap output = new SKBitmap(input.Width, input.Height);
 
-            using (UnsafeBitmapContext ocon = new UnsafeBitmapContext(output))
-            using (UnsafeBitmapContext bcon = new UnsafeBitmapContext(bmp))
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
-                    {
-                        Vector2 target = trans(x, y);
-
-                        if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
-                            target.X = x;
-                        if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
-                            target.Y = y;
-                        if (target.X < 0)
-                            target.X = 0;
-                        if (target.X > bmp.Width - 1)
-                            target.X = bmp.Width - 1;
-                        if (target.Y < 0)
-                            target.Y = 0;
-                        if (target.Y > bmp.Height - 1)
-                            target.Y = bmp.Height - 1;
-
-                        ocon.SetPixel(x, y, bcon.GetPixel((int)target.X, (int)target.Y));
-                    }
-
-            return output;
-        }
-        static ImageCodecInfo GetEncoder(System.Drawing.Imaging.ImageFormat format)
-        {
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-            foreach (ImageCodecInfo codec in codecs)
+            using (var outputPixmap = input.PeekPixels())
             {
-                if (codec.FormatID == format.Guid)
+                Span<byte> outputPixels = outputPixmap.GetPixelSpan();
+                using (var inputPixmap = input.PeekPixels())
                 {
-                    return codec;
+                    Span<byte> inputPixels = inputPixmap.GetPixelSpan();
+                    for (int x = 0; x < input.Width; x++)
+                        for (int y = 0; y < input.Height; y++)
+                        {
+                            Vector2 target = trans(x, y);
+
+                            if (float.IsNaN((float)target.X) || float.IsInfinity((float)target.X))
+                                target.X = x;
+                            if (float.IsNaN((float)target.Y) || float.IsInfinity((float)target.Y))
+                                target.Y = y;
+                            if (target.X < 0)
+                                target.X = 0;
+                            if (target.X > input.Width - 1)
+                                target.X = input.Width - 1;
+                            if (target.Y < 0)
+                                target.Y = 0;
+                            if (target.Y > input.Height - 1)
+                                target.Y = input.Height - 1;
+
+                            outputPixels.SetPixel(x, y, outputPixmap.RowBytes, inputPixels.GetPixel((int)target.X, (int)target.Y, inputPixmap.RowBytes));
+                        }
                 }
             }
-            return null;
+
+            return output;
         }
         static SKRect FindRectangle(SKBitmap Pic, SKColor C, int MinSize)
         {
@@ -1055,11 +1070,11 @@ namespace MEE7.Commands.Edit
             bmp.Dispose();
             return output;
         }
-        static Bitmap FlagColor(Color[] Cs, Bitmap P, bool Horz = false)
+        static SKBitmap FlagColor(SKColor[] Cs, SKBitmap P, bool Horz = false)
         {
             using (UnsafeBitmapContext c = new UnsafeBitmapContext(P))
             {
-                Color[] edges = new Color[] { c.GetPixel(0, 0),
+                SKColor[] edges = new SKColor[] { c.GetPixel(0, 0),
                     c.GetPixel(0, c.Height - 1), c.GetPixel(c.Width - 1, 0),
                     c.GetPixel(c.Width - 1, c.Height - 1) };
 
@@ -1076,7 +1091,7 @@ namespace MEE7.Commands.Edit
             }
             return P;
         }
-        static Rectangle IncreaseSize(Rectangle r, int x, int y)
+        static SKRect IncreaseSize(SKRect r, int x, int y)
         {
             r.Width += x;
             r.Height += y;

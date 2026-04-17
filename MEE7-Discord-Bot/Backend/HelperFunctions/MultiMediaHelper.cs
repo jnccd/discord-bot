@@ -249,10 +249,10 @@ namespace MEE7.Backend.HelperFunctions
         public static void SaveGif(Gif gif, Stream s)
         {
             GifEngine ge = new GifEngine(new ImageSharpImageLibrary());
-            using (var creator = ge.CreateGif(s, -1))
-                for (int i = 0; i < gif.Item1.Length; i++)
-                    using (var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(gif.Item1[i].Bytes, gif.Item1[i].Width, gif.Item1[i].Height))
-                        creator.AddFrame(BitmapConverter.Convert(image), gif.Item2[i], GifQuality.Bit8);
+            using var creator = ge.CreateGif(s, -1);
+            for (int i = 0; i < gif.Item1.Length; i++)
+                using (var image = Image.LoadPixelData<Rgba32>(gif.Item1[i].Bytes, gif.Item1[i].Width, gif.Item1[i].Height))
+                    creator.AddFrame(BitmapConverter.Convert(image), gif.Item2[i], GifQuality.Bit8);
         }
         public static Gif LoadGifFromUrl(string gifUrl)
         {
