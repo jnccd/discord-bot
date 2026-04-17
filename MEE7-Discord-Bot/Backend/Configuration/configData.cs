@@ -1,4 +1,5 @@
 ﻿using MEE7.Commands;
+using System;
 using System.Collections.Generic;
 
 namespace MEE7.Configuration
@@ -29,6 +30,8 @@ namespace MEE7.Configuration
         public List<ManageRoleByEmoteMessage> manageRoleByEmoteMessages;
         public List<ConfigTimer> timers;
         public long lastCodeMemeId;
+        public bool saidGoodMorningAlready = false;
+        public DateOnly lastGoodMorningDate = DateOnly.FromDateTime(DateTime.Now);
 
         public ConfigData()
         {
