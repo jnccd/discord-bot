@@ -263,3 +263,4 @@ __pycache__/
 
 # custom
 launchSettings.json
+**.lscache
