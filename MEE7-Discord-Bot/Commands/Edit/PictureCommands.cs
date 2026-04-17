@@ -1,35 +1,19 @@
-﻿using BumpKit;
+﻿using System.Numerics;
 using Discord;
-using Emgu.CV;
-using Emgu.CV.Stitching;
-using Emgu.CV.Structure;
-using MEE7.Backend.HelperFunctions;
-using MEE7.Commands.Edit.Resources;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using Tesseract;
-using static MEE7.Commands.Edit.Edit;
-using Color = System.Drawing.Color;
-using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using SkiaSharp;
 
 namespace MEE7.Commands.Edit
 {
     public class PictureCommands : EditCommandProvider
     {
         public string GetColorDesc = "Get the color of a pixel";
-        public Color GetColor(Bitmap b, IMessage m, int x, int y)
+        public SKColor GetColor(SKBitmap b, IMessage m, int x, int y)
         {
             return b.GetPixel(x, y);
         }
 
         public string colorChannelSwapDesc = "Swap the rgb color channels for each pixel";
-        public Bitmap ColorChannelSwap(Bitmap bmp, IMessage m)
+        public SKBitmap ColorChannelSwap(SKBitmap bmp, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -44,7 +28,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string reddifyDesc = "Make it red af";
-        public Bitmap Reddify(Bitmap bmp, IMessage m)
+        public SKBitmap Reddify(SKBitmap bmp, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -59,7 +43,7 @@ namespace MEE7.Commands.Edit
         }
 
         public string invertDesc = "Invert the color of each pixel";
-        public Bitmap Invert(Bitmap bmp, IMessage m)
+        public SKBitmap Invert(SKBitmap bmp, IMessage m)
         {
             using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
                 for (int x = 0; x < bmp.Width; x++)
@@ -663,7 +647,7 @@ namespace MEE7.Commands.Edit
         public string cropDesc = "Crop the picture";
         public Bitmap Crop(Bitmap b, IMessage m, int x, int y, int w, int h)
         {
-            return b.CropImage(new Rectangle(x,y,w,h));
+            return b.CropImage(new Rectangle(x, y, w, h));
         }
 
         public string splitDesc = "Split the picture into x * y pieces";
@@ -788,8 +772,8 @@ namespace MEE7.Commands.Edit
         public Bitmap[] ForSeamCarveM(Bitmap b, IMessage m, float endValue, int numFrames, bool stretch = true)
         {
             if (endValue > 1)
-                throw new Exception("I cant make larger >:("); 
-            
+                throw new Exception("I cant make larger >:(");
+
             float getVal(int i) => 1 + (endValue - 1) * (i / (float)numFrames);
 
             Bitmap[] frames = new Bitmap[numFrames];
@@ -840,11 +824,13 @@ namespace MEE7.Commands.Edit
                 throw new Exception("nope, thats not a language");
 
             string conf, text;
-            if (Program.RunningOnLinux) 
+            if (Program.RunningOnLinux)
             {
                 text = $"tesseract {imgPath} - quiet -l {language}".GetShellOut();
                 conf = "x";
-            } else {
+            }
+            else
+            {
                 using var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
                 using var img = Pix.LoadFromFile(imgPath);
                 using var page = engine.Process(img);
@@ -859,11 +845,11 @@ namespace MEE7.Commands.Edit
         }
 
         public string InsertIntoRectDesc = "Inserts picture into the red rectangle of another picture";
-        public static Bitmap InsertIntoRect(Bitmap insertion, IMessage m, Bitmap design, Bitmap overlay = null, bool drawDesign = true)
+        public static SKBitmap InsertIntoRect(SKBitmap insertion, IMessage m, SKBitmap design, SKBitmap overlay = null, bool drawDesign = true)
         {
-            Rectangle redRekt = FindRectangle(design, Color.FromArgb(255, 0, 0), 30);
+            SKRect redRekt = FindRectangle(design, new SKColor(255, 0, 0), 30);
             if (redRekt.Width == 0)
-                redRekt = FindRectangle(design, Color.FromArgb(254, 34, 34), 20);
+                redRekt = FindRectangle(design, new SKColor(254, 34, 34), 20);
             if (!drawDesign)
                 using (UnsafeBitmapContext con = new UnsafeBitmapContext(design))
                     for (int x = 0; x < design.Width; x++)
@@ -918,7 +904,7 @@ namespace MEE7.Commands.Edit
             for (int x = 0; x < b.Width; x++)
                 for (int y = 0; y < b.Height; y++)
                 {
-                    float sx = x / (float)b.Width - 0.5f, 
+                    float sx = x / (float)b.Width - 0.5f,
                           sy = y / (float)b.Height - 0.5f;
                     if (sx * sx + sy * sy > 0.25)
                         c.SetPixel(x, y, Color.FromArgb(0, 0, 0, 0));
@@ -973,11 +959,11 @@ namespace MEE7.Commands.Edit
             }
             return null;
         }
-        static Rectangle FindRectangle(Bitmap Pic, Color C, int MinSize)
+        static SKRect FindRectangle(SKBitmap Pic, SKColor C, int MinSize)
         {
-            bool IsSameColor(Color C1, Color C2)
+            bool IsSameColor(SKColor C1, SKColor C2)
             {
-                return Math.Abs(C1.R - C2.R) < 10 && Math.Abs(C1.G - C2.G) < 10 && Math.Abs(C1.B - C2.B) < 10;
+                return Math.Abs(C1.Red - C2.Red) < 10 && Math.Abs(C1.Green - C2.Green) < 10 && Math.Abs(C1.Blue - C2.Blue) < 10;
             }
 
             for (int x = 0; x < Pic.Width; x++)
@@ -993,12 +979,12 @@ namespace MEE7.Commands.Edit
                             b++;
 
                         if (a - x > MinSize && b - y > MinSize)
-                            return new Rectangle(x, y, a - x - 1, b - y - 1);
+                            return new SKRect(x, y, a - x - 1, b - y - 1);
                     }
 
-            return new Rectangle();
+            return new SKRect();
         }
-        static Bitmap ApplyKernel(Bitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
+        static SKBitmap ApplyKernel(SKBitmap bmp, int[,] kernel, float factor = 1, bool grayscale = false)
         {
             float[,] fKernel = new float[kernel.GetLength(0), kernel.GetLength(1)];
             for (int x = 0; x < kernel.GetLength(0); x++)
@@ -1006,11 +992,11 @@ namespace MEE7.Commands.Edit
                     fKernel[x, y] = kernel[x, y];
             return ApplyKernel(bmp, fKernel, factor, grayscale);
         }
-        static Bitmap ApplyKernel(Bitmap bmp, float[,] kernel, float factor = 1, bool grayscale = false)
+        static SKBitmap ApplyKernel(SKBitmap bmp, float[,] kernel, float factor = 1, bool grayscale = false)
         {
             int kernelW = kernel.GetLength(0);
             int kernelH = kernel.GetLength(1);
-            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            SKBitmap output = new SKBitmap(bmp.Width, bmp.Height);
 
             static int inBounds(int x, int bound)
             {
@@ -1054,7 +1040,7 @@ namespace MEE7.Commands.Edit
                                 for (int yk = 0; yk < kernelH; yk++)
                                     activation[i] += kernel[xk, yk] * (i == 0 ?
                                         cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).R : (i == 1 ?
-                                        cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).G : 
+                                        cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).G :
                                         cb.GetPixel(inBounds(x + xk - kernelW / 2, bmp.Width), inBounds(y + yk - kernelH / 2, bmp.Height)).B));
                             activation[i] = (int)Math.Abs(activation[i] * factor);
                             if (activation[i] > 255)

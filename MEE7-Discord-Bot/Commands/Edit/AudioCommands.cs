@@ -4,8 +4,8 @@ using Discord.WebSocket;
 using MEE7.Backend.HelperFunctions;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using SkiaSharp;
 using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -76,12 +76,13 @@ namespace MEE7.Commands.Edit
         }
 
         public string drawAudioDesc = "Draw the samples";
-        public Bitmap DrawAudio(WaveStream w, IMessage m)
+        public SKBitmap DrawAudio(WaveStream w, IMessage m)
         {
+            var n = 1000;
             var c = new WaveChannel32(w);
 
-            float[] normSamplesMin = new float[1000]; Array.Fill(normSamplesMin, 250);
-            float[] normSamplesMax = new float[1000]; Array.Fill(normSamplesMax, 250);
+            float[] normSamplesMin = new float[n]; Array.Fill(normSamplesMin, 250);
+            float[] normSamplesMax = new float[n]; Array.Fill(normSamplesMax, 250);
             byte[] buffer = new byte[1024];
             int reader = 0;
             while (c.Position < c.Length)
@@ -101,16 +102,14 @@ namespace MEE7.Commands.Edit
             }
 
             int j = 0;
-            Bitmap output = new Bitmap(1000, 500);
-            using (Graphics graphics = Graphics.FromImage(output))
-                graphics.DrawLines(new Pen(System.Drawing.Color.White), Enumerable.
-                    Range(0, 1000).
-                    Select(x => new Point[] {
-                            new Point(j, (int)normSamplesMin[x]),
-                            new Point(j++, (int)normSamplesMax[x]),
-                    }).
-                    SelectMany(x => x).
-                    ToArray());
+            SKBitmap output = new SKBitmap(n, 500);
+            using SKCanvas canvas = new SKCanvas(output);
+
+            canvas.Clear(SKColors.White);
+            for (int x = 0; x < n; x++)
+            {
+                canvas.DrawLine(new SKPoint(j, (int)normSamplesMin[x]), new SKPoint(j++, (int)normSamplesMax[x]), new SKPaint { Color = SKColors.LightGray });
+            }
 
             w.Dispose();
             return output;

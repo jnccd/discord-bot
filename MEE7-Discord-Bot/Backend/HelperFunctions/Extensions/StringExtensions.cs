@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,6 +11,7 @@ using System.Threading.Tasks;
 using NAudio.Wave;
 using NLayer.NAudioSupport;
 using static MEE7.Commands.Edit.Edit;
+using SkiaSharp;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -156,24 +155,8 @@ namespace MEE7.Backend.HelperFunctions
                     o += char.ToLower(s[i]);
             return o;
         }
-        public static Bitmap GetBitmapFromURL(this string url) => new Bitmap(WebRequest.Create(url).GetResponse().GetResponseStream());
-        public static Bitmap[] GetBitmapsFromGIFURL(this string url)
-        {
-            Image gif = Image.FromStream(WebRequest.Create(url).GetResponse().GetResponseStream());
-            FrameDimension dimension = new FrameDimension(gif.FrameDimensionsList[0]);
-            return Enumerable.Range(0, gif.GetFrameCount(dimension)).
-                Select(x =>
-                {
-                    gif.SelectActiveFrame(dimension, x);
-                    return new Bitmap(gif);
-                }).
-                ToArray();
-        }
-        public static Gif GetBitmapsAndTimingsFromGIFURL(this string url)
-        {
-            Image gif = Image.FromStream(WebRequest.Create(url).GetResponse().GetResponseStream());
-            return MultiMediaHelper.ImageToGif(gif);
-        }
+        public static SKBitmap GetBitmapFromURL(this string url) => MultiMediaHelper.LoadBitmapFromUrl(url);
+        public static Gif GetBitmapsAndTimingsFromGIFURL(this string url) => MultiMediaHelper.LoadGifFromUrl(url);
         public static Mp3FileReader GetMp3AudioFromURL(this string url)
         {
             Stream ms = new MemoryStream();

@@ -2,9 +2,9 @@
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace MEE7.Commands
@@ -229,26 +229,25 @@ namespace MEE7.Commands
 
             return re;
         }
-        public Bitmap ChessBoardToPicture(ChessBoard Board)
+        public SKBitmap ChessBoardToPicture(ChessBoard Board)
         {
             int FieldOffset = 25;
             int FieldSize = 100;
-            Bitmap picture = new Bitmap(8 * FieldSize + FieldOffset, 8 * FieldSize + FieldOffset);
-            using (Graphics g = Graphics.FromImage(picture))
+            SKBitmap picture = new SKBitmap(8 * FieldSize + FieldOffset, 8 * FieldSize + FieldOffset);
+            using (SKCanvas canvas = new SKCanvas(picture))
             {
-                g.FillRectangle(Brushes.White, new Rectangle(0, 0, picture.Width, picture.Height));
+                canvas.Clear(SKColors.White);
                 for (int x = 0; x < 8; x++)
                     for (int y = 0; y < 8; y++)
                     {
-                        RectangleF FieldRect = new Rectangle(FieldSize * x + FieldOffset, FieldSize * y + FieldOffset, FieldSize, FieldSize);
+                        SKRect FieldRect = new SKRect(FieldSize * x + FieldOffset, FieldSize * y + FieldOffset, FieldSize * x + FieldOffset + FieldSize, FieldSize * y + FieldOffset + FieldSize);
                         if ((x + y) % 2 == 0)
-                            g.FillRectangle(Brushes.Beige, FieldRect);
-                        g.DrawString(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new Font("Arial", (int)(FieldSize / 1.6f)), Brushes.Black, FieldRect);
-
+                            canvas.DrawRect(FieldRect, new SKPaint { Color = SKColors.Beige });
+                        canvas.DrawText(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new SKPoint(FieldRect.Left + 5, FieldRect.Top + FieldRect.Height - 5), new SKPaint { Color = SKColors.Black, TextSize = FieldSize / 1.6f });
                         if (y == 0)
-                            g.DrawString(x.ToString(), new Font("Arial", (int)(FieldOffset / 1.6f)), Brushes.Black, FieldSize * x + FieldOffset, 0);
+                            canvas.DrawText(x.ToString(), new SKPoint(FieldSize * x + FieldOffset, 0), new SKPaint { Color = SKColors.Black, TextSize = FieldOffset / 1.6f });
                         if (x == 0)
-                            g.DrawString(y.ToString(), new Font("Arial", (int)(FieldOffset / 1.6f)), Brushes.Black, 0, FieldSize * y + FieldOffset);
+                            canvas.DrawText(y.ToString(), new SKPoint(0, FieldSize * y + FieldOffset), new SKPaint { Color = SKColors.Black, TextSize = FieldOffset / 1.6f });
                     }
             }
             return picture;

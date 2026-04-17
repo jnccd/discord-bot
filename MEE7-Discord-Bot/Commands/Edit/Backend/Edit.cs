@@ -1,6 +1,7 @@
 ﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -138,11 +139,11 @@ namespace MEE7.Commands.Edit
                 return RunPipe(this, message, inputData, vars);
             }
         }
-        public class Video 
-        { 
-            public string filePath; 
-            public string name; 
-            public Video(string filePath, string name = "") 
+        public class Video
+        {
+            public string filePath;
+            public string name;
+            public Video(string filePath, string name = "")
             {
                 this.filePath = filePath;
                 this.name = name;
@@ -153,7 +154,7 @@ namespace MEE7.Commands.Edit
                 return this;
             }
         }
-        public class Gif : Tuple<Bitmap[], int[]> { public Gif(Bitmap[] item1, int[] item2) : base(item1, item2) { } }
+        public class Gif : Tuple<SKBitmap[], int[]> { public Gif(SKBitmap[] item1, int[] item2) : base(item1, item2) { } }
         public class EditNull { }
         public class EditVariable { public string VarName; }
 
