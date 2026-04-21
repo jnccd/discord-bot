@@ -240,7 +240,7 @@ namespace MEE7.Commands
                 for (int x = 0; x < 8; x++)
                     for (int y = 0; y < 8; y++)
                     {
-                        SKRect FieldRect = new SKRect(FieldSize * x + FieldOffset, FieldSize * y + FieldOffset, FieldSize * x + FieldOffset + FieldSize, FieldSize * y + FieldOffset + FieldSize);
+                        SKRect FieldRect = new SKRect(FieldSize * x + FieldOffset, FieldSize * y + FieldOffset, FieldSize * x * 2 + FieldOffset * 2 + FieldSize, FieldSize * y * 2 + FieldOffset * 2 + FieldSize);
                         if ((x + y) % 2 == 0)
                             canvas.DrawRect(FieldRect, new SKPaint { Color = SKColors.Beige });
                         canvas.DrawText(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new SKPoint(FieldRect.Left + 5, FieldRect.Top + FieldRect.Height - 5), SKTextAlign.Left, new SKFont(SKTypeface.Default, size: FieldOffset / 1.6f), new SKPaint { Color = SKColors.Black });

@@ -685,14 +685,14 @@ namespace MEE7.Commands.Edit
                     H--;
             }
 
-            SKBitmap re = bitmap.CropImage(new SKRect(X, Y, W - X, H - Y));
+            SKBitmap re = bitmap.CropImage(new SKRect(X, Y, W, H));
             return re;
         }
 
         public string cropDesc = "Crop the picture";
         public SKBitmap Crop(SKBitmap bitmap, IMessage m, int x, int y, int w, int h)
         {
-            return bitmap.CropImage(new SKRect(x, y, w, h));
+            return bitmap.CropImage(new SKRect(x, y, w + x, h + y));
         }
 
         public string splitDesc = "Split the picture into x * y pieces";
@@ -701,7 +701,7 @@ namespace MEE7.Commands.Edit
             for (int i = 0; i < x; i++)
                 for (int j = 0; j < y; j++)
                     DiscordNETWrapper.SendBitmap(bitmap.CropImage(new SKRect((int)(bitmap.Width * (i / (float)x)), (int)(bitmap.Height * (j / (float)y)),
-                        (int)(bitmap.Width / (float)x), (int)(bitmap.Height / (float)y)), false), m.Channel, (i + 1) + " " + (j + 1)).Wait();
+                        (int)(bitmap.Width * (i / (float)x)) + (int)(bitmap.Width / (float)x), (int)(bitmap.Height * (j / (float)y)) + (int)(bitmap.Height / (float)y)), false), m.Channel, (i + 1) + " " + (j + 1)).Wait();
 
             bitmap.Dispose();
         }
@@ -738,7 +738,7 @@ namespace MEE7.Commands.Edit
             Vector2 lowerRight = bSize + (point - bSize) * zoomLevel;
 
             return b.CropImage(new SKRect(
-                (int)upperLeft.X, (int)upperLeft.Y, (int)lowerRight.X - (int)upperLeft.X, (int)lowerRight.Y - (int)upperLeft.Y)).
+                (int)upperLeft.X, (int)upperLeft.Y, (int)lowerRight.X, (int)lowerRight.Y)).
                 Stretch((int)bSize.X, (int)bSize.Y);
         }
 
@@ -861,7 +861,7 @@ namespace MEE7.Commands.Edit
         public static SKBitmap InsertIntoRect(SKBitmap insertion, IMessage m, SKBitmap design, SKBitmap overlay = null, bool drawDesign = true)
         {
             SKRect redRekt = FindRectangle(design, new SKColor(255, 0, 0), 30);
-            if (redRekt.Width == 0)
+            if (redRekt.Width <= 0)
                 redRekt = FindRectangle(design, new SKColor(254, 34, 34), 20);
             if (!drawDesign)
                 using (var pixmap = design.PeekPixels())
@@ -875,7 +875,8 @@ namespace MEE7.Commands.Edit
                 }
             using (var canvas = new SKCanvas(design))
             {
-                canvas.DrawBitmap(insertion, IncreaseSize(redRekt, 1, 1));
+                redRekt.Inflate(1, 1);
+                canvas.DrawBitmap(insertion, redRekt);
                 if (overlay != null)
                     canvas.DrawBitmap(overlay, 0, 0);
             }
@@ -976,9 +977,10 @@ namespace MEE7.Commands.Edit
         }
         static SKRect FindRectangle(SKBitmap Pic, SKColor C, int MinSize)
         {
+            var colorThreshold = 40;
             bool IsSameColor(SKColor C1, SKColor C2)
             {
-                return Math.Abs(C1.Red - C2.Red) < 10 && Math.Abs(C1.Green - C2.Green) < 10 && Math.Abs(C1.Blue - C2.Blue) < 10;
+                return Math.Abs(C1.Red - C2.Red) < colorThreshold && Math.Abs(C1.Green - C2.Green) < colorThreshold && Math.Abs(C1.Blue - C2.Blue) < colorThreshold;
             }
 
             for (int x = 0; x < Pic.Width; x++)
@@ -994,7 +996,7 @@ namespace MEE7.Commands.Edit
                             b++;
 
                         if (a - x > MinSize && b - y > MinSize)
-                            return new SKRect(x, y, a - x - 1, b - y - 1);
+                            return new SKRect(x, y, a - 1, b - 1);
                     }
 
             return new SKRect();
@@ -1105,10 +1107,6 @@ namespace MEE7.Commands.Edit
             }
 
             return bitmap;
-        }
-        static SKRect IncreaseSize(SKRect r, int x, int y)
-        {
-            return new SKRect(r.Left, r.Top, r.Width + x, r.Height + y);
         }
     }
 }
