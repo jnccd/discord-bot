@@ -15,8 +15,12 @@ namespace MEE7.Backend.HelperFunctions
                 else
                 {
                     if (!Program.RunningOnLinux)
-                        if (Console.CursorLeft == 1)
-                            Console.CursorLeft = 0;
+                        try
+                        {
+                            if (Console.CursorLeft == 1)
+                                Console.CursorLeft = 0;
+                        }
+                        catch { }
                     Console.ForegroundColor = Color;
                     Console.WriteLine(text);
                     Console.ForegroundColor = ConsoleColor.White;
@@ -33,11 +37,19 @@ namespace MEE7.Backend.HelperFunctions
                     Console.WriteLine(text);
                 else
                 {
-                    if (Console.CursorLeft == 1)
-                        Console.CursorLeft = 0;
+                    try
+                    {
+                        if (Console.CursorLeft == 1)
+                            Console.CursorLeft = 0;
+                    }
+                    catch { }
                     Console.WriteLine(text);
-                    if (!Program.RunningOnLinux)
-                        Console.Write("$");
+                    try
+                    {
+                        if (!Program.RunningOnLinux)
+                            Console.Write("$");
+                    }
+                    catch { }
                 }
             }
         }
@@ -68,8 +80,12 @@ namespace MEE7.Backend.HelperFunctions
                 else
                 {
                     if (!Program.RunningOnLinux)
-                        if (Console.CursorLeft == 1)
-                            Console.CursorLeft = 0;
+                        try
+                        {
+                            if (Console.CursorLeft == 1)
+                                Console.CursorLeft = 0;
+                        }
+                        catch { }
                     Console.ForegroundColor = Color;
                     Console.WriteLine(text);
                     Console.ForegroundColor = ConsoleColor.White;

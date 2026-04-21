@@ -1,13 +1,16 @@
-﻿using Discord.Audio;
+﻿using AnimatedGif;
+using AnimatedGif.ImageSharp;
+using Discord.Audio;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using static MEE7.Commands.Edit.Edit;
-using Image = System.Drawing.Image;
 
 namespace MEE7.Backend.HelperFunctions
 {
@@ -133,33 +136,170 @@ namespace MEE7.Backend.HelperFunctions
             if (ex != null)
                 throw ex;
         }
-        public static Gif ImageToGif(Image i)
+        public static (int FrameCount, int[] FrameDurations) GetGifFrameInfo(SKImage image)
         {
-            FrameDimension dimension = new FrameDimension(i.FrameDimensionsList[0]);
-            int[] timings = new int[i.GetFrameCount(dimension)];
-            return new Gif(Enumerable.Range(0, i.GetFrameCount(dimension)).
-                Select(x =>
-                {
-                    i.SelectActiveFrame(dimension, x);
-                    try
-                    {
-                        timings[x] = BitConverter.ToInt32(i.GetPropertyItem(20736).Value, x * 4) * 10; // this works on windows sometimes
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            var prop = i.GetPropertyItem(20736);
-                            timings[x] = (prop.Value[0] + prop.Value[1] * 256) * 10; // this works according to https://stackoverflow.com/questions/3785031/getting-the-frame-duration-of-an-animated-gif
-                        }
-                        catch
-                        {
-                            timings[x] = 33; // just set it to 30fps lul, works for consoles
-                        }
-                    }
-                    return new Bitmap(i);
-                }).
-                ToArray(), timings);
+            using var codec = SKCodec.Create(image.Encode(SKEncodedImageFormat.Gif, 100));
+
+            if (codec == null)
+                throw new ArgumentException("The image is not a valid GIF or could not be decoded.");
+
+            int frameCount = codec.FrameCount;
+            int[] frameDurations = new int[frameCount];
+
+            for (int i = 0; i < frameCount; i++)
+            {
+                if (codec.GetFrameInfo(i, out SKCodecFrameInfo frameInfo))
+                    frameDurations[i] = frameInfo.Duration;
+                else
+                    frameDurations[i] = 33;
+            }
+
+            return (frameCount, frameDurations);
+        }
+        public static SKBitmap GetGifFrame(SKImage gifImage, int frameIndex)
+        {
+            using var gifData = gifImage.Encode(SKEncodedImageFormat.Gif, 100);
+            using var codec = SKCodec.Create(gifData);
+
+            if (codec == null)
+                throw new ArgumentException("The image is not a valid GIF or could not be decoded.");
+
+            // Check if the frame index is valid
+            if (frameIndex < 0 || frameIndex >= codec.FrameCount)
+                throw new ArgumentOutOfRangeException(nameof(frameIndex), "Frame index is out of range.");
+
+            // Create a bitmap to hold the frame
+            if (!codec.GetFrameInfo(frameIndex, out SKCodecFrameInfo frameInfo))
+                throw new ArgumentException("Failed to get frame info.");
+
+            var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+
+            var bitmap = new SKBitmap(frameInfo.FrameRect.Width, frameInfo.FrameRect.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+
+            // Decode the specific frame into the bitmap
+            var opts = new SKCodecOptions(frameIndex);
+            var result = codec.GetPixels(info, bitmap.GetPixels(), opts);
+            if (result != SKCodecResult.Success)
+                throw new InvalidOperationException("Failed to decode the frame.");
+
+            return bitmap;
+        }
+        public static SKBitmap[] GetGifFrames(SKImage gifImage)
+        {
+            using var gifData = gifImage.Encode(SKEncodedImageFormat.Gif, 100);
+            using var codec = SKCodec.Create(gifData);
+
+            if (codec == null)
+                throw new ArgumentException("The image is not a valid GIF or could not be decoded.");
+
+            SKBitmap[] frames = new SKBitmap[codec.FrameCount];
+
+            for (int frameIndex = 0; frameIndex < codec.FrameCount; frameIndex++)
+            {
+                // Create a bitmap to hold the frame
+                if (!codec.GetFrameInfo(frameIndex, out SKCodecFrameInfo frameInfo))
+                    throw new ArgumentException("Failed to get frame info.");
+
+                var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+
+                var bitmap = new SKBitmap(frameInfo.FrameRect.Width, frameInfo.FrameRect.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+
+                // Decode the specific frame into the bitmap
+                var opts = new SKCodecOptions(frameIndex);
+                var result = codec.GetPixels(info, bitmap.GetPixels(), opts);
+                if (result != SKCodecResult.Success)
+                    throw new InvalidOperationException("Failed to decode the frame.");
+            }
+
+            return frames;
+        }
+        public static Gif ImageToGif(SKImage i)
+        {
+            (_, int[] timings) = GetGifFrameInfo(i);
+            var frames = GetGifFrames(i);
+            return new Gif(frames, timings);
+        }
+
+        public static SKBitmap LoadBitmapFromUrl(string imageUrl)
+        {
+            using var httpClient = new HttpClient();
+
+            // Download the image data as a byte array
+            byte[] imageData = httpClient.GetByteArrayAsync(imageUrl).Result;
+
+            // Decode the byte array into an SKBitmap
+            using (var stream = new MemoryStream(imageData))
+            using (var codec = SKCodec.Create(stream))
+            {
+                var bitmap = new SKBitmap(
+                    codec.Info.Width,
+                    codec.Info.Height,
+                    SKColorType.Rgba8888,
+                    SKAlphaType.Premul
+                );
+
+                // Decode the image into the bitmap
+                var result = codec.GetPixels(bitmap.Info, bitmap.GetPixels());
+                if (result != SKCodecResult.Success)
+                    throw new InvalidOperationException("Failed to decode the image.");
+
+                return bitmap;
+            }
+        }
+        public static void SaveGif(Gif gif, Stream s)
+        {
+            GifEngine ge = new GifEngine(new ImageSharpImageLibrary());
+            using var creator = ge.CreateGif(s, -1);
+            for (int i = 0; i < gif.Item1.Length; i++)
+                using (var image = Image.LoadPixelData<Rgba32>(gif.Item1[i].Bytes, gif.Item1[i].Width, gif.Item1[i].Height))
+                    creator.AddFrame(BitmapConverter.Convert(image), gif.Item2[i], GifQuality.Bit8);
+        }
+        public static void SaveBitmaps(SKBitmap[] bitmaps, Stream s, int delay = 33)
+        {
+            GifEngine ge = new GifEngine(new ImageSharpImageLibrary());
+            using var creator = ge.CreateGif(s, -1);
+            for (int i = 0; i < bitmaps.Length; i++)
+                using (var image = Image.LoadPixelData<Rgba32>(bitmaps[i].Bytes, bitmaps[i].Width, bitmaps[i].Height))
+                    creator.AddFrame(BitmapConverter.Convert(image), delay, GifQuality.Bit8);
+        }
+        public static Gif LoadGifFromUrl(string gifUrl)
+        {
+            using var httpClient = new HttpClient();
+            byte[] gifData = httpClient.GetByteArrayAsync(gifUrl).Result;
+
+            using var stream = new MemoryStream(gifData);
+            using var codec = SKCodec.Create(stream);
+            var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+
+            if (codec == null)
+                throw new ArgumentException("The URL does not point to a valid GIF.");
+
+            int frameCount = codec.FrameCount;
+            var bitmaps = new SKBitmap[frameCount];
+            var timings = new int[frameCount];
+
+            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            {
+                if (!codec.GetFrameInfo(frameIndex, out SKCodecFrameInfo frameInfo))
+                    throw new ArgumentException("Failed to get frame info.");
+                var bitmap = new SKBitmap(
+                    frameInfo.FrameRect.Width,
+                    frameInfo.FrameRect.Height,
+                    SKColorType.Rgba8888,
+                    SKAlphaType.Premul
+                );
+
+                // Decode the frame
+                var opts = new SKCodecOptions(frameIndex);
+                var result = codec.GetPixels(info, bitmap.GetPixels(), opts);
+                if (result != SKCodecResult.Success)
+                    throw new InvalidOperationException("Failed to decode the frame.");
+
+                bitmaps[frameIndex] = bitmap;
+                timings[frameIndex] = frameInfo.Duration;
+            }
+
+            return new Gif(bitmaps, timings);
         }
     }
 }

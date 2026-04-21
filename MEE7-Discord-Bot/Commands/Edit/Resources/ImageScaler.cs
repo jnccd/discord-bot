@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Drawing;
+using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 
 namespace MEE7.Commands.Edit.Resources
 {
     // Taken from: https://github.com/TarekVito/Content-Aware-Image-Scaling/tree/master/Content-Aware Image Scaling(Seam Carving)
     class ImageScaler
     {
-        Bitmap userImage;
+        SKBitmap userImage;
         int[,] energyImage, minTable;
-        Color[,] imgColors;
+        SKColor[,] imgColors;
         int newWidth, newHeight;
         const int SCALE_RATE = 1;
-        public ImageScaler(Bitmap userImage, int width, int height)
+        public ImageScaler(SKBitmap userImage, int width, int height)
         {
             this.userImage = userImage;
             newHeight = height;
@@ -21,34 +23,40 @@ namespace MEE7.Commands.Edit.Resources
         }
         private void fillColors()
         {
-            imgColors = new Color[userImage.Width, userImage.Height];
-            LockBitmap lImg = new LockBitmap(userImage);
-            lImg.LockBits();
-            for (int x = 0; x < userImage.Width; ++x)
-                for (int y = 0; y < userImage.Height; ++y)
-                    imgColors[x, y] = lImg.GetPixel(x, y);
-            lImg.UnlockBits();
+            imgColors = new SKColor[userImage.Width, userImage.Height];
+            using (var pixmap = userImage.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int y = 0; y < userImage.Height; y++)
+                    for (int x = 0; x < userImage.Width; x++)
+                    {
+                        imgColors[x, y] = pixels.GetPixel(x, y, pixmap.RowBytes);
+                    }
+            }
         }
-        public Bitmap commitScale()
+        public SKBitmap commitScale()
         {
             computeVert();
             computeHori();
             return createNewImage();
         }
-        private Bitmap createNewImage()
+        private SKBitmap createNewImage()
         {
-            Bitmap resultImg = new Bitmap(newWidth, newHeight);
-            LockBitmap lockRes = new LockBitmap(resultImg);
-            lockRes.LockBits();
-            for (int x = 0; x < newWidth; ++x)
-                for (int y = 0; y < newHeight; ++y)
-                    lockRes.SetPixel(x, y, imgColors[x, y]);
-            lockRes.UnlockBits();
+            SKBitmap resultImg = new SKBitmap(newWidth, newHeight);
+            using (var pixmap = resultImg.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int y = 0; y < resultImg.Height; y++)
+                    for (int x = 0; x < resultImg.Width; x++)
+                    {
+                        pixels.SetPixel(x, y, pixmap.RowBytes, imgColors[x, y]);
+                    }
+            }
             return resultImg;
         }
-        private Color[,] createNewColor(int w, int h)
+        private SKColor[,] createNewColor(int w, int h)
         {
-            Color[,] tmp = new Color[w, h];
+            SKColor[,] tmp = new SKColor[w, h];
             for (int x = 0; x < w; ++x)
                 for (int y = 0; y < h; ++y)
                     tmp[x, y] = imgColors[x, y];
@@ -216,7 +224,7 @@ namespace MEE7.Commands.Edit.Resources
                     energyImage[i, j] = val;
                 }
         }
-        public Bitmap getEnergyImage()
+        public SKBitmap getEnergyImage()
         {
             double maxVal = 0;
             int w = energyImage.GetLength(0);
@@ -225,23 +233,24 @@ namespace MEE7.Commands.Edit.Resources
                 for (int j = 0; j < h; ++j)
                     maxVal = Math.Max(maxVal, energyImage[i, j]);
 
-            Bitmap energyResult = new Bitmap(w, h);
-            LockBitmap lockEnergy = new LockBitmap(energyResult);
-            lockEnergy.LockBits();
-            for (int i = 0; i < w; ++i)
-                for (int j = 0; j < h; ++j)
-                {
-                    int map = (int)((energyImage[i, j] / maxVal) * 255.0);
-                    lockEnergy.SetPixel(i, j, Color.FromArgb(map, map, map));
-                }
-            lockEnergy.UnlockBits();
+            SKBitmap energyResult = new SKBitmap(w, h);
+            using (var pixmap = energyResult.PeekPixels())
+            {
+                Span<byte> pixels = pixmap.GetPixelSpan();
+                for (int i = 0; i < energyResult.Height; i++)
+                    for (int j = 0; j < energyResult.Width; j++)
+                    {
+                        byte map = (byte)(energyImage[i, j] / maxVal * 255.0);
+                        energyResult.SetPixel(i, j, new SKColor(map, map, map));
+                    }
+            }
             return energyResult;
         }
-        private int colorDist(Color A, Color B)
+        private int colorDist(SKColor A, SKColor B)
         {
-            int red = (A.R - B.R);
-            int green = (A.G - B.G);
-            int blue = (A.B - B.B);
+            int red = A.Red - B.Red;
+            int green = A.Green - B.Green;
+            int blue = A.Blue - B.Blue;
             double sum = red * red + green * green + blue * blue;
             return (int)Math.Sqrt(sum);
         }

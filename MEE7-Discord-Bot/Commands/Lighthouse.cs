@@ -11,7 +11,7 @@ using Discord.Net.WebSockets;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
-using System.Drawing;
+using SkiaSharp;
 
 namespace MEE7.Commands
 {
@@ -53,7 +53,7 @@ namespace MEE7.Commands
             }
 
             var split = message.Content.Split(' ');
-            if (split.Length >= 3 && split[1] == "set-token") 
+            if (split.Length >= 3 && split[1] == "set-token")
             {
                 cancelTokenSource.Cancel();
                 lighthouseThread.Wait();
@@ -77,12 +77,12 @@ namespace MEE7.Commands
             {
                 foreach (var image in images)
                 {
-                    Bitmap b = new(28, 14);
+                    SKBitmap b = new(28, 14);
                     for (var y = 0; y < image.Item1.GetLength(0); y++)
                     {
                         for (var x = 0; x < image.Item1.GetLength(1); x++)
                         {
-                            b.SetPixel(x, y, System.Drawing.Color.FromArgb(image.Item1[y, x, 0], image.Item1[y, x, 1], image.Item1[y, x, 2]));
+                            b.SetPixel(x, y, new SKColor(image.Item1[y, x, 0], image.Item1[y, x, 1], image.Item1[y, x, 2], 255));
                         }
                     }
                     DiscordNETWrapper.SendBitmap(b, message.Channel).Wait();
@@ -94,7 +94,7 @@ namespace MEE7.Commands
                 if (ex != null)
                     throw ex;
                 else
-                    DiscordNETWrapper.SendText("Ne exceptions yet", message.Channel);
+                    DiscordNETWrapper.SendText("Ne exceptions yet", message.Channel).Wait();
             }
         }
 

@@ -1,75 +1,79 @@
 ﻿using Discord;
 using MEE7.Backend.HelperFunctions;
-using System.Drawing;
+using SkiaSharp;
 using static MEE7.Commands.Edit.Edit;
-using Color = System.Drawing.Color;
 
 namespace MEE7.Commands.Edit
 {
     class DrawCommands : EditCommandProvider
     {
         public string DrawTextDesc = "Draw Text into pic";
-        public Bitmap DrawText(Bitmap b, IMessage m, string text, Color c, int x = 0, int y = 0, float fontSize = 72, string font = "Arial", int maxX = 99999, int maxY = 99999)
+        public SKBitmap DrawText(SKBitmap b, IMessage m, string text, SKColor c, int x = 0, int y = 0, float fontSize = 72, string font = "Arial", int maxX = 99999, int maxY = 99999)
         {
-            using Graphics g = Graphics.FromImage(b);
+            using SKCanvas canvas = new SKCanvas(b);
+            SKFont skFont = new SKFont(SKTypeface.FromFamilyName(font), fontSize);
+            using SKPaint paint = new SKPaint()
+            {
+                Color = c,
+            };
 
-            g.DrawString(text, new Font(font, fontSize), new SolidBrush(c), new Rectangle(x, y, maxX, maxY));
+            canvas.DrawText(text, new SKPoint(x, y), skFont, paint);
 
             return b;
         }
 
         public string DrawCircleDesc = "Draw Circle into pic";
-        public Bitmap DrawCircle(Bitmap b, IMessage m, Rectangle r, Color c)
+        public SKBitmap DrawCircle(SKBitmap b, IMessage m, float cx, float cy, float radius, SKColor c)
         {
-            using Graphics g = Graphics.FromImage(b);
+            using SKCanvas canvas = new SKCanvas(b);
 
-            g.DrawEllipse(new Pen(c), r);
+            canvas.DrawCircle(new SKPoint(cx, cy), radius, new SKPaint { Color = c });
 
             return b;
         }
 
         public string DrawRectDesc = "Draw Rect into pic";
-        public Bitmap DrawRect(Bitmap b, IMessage m, Rectangle r, Color c)
+        public SKBitmap DrawRect(SKBitmap b, IMessage m, SKRect r, SKColor c)
         {
-            using Graphics g = Graphics.FromImage(b);
+            using SKCanvas canvas = new SKCanvas(b);
 
-            g.DrawRectangle(new Pen(c), r);
+            canvas.DrawRect(r, new SKPaint { Color = c });
 
             return b;
         }
 
         public string RectDesc = "Get Rect";
-        public Rectangle Rect(EditNull n, IMessage m, int x, int y, int w, int h)
+        public SKRect Rect(EditNull n, IMessage m, int x, int y, int w, int h)
         {
-            return new Rectangle(x, y, w, h);
+            return new SKRect(x, y, x + w, y + h);
         }
 
         public string WhiteDesc = "Get my skin color";
-        public Color White(EditNull n, IMessage m)
+        public SKColor White(EditNull n, IMessage m)
         {
-            return Color.White;
+            return SKColor.Parse("white");
         }
 
         public string RedDesc = "Get red";
-        public Color Red(EditNull n, IMessage m)
+        public SKColor Red(EditNull n, IMessage m)
         {
-            return Color.Red;
+            return SKColor.Parse("red");
         }
 
         public string ColDesc = "Get a color from rgb";
-        public Color Col(EditNull n, IMessage m, byte r, byte g, byte b)
+        public SKColor Col(EditNull n, IMessage m, byte r, byte g, byte b)
         {
-            return Color.FromArgb(r, g, b);
+            return new SKColor(r, g, b);
         }
 
         public string ColNameDesc = "Get a color from name";
-        public Color ColName(EditNull n, IMessage m, string name)
+        public SKColor ColName(EditNull n, IMessage m, string name)
         {
-            return Color.FromName(name);
+            return SKColor.Parse(name);
         }
 
         public string lerpDesc = "Lerp two colors";
-        public Color Lerp(EditNull n, IMessage m, Color a, Color b, float l)
+        public SKColor Lerp(EditNull n, IMessage m, SKColor a, SKColor b, float l)
         {
             return a.Lerp(b, l);
         }

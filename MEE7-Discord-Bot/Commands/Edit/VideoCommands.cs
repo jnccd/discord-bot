@@ -1,5 +1,6 @@
 ﻿using Discord;
 using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -84,7 +85,9 @@ namespace MEE7.Commands.Edit
                 runner.WaitForExit();
 
                 File.Delete(video.filePath);
-                Image i = Image.FromFile(outPath);
+                SKBitmap b = SKBitmap.Decode(outPath);
+                SKImage i = SKImage.FromBitmap(b);
+                b.Dispose();
                 return MultiMediaHelper.ImageToGif(i);
             }
         }

@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using MEE7.Backend;
 
 namespace MEE7.Commands.CAUServerSpecific

@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,11 +25,13 @@ namespace MEE7.Backend.HelperFunctions
             stream.Position = 0;
             return await Channel.SendFileAsync(stream, fileName + "." + fileEnd.TrimStart('.'), text);
         }
-        public static async Task<IUserMessage> SendBitmap(Bitmap bmp, IMessageChannel Channel, string text = "")
+        public static async Task<IUserMessage> SendBitmap(SKBitmap bmp, IMessageChannel Channel, string text = "")
         {
             Saver.SaveChannel(Channel);
             MemoryStream stream = new MemoryStream();
-            bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            using var image = SKImage.FromBitmap(bmp);
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            data.SaveTo(stream);
             return await SendFile(stream, Channel, "png", "", text);
         }
         public static async Task<List<IUserMessage>> SendText(string text, IMessageChannel Channel)
@@ -130,7 +132,7 @@ namespace MEE7.Backend.HelperFunctions
             {
                 if (userText.Contains('@') && !userText.Contains('<') && !userText.Contains('>'))
                 {
-                    TwitterUser user = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions(){ ScreenName = userText.Trim(' ', '@') });
+                    TwitterUser user = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions() { ScreenName = userText.Trim(' ', '@') });
                     return new TwitterDiscordUser(user);
                 }
                 else if (userText.Contains('@'))

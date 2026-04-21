@@ -1,6 +1,7 @@
 ﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -138,11 +139,11 @@ namespace MEE7.Commands.Edit
                 return RunPipe(this, message, inputData, vars);
             }
         }
-        public class Video 
-        { 
-            public string filePath; 
-            public string name; 
-            public Video(string filePath, string name = "") 
+        public class Video
+        {
+            public string filePath;
+            public string name;
+            public Video(string filePath, string name = "")
             {
                 this.filePath = filePath;
                 this.name = name;
@@ -153,7 +154,7 @@ namespace MEE7.Commands.Edit
                 return this;
             }
         }
-        public class Gif : Tuple<Bitmap[], int[]> { public Gif(Bitmap[] item1, int[] item2) : base(item1, item2) { } }
+        public class Gif : Tuple<SKBitmap[], int[]> { public Gif(SKBitmap[] item1, int[] item2) : base(item1, item2) { } }
         public class EditNull { }
         public class EditVariable { public string VarName; }
 
@@ -505,7 +506,7 @@ namespace MEE7.Commands.Edit
                             $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
                             $"from {pipe[i - 1].Item2.Command}");
                 }
-                catch (Exception e) { if (e.Message.StartsWith("Type Error")) throw e; }
+                catch (Exception e) { if (e.Message.StartsWith("Type Error")) throw; }
             for (int i = 1; i < pipe.Count - 1; i++)
                 try
                 {
@@ -516,7 +517,7 @@ namespace MEE7.Commands.Edit
                             $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
                             $"from {pipe[i - 1].Item2.Command}");
                 }
-                catch (Exception e) { if (e.Message.StartsWith("Generic Type Error")) throw e; }
+                catch (Exception e) { if (e.Message.StartsWith("Generic Type Error")) throw; }
 
 
             foreach (ForCommand f in pipe.Select(x => x.Item2).Where(x => x is ForCommand).Select(x => x as ForCommand))
