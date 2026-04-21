@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using Discord;
-using Emgu.CV;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Commands.Edit.Resources;
 using SkiaSharp;
@@ -470,7 +469,7 @@ namespace MEE7.Commands.Edit
                         SKColor col = pixels.GetPixel(x, y, pixmap.RowBytes);
                         col.ToHsv(out float h, out float s, out float v);
                         h += AngleInDegrees;
-                        var newCol = SKColor.FromHsv(h, s, v);
+                        var newCol = SKColor.FromHsv(h, s, v, col.Alpha);
                         pixels.SetPixel(x, y, pixmap.RowBytes, newCol);
                     }
             }

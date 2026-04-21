@@ -573,6 +573,8 @@ namespace MEE7.Commands.Edit
                                 {
                                     if (currentData is ICloneable)
                                         usableData = (currentData as ICloneable).Clone();
+                                    else if (currentData is SKBitmap bmp)
+                                        usableData = bmp.Copy();
                                     else
                                         usableData = currentData;
                                 }
@@ -638,11 +640,11 @@ namespace MEE7.Commands.Edit
         {
             if (output == null || (output is string && string.IsNullOrWhiteSpace(output as string))) return;
             object[] arr;
-            if (output.GetType().IsArray && (arr = output as object[]).All(x => x.GetType() == typeof(Bitmap)))
+            if (output.GetType().IsArray && (arr = output as object[]).All(x => x.GetType() == typeof(SKBitmap)))
             {
-                output = new Bitmap[arr.Length];
+                output = new SKBitmap[arr.Length];
                 for (int i = 0; i < arr.Length; i++)
-                    (output as Bitmap[])[i] = (Bitmap)arr[i];
+                    (output as SKBitmap[])[i] = (SKBitmap)arr[i];
             }
             PrintMethod.PrintMethods.FirstOrDefault(x => x.Type.IsAssignableFrom(output.GetType())).Function(message, output);
         }
