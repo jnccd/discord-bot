@@ -1,4 +1,11 @@
 ﻿using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using Discord;
+using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 
 namespace MEE7.Commands;
 
@@ -42,16 +49,17 @@ public class Latex : Command
 
             foreach (string outputPath in outputFilePaths)
             {
-                Bitmap output = null;
-                using (Bitmap latexOutput = new Bitmap(outputPath))
+                using var latexOutput = SKBitmap.Decode(outputPath);
+                // Create a new bitmap with the same dimensions as the original
+                var output = new SKBitmap(latexOutput.Width, latexOutput.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+
+                // Fill the new bitmap with a white background
+                using (var canvas = new SKCanvas(output))
                 {
-                    output = new Bitmap(latexOutput.Width, latexOutput.Height);
-                    using (Graphics graphics = Graphics.FromImage(output))
-                    {
-                        graphics.FillRectangle(Brushes.White, new Rectangle(0, 0, latexOutput.Width, latexOutput.Height));
-                        graphics.DrawImage(latexOutput, new Point(0, 0));
-                    }
+                    canvas.Clear(SKColors.White);
+                    canvas.DrawBitmap(latexOutput, 0, 0);
                 }
+
                 DiscordNETWrapper.SendBitmap(output, message.Channel).Wait();
                 output.Dispose();
             }

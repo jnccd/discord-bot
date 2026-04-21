@@ -1,4 +1,10 @@
-﻿namespace MEE7.Commands;
+﻿using System;
+using System.IO;
+using Discord;
+using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+
+namespace MEE7.Commands;
 
 public class Haskell : Command
 {
@@ -49,7 +55,7 @@ public class Haskell : Command
                         DiscordNETWrapper.SendText(output, message.Channel).Wait();
                 });
             }
-            catch (Exception e) { ConsoleWrapper.ConsoleWriteLine(e, ConsoleColor.Red); }
+            catch (Exception e) { ConsoleWrapper.WriteLine(e, ConsoleColor.Red); }
         }
     }
 }

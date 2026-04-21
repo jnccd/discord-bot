@@ -1,5 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Numerics;
+using System.Threading;
+using Discord;
+using Discord.Audio;
+using Discord.Audio.Streams;
+using Discord.WebSocket;
+using MEE7.Backend;
+using MEE7.Backend.HelperFunctions;
+using NAudio.Wave;
+using SkiaSharp;
+using TweetSharp;
+using static MEE7.Commands.Edit.Edit;
 using Color = System.Drawing.Color;
 
 namespace MEE7.Commands.Edit;
@@ -20,7 +34,7 @@ public class InputCommands : EditCommandProvider
     }
 
     public string lastPDesc = "Gets the last messages picture";
-    public Bitmap LastP(EditNull n, IMessage m, int messagesToSkip = 0)
+    public SKBitmap LastP(EditNull n, IMessage m, int messagesToSkip = 0)
     {
         var messages = DiscordNETWrapper.EnumerateMessages(m.Channel).Skip(1 + messagesToSkip);
         foreach (var lm in messages)
@@ -80,7 +94,7 @@ public class InputCommands : EditCommandProvider
     }
 
     public string thisPDesc = "Gets attached picture / picture from url argument";
-    public Bitmap ThisP(EditNull n, IMessage m, string PictureURL = "")
+    public SKBitmap ThisP(EditNull n, IMessage m, string PictureURL = "")
     {
         var b = GetPictureLinkFromMessage(m, PictureURL).GetBitmapFromURL();
         if ((long)b.Width * b.Height > maxImagePixelSize)
@@ -135,7 +149,7 @@ public class InputCommands : EditCommandProvider
     }
 
     public string profilePicDesc = "Gets a profile picture";
-    public Bitmap ProfilePic(EditNull n, IMessage m, IUser user)
+    public SKBitmap ProfilePic(EditNull n, IMessage m, IUser user)
     {
         string avatarURL = user.GetAvatarUrl(ImageFormat.Png, 512);
         return (string.IsNullOrWhiteSpace(avatarURL) ? user.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
@@ -149,7 +163,7 @@ public class InputCommands : EditCommandProvider
     }
 
     public string myProfilePicDesc = "Gets your profile picture";
-    public Bitmap MyProfilePic(EditNull n, IMessage m)
+    public SKBitmap MyProfilePic(EditNull n, IMessage m)
     {
         if (m is TwitterMessage)
         {
@@ -164,7 +178,7 @@ public class InputCommands : EditCommandProvider
     }
 
     public string serverPicDesc = "Gets the server picture from a server id";
-    public Bitmap ServerPic(EditNull n, IMessage m, string ServerID)
+    public SKBitmap ServerPic(EditNull n, IMessage m, string ServerID)
     {
         if (ServerID == "")
             return Program.GetGuildFromChannel(m.Channel).IconUrl.GetBitmapFromURL();
@@ -173,7 +187,7 @@ public class InputCommands : EditCommandProvider
     }
 
     public string emoteDesc = "Gets the picture of the emote";
-    public Bitmap Emote(EditNull n, IMessage m, string emote)
+    public SKBitmap Emote(EditNull n, IMessage m, string emote)
     {
         Discord.Emote.TryParse(emote.Trim(' '), out Emote res);
         if (res != null) return res.Url.GetBitmapFromURL();
@@ -211,21 +225,23 @@ public class InputCommands : EditCommandProvider
     }
 
     public string mandelbrotDesc = "Render a mandelbrot";
-    public Bitmap Mandelbrot(EditNull n, IMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
+    public SKBitmap Mandelbrot(EditNull n, IMessage m, double zoom = 1, Vector2 camera = new Vector2(), int passes = 40)
     {
-        Bitmap bmp = new Bitmap(500, 500);
+        SKBitmap bmp = new SKBitmap(500, 500);
 
         if (passes > 200)
             throw new Exception("200 passes should be enough, everything else would be spam and you dont wanna spam");
 
         zoom = Math.Pow(2, -zoom);
 
-        using (UnsafeBitmapContext con = new UnsafeBitmapContext(bmp))
+        using (var pixmap = bmp.PeekPixels())
+        {
+            Span<byte> pixels = pixmap.GetPixelSpan();
             for (int x = 0; x < bmp.Width; x++)
                 for (int y = 0; y < bmp.Height; y++)
                 {
-                    double cre = (2 * ((x / (double)bmp.Width) - 0.5)) * zoom - camera.X;
-                    double cim = (2 * ((y / (double)bmp.Height) - 0.5)) * zoom - camera.Y;
+                    double cre = 2 * ((x / (double)bmp.Width) - 0.5) * zoom - camera.X;
+                    double cim = 2 * ((y / (double)bmp.Height) - 0.5) * zoom - camera.Y;
 
                     double x2 = 0, y2 = 0;
                     int count = 0;
@@ -241,8 +257,9 @@ public class InputCommands : EditCommandProvider
                     }
 
                     var float4 = HSVtoRGB((float)((Math.Atan2(y2, x2) + Math.PI) / (Math.PI * 2) * 360), 1, count * 10);
-                    con.SetPixel(x, y, Color.FromArgb((x2 + y2 < 1000 ? 255 : 0), (int)(float4.X * 255), (int)(float4.Y * 255), (int)(float4.Z * 255)));
+                    pixels.SetPixel(x, y, pixmap.RowBytes, new SKColor((byte)(float4.X * 255), (byte)(float4.Y * 255), (byte)(float4.Z * 255), (byte)(x2 + y2 < 1000 ? 255 : 0)));
                 }
+        }
 
         return bmp;
     }
@@ -272,7 +289,6 @@ public class InputCommands : EditCommandProvider
 
         using (MemoryStream mem = new MemoryStream())
         {
-
             SocketGuild g = Program.GetGuildFromChannel(m.Channel);
             ISocketAudioChannel channel = g.VoiceChannels.FirstOrDefault(x => x.Users.Select(y => y.Id).Contains(m.Author.Id));
 
@@ -428,7 +444,7 @@ public class InputCommands : EditCommandProvider
 
         //using wikipedia formulas https://de.wikipedia.org/wiki/HSV-Farbraum
         int hi = (int)(H / 60);
-        float f = (H / 60 - hi);
+        float f = H / 60 - hi;
         float p = V * (1 - S);
         float q = V * (1 - S * f);
         float t = V * (1 - S * (1 - f));

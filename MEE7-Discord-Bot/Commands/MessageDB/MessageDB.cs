@@ -83,53 +83,53 @@ namespace MEE7.Commands.MessageDB
                     DiscordNETWrapper.SendText(top5.Select(x => $"{x.Reactions.Sum(y => y.count)}: {x.Link}").Combine("\n"), message.Channel).Wait();
                 }
             },
-            new DBCommand()
-            {
-                name = "plotActivityOverTime",
-                doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
-                    List<DBMessage> allGuildMessages = new List<DBMessage>();
-                    try
-                    {
-                        ulong channelID = Convert.ToUInt64(args[0]);
-                        allGuildMessages = dbGuild.TextChannels.First(x => x.Id == channelID).Messages;
-                    }
-                    catch
-                    {
-                        allGuildMessages.Clear();
-                        foreach (var channel in dbGuild.TextChannels)
-                            allGuildMessages.AddRange(channel.Messages);
-                    }
+            // new DBCommand()
+            // {
+            //     name = "plotActivityOverTime",
+            //     doStuffLul = (DBGuild dbGuild, IMessage message, string[] args) => {
+            //         List<DBMessage> allGuildMessages = new List<DBMessage>();
+            //         try
+            //         {
+            //             ulong channelID = Convert.ToUInt64(args[0]);
+            //             allGuildMessages = dbGuild.TextChannels.First(x => x.Id == channelID).Messages;
+            //         }
+            //         catch
+            //         {
+            //             allGuildMessages.Clear();
+            //             foreach (var channel in dbGuild.TextChannels)
+            //                 allGuildMessages.AddRange(channel.Messages);
+            //         }
 
-                    if (allGuildMessages.Count == 0)
-                    {
-                        DiscordNETWrapper.SendText("No messages to plot :/", message.Channel).Wait();
-                        return;
-                    }
+            //         if (allGuildMessages.Count == 0)
+            //         {
+            //             DiscordNETWrapper.SendText("No messages to plot :/", message.Channel).Wait();
+            //             return;
+            //         }
 
-                    var messagesGroupedByDay = allGuildMessages.
-                        OrderBy(x => x.Timestamp).
-                        Select(x => new Tuple<DBMessage, string>(x, x.Timestamp.ToShortDateString())).
-                        GroupBy(x => x.Item2).
-                        Select(x => new Tuple<string, int>(x.Key, x.Count())).
-                        ToArray();
+            //         var messagesGroupedByDay = allGuildMessages.
+            //             OrderBy(x => x.Timestamp).
+            //             Select(x => new Tuple<DBMessage, string>(x, x.Timestamp.ToShortDateString())).
+            //             GroupBy(x => x.Item2).
+            //             Select(x => new Tuple<string, int>(x.Key, x.Count())).
+            //             ToArray();
 
-                    Plot plt = new Plot();
-                    plt.PlotScatter(
-                        messagesGroupedByDay.
-                        Select(x => DateTime.Parse(x.Item1).ToOADate()).
-                        ToArray(),
-                        messagesGroupedByDay.
-                        Select(x => (double)x.Item2).
-                        ToArray());
-                    plt.Ticks(dateTimeX: true);
-                    plt.Legend();
-                    plt.Title("Server Activity over Time");
-                    plt.YLabel("Messages send on that day");
-                    plt.XLabel("Day");
+            //         Plot plt = new Plot();
+            //         plt.PlotScatter(
+            //             messagesGroupedByDay.
+            //             Select(x => DateTime.Parse(x.Item1).ToOADate()).
+            //             ToArray(),
+            //             messagesGroupedByDay.
+            //             Select(x => (double)x.Item2).
+            //             ToArray());
+            //         plt.Ticks(dateTimeX: true);
+            //         plt.Legend();
+            //         plt.Title("Server Activity over Time");
+            //         plt.YLabel("Messages send on that day");
+            //         plt.XLabel("Day");
 
-                    DiscordNETWrapper.SendBitmap(plt.GetBitmap(), message.Channel).Wait();
-                }
-            },
+            //         DiscordNETWrapper.SendBitmap(plt.GetBitmap(), message.Channel).Wait();
+            //     }
+            // },
             new DBCommand()
             {
                 name = "getMostUsedEmotes",

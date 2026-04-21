@@ -254,6 +254,14 @@ namespace MEE7.Backend.HelperFunctions
                 using (var image = Image.LoadPixelData<Rgba32>(gif.Item1[i].Bytes, gif.Item1[i].Width, gif.Item1[i].Height))
                     creator.AddFrame(BitmapConverter.Convert(image), gif.Item2[i], GifQuality.Bit8);
         }
+        public static void SaveBitmaps(SKBitmap[] bitmaps, Stream s, int delay = 33)
+        {
+            GifEngine ge = new GifEngine(new ImageSharpImageLibrary());
+            using var creator = ge.CreateGif(s, -1);
+            for (int i = 0; i < bitmaps.Length; i++)
+                using (var image = Image.LoadPixelData<Rgba32>(bitmaps[i].Bytes, bitmaps[i].Width, bitmaps[i].Height))
+                    creator.AddFrame(BitmapConverter.Convert(image), delay, GifQuality.Bit8);
+        }
         public static Gif LoadGifFromUrl(string gifUrl)
         {
             using var httpClient = new HttpClient();

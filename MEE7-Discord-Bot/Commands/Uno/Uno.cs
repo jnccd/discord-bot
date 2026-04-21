@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -32,7 +33,7 @@ namespace MEE7.Commands
         class UnoGame
         {
             public List<Tuple<SocketUser, List<UnoCard>>> Players = new List<Tuple<SocketUser, List<UnoCard>>>();
-            Bitmap curStack = new Bitmap(1000, 1000);
+            SKBitmap curStack = new SKBitmap(1000, 1000);
             UnoCard TopStackCard = null;
             bool ReversedTurns = false;
             int curPlayerIndex = 0;
@@ -72,7 +73,7 @@ namespace MEE7.Commands
                 }
                 UnoCard newCard = UnoCards.FirstOrDefault(x => (HasColor(t) ? x.Color == c : x.Color == UnoColor.none) && x.Type == t);
                 Tuple<SocketUser, List<UnoCard>> player = Players.Find(x => x.Item1.Id == PlayerID);
-                if (!player.Item2.Exists(x => (x.Type == t && x.Color == c) || 
+                if (!player.Item2.Exists(x => (x.Type == t && x.Color == c) ||
                         (x.Type == t && (x.Type == UnoCardType.changecolor || x.Type == UnoCardType.plus4))))
                 {
                     DiscordNETWrapper.SendText("You don't even have that card :thinking:", channel).Wait();
@@ -104,19 +105,19 @@ namespace MEE7.Commands
             }
             private void DrawCardOnStack(UnoCard newCard)
             {
-                Point topLeft = new Point(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(200) - 100,
+                SKPoint topLeft = new SKPoint(curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(200) - 100,
                                               curStack.Width / 2 - newCard.Picture.Width / 2 + Program.RDM.Next(200) - 100);
-                Point topRight = new Point(topLeft.X + newCard.Picture.Width, topLeft.Y);
-                Point botLeft = new Point(topLeft.X, topLeft.Y + newCard.Picture.Height);
+                SKPoint topRight = new SKPoint(topLeft.X + newCard.Picture.Width, topLeft.Y);
+                SKPoint botLeft = new SKPoint(topLeft.X, topLeft.Y + newCard.Picture.Height);
 
-                Point Origin = new Point(500, 500);
+                SKPoint Origin = new SKPoint(500, 500);
                 double rotationAngle = Program.RDM.NextDouble() * 2 - 1;
                 topLeft = topLeft.RotatePointAroundPoint(Origin, rotationAngle);
                 topRight = topRight.RotatePointAroundPoint(Origin, rotationAngle);
                 botLeft = botLeft.RotatePointAroundPoint(Origin, rotationAngle);
 
-                using (Graphics g = Graphics.FromImage(curStack))
-                    g.DrawImage(newCard.Picture, new Point[] { topLeft, topRight, botLeft });
+                using (SKCanvas c = new SKCanvas(curStack))
+                    c.DrawImageWithThreePoints(newCard.Picture, topLeft, topRight, botLeft);
             }
             private void NextPlayer()
             {
@@ -144,16 +145,16 @@ namespace MEE7.Commands
                         player.Item2.Add(UnoCards.GetRandomValue());
                 SendDeck(player);
             }
-            public static Bitmap RenderDeck(List<UnoCard> cards)
+            public static SKBitmap RenderDeck(List<UnoCard> cards)
             {
                 if (cards.Count == 0)
-                    return new Bitmap(1, 1);
+                    return new SKBitmap(1, 1);
 
                 int padding = 15;
-                Bitmap re = new Bitmap(cards[0].Picture.Width * cards.Count + padding * (cards.Count - 1), cards[0].Picture.Height);
-                using (Graphics g = Graphics.FromImage(re))
+                SKBitmap re = new SKBitmap(cards[0].Picture.Width * cards.Count + padding * (cards.Count - 1), cards[0].Picture.Height);
+                using (SKCanvas c = new SKCanvas(re))
                     for (int i = 0; i < cards.Count; i++)
-                        g.DrawImageUnscaled(cards[i].Picture, new Point((cards[0].Picture.Width + padding) * i, 0));
+                        c.DrawBitmap(cards[i].Picture, new SKPoint((cards[0].Picture.Width + padding) * i, 0));
                 return re;
             }
             public ulong TurnPlayerID()
@@ -183,7 +184,7 @@ namespace MEE7.Commands
         {
             public UnoColor Color;
             public UnoCardType Type;
-            public Bitmap Picture;
+            public SKBitmap Picture;
 
             public UnoCard(UnoColor Color, UnoCardType Type)
             {
@@ -195,7 +196,7 @@ namespace MEE7.Commands
         enum UnoColor { red, yellow, blue, green, none }
         enum UnoCardType { one, two, three, four, five, six, seven, eight, nine, skip, reverse, plus2, plus4, changecolor }
 
-        readonly static Bitmap CardsTexture = (Bitmap)Bitmap.FromFile($"Commands{Path.DirectorySeparatorChar}Uno{Path.DirectorySeparatorChar}UNO-Front.png");
+        readonly static SKBitmap CardsTexture = SKBitmap.Decode($"Commands{Path.DirectorySeparatorChar}Uno{Path.DirectorySeparatorChar}UNO-Front.png");
         readonly static List<UnoCard> UnoCards = GetUnoCards();
         List<UnoGame> UnoGames = new List<UnoGame>();
 
@@ -275,7 +276,7 @@ namespace MEE7.Commands
                     cards.Add(new UnoCard(UnoColor.none, t));
             return cards;
         }
-        private static Bitmap GetPicture(UnoColor c, UnoCardType t)
+        private static SKBitmap GetPicture(UnoColor c, UnoCardType t)
         {
             float cardWidth = 4096 / 10f;
             float cardHeight = 4096 / 7f;
@@ -286,34 +287,34 @@ namespace MEE7.Commands
                 int X = (int)(cardWidth * (ToNumber(t) - 1));
                 int YNumber = c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1)));
                 int Y = (int)(cardHeight * YNumber);
-                return CardsTexture.CropImage(new Rectangle(X, Y, CutOutWidth, CutOutHeight), false);
+                return CardsTexture.CropImage(new SKRect(X, Y, CutOutWidth, CutOutHeight), false);
             }
             else
             {
                 if (t == UnoCardType.changecolor)
-                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(0 * cardHeight), CutOutWidth, CutOutHeight), false);
+                    return CardsTexture.CropImage(new SKRect((int)(9 * cardWidth), (int)(0 * cardHeight), CutOutWidth, CutOutHeight), false);
                 else if (t == UnoCardType.plus4)
-                    return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(2 * cardHeight), CutOutWidth, CutOutHeight), false);
+                    return CardsTexture.CropImage(new SKRect((int)(9 * cardWidth), (int)(2 * cardHeight), CutOutWidth, CutOutHeight), false);
                 else if (t == UnoCardType.skip)
                 {
                     int XNumber = c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1)));
-                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
+                    return CardsTexture.CropImage(new SKRect((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                 }
                 else if (t == UnoCardType.plus2)
                 {
                     int XNumber = 4 + (c == UnoColor.red ? 0 : (c == UnoColor.yellow ? 1 : (c == UnoColor.blue ? 2 : (c == UnoColor.green ? 3 : -1))));
-                    return CardsTexture.CropImage(new Rectangle((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
+                    return CardsTexture.CropImage(new SKRect((int)(XNumber * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                 }
                 else if (t == UnoCardType.reverse)
                 {
                     if (c == UnoColor.red)
-                        return CardsTexture.CropImage(new Rectangle((int)(8 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
+                        return CardsTexture.CropImage(new SKRect((int)(8 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                     else if (c == UnoColor.yellow)
-                        return CardsTexture.CropImage(new Rectangle((int)(9 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
+                        return CardsTexture.CropImage(new SKRect((int)(9 * cardWidth), (int)(4 * cardHeight), CutOutWidth, CutOutHeight), false);
                     else if (c == UnoColor.blue)
-                        return CardsTexture.CropImage(new Rectangle((int)(0 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight), false);
+                        return CardsTexture.CropImage(new SKRect((int)(0 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight), false);
                     else if (c == UnoColor.green)
-                        return CardsTexture.CropImage(new Rectangle((int)(1 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight), false);
+                        return CardsTexture.CropImage(new SKRect((int)(1 * cardWidth), (int)(5 * cardHeight), CutOutWidth, CutOutHeight), false);
                 }
             }
             return null;
