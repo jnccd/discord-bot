@@ -14,7 +14,10 @@
       (system: let
           pkgs = import nixpkgs {inherit system;};
         in {
-          devShells.default = import ./shell.nix { inherit pkgs; };
+          devShells = rec {
+            service = import ./shell.nix { inherit pkgs; };
+            default = service;
+          };
         }
       );
 }

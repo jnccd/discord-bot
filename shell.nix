@@ -4,9 +4,10 @@
 with pkgs;
 mkShell {
   packages = [
-    dotnet-sdk_6
-    libgdiplus
-    ffmpeg_6
-    youtube-dl
+    icu
+    dotnet-sdk_10
+    ffmpeg
+    yt-dlp
+    tesseract
   ];
 }
