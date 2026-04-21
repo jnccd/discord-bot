@@ -6,16 +6,21 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    flake-utils.url = "github:numtide/flake-utils";
+    numtide-utils.url = "github:numtide/flake-utils";
+    jnccd-utils.url = "github:jnccd/nix-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem
+  outputs = { self, nixpkgs, numtide-utils, jnccd-utils }:
+    numtide-utils.lib.eachDefaultSystem
       (system: let
           pkgs = import nixpkgs {inherit system;};
         in {
           devShells = rec {
-            service = import ./shell.nix { inherit pkgs; };
+            service = inputs.jnccd-utils.lib.mkUnfrozenDotnetShell {
+              inherit system nixpkgs;
+              dotnetVersion = "10.0";
+              includeAndroidSdk = false;
+            };
             default = service;
           };
         }
