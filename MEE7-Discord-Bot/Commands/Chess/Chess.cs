@@ -243,11 +243,11 @@ namespace MEE7.Commands
                         SKRect FieldRect = new SKRect(FieldSize * x + FieldOffset, FieldSize * y + FieldOffset, FieldSize * x + FieldOffset + FieldSize, FieldSize * y + FieldOffset + FieldSize);
                         if ((x + y) % 2 == 0)
                             canvas.DrawRect(FieldRect, new SKPaint { Color = SKColors.Beige });
-                        canvas.DrawText(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new SKPoint(FieldRect.Left + 5, FieldRect.Top + FieldRect.Height - 5), new SKPaint { Color = SKColors.Black, TextSize = FieldSize / 1.6f });
+                        canvas.DrawText(ChessPieceToCharacter(Board.GetChessPieceFromPoint(x, y), Board), new SKPoint(FieldRect.Left + 5, FieldRect.Top + FieldRect.Height - 5), SKTextAlign.Left, new SKFont(SKTypeface.Default, size: FieldOffset / 1.6f), new SKPaint { Color = SKColors.Black });
                         if (y == 0)
-                            canvas.DrawText(x.ToString(), new SKPoint(FieldSize * x + FieldOffset, 0), new SKPaint { Color = SKColors.Black, TextSize = FieldOffset / 1.6f });
+                            canvas.DrawText(x.ToString(), new SKPoint(FieldSize * x + FieldOffset, 0), SKTextAlign.Left, new SKFont(SKTypeface.Default, size: FieldOffset / 1.6f), new SKPaint { Color = SKColors.Black });
                         if (x == 0)
-                            canvas.DrawText(y.ToString(), new SKPoint(0, FieldSize * y + FieldOffset), new SKPaint { Color = SKColors.Black, TextSize = FieldOffset / 1.6f });
+                            canvas.DrawText(y.ToString(), new SKPoint(0, FieldSize * y + FieldOffset), SKTextAlign.Left, new SKFont(SKTypeface.Default, size: FieldOffset / 1.6f), new SKPaint { Color = SKColors.Black });
                     }
             }
             return picture;

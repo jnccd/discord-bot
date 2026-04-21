@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 
 namespace MEE7.Configuration
@@ -18,6 +19,7 @@ namespace MEE7.Configuration
         static readonly ulong DiscordConfigChannelID = Program.logChannel;
         static readonly string DiscordConfigMessage = "autosave";
         public static bool UnsavedChanges = false;
+        static HttpClient client = new HttpClient();
         public static ConfigData Data
         {
             get
@@ -79,8 +81,7 @@ namespace MEE7.Configuration
 
                     url = ((IMessageChannel)tmp_channel).GetMessagesAsync().FlattenAsync().Result.
                         First(x => x.Content.StartsWith(DiscordConfigMessage) && x.Attachments.Count > 0 && x.Attachments.First().Filename == "config.json").Attachments.First().Url;
-                    using (var wc = new System.Net.WebClient())
-                        discordConfig = wc.DownloadString(url);
+                    discordConfig = client.GetStringAsync(url).Result;
                 }
                 catch { }
 

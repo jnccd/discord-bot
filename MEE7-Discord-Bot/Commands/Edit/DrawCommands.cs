@@ -11,14 +11,13 @@ namespace MEE7.Commands.Edit
         public SKBitmap DrawText(SKBitmap b, IMessage m, string text, SKColor c, int x = 0, int y = 0, float fontSize = 72, string font = "Arial", int maxX = 99999, int maxY = 99999)
         {
             using SKCanvas canvas = new SKCanvas(b);
+            SKFont skFont = new SKFont(SKTypeface.FromFamilyName(font), fontSize);
             using SKPaint paint = new SKPaint()
             {
                 Color = c,
-                TextSize = fontSize,
-                Typeface = SKTypeface.FromFamilyName(font)
             };
 
-            canvas.DrawText(text, new SKPoint(x, y), paint);
+            canvas.DrawText(text, new SKPoint(x, y), skFont, paint);
 
             return b;
         }

@@ -12,12 +12,18 @@ using NAudio.Wave;
 using NLayer.NAudioSupport;
 using static MEE7.Commands.Edit.Edit;
 using SkiaSharp;
+using System.Net.Http;
 
 namespace MEE7.Backend.HelperFunctions
 {
     public static class StringExtensions
     {
         private static int RunAsConsoleCommandThreadIndex = 0;
+        static HttpClient client = new HttpClient();
+        static StringExtensions()
+        {
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.142 Safari/537.36");
+        }
 
         public static List<int> AllIndexesOf(this string str, string value)
         {
@@ -127,12 +133,8 @@ namespace MEE7.Backend.HelperFunctions
                 if (uriResult != null && uriResult.Scheme == Uri.UriSchemeHttps ||
                     uriResult != null && uriResult.Scheme == Uri.UriSchemeHttp)
                 {
-                    var req = (HttpWebRequest)HttpWebRequest.Create(s);
-                    req.Method = "GET";
-                    req.AllowAutoRedirect = true;
-                    req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.142 Safari/537.36";
-                    using var resp = req.GetResponse();
-                    if (resp.ContentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/"))
+                    using var response = client.GetAsync(s, HttpCompletionOption.ResponseHeadersRead).Result;
+                    if (response.Content.Headers.ContentType?.MediaType?.ToLower(CultureInfo.InvariantCulture).StartsWith("image/") == true)
                         return s;
                 }
             }
@@ -159,16 +161,18 @@ namespace MEE7.Backend.HelperFunctions
         public static Gif GetBitmapsAndTimingsFromGIFURL(this string url) => MultiMediaHelper.LoadGifFromUrl(url);
         public static Mp3FileReader GetMp3AudioFromURL(this string url)
         {
-            Stream ms = new MemoryStream();
-            using (Stream stream = WebRequest.Create(url).GetResponse().GetResponseStream())
-                stream.CopyTo(ms);
+            var ms = new MemoryStream();
+            using var response = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result;
+            response.EnsureSuccessStatusCode();
+            using var contentStream = response.Content.ReadAsStreamAsync().Result;
+            contentStream.CopyToAsync(ms).Wait();
             ms.Position = 0;
 
             var builder = new Mp3FileReader.FrameDecompressorBuilder(wf => new Mp3FrameDecompressor(wf));
             return new Mp3FileReader(ms, builder);
         }
-        public static WaveFileReader GetwavAudioFromURL(this string url) => new WaveFileReader(WebRequest.Create(url).GetResponse().GetResponseStream());
-        public static VorbisReader GetoggAudioFromURL(this string url) => new VorbisReader(WebRequest.Create(url).GetResponse().GetResponseStream(), true);
+        public static WaveFileReader GetwavAudioFromURL(this string url) => new WaveFileReader(client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result.Content.ReadAsStreamAsync().Result);
+        public static VorbisReader GetoggAudioFromURL(this string url) => new VorbisReader(client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result.Content.ReadAsStreamAsync().Result, true);
         public static int LevenshteinDistance(this string s, string t)
         {
             if (string.IsNullOrEmpty(s))
@@ -314,42 +318,24 @@ namespace MEE7.Backend.HelperFunctions
         {
             try
             {
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
-                req.KeepAlive = false;
-                req.Timeout = 3000;
-                req.AllowAutoRedirect = true;
-                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
-                using (WebResponse w = req.GetResponse())
-                using (Stream s = w.GetResponseStream())
+                var res = client.GetAsync(URL, HttpCompletionOption.ResponseHeadersRead).Result;
+                using (Stream s = res.Content.ReadAsStreamAsync().Result)
                 using (StreamReader sr = new StreamReader(s))
                     return sr.ReadToEnd();
             }
             catch (Exception e) { return $"Exception: {e}"; }
         }
-        public static WebResponse GetWebResponsefromURL(this string URL)
-        {
-            try
-            {
-                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
-                req.KeepAlive = false;
-                req.Timeout = 3000;
-                req.AllowAutoRedirect = true;
-                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0";
-
-                return req.GetResponse();
-            }
-            catch (Exception) { return null; }
-        }
         public static MemoryStream GetStreamFromUrl(this string url)
         {
-            byte[] imageData = null;
             MemoryStream ms = null;
 
             try
             {
-                using (var wc = new WebClient())
-                    imageData = wc.DownloadData(url);
-                ms = new MemoryStream(imageData);
+                var res = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result.EnsureSuccessStatusCode();
+                using var contentStream = res.Content.ReadAsStreamAsync().Result;
+                ms = new MemoryStream();
+                contentStream.CopyToAsync(ms).Wait();
+                ms.Position = 0;
             }
             catch { }
 

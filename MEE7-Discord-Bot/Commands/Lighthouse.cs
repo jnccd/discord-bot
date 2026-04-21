@@ -94,7 +94,7 @@ namespace MEE7.Commands
                 if (ex != null)
                     throw ex;
                 else
-                    DiscordNETWrapper.SendText("Ne exceptions yet", message.Channel);
+                    DiscordNETWrapper.SendText("Ne exceptions yet", message.Channel).Wait();
             }
         }
 

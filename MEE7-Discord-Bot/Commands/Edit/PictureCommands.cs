@@ -850,9 +850,7 @@ namespace MEE7.Commands.Edit
             if (!language.All(x => char.IsLetter(x) || x == '_' || x == '+'))
                 throw new Exception("nope, thats not a language");
 
-            string conf, text;
-            text = $"tesseract {imgPath} - quiet -l {language}".GetShellOut();
-            conf = "x";
+            string text = $"tesseract {imgPath} - quiet -l {language}".GetShellOut();
 
             if (getLargestBlock)
                 return text.Split("\n\n").MaxElement(x => x.Length);

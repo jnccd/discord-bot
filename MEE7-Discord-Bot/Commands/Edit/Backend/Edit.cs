@@ -506,7 +506,7 @@ namespace MEE7.Commands.Edit
                             $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
                             $"from {pipe[i - 1].Item2.Command}");
                 }
-                catch (Exception e) { if (e.Message.StartsWith("Type Error")) throw e; }
+                catch (Exception e) { if (e.Message.StartsWith("Type Error")) throw; }
             for (int i = 1; i < pipe.Count - 1; i++)
                 try
                 {
@@ -517,7 +517,7 @@ namespace MEE7.Commands.Edit
                             $"{pipe[i].Item2.InputType.ToReadableString()} but gets a {pipe[i - 1].Item2.OutputType.ToReadableString()} " +
                             $"from {pipe[i - 1].Item2.Command}");
                 }
-                catch (Exception e) { if (e.Message.StartsWith("Generic Type Error")) throw e; }
+                catch (Exception e) { if (e.Message.StartsWith("Generic Type Error")) throw; }
 
 
             foreach (ForCommand f in pipe.Select(x => x.Item2).Where(x => x is ForCommand).Select(x => x as ForCommand))
