@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using HtmlAgilityPack;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;

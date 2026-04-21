@@ -1,6 +1,7 @@
 ﻿using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
+using SkiaSharp;
 using System;
 using System.Drawing;
 using System.IO;
@@ -67,18 +68,21 @@ namespace MEE7.Commands
                     int X = Convert.ToInt32(temps[0]);
                     int Y = Convert.ToInt32(temps[1]);
 
-                    Bitmap temp;
+                    SKBitmap temp;
                     System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
                     using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                        temp = (Bitmap)Bitmap.FromStream(stream);
+                        temp = SKBitmap.Decode(stream);
 
-                    using (Graphics graphics = Graphics.FromImage(temp))
+                    using (SKCanvas canvas = new SKCanvas(temp))
                     {
-                        graphics.FillRectangle(new SolidBrush(brushColor), new Rectangle(X * pixelSize, Y * pixelSize, pixelSize, pixelSize));
+                        canvas.DrawRect(X * pixelSize, Y * pixelSize, pixelSize, pixelSize, new SKPaint { Color = new SKColor(brushColor.R, brushColor.G, brushColor.B) });
                     }
 
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    {
+                        var imgdata = temp.Encode(SKEncodedImageFormat.Png, 100);
+                        imgdata.SaveTo(stream);
+                    }
 
                     DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
                 }),
@@ -146,18 +150,18 @@ namespace MEE7.Commands
 
                     int S = Convert.ToInt32(split[4]);
 
-                    Bitmap temp;
+                    SKBitmap temp;
                     System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
                     using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                        temp = (Bitmap)Bitmap.FromStream(stream);
+                        temp = SKBitmap.Decode(stream);
 
-                    using (Graphics graphics = Graphics.FromImage(temp))
+                    using (SKCanvas canvas = new SKCanvas(temp))
                     {
-                        graphics.FillPie(new SolidBrush(brushColor), new Rectangle(X - S, Y - S, S * 2, S * 2), 0, 360);
+                        canvas.DrawRect(X - S, Y - S, S * 2, S * 2, new SKPaint { Color = new SKColor(brushColor.R, brushColor.G, brushColor.B) });
                     }
 
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        temp.Encode(SKEncodedImageFormat.Png, 100).SaveTo(stream);
 
                     DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
@@ -223,18 +227,18 @@ namespace MEE7.Commands
                     int W = Convert.ToInt32(temps[0]);
                     int H = Convert.ToInt32(temps[1]);
 
-                    Bitmap temp;
+                    SKBitmap temp;
                     System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
                     using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                        temp = (Bitmap)Bitmap.FromStream(stream);
+                        temp = SKBitmap.Decode(stream);
 
-                    using (Graphics graphics = Graphics.FromImage(temp))
+                    using (SKCanvas canvas = new SKCanvas(temp))
                     {
-                        graphics.FillRectangle(new SolidBrush(brushColor), new Rectangle(X, Y, W, H));
+                        canvas.DrawRect(X, Y, W, H, new SKPaint { Color = new SKColor(brushColor.R, brushColor.G, brushColor.B) });
                     }
 
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        temp.Encode(SKEncodedImageFormat.Png, 100).SaveTo(stream);
 
                     DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 
@@ -285,18 +289,18 @@ namespace MEE7.Commands
                     int X = Convert.ToInt32(temps[0]);
                     int Y = Convert.ToInt32(temps[1]);
 
-                    Bitmap temp;
+                    SKBitmap temp;
                     System.Drawing.Color brushColor = System.Drawing.Color.FromName(split[3]);
                     using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                        temp = (Bitmap)Bitmap.FromStream(stream);
+                        temp = SKBitmap.Decode(stream);
 
-                    using (Graphics graphics = Graphics.FromImage(temp))
+                    using (SKCanvas canvas = new SKCanvas(temp))
                     {
-                        graphics.DrawString(string.Join(" ", split.Skip(4).ToArray()), new Font("Comic Sans", 16), new SolidBrush(brushColor), new PointF(X, Y) );
+                        canvas.DrawText(string.Join(" ", split.Skip(4).ToArray()), X, Y, new SKFont(), new SKPaint { Color = new SKColor(brushColor.R, brushColor.G, brushColor.B) });
                     }
 
                     using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                        temp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        temp.Encode(SKEncodedImageFormat.Png, 100).SaveTo(stream);
 
                     DiscordNETWrapper.SendFile(filePath, commandmessage.Channel, "Succsessfully drawn!").Wait();
 

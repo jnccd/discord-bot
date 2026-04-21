@@ -3,7 +3,6 @@ using Discord.WebSocket;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using Newtonsoft.Json;
-using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.IO;

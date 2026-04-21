@@ -152,7 +152,8 @@ public class InputCommands : EditCommandProvider
     public SKBitmap ProfilePic(EditNull n, IMessage m, IUser user)
     {
         string avatarURL = user.GetAvatarUrl(ImageFormat.Png, 512);
-        return (string.IsNullOrWhiteSpace(avatarURL) ? user.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+        var re = (string.IsNullOrWhiteSpace(avatarURL) ? user.GetDefaultAvatarUrl() : avatarURL).GetBitmapFromURL();
+        return re;
     }
 
     public string profilePicGDesc = "Gets a profile picture gif";

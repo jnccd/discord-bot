@@ -51,13 +51,13 @@ namespace MEE7.Commands.Edit
         public string WhiteDesc = "Get my skin color";
         public SKColor White(EditNull n, IMessage m)
         {
-            return SKColor.Parse("white");
+            return SKColor.Parse("FFFFFF");
         }
 
         public string RedDesc = "Get red";
         public SKColor Red(EditNull n, IMessage m)
         {
-            return SKColor.Parse("red");
+            return SKColor.Parse("FF0000");
         }
 
         public string ColDesc = "Get a color from rgb";
