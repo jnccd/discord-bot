@@ -44,11 +44,19 @@ namespace MEE7.Commands
                 {
                     Config.Data.saidGoodMorningAlready = true;
                     Config.Save();
-                    FeelsAsynchronousMan().Wait();
+                    try
+                    {
+                        FeelsAsynchronousMan().Wait();
+                    }
+                    catch (Exception ex)
+                    {
+                        ConsoleWrapper.WriteLineAndDiscordLog($"Error occurred while fetching good morning instagram content: {ex}");
+                    }
                 }
                 if (Config.Data.lastGoodMorningDate < DateOnly.FromDateTime(DateTime.Now))
                 {
                     Config.Data.saidGoodMorningAlready = false;
+                    Config.Data.lastGoodMorningDate = DateOnly.FromDateTime(DateTime.Now);
                     Config.Save();
                 }
 
