@@ -10,7 +10,7 @@
     jnccd-utils.url = "github:jnccd/nix-utils";
   };
 
-  outputs = { self, nixpkgs, numtide-utils, jnccd-utils }:
+  outputs = { self, nixpkgs, numtide-utils, jnccd-utils }@inputs:
     numtide-utils.lib.eachDefaultSystem
       (system: let
           pkgs = import nixpkgs {inherit system;};
