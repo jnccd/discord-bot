@@ -301,14 +301,15 @@ namespace MEE7.Backend.HelperFunctions
         {
             string[] split = command.Split(' ');
 
-            Process P = Process.Start(new ProcessStartInfo()
+            var pInfo = new ProcessStartInfo()
             {
                 FileName = split.First(),
                 Arguments = split.Skip(1).Combine(" "),
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
-                RedirectStandardError = true
-            });
+                RedirectStandardError = true,
+            };
+            Process P = Process.Start(pInfo);
             if (!P.WaitForExit(timeout))
                 P.Kill();
 

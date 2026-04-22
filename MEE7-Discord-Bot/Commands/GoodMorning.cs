@@ -37,39 +37,38 @@ namespace MEE7.Commands
         {
             Thread.CurrentThread.Name = "Good Morning Notification Loop";
 
-            while (true)
-            {
-                try
-                {
-                    string postId = GetPostId();
-                    if (postId != Config.Data.lastGoodMorningPostId)
-                    {
-                        Config.Data.lastGoodMorningPostId = postId;
-                        Config.Save();
-                        DiscordNETWrapper.SendText($"https://www.kkinstagram.com/p/{postId}/", goodMorningChannelId).Wait();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ConsoleWrapper.WriteLineAndDiscordLog($"GoodMorning Error occurred: {ex.Message}");
-                }
+            // while (true)
+            // {
+            //     try
+            //     {
+            //         string postId = GetPostId();
+            //         if (postId != Config.Data.lastGoodMorningPostId)
+            //         {
+            //             Config.Data.lastGoodMorningPostId = postId;
+            //             Config.Save();
+            //             DiscordNETWrapper.SendText($"https://www.kkinstagram.com/p/{postId}/", goodMorningChannelId).Wait();
+            //         }
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         ConsoleWrapper.WriteLineAndDiscordLog($"GoodMorning Error occurred: {ex.Message}");
+            //     }
 
-                Thread.Sleep(updateIntervalMin * 60000);
-            }
+            //     Thread.Sleep(updateIntervalMin * 60000);
+            // }
         }
 
         public string GetPostId()
         {
-            new BrowserFetcher().DownloadAsync().Wait();
-            using var browser = Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }).Result;
-            using var page = browser.NewPageAsync().Result;
-
-            page.GoToAsync("https://www.instagram.com/fire.scoop/").Wait();
-            page.WaitForSelectorAsync("a div div").Wait();
-
-            string html = page.GetContentAsync().Result;
+            Console.WriteLine("Getting post id...");
+            int timeoutMs = 15000;
+            string command = $"chromium --headless --no-sandbox --disable-gpu --dump-dom --virtual-time-budget={timeoutMs - 2000} https://www.instagram.com/fire.scoop/";
+            Console.WriteLine("command: " + command);
+            string html = command.GetShellOut(timeoutMs);
+            Console.WriteLine("html: " + html);
 
             string postId = html.GetEverythingBetween("href=\"/fire.scoop/reel/", "/\"");
+            Console.WriteLine("postId: " + postId);
 
             return postId;
         }
