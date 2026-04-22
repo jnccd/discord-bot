@@ -39,44 +39,39 @@ namespace MEE7.Commands
 
             while (true)
             {
-                if (!Config.Data.saidGoodMorningAlready && DateTime.Now.Hour >= 9)
+                try
                 {
-                    Config.Data.saidGoodMorningAlready = true;
-                    Config.Save();
-                    try
+                    string postId = GetPostId();
+                    if (postId != Config.Data.lastGoodMorningPostId)
                     {
-                        FeelsAsynchronousMan().Wait();
-                    }
-                    catch (Exception ex)
-                    {
-                        ConsoleWrapper.WriteLineAndDiscordLog($"Error occurred while fetching good morning instagram content: {ex}");
+                        Config.Data.lastGoodMorningPostId = postId;
+                        Config.Save();
+                        DiscordNETWrapper.SendText($"https://www.kkinstagram.com/p/{postId}/", goodMorningChannelId).Wait();
                     }
                 }
-                if (Config.Data.lastGoodMorningDate < DateOnly.FromDateTime(DateTime.Now))
+                catch (Exception ex)
                 {
-                    Config.Data.saidGoodMorningAlready = false;
-                    Config.Data.lastGoodMorningDate = DateOnly.FromDateTime(DateTime.Now);
-                    Config.Save();
+                    ConsoleWrapper.WriteLineAndDiscordLog($"GoodMorning Error occurred: {ex.Message}");
                 }
 
                 Thread.Sleep(updateIntervalMin * 60000);
             }
         }
 
-        public async Task FeelsAsynchronousMan()
+        public string GetPostId()
         {
             new BrowserFetcher().DownloadAsync().Wait();
-            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
-            using var page = await browser.NewPageAsync();
+            using var browser = Puppeteer.LaunchAsync(new LaunchOptions { Headless = true }).Result;
+            using var page = browser.NewPageAsync().Result;
 
-            await page.GoToAsync("https://www.instagram.com/fire.scoop/");
-            await page.WaitForSelectorAsync("a div div");
+            page.GoToAsync("https://www.instagram.com/fire.scoop/").Wait();
+            page.WaitForSelectorAsync("a div div").Wait();
 
-            string html = await page.GetContentAsync();
+            string html = page.GetContentAsync().Result;
 
             string postId = html.GetEverythingBetween("href=\"/fire.scoop/reel/", "/\"");
 
-            DiscordNETWrapper.SendText($"https://www.kkinstagram.com/p/{postId}/", goodMorningChannelId).Wait();
+            return postId;
         }
     }
 }

@@ -15,23 +15,22 @@ namespace MEE7.Configuration
         public List<ulong> PatchNoteSubscribedChannels;
         public List<ulong> WarframeSubscribedChannels;
         public List<string> LoadedMarkovTextFiles;
-        public string LastCommitMessage;
+        public string? LastCommitMessage;
         public List<ulong> MessagePreviewServers;
         public bool WarframeVoidTraderArrived;
         public List<string> WarframeIDList;
-        public string TwtichChannelName;
-        public string TwtichBotUsername;
-        public string TwtichAccessToken;
-        public string TwtichRefreshToken;
-        public string TwtichClientID;
-        public string TwitchAPIClientID;
-        public string TwitchAPIAccessToken;
-        public string ExtraStuff;
+        public string? TwtichChannelName;
+        public string? TwtichBotUsername;
+        public string? TwtichAccessToken;
+        public string? TwtichRefreshToken;
+        public string? TwtichClientID;
+        public string? TwitchAPIClientID;
+        public string? TwitchAPIAccessToken;
+        public string? ExtraStuff;
         public List<ManageRoleByEmoteMessage> manageRoleByEmoteMessages;
         public List<ConfigTimer> timers;
         public long lastCodeMemeId;
-        public bool saidGoodMorningAlready = false;
-        public DateOnly lastGoodMorningDate = DateOnly.FromDateTime(DateTime.Now);
+        public string? lastGoodMorningPostId = null;
 
         public ConfigData()
         {

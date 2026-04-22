@@ -8,6 +8,7 @@
     <StartupObject>MEE7.Program</StartupObject>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <NoWarn>NU1701</NoWarn>
+    <Nullable>enable</Nullable>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileRunEnvironmentFiles>settings.env</DockerfileRunEnvironmentFiles>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
