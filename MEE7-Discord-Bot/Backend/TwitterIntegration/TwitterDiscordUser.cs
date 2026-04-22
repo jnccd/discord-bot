@@ -46,7 +46,7 @@ namespace MEE7.Backend
 
         public ulong? AvatarDecorationSkuId => throw new NotImplementedException();
 
-        public PrimaryGuild? PrimaryGuild => throw new NotImplementedException();
+        // public PrimaryGuild? PrimaryGuild => throw new NotImplementedException();
 
         UserProperties? IUser.PublicFlags => throw new NotImplementedException();
 
