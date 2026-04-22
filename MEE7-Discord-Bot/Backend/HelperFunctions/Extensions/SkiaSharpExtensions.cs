@@ -24,6 +24,7 @@ namespace MEE7.Backend.HelperFunctions
 
             return bmp;
         }
+        public static SKRect CreateRectFromXYWH(float x, float y, float w, float h) => new SKRect(x, y, x + w, y + h);
         public static int GetGrayScale(this SKColor c) => (c.Red + c.Green + c.Blue) / 3;
         public static int GetColorDist(this SKColor c, SKColor C) => Math.Abs(c.Red - C.Red) + Math.Abs(c.Green - C.Green) + Math.Abs(c.Blue - C.Blue);
         public static SKColor HsvToRgb(this Vector3 HSV) // from https://stackoverflow.com/questions/1335426/is-there-a-built-in-c-net-system-api-for-hsv-to-rgb
