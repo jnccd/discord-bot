@@ -481,8 +481,23 @@ namespace MEE7
                 if (RunningOnCI)
                     CILimbo();
                 else
-                    try { input = Console.ReadLine(); }
-                    catch (Exception e) { CILimbo(); e.ToString(); }
+                    try
+                    {
+                        while (true)
+                        {
+                            var stdinData = Console.Read();
+                            if (stdinData >= 0)
+                                input += (char)stdinData;
+                            if (stdinData == '\n')
+                                break;
+
+                            Task.Delay(100).Wait();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message); CILimbo();
+                    }
 
                 if (input == "exit")
                     break;
@@ -759,7 +774,7 @@ namespace MEE7
         {
             while (true)
             {
-                Thread.Sleep(int.MaxValue);
+                Task.Delay(5000).Wait();
             }
         }
 
