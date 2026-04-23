@@ -315,6 +315,39 @@ namespace MEE7.Backend.HelperFunctions
 
             return P.StandardOutput.ReadToEnd() + P.StandardError.ReadToEnd();
         }
+        public static async Task<string> GetShellOutAsync(this string command, int timeout = 10000)
+        {
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "bash",
+                Arguments = $"-c \"{command}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            using (var process = new Process { StartInfo = processInfo })
+            {
+                process.Start();
+
+                // Read output and error asynchronously
+                var outputTask = process.StandardOutput.ReadToEndAsync();
+                var errorTask = process.StandardError.ReadToEndAsync();
+
+                // Wait for the process to exit or timeout
+                await Task.WhenAny(Task.Run(() => process.WaitForExit(timeout)), Task.Delay(timeout));
+
+                if (!process.HasExited)
+                    process.Kill();
+
+                // Combine output and error
+                string output = await outputTask;
+                string error = await errorTask;
+
+                return output + error;
+            }
+        }
         public static string GetHTMLfromURL(this string URL)
         {
             try
