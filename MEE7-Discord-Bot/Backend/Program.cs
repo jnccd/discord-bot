@@ -86,9 +86,16 @@ namespace MEE7
             }
             catch (Exception ex)
             {
-                try { Config.Save(); } catch (Exception e) { Console.WriteLine("Config Save Error: " + e); }
-                ConsoleWrapper.WriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
-                Saver.SaveToLog("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
+                try { Config.Save(); }
+                catch (Exception e)
+                {
+                    try { Console.WriteLine("Config Save Error: " + e); } catch { }
+                }
+
+                try { ConsoleWrapper.WriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace); }
+                catch { }
+
+                try { Saver.SaveToLog("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace); } catch { }
 
                 Environment.Exit(1);
             }
@@ -152,9 +159,9 @@ namespace MEE7
             CreateCommandInstances();
 
             while (!ClientReady || client.ConnectionState != ConnectionState.Connected) { Thread.Sleep(50); }
-            
+
             SetState();
-            
+
             CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
             Thread.Sleep(1000);
 
@@ -180,6 +187,7 @@ namespace MEE7
             BuildHelpMenu();
 
             StartAutosaveLoop();
+            ConnectionChecker.StartReconnectLoop(client);
 
             Task.Run(() => BootTwitterModule());
             OnConnected.InvokeParallel();
@@ -294,7 +302,7 @@ namespace MEE7
             client.LoggedOut += () =>
             {
                 OnLoggedOut?.InvokeParallel();
-                return Task.FromResult(default(object)); 
+                return Task.FromResult(default(object));
             };
             client.MessageDeleted += (Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2) =>
             {
@@ -416,7 +424,7 @@ namespace MEE7
             {
                 try
                 {
-                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]); 
+                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]);
                     if (commandInstance.CommandLine.Contains(" ") || commandInstance.Prefix.Contains(" "))
                         throw new IllegalCommandException($"Commands and Prefixes mustn't contain spaces!\n" +
                             $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
@@ -487,6 +495,7 @@ namespace MEE7
                 }
             });
         }
+
 
         static void HandleConsoleCommandsLoop()
         {
@@ -874,7 +883,7 @@ namespace MEE7
         }
         public static bool IsInDebugMode() => runConfig == "Debug";
         public static bool IsInReleaseMode() => runConfig == "Release";
-    
+
         // Execute BeforeClose before closing
         static ConsoleEventDelegate handler;
         static bool ConsoleEventCallback(int eventType)

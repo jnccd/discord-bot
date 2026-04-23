@@ -10,23 +10,7 @@ namespace MEE7.Commands
     {
         public Close() : base("close", "Closes the bot", false, true)
         {
-            Task.Run(() =>
-            {
-                DateTime lastConnected = DateTime.Now;
-                while (true)
-                {
-                    Task.Delay(1000).Wait();
-                    if (Program.Client.ConnectionState == ConnectionState.Connected)
-                    {
-                        lastConnected = DateTime.Now;
-                    }
-                    if (DateTime.Now - lastConnected > TimeSpan.FromMinutes(5))
-                    {
-                        ConsoleWrapper.WriteLineAndDiscordLog("Closing due to long disconnect...");
-                        Program.Exit(0);
-                    }
-                }
-            });
+
         }
 
         public override void Execute(IMessage message)
