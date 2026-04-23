@@ -19,19 +19,20 @@ public static class ConnectionChecker
         Task.Run(() =>
         {
             Thread.CurrentThread.Name = "Reconnecter";
+            Console.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
             while (true)
             {
                 Thread.Sleep(ReconnecterIntervalInMinutes * 60000);
 
                 // Check what client reports
-                ConsoleWrapper.WriteLine($"{DateTime.Now:T} Connection State is: {client.ConnectionState}");
+                Console.WriteLine($"{DateTime.Now:T} Connection State is: {client.ConnectionState}");
 
                 // Check what message sending does
                 try
                 {
                     DiscordNETWrapper.SendText($"Test Message", ConnectionCheckChannelId).Wait();
                     IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ConnectionCheckChannelId)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
-                    ConsoleWrapper.WriteLine($"{DateTime.Now:T} Got {messages.Count()} message(s)!");
+                    Console.WriteLine($"{DateTime.Now:T} Got {messages.Count()} message(s)!");
                     foreach (IMessage m in messages)
                     {
                         if (m.Author.Id == client.CurrentUser.Id)
@@ -40,7 +41,7 @@ public static class ConnectionChecker
                 }
                 catch (Exception ex)
                 {
-                    ConsoleWrapper.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex.Message}", ConsoleColor.Red);
+                    Console.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex.Message}");
                 }
 
                 // Reconnect if necessary
@@ -50,11 +51,11 @@ public static class ConnectionChecker
                     {
                         client.StopAsync().Wait();
                         client.StartAsync().Wait();
-                        ConsoleWrapper.WriteLine($"{DateTime.Now:T} Reconnected! Current state is {client.ConnectionState}", ConsoleColor.Green);
+                        Console.WriteLine($"{DateTime.Now:T} Reconnected! Current state is {client.ConnectionState}");
                     }
                     catch (Exception ex)
                     {
-                        ConsoleWrapper.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {client.ConnectionState}\nError: {ex.Message}", ConsoleColor.Red);
+                        Console.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {client.ConnectionState}\nError: {ex.Message}");
                     }
                 }
             }

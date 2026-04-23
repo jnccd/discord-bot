@@ -186,8 +186,8 @@ namespace MEE7
 
             BuildHelpMenu();
 
-            StartAutosaveLoop();
-            ConnectionChecker.StartReconnectLoop(client);
+            Task.Run(() => StartAutosaveLoop());
+            Task.Run(() => ConnectionChecker.StartReconnectLoop(client));
 
             Task.Run(() => BootTwitterModule());
             OnConnected.InvokeParallel();
@@ -202,32 +202,6 @@ namespace MEE7
             {
                 if (buildDate == null)
                     buildDate = "Error: Couldn't read build date!";
-            }
-        }
-        static void UpdateYTDL()
-        {
-            try
-            {
-                Process ytdlUpdater = new Process
-                {
-                    StartInfo = new ProcessStartInfo()
-                    {
-                        FileName = "youtube-dl.exe",
-                        Arguments = "-U",
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                    }
-                };
-                ytdlUpdater.Start();
-                ytdlUpdater.WaitForExit();
-                ytdlUpdater.Dispose();
-            }
-            catch
-            {
-                ConsoleWrapper.WriteLine("Couldn't update youtube-dl :C", ConsoleColor.Red);
             }
         }
         static void SetClientEvents()
