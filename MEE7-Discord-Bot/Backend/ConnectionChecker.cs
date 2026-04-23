@@ -22,8 +22,6 @@ public static class ConnectionChecker
             Console.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
             while (true)
             {
-                Thread.Sleep(ReconnecterIntervalInMinutes * 60000);
-
                 // Check what client reports
                 Console.WriteLine($"{DateTime.Now:T} Connection State is: {client.ConnectionState}");
 
@@ -58,6 +56,8 @@ public static class ConnectionChecker
                         Console.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {client.ConnectionState}\nError: {ex.Message}");
                     }
                 }
+
+                Task.Delay(ReconnecterIntervalInMinutes * 60000).Wait();
             }
         });
     }
