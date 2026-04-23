@@ -68,7 +68,7 @@ namespace MEE7.Commands
             string command = $"eval $(dbus-launch --sh-syntax) && chromium --headless --no-sandbox --disable-gpu --dump-dom --virtual-time-budget={timeoutMs - 2000} https://www.tiktok.com/@fire.scoop";
             Console.WriteLine("command: " + command);
             string html = command.GetShellOutAsync(timeoutMs).Result;
-            //Console.WriteLine("html: " + html);
+            Console.WriteLine("html: " + new string(html.Take(1200).ToArray()));
 
             string postId = html.GetEverythingBetween("href=\"https://www.tiktok.com/@fire.scoop/video/", "\"");
             Console.WriteLine("postId: " + postId);
