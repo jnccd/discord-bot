@@ -42,14 +42,11 @@ namespace MEE7.Commands
                 try
                 {
                     string postId = GetPostId();
-                    if (postId != Config.Data.lastGoodMorningPostId)
+                    if (!string.IsNullOrWhiteSpace(postId) && postId != Config.Data.lastGoodMorningPostId)
                     {
                         Config.Data.lastGoodMorningPostId = postId;
                         Config.Save();
-                        if (!string.IsNullOrWhiteSpace(postId))
-                        {
-                            DiscordNETWrapper.SendText($"https://www.tnktok.com/@fire.scoop/video/{postId}/", goodMorningChannelId).Wait();
-                        }
+                        DiscordNETWrapper.SendText($"https://www.tnktok.com/@fire.scoop/video/{postId}/", goodMorningChannelId).Wait();
                     }
                 }
                 catch (Exception ex)
