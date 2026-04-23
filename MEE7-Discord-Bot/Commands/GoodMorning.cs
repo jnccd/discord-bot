@@ -46,7 +46,7 @@ namespace MEE7.Commands
                     {
                         Config.Data.lastGoodMorningPostId = postId;
                         Config.Save();
-                        DiscordNETWrapper.SendText($"https://www.tnktok.com/@fire.scoop/video/{postId}/", goodMorningChannelId).Wait();
+                        DiscordNETWrapper.SendText($"https://www.kkinstagram.com/p/{postId}/", goodMorningChannelId).Wait();
                     }
                 }
                 catch (Exception ex)
@@ -62,12 +62,12 @@ namespace MEE7.Commands
         {
             Console.WriteLine("Getting post id...");
             int timeoutMs = 17000;
-            string command = $"eval $(dbus-launch --sh-syntax) && chromium --headless --no-sandbox --disable-gpu --dump-dom --virtual-time-budget={timeoutMs - 2000} https://www.tiktok.com/@fire.scoop";
+            string command = $"eval $(dbus-launch --sh-syntax) && chromium --headless --no-sandbox --disable-gpu --dump-dom --virtual-time-budget={timeoutMs - 2000} https://www.instagram.com/fire.scoop/";
             Console.WriteLine("command: " + command);
             string html = command.GetShellOutAsync(timeoutMs).Result;
             Console.WriteLine("html: " + new string(html.Take(1200).ToArray()));
 
-            string postId = html.GetEverythingBetween("href=\"https://www.tiktok.com/@fire.scoop/video/", "\"");
+            string postId = html.GetEverythingBetween("href=\"/fire.scoop/reel/", "/\"");
             Console.WriteLine("postId: " + postId);
 
             return postId;
