@@ -487,20 +487,13 @@ namespace MEE7
                 else
                     try
                     {
-                        while (true)
-                        {
-                            var stdinData = Console.Read();
-                            if (stdinData >= 0)
-                                input += (char)stdinData;
-                            if (stdinData == '\n')
-                                break;
-
-                            await Task.Delay(100);
-                        }
+                        using var reader = new StreamReader(Console.OpenStandardInput());
+                        input = await reader.ReadLineAsync() ?? "";
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message); await CILimbo();
+                        Console.WriteLine(e.Message);
+                        await CILimbo();
                     }
 
                 if (input == "exit")
