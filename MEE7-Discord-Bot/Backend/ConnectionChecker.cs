@@ -14,26 +14,52 @@ public static class ConnectionChecker
     static readonly int ReconnecterIntervalInMinutes = 10;
     static readonly ulong ConnectionCheckChannelId = 1496889462955966535;
 
-    public static void StartReconnectLoop(DiscordSocketClient client)
+    static void Reconnect()
+    {
+        try
+        {
+            Program.Client?.StopAsync().Wait();
+            Program.Client?.LogoutAsync().Wait();
+            Program.Login();
+            Console.WriteLine($"{DateTime.Now:T} Reconnected! Current state is {Program.Client?.ConnectionState}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {Program.Client?.ConnectionState}\nError: {ex.Message}");
+        }
+    }
+
+    public static void StartReconnectLoop()
     {
         Task.Run(() =>
         {
             Thread.CurrentThread.Name = "Reconnecter";
             Console.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
+
+            Program.Client?.Log += (LogMessage msg) =>
+            {
+                if (msg.Exception.GetType() == typeof(Discord.WebSocket.GatewayReconnectException) || msg.Message.Contains("Discord.WebSocket.GatewayReconnectException"))
+                {
+                    Console.WriteLine($"{DateTime.Now:T} GatewayReconnectException! Current state is {Program.Client?.ConnectionState}");
+                    Reconnect();
+                }
+                return Task.CompletedTask;
+            };
+
             while (true)
             {
                 // Check what client reports
-                Console.WriteLine($"{DateTime.Now:T} Connection State is: {client.ConnectionState}");
+                Console.WriteLine($"{DateTime.Now:T} Connection State is: {Program.Client?.ConnectionState}");
 
                 // Check what message sending does
                 try
                 {
                     DiscordNETWrapper.SendText($"Test Message", ConnectionCheckChannelId).Wait();
-                    IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ConnectionCheckChannelId)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
+                    IEnumerable<IMessage> messages = ((ISocketMessageChannel?)Program.Client?.GetChannel(ConnectionCheckChannelId))?.GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult() ?? [];
                     Console.WriteLine($"{DateTime.Now:T} Got {messages.Count()} message(s)!");
                     foreach (IMessage m in messages)
                     {
-                        if (m.Author.Id == client.CurrentUser.Id)
+                        if (m.Author.Id == Program.Client?.CurrentUser.Id)
                             m.DeleteAsync().Wait();
                     }
                 }
@@ -43,18 +69,9 @@ public static class ConnectionChecker
                 }
 
                 // Reconnect if necessary
-                if (client.ConnectionState != ConnectionState.Connected)
+                if (Program.Client?.ConnectionState != ConnectionState.Connected)
                 {
-                    try
-                    {
-                        client.StopAsync().Wait();
-                        client.StartAsync().Wait();
-                        Console.WriteLine($"{DateTime.Now:T} Reconnected! Current state is {client.ConnectionState}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {client.ConnectionState}\nError: {ex.Message}");
-                    }
+                    Reconnect();
                 }
 
                 Task.Delay(ReconnecterIntervalInMinutes * 60000).Wait();

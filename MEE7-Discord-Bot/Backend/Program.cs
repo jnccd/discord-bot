@@ -53,8 +53,13 @@ namespace MEE7
         public static readonly string logStartupMessage = logStartupMessagePräfix + " I am here: " + instanceIdentifier;
 
         // Client 
-        static DiscordSocketClient client;
-        public static DiscordSocketClient Client { get { return client; } }
+        static DiscordSocketConfig discordSocketConfig = new()
+        {
+            GatewayIntents = GatewayIntents.All,
+            AlwaysDownloadUsers = true,
+        };
+        static DiscordSocketClient? client;
+        public static DiscordSocketClient? Client { get { return client; } }
         public static bool ClientReady { get; private set; }
 
         static readonly string exitlock = "";
@@ -122,7 +127,7 @@ namespace MEE7
             if (RunningOnLinux)
                 ConsoleWrapper.WriteLine("Linux Environment detected!");
 
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath));
+            if (Path.GetDirectoryName(ExePath) != null) Directory.SetCurrentDirectory(Path.GetDirectoryName(ExePath) ?? "");
 
             if (RunningOnCI)
                 ConsoleWrapper.WriteLine("CI Environment detected!");
@@ -144,14 +149,8 @@ namespace MEE7
             }
 
             LoadBuildDate();
-            //UpdateYTDL();
 
-            var config = new DiscordSocketConfig()
-            {
-                GatewayIntents = GatewayIntents.All,
-                AlwaysDownloadUsers = true,
-            };
-            client = new DiscordSocketClient(config);
+            client = new DiscordSocketClient(discordSocketConfig);
             SetClientEvents();
 
             Login();
@@ -187,7 +186,7 @@ namespace MEE7
             BuildHelpMenu();
 
             Task.Run(() => StartAutosaveLoop());
-            Task.Run(() => ConnectionChecker.StartReconnectLoop(client));
+            Task.Run(() => ConnectionChecker.StartReconnectLoop());
 
             Task.Run(() => BootTwitterModule());
             OnConnected.InvokeParallel();
@@ -364,7 +363,7 @@ namespace MEE7
                 return Task.FromResult(default(object));
             };
         }
-        static void Login()
+        public static void Login()
         {
             //Saver.SaveToLog($"Got tokens {Environment.GetEnvironmentVariable("BotToken")} {Config.Data.BotToken}");
 
@@ -372,16 +371,16 @@ namespace MEE7
             {
                 var token = Environment.GetEnvironmentVariable("BotToken");
                 if (String.IsNullOrWhiteSpace(token)) throw new ArgumentException();
-                client.LoginAsync(TokenType.Bot, token).Wait();
-                client.StartAsync().Wait();
+                client?.LoginAsync(TokenType.Bot, token).Wait();
+                client?.StartAsync().Wait();
             }
             catch (Exception e1)
             {
                 try
                 {
                     ConsoleWrapper.WriteLine($"Wrong token: {Environment.GetEnvironmentVariable("BotToken")}");
-                    client.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
-                    client.StartAsync().Wait();
+                    client?.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
+                    client?.StartAsync().Wait();
                 }
                 catch (Exception e2)
                 {
@@ -791,9 +790,9 @@ namespace MEE7
                 DisposeErrorMessages();
 
                 ConsoleWrapper.WriteLine("Closing... Logging out");
-                client.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
-                client.StopAsync().Wait();
-                client.LogoutAsync().Wait();
+                client?.SetStatusAsync(UserStatus.DoNotDisturb).Wait();
+                client?.StopAsync().Wait();
+                client?.LogoutAsync().Wait();
 
                 exitedNormally = true;
             }
