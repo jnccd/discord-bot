@@ -19,7 +19,7 @@ namespace MEE7.Commands
         private const int updateIntervalMin = 1;
         private const ulong goodMorningChannelId = 500759857205346304;
 #else
-        private const int updateIntervalMin = 60;
+        private const int updateIntervalMin = 3 * 60;
         private const ulong goodMorningChannelId = 479951853766049803;
 #endif
 
