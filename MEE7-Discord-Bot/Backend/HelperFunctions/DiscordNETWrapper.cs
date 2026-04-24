@@ -69,7 +69,7 @@ namespace MEE7.Backend.HelperFunctions
                 sendMessages.Add(await Channel.SendMessageAsync(text, false, Embed.Build()));
             else if (Embed.Length >= 6000)
             {
-                List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields);
+                List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields ?? []);
                 while (Fields.Count > 0)
                 {
                     EmbedBuilder eb = new EmbedBuilder
@@ -94,7 +94,7 @@ namespace MEE7.Backend.HelperFunctions
             }
             else
             {
-                List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields);
+                List<EmbedFieldBuilder> Fields = new List<EmbedFieldBuilder>(Embed.Fields ?? []);
                 while (Fields.Count > 0)
                 {
                     EmbedBuilder eb = new EmbedBuilder
@@ -121,19 +121,19 @@ namespace MEE7.Backend.HelperFunctions
             return sendMessages;
         }
 
-        public static IUser ParseUser(string userText, IMessageChannel c)
+        public static IUser? ParseUser(string userText, IMessageChannel c)
         {
             return ParseUser(userText, c.GetUsersAsync().FlattenAsync().Result);
         }
 
-        public static IUser ParseUser(string userText, IEnumerable<IUser> possibleUsers = null)
+        public static IUser? ParseUser(string userText, IEnumerable<IUser>? possibleUsers = null)
         {
             try
             {
                 if (userText.Contains('@') && !userText.Contains('<') && !userText.Contains('>'))
                 {
-                    TwitterUser user = Program.twitterService.GetUserProfileFor(new GetUserProfileForOptions() { ScreenName = userText.Trim(' ', '@') });
-                    return new TwitterDiscordUser(user);
+                    TwitterUser? user = Program.twitterService?.GetUserProfileFor(new GetUserProfileForOptions() { ScreenName = userText.Trim(' ', '@') });
+                    return user == null ? null : new TwitterDiscordUser(user);
                 }
                 else if (userText.Contains('@'))
                 {
@@ -141,7 +141,7 @@ namespace MEE7.Backend.HelperFunctions
                 }
                 else if (userText.Contains('#'))
                 {
-                    return possibleUsers.First(x => x.ToString() == userText);
+                    return possibleUsers?.First(x => x.ToString() == userText);
                 }
                 else if (userText.All(x => char.IsDigit(x)))
                 {
@@ -151,11 +151,11 @@ namespace MEE7.Backend.HelperFunctions
                 {
                     List<Tuple<string, IUser>> users = new List<Tuple<string, IUser>>();
 
-                    foreach (var user in possibleUsers)
+                    foreach (var user in possibleUsers ?? [])
                     {
                         if (user is SocketGuildUser)
                         {
-                            users.Add(new Tuple<string, IUser>((user as SocketGuildUser).Nickname, user));
+                            users.Add(new Tuple<string, IUser>((user as SocketGuildUser)?.Nickname ?? "No Name", user));
                         }
                         users.Add(new Tuple<string, IUser>(user.Username, user));
                     }
@@ -169,7 +169,7 @@ namespace MEE7.Backend.HelperFunctions
             }
         }
 
-        public static EmbedBuilder CreateEmbedBuilder(string TitleText = "", string DescText = "", string ImgURL = "", IUser Author = null, string ThumbnailURL = "")
+        public static EmbedBuilder CreateEmbedBuilder(string TitleText = "", string DescText = "", string ImgURL = "", IUser? Author = null, string ThumbnailURL = "")
         {
             EmbedBuilder e = new EmbedBuilder();
             e.WithDescription(DescText);

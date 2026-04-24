@@ -10,7 +10,7 @@ namespace MEE7
 {
     public static partial class Program
     {
-        public static TwitterService twitterService;
+        public static TwitterService? twitterService;
 
         public static void BootTwitterModule()
         {
@@ -44,6 +44,12 @@ namespace MEE7
         }
         static void StartTwitterLoop()
         {
+            if (twitterService == null)
+            {
+                ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} TwitterService is null!");
+                return;
+            }
+
             long lastMentionId = twitterService.ListTweetsMentioningMe(new ListTweetsMentioningMeOptions() { Count = 1 }).Last().Id;
             TweetSharpWrapper.PrintTwitterRateLimitStatus(twitterService);
 
@@ -53,13 +59,13 @@ namespace MEE7
                 if (mentions != null)
                     foreach (var m in mentions.Reverse())
                     {
-                        ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Recieved Tweet: " + m.Text);
+                        ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Received Tweet: " + m.Text);
 
                         try
                         {
                             TwitterChannel c = new TwitterChannel(m, twitterService);
                             TweetSharpWrapper.PrintTwitterRateLimitStatus(twitterService);
-                            if (c.InitialMessage.Content.StartsWith(Program.Prefix))
+                            if (c.InitialMessage?.Content.StartsWith(Program.Prefix) == true)
                                 Task.Run(() => Program.ParallelMessageReceived(c.InitialMessage));
                         }
                         catch (Exception e)

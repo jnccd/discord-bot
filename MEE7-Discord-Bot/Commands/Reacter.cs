@@ -15,7 +15,7 @@ namespace MEE7.Commands
         public Reacter()
         {
             Program.OnConnected += Program_OnConnected;
-            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
+            Program.OnNonCommandMessageReceived += OnNonCommandMessageRecieved;
         }
 
         private void Program_OnConnected()
@@ -26,10 +26,10 @@ namespace MEE7.Commands
             emoteDict.Add("sosig", Emote.Parse("<a:sosig:746025962248077352>"));
             emoteDict.Add("spooky", Emote.Parse("<a:spooky:754856306476580965>"));
             emoteDict.Add("goodMorning", Emote.Parse("<a:GoodMorning:757939668221427742>"));
-            emoteDict.Add("goodNight", Emote.Parse("<a:GoodNight:801591068571336705>")); 
+            emoteDict.Add("goodNight", Emote.Parse("<a:GoodNight:801591068571336705>"));
             emoteDict.Add("no", Emote.Parse("<:no:778447862735568916>"));
             emoteDict.Add("sus", Emote.Parse("<:sussy_baka:1022741633923551232>"));
-            emoteDict.Add("bright_lain", Emote.Parse("<:bright_lain:1421504967876939988>")); 
+            emoteDict.Add("bright_lain", Emote.Parse("<:bright_lain:1421504967876939988>"));
 
             emoteDict.Add("eyes", new Emoji("👀"));
             emoteDict.Add("wave", new Emoji("👋"));
@@ -93,7 +93,7 @@ namespace MEE7.Commands
                 message.AddReactionAsync(emoteDict.GetValueOrDefault("wave")).Wait();
 
             if (message.Content.ToLower().Contains("hotel"))
-                (message as IUserMessage).AddReactionsAsync(new IEmote[] { 
+                (message as IUserMessage).AddReactionsAsync(new IEmote[] {
                     emoteDict.GetValueOrDefault("T"),
                     emoteDict.GetValueOrDefault("R"),
                     emoteDict.GetValueOrDefault("I"),

@@ -34,7 +34,7 @@ namespace MEE7.Backend
 
         public string Mention => user.ScreenName;
 
-        public IActivity Activity => null;
+        public IActivity? Activity => null;
 
         public UserStatus Status => UserStatus.Online;
 
@@ -74,9 +74,9 @@ namespace MEE7.Backend
             throw new NotImplementedException();
         }
 
-        public Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
+        public Task<IDMChannel?> GetOrCreateDMChannelAsync(RequestOptions? options = null)
         {
-            return Task.FromResult<IDMChannel>(null);
+            return Task.FromResult<IDMChannel?>(null);
         }
 
         Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)

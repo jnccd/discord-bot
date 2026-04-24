@@ -74,7 +74,7 @@ namespace MEE7.Backend.HelperFunctions
             }
             return e;
         }
-        public static SelfmadeMessage EditContent(this SelfmadeMessage m, string newContent)
+        public static SelfMadeMessage EditContent(this SelfMadeMessage m, string newContent)
         {
             m.Content = newContent;
             return m;

@@ -13,7 +13,7 @@ namespace MEE7.Commands
         public PingReact() : base("", "", false, true)
         {
             Program.OnConnected += Program_OnConnected;
-            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
+            Program.OnNonCommandMessageReceived += OnNonCommandMessageRecieved;
         }
 
         private void Program_OnConnected()

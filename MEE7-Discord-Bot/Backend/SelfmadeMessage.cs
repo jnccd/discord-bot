@@ -6,36 +6,36 @@ using System.Threading.Tasks;
 
 namespace MEE7.Backend
 {
-    public class SelfmadeMessage : IMessage
+    public class SelfMadeMessage : IMessage
     {
-        public string Content;
-        public DateTimeOffset Timestamp;
+        public string? Content;
+        public DateTimeOffset? Timestamp;
         public DateTimeOffset? EditedTimestamp;
-        public IMessageChannel Channel;
-        public IUser Author;
-        public DateTimeOffset CreatedAt;
+        public IMessageChannel? Channel;
+        public IUser? Author;
+        public DateTimeOffset? CreatedAt;
         public ulong Id;
-        public MessageType Type;
-        public MessageSource Source;
-        public bool IsTTS;
-        public bool IsPinned;
-        public MessageActivity Activity;
-        public MessageApplication Application;
+        public MessageType? Type;
+        public MessageSource? Source;
+        public bool? IsTTS;
+        public bool? IsPinned;
+        public MessageActivity? Activity;
+        public MessageApplication? Application;
 
-        public List<IAttachment> Attachments;
-        public List<IEmbed> Embeds;
-        public List<ITag> Tags;
-        public List<ulong> MentionedChannelIds;
-        public List<ulong> MentionedRoleIds;
-        public List<ulong> MentionedUserIds;
+        public List<IAttachment>? Attachments;
+        public List<IEmbed>? Embeds;
+        public List<ITag>? Tags;
+        public List<ulong>? MentionedChannelIds;
+        public List<ulong>? MentionedRoleIds;
+        public List<ulong>? MentionedUserIds;
 
-        public Func<RequestOptions, Task> DeleteFunc = (RequestOptions options) => Task.FromResult(default(object));
+        public Func<RequestOptions?, Task> DeleteFunc = (RequestOptions? options) => Task.FromResult(default(object));
 
-        public SelfmadeMessage()
+        public SelfMadeMessage()
         {
-
+            Id = (ulong)Random.Shared.NextInt64();
         }
-        public SelfmadeMessage(IMessage m)
+        public SelfMadeMessage(IMessage m)
         {
             Content = m.Content;
             Timestamp = m.Timestamp;
@@ -71,26 +71,26 @@ namespace MEE7.Backend
 
         public MessageCallData? CallData => throw new NotImplementedException();
 
-        string IMessage.Content => Content;
-        DateTimeOffset IMessage.Timestamp => Timestamp;
+        string IMessage.Content => Content ?? "";
+        DateTimeOffset IMessage.Timestamp => Timestamp ?? DateTimeOffset.MinValue;
         DateTimeOffset? IMessage.EditedTimestamp => EditedTimestamp;
-        IMessageChannel IMessage.Channel => Channel;
-        IUser IMessage.Author => Author;
-        DateTimeOffset ISnowflakeEntity.CreatedAt => CreatedAt;
+        IMessageChannel? IMessage.Channel => Channel;
+        IUser? IMessage.Author => Author;
+        DateTimeOffset ISnowflakeEntity.CreatedAt => CreatedAt ?? DateTimeOffset.MinValue;
         ulong IEntity<ulong>.Id => Id;
-        MessageType IMessage.Type => Type;
-        MessageSource IMessage.Source => Source;
-        bool IMessage.IsTTS => IsTTS;
-        bool IMessage.IsPinned => IsPinned;
-        MessageActivity IMessage.Activity => Activity;
-        MessageApplication IMessage.Application => Application;
+        MessageType IMessage.Type => Type ?? MessageType.Default;
+        MessageSource IMessage.Source => Source ?? MessageSource.User;
+        bool IMessage.IsTTS => IsTTS == true;
+        bool IMessage.IsPinned => IsPinned == true;
+        MessageActivity? IMessage.Activity => Activity;
+        MessageApplication? IMessage.Application => Application;
 
-        IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
-        IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
-        IReadOnlyCollection<ITag> IMessage.Tags => Tags;
-        IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannelIds;
-        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds;
-        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds;
+        IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments ?? [];
+        IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds ?? [];
+        IReadOnlyCollection<ITag> IMessage.Tags => Tags ?? [];
+        IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannelIds ?? [];
+        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoleIds ?? [];
+        IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUserIds ?? [];
 
         bool IMessage.MentionedEveryone => throw new NotImplementedException();
 
@@ -104,18 +104,18 @@ namespace MEE7.Backend
 
         IMessageInteraction IMessage.Interaction => throw new NotImplementedException();
 
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null) => Task.FromResult("");
-        public Task DeleteAsync(RequestOptions options = null) => DeleteFunc(options);
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null) => (IAsyncEnumerable<IReadOnlyCollection<IUser>>)null;
+        public Task AddReactionAsync(IEmote emote, RequestOptions? options = null) => Task.FromResult("");
+        public Task DeleteAsync(RequestOptions? options = null) => DeleteFunc(options);
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>>? GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions? options = null) => null;
 
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null, ReactionType type = ReactionType.Normal)
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions? options = null, ReactionType type = ReactionType.Normal)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveAllReactionsAsync(RequestOptions options = null) => throw new NotImplementedException();
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null) => Task.FromResult("");
-        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null) => Task.FromResult("");
+        public Task RemoveAllReactionsAsync(RequestOptions? options = null) => throw new NotImplementedException();
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions? options = null) => Task.FromResult("");
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions? options = null) => Task.FromResult("");
 
         Task IMessage.RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options)
         {

@@ -9,9 +9,9 @@ namespace MEE7.Backend
 {
     public class TweetSharpWrapper
     {
-        public static Tuple<TwitterStatus, TwitterResponse> SendReply(TwitterService service, TwitterStatus m, string text)
+        public static Tuple<TwitterStatus?, TwitterResponse?> SendReply(TwitterService service, TwitterStatus m, string text)
         {
-            TwitterStatus sta = null; TwitterResponse res = null; bool finished = false;
+            TwitterStatus? sta = null; TwitterResponse? res = null; bool finished = false;
 
             service.SendTweet(new SendTweetOptions() { Status = text, AutoPopulateReplyMetadata = true, InReplyToStatusId = m.Id },
                 (TwitterStatus s, TwitterResponse r) => { sta = s; res = r; finished = true; });
@@ -19,12 +19,12 @@ namespace MEE7.Backend
             while (!finished)
                 Thread.Sleep(500);
 
-            return new Tuple<TwitterStatus, TwitterResponse>(sta, res);
+            return new Tuple<TwitterStatus?, TwitterResponse?>(sta, res);
         }
 
-        public static Tuple<TwitterStatus, TwitterResponse> SendReplyImage(TwitterService service, TwitterStatus m, string text, string ImagePath)
+        public static Tuple<TwitterStatus?, TwitterResponse?> SendReplyImage(TwitterService service, TwitterStatus m, string text, string ImagePath)
         {
-            TwitterStatus sta = null; TwitterResponse res = null; bool finished = false;
+            TwitterStatus? sta = null; TwitterResponse? res = null; bool finished = false;
 
             using var stream = new FileStream(ImagePath, FileMode.Open);
             var Media = service.UploadMedia(new UploadMediaOptions() { Media = new MediaFile() { FileName = ImagePath, Content = stream } });
@@ -37,12 +37,12 @@ namespace MEE7.Backend
             while (!finished)
                 Thread.Sleep(500);
 
-            return new Tuple<TwitterStatus, TwitterResponse>(sta, res);
+            return new Tuple<TwitterStatus?, TwitterResponse?>(sta, res);
         }
 
-        public static Tuple<TwitterStatus, TwitterResponse> SendReplyImage(TwitterService service, TwitterStatus m, string text, Stream imageStream, string fileName)
+        public static Tuple<TwitterStatus?, TwitterResponse?> SendReplyImage(TwitterService service, TwitterStatus m, string text, Stream imageStream, string fileName)
         {
-            TwitterStatus sta = null; TwitterResponse res = null; bool finished = false;
+            TwitterStatus? sta = null; TwitterResponse? res = null; bool finished = false;
 
             MemoryStream mem = new MemoryStream();
             try { imageStream.Position = 0; } catch { }
@@ -54,20 +54,21 @@ namespace MEE7.Backend
             List<string> MediaIds = new List<string> { Media.Media_Id };
 
             var Result = service.SendTweet(new SendTweetOptions() { Status = text, AutoPopulateReplyMetadata = true, InReplyToStatusId = m.Id, MediaIds = MediaIds },
-                (TwitterStatus s, TwitterResponse r) => {
+                (TwitterStatus s, TwitterResponse r) =>
+                {
                     sta = s; res = r; finished = true;
                 });
 
             while (!finished)
                 Thread.Sleep(500);
 
-            return new Tuple<TwitterStatus, TwitterResponse>(sta, res);
+            return new Tuple<TwitterStatus?, TwitterResponse?>(sta, res);
         }
 
         public static void PrintTwitterRateLimitStatus(TwitterService service)
         {
             TwitterRateLimitStatus rate = service.Response.RateLimitStatus;
-            ConsoleWrapper.WriteLine($"{DateTime.Now.ToLongTimeString()} Twitter rate limit status: {rate.RemainingHits}/{rate.HourlyLimit}");
+            ConsoleWrapper.WriteLine($"{DateTime.Now:T} Twitter rate limit status: {rate.RemainingHits}/{rate.HourlyLimit}");
         }
     }
 }

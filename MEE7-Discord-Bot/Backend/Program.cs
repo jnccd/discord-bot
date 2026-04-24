@@ -457,7 +457,7 @@ namespace MEE7
         {
             Task.Run(() =>
             {
-                Thread.CurrentThread.Name = "Autosaver";
+                Thread.CurrentThread.Name = "AutoSaver";
                 while (true)
                 {
                     Thread.Sleep(AutoSaveIntervalInMinutes * 60000);
@@ -517,7 +517,7 @@ namespace MEE7
                             {
                                 if (Master == null)
                                     throw new Exception("No Master :(");
-                                SelfmadeMessage m = new SelfmadeMessage
+                                SelfMadeMessage m = new SelfMadeMessage
                                 {
                                     Channel = CurrentChannel,
                                     Content = input,
@@ -774,7 +774,7 @@ namespace MEE7
                     foreach (SocketGuild g in client?.Guilds ?? [])
                     {
                         ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
-                        ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client?.Guilds.Max(x => x.Name.Length) ?? 0 - g.Name.Length + 2).ToArray())}{g.Id}",
+                        ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', (client?.Guilds.Max(x => x.Name.Length) ?? 0) - g.Name.Length + 2).ToArray())}{g.Id}",
                             ConsoleColor.White);
                     }
                 }

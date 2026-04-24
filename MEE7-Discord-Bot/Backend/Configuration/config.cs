@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using MEE7.Backend.HelperFunctions;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
@@ -13,14 +14,14 @@ namespace MEE7.Configuration
     public static class Config
     {
         static readonly object lockject = new object();
-        static readonly string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
+        static readonly string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? throw new InvalidOperationException("Where am I ??")) + Path.DirectorySeparatorChar;
         static readonly string configPath = exePath + "config.json";
         static readonly string configBackupPath = exePath + "config_backup.json";
         static readonly ulong DiscordConfigChannelID = Program.logChannel;
         static readonly string DiscordConfigMessage = "autosave";
         public static bool UnsavedChanges = false;
         static HttpClient client = new HttpClient();
-        public static ConfigData Data
+        public static ConfigData? Data
         {
             get
             {
@@ -36,7 +37,7 @@ namespace MEE7.Configuration
                 data = value;
             }
         }
-        private static ConfigData data = new ConfigData();
+        private static ConfigData? data = new ConfigData();
 
         static Config()
         {
@@ -62,7 +63,7 @@ namespace MEE7.Configuration
                     File.Copy(configPath, configBackupPath, true);
                 File.WriteAllText(configPath, JsonConvert.SerializeObject(Data, Formatting.Indented));
 
-                if (Program.ClientReady && File.Exists(configPath) && data.ServerList.Count > 0)
+                if (Program.ClientReady && File.Exists(configPath) && data?.ServerList.Count > 0)
                     DiscordNETWrapper.SendFile(configPath, (IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID), DiscordConfigMessage).Wait();
 
                 UnsavedChanges = false;
@@ -89,7 +90,7 @@ namespace MEE7.Configuration
                     Data = JsonConvert.DeserializeObject<ConfigData>(discordConfig);
                 else if (Exists())
                     Data = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(configPath));
-                else
+                if (Data == null)
                     Data = new ConfigData();
             }
         }
@@ -98,6 +99,7 @@ namespace MEE7.Configuration
             lock (lockject)
             {
                 Data = JsonConvert.DeserializeObject<ConfigData>(JSON);
+                Data ??= new ConfigData();
             }
         }
         public static new string ToString()
@@ -112,8 +114,10 @@ namespace MEE7.Configuration
                 if (info.FieldType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(info.FieldType))
                 {
                     output += "\n";
-                    IEnumerable a = (IEnumerable)info.GetValue(Data);
-                    IEnumerator e = a.GetEnumerator();
+                    IEnumerable? a = (IEnumerable?)info.GetValue(Data);
+                    IEnumerator? e = a?.GetEnumerator();
+                    if (e == null)
+                        continue;
                     e.Reset();
                     while (e.MoveNext())
                     {

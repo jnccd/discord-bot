@@ -24,7 +24,7 @@ namespace MEE7.Backend
             }
         }
 
-        public EmbedBuilder HelpMenu;
+        public EmbedBuilder? HelpMenu;
 
         // May be implemented later (probably never)
         //private class SubCommand

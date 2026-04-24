@@ -6,7 +6,7 @@ using TweetSharp;
 
 namespace MEE7.Backend
 {
-    class TwitterMessage : SelfmadeMessage
+    class TwitterMessage : SelfMadeMessage
     {
         public TwitterStatus s;
 
@@ -14,7 +14,7 @@ namespace MEE7.Backend
         {
             this.Content = s.GetContent();
 
-            this.Author = new TwitterDiscordUser(s.Author as TwitterUser);
+            this.Author = s.Author is not TwitterUser ? null : new TwitterDiscordUser(s.Author as TwitterUser ?? new TwitterUser());
             this.Channel = channel;
             this.CreatedAt = s.CreatedDate;
             this.EditedTimestamp = s.CreatedDate;

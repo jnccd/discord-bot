@@ -18,7 +18,7 @@ namespace MEE7.Backend.HelperFunctions
     {
         static readonly string youtubeDownloadLock = "";
 
-        private static Process CreateFFMPEGProcess(string path)
+        private static Process? CreateFFMPEGProcess(string path)
         {
             return Process.Start(new ProcessStartInfo
             {
@@ -36,7 +36,10 @@ namespace MEE7.Backend.HelperFunctions
             lock (youtubeDownloadLock)
             {
                 string videofile = $"Downloads{Path.DirectorySeparatorChar}YoutubeVideo.mp4";
-                Directory.CreateDirectory(Path.GetDirectoryName(videofile));
+                var videoDir = Path.GetDirectoryName(videofile);
+                if (videoDir == null)
+                    throw new InvalidOperationException("Failed to get video directory.");
+                Directory.CreateDirectory(videoDir);
                 if (File.Exists(videofile))
                 {
                     int i = 0;
@@ -62,7 +65,7 @@ namespace MEE7.Backend.HelperFunctions
                     return "";
             }
         }
-        public static Process GetStreamFromYouTubeVideo(string YoutubeURL, string arguments = "")
+        public static Process? GetStreamFromYouTubeVideo(string YoutubeURL, string arguments = "")
         {
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
@@ -76,7 +79,7 @@ namespace MEE7.Backend.HelperFunctions
                 RedirectStandardError = true
             });
         }
-        public static Process GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat)
+        public static Process? GetAudioStreamFromYouTubeVideo(string YoutubeURL, string audioFormat)
         {
             if (!YoutubeURL.StartsWith("https://www.youtube.com/watch?"))
                 return null;
@@ -94,7 +97,7 @@ namespace MEE7.Backend.HelperFunctions
                 RedirectStandardError = true
             });
         }
-        public static Process CreateFfmpegOut(string filePath)
+        public static Process? CreateFfmpegOut(string filePath)
         {
             string filename;
             if (Program.RunningOnLinux) filename = "./ffmpeg";
@@ -111,7 +114,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static async Task SendAudioAsync(IAudioClient audioClient, Stream stream)
         {
-            Exception ex = null;
+            Exception? ex = null;
             using (AudioOutStream audioStream = audioClient.CreatePCMStream(AudioApplication.Music))
             {
                 try { await stream.CopyToAsync(audioStream); }
@@ -124,8 +127,8 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static async Task SendAudioAsync(IAudioClient audioClient, string path)
         {
-            Exception ex = null;
-            using (Process ffmpeg = CreateFFMPEGProcess(path))
+            Exception? ex = null;
+            using (Process ffmpeg = CreateFFMPEGProcess(path) ?? throw new InvalidOperationException("Failed to start ffmpeg process."))
             using (AudioOutStream stream = audioClient.CreatePCMStream(AudioApplication.Music))
             {
                 try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }

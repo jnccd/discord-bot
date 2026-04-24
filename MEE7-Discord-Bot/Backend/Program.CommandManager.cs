@@ -22,7 +22,7 @@ namespace MEE7
         public const string Prefix = "$";
 #endif
 
-        static Command[] commands;
+        static Command[]? commands;
         static readonly EmbedBuilder helpMenu = new EmbedBuilder();
         static readonly Type[] commandTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                                from assemblyType in domainAssembly.GetTypes()
@@ -34,74 +34,74 @@ namespace MEE7
         static readonly ulong[] experimentalChannels = new ulong[] { 473991188974927884 };
         static readonly List<DiscordUser> usersWithRunningCommands = new List<DiscordUser>();
 
-        public delegate void NonCommandMessageRecievedHandler(IMessage message);
-        public static event NonCommandMessageRecievedHandler OnNonCommandMessageRecieved;
+        public delegate void NonCommandMessageReceivedHandler(IMessage message);
+        public static event NonCommandMessageReceivedHandler? OnNonCommandMessageReceived;
         public delegate void EmojiReactionAddedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3);
-        public static event EmojiReactionAddedHandler OnEmojiReactionAdded;
+        public static event EmojiReactionAddedHandler? OnEmojiReactionAdded;
         public delegate void EmojiReactionRemovedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3);
-        public static event EmojiReactionRemovedHandler OnEmojiReactionRemoved;
+        public static event EmojiReactionRemovedHandler? OnEmojiReactionRemoved;
         public delegate void EmojiReactionUpdatedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3);
-        public static event EmojiReactionUpdatedHandler OnEmojiReactionUpdated;
+        public static event EmojiReactionUpdatedHandler? OnEmojiReactionUpdated;
         public delegate void UserJoinedHandler(SocketGuildUser arg);
-        public static event UserJoinedHandler OnUserJoined;
+        public static event UserJoinedHandler? OnUserJoined;
         public delegate void ChannelCreatedHandler(SocketChannel arg);
-        public static event ChannelCreatedHandler OnChannelCreated;
+        public static event ChannelCreatedHandler? OnChannelCreated;
         public delegate void ChannelDestroyedHandler(SocketChannel arg);
-        public static event ChannelDestroyedHandler OnChannelDestroyed;
+        public static event ChannelDestroyedHandler? OnChannelDestroyed;
         public delegate void ChannelUpdatedHandler(SocketChannel arg1, SocketChannel arg2);
-        public static event ChannelUpdatedHandler OnChannelUpdated;
+        public static event ChannelUpdatedHandler? OnChannelUpdated;
         public delegate void CurrentUserUpdatedHandler(SocketSelfUser arg1, SocketSelfUser arg2);
-        public static event CurrentUserUpdatedHandler OnCurrentUserUpdated;
+        public static event CurrentUserUpdatedHandler? OnCurrentUserUpdated;
         public delegate void GuildAvailableHandler(SocketGuild arg);
-        public static event GuildAvailableHandler OnGuildAvailable;
+        public static event GuildAvailableHandler? OnGuildAvailable;
         public delegate void GuildMembersDownloadedHandler(SocketGuild arg);
-        public static event GuildMembersDownloadedHandler OnGuildMembersDownloaded;
+        public static event GuildMembersDownloadedHandler? OnGuildMembersDownloaded;
         public delegate void GuildMemberUpdatedHandler(SocketGuildUser arg1, SocketGuildUser arg2);
-        public static event GuildMemberUpdatedHandler OnGuildMemberUpdated;
+        public static event GuildMemberUpdatedHandler? OnGuildMemberUpdated;
         public delegate void GuildUnavailableHandler(SocketGuild arg);
-        public static event GuildUnavailableHandler OnGuildUnavailable;
+        public static event GuildUnavailableHandler? OnGuildUnavailable;
         public delegate void GuildUpdatedHandler(SocketGuild arg1, SocketGuild arg2);
-        public static event GuildUpdatedHandler OnGuildUpdated;
+        public static event GuildUpdatedHandler? OnGuildUpdated;
         public delegate void LatencyUpdatedHandler(int arg1, int arg2);
-        public static event LatencyUpdatedHandler OnLatencyUpdated;
+        public static event LatencyUpdatedHandler? OnLatencyUpdated;
         public delegate void LeftGuildHandler(SocketGuild arg);
-        public static event LeftGuildHandler OnLeftGuild;
+        public static event LeftGuildHandler? OnLeftGuild;
         public delegate void LoggedInHandler();
-        public static event LoggedInHandler OnLoggedIn;
+        public static event LoggedInHandler? OnLoggedIn;
         public delegate void LoggedOutHandler();
-        public static event LoggedOutHandler OnLoggedOut;
+        public static event LoggedOutHandler? OnLoggedOut;
         public delegate void MessageDeletedHandler(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2);
-        public static event MessageDeletedHandler OnMessageDeleted;
+        public static event MessageDeletedHandler? OnMessageDeleted;
         public delegate void MessagesBulkDeletedHandler(IReadOnlyCollection<Cacheable<IMessage, ulong>> arg1, Cacheable<IMessageChannel, ulong> arg2);
-        public static event MessagesBulkDeletedHandler OnMessagesBulkDeleted;
+        public static event MessagesBulkDeletedHandler? OnMessagesBulkDeleted;
         public delegate void MessageUpdatedHandler(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, Cacheable<IMessageChannel, ulong> arg3);
-        public static event MessageUpdatedHandler OnMessageUpdated;
+        public static event MessageUpdatedHandler? OnMessageUpdated;
         public delegate void ReactionsClearedHandler(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2);
-        public static event ReactionsClearedHandler OnReactionsCleared;
+        public static event ReactionsClearedHandler? OnReactionsCleared;
         public delegate void RecipientAddedHandler(SocketGroupUser arg1);
-        public static event RecipientAddedHandler OnRecipientAdded;
+        public static event RecipientAddedHandler? OnRecipientAdded;
         public delegate void RecipientRemovedHandler(SocketGroupUser arg1);
-        public static event RecipientRemovedHandler OnRecipientRemoved;
+        public static event RecipientRemovedHandler? OnRecipientRemoved;
         public delegate void RoleCreatedHandler(SocketRole arg1);
-        public static event RoleCreatedHandler OnRoleCreated;
+        public static event RoleCreatedHandler? OnRoleCreated;
         public delegate void RoleDeletedHandler(SocketRole arg1);
-        public static event RoleDeletedHandler OnRoleDeleted;
+        public static event RoleDeletedHandler? OnRoleDeleted;
         public delegate void RoleUpdatedHandler(SocketRole arg1, SocketRole arg2);
-        public static event RoleUpdatedHandler OnRoleUpdated;
+        public static event RoleUpdatedHandler? OnRoleUpdated;
         public delegate void UserBannedHandler(SocketUser arg1, SocketGuild arg2);
-        public static event UserBannedHandler OnUserBanned;
+        public static event UserBannedHandler? OnUserBanned;
         public delegate void UserIsTypingHandler(SocketUser arg1, ISocketMessageChannel arg2);
-        public static event UserIsTypingHandler OnUserIsTyping;
+        public static event UserIsTypingHandler? OnUserIsTyping;
         public delegate void UserLeftHandler(SocketGuildUser arg);
-        public static event UserLeftHandler OnUserLeft;
+        public static event UserLeftHandler? OnUserLeft;
         public delegate void UserUnbannedHandler(SocketUser arg, SocketGuild arg2);
-        public static event UserUnbannedHandler OnUserUnbanned;
+        public static event UserUnbannedHandler? OnUserUnbanned;
         public delegate void UserUpdatedHandler(SocketUser arg1, SocketUser arg2);
-        public static event UserUpdatedHandler OnUserUpdated;
+        public static event UserUpdatedHandler? OnUserUpdated;
         public delegate void UserVoiceStateUpdatedHandler(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3);
-        public static event UserVoiceStateUpdatedHandler OnUserVoiceStateUpdated;
+        public static event UserVoiceStateUpdatedHandler? OnUserVoiceStateUpdated;
         public delegate void VoiceServerUpdatedHandler(SocketVoiceServer arg1);
-        public static event VoiceServerUpdatedHandler OnVoiceServerUpdated;
+        public static event VoiceServerUpdatedHandler? OnVoiceServerUpdated;
 
         static readonly List<Tuple<IUserMessage, Exception>> cachedErrorMessages = new List<Tuple<IUserMessage, Exception>>();
         static readonly string errorMessage = "Uwu We made a fucky wucky!! A wittle fucko boingo! " +
@@ -126,9 +126,9 @@ namespace MEE7
             }
         }
 
-        public static Command GetCommandInstance(string CommandName)
+        public static Command? GetCommandInstance(string CommandName)
         {
-            return commands.FirstOrDefault(x => x.CommandLine.ToLower() == CommandName.ToLower());
+            return commands?.FirstOrDefault(x => x.CommandLine.ToLower() == CommandName.ToLower());
         }
 
         // Events
@@ -138,12 +138,14 @@ namespace MEE7
             {
                 bool hasWrite = false, hasRead = false, hasReadHistory = false, hasFiles = false;
                 SocketGuild g = Program.GetGuildFromID(479950092938248193);
-                IUser u = g.Users.FirstOrDefault(x => x.Id == Program.GetSelf().Id);
+                IUser? u = g.Users.FirstOrDefault(x => x.Id == Program.GetSelf().Id);
                 if (u != null)
                 {
-                    IEnumerable<IRole> roles = (u as IGuildUser).RoleIds.Select(x => (u as IGuildUser).Guild.GetRole(x));
-                    foreach (IRole r in roles)
+                    IEnumerable<IRole?>? roles = (u as IGuildUser)?.RoleIds.Select(x => (u as IGuildUser)?.Guild.GetRole(x));
+                    foreach (IRole? r in roles ?? [])
                     {
+                        if (r == null)
+                            continue;
                         if (r.Permissions.SendMessages)
                             hasWrite = true;
                         if (r.Permissions.ViewChannel)
@@ -174,11 +176,11 @@ namespace MEE7
         {
             Task.Run(async () =>
             {
-                Tuple<IUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                Tuple<IUserMessage, Exception>? error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-                    if (arg3.User.GetValueOrDefault().Id == Master.Id)
+                    if (arg3.User.GetValueOrDefault().Id == Master?.Id)
                         await error.Item1.ModifyAsync(m => m.Content = errorMessage + "\n\n```" + error.Item2 + "```");
                 }
             });
@@ -199,11 +201,11 @@ namespace MEE7
         {
             Task.Run(() =>
             {
-                Tuple<IUserMessage, Exception> error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
+                Tuple<IUserMessage, Exception>? error = cachedErrorMessages.FirstOrDefault(x => x.Item1.Id == arg1.Id);
                 if (error != null)
                 {
                     Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-                    if (arg3.User.GetValueOrDefault().Id == Master.Id)
+                    if (arg3.User.GetValueOrDefault().Id == Master?.Id)
                         error.Item1.ModifyAsync(m => m.Content = errorMessage).Wait();
                 }
             });
@@ -234,7 +236,7 @@ namespace MEE7
             if (message.Content.Length > 0 && (char.IsLetter(message.Content[0]) || message.Content[0] == '<' || message.Content[0] == ':'))
                 Task.Run(() =>
                 {
-                    try { OnNonCommandMessageRecieved.InvokeParallel(message); }
+                    try { OnNonCommandMessageReceived?.InvokeParallel(message); }
                     catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 });
             return Task.FromResult(default(object));
@@ -253,7 +255,7 @@ namespace MEE7
                     DiscordNETWrapper.SendEmbed(helpMenu, message.Channel).Wait();
                 else
                 {
-                    foreach (Command c in commands)
+                    foreach (Command c in commands ?? [])
                         if (c.CommandLine == split[1])
                         {
                             DiscordNETWrapper.SendEmbed(c.HelpMenu, message.Channel).Wait();
@@ -264,13 +266,13 @@ namespace MEE7
             }
             else
             {
-                if (Program.RunningOnCI || user.UserID == Program.Master.Id || !usersWithRunningCommands.Contains(user))
+                if (Program.RunningOnCI || user.UserID == Program.Master?.Id || !usersWithRunningCommands.Contains(user))
                 {
                     usersWithRunningCommands.Add(user);
 
                     // Find command
                     string[] split = message.Content.Split(new char[] { ' ', '\n' });
-                    Command called = commands.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == split[0].ToLower());
+                    Command? called = commands?.FirstOrDefault(x => (x.Prefix + x.CommandLine).ToLower() == split[0].ToLower());
                     if (called != null)
                     {
                         ExecuteCommand(called, message);
@@ -278,15 +280,15 @@ namespace MEE7
                     else
                     {
                         // No command found
-                        float[] distances = new float[commands.Length];
-                        for (int i = 0; i < commands.Length; i++)
+                        float[] distances = new float[commands?.Length ?? 0];
+                        for (int i = 0; i < commands?.Length; i++)
                             if (commands[i].CommandLine != "" && !commands[i].IsHidden)
                                 distances[i] = StringExtensions.ModifiedLevenshteinDistance((commands[i].Prefix + commands[i].CommandLine).ToLower(), split[0].ToLower());
                             else
                                 distances[i] = int.MaxValue;
                         int minIndex = 0;
                         float min = float.MaxValue;
-                        for (int i = 0; i < commands.Length; i++)
+                        for (int i = 0; i < commands?.Length; i++)
                             if (distances[i] < min)
                             {
                                 minIndex = i;
@@ -294,10 +296,12 @@ namespace MEE7
                             }
                         if (min < Math.Min(4, split[0].Length - 1))
                         {
-                            if (commands[minIndex].CommandLine != "9ball")
-                                DiscordNETWrapper.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine +
+                            if (commands?[minIndex].CommandLine != "9ball")
+                                DiscordNETWrapper.SendText("I don't know that command, but " + commands?[minIndex].Prefix + commands?[minIndex].CommandLine +
                                     " is pretty close:", message.Channel).Wait();
-                            ExecuteCommand(commands[minIndex], message);
+                            var command = commands?[minIndex];
+                            if (command != null)
+                                ExecuteCommand(command, message);
                         }
                     }
 
@@ -317,7 +321,7 @@ namespace MEE7
                 return;
             }
 
-            IDisposable typingState = null;
+            IDisposable? typingState = null;
             try
             {
                 typingState = message.Channel.EnterTypingState();
@@ -331,10 +335,10 @@ namespace MEE7
                 command.Execute(message);
 
                 if (message.Channel is SocketGuildChannel)
-                    ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                    ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now:T} Send {command.GetType().Name}\tin " +
                         $"{((SocketGuildChannel)message.Channel).Guild.Name} \tin {message.Channel.Name} \tfor {message.Author.Username}", ConsoleColor.Green);
                 else
-                    ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} Send {command.GetType().Name}\tin " +
+                    ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now:T} Send {command.GetType().Name}\tin " +
                        $"DMs \tfor {message.Author.Username}", ConsoleColor.Green);
             }
             catch (Exception e)
@@ -349,12 +353,12 @@ namespace MEE7
                 catch { }
 
                 ConsoleWrapper.WriteLineAndDiscordLog($"{DateTime.Now.ToLongTimeString()} [{command.GetType().Name}] {e.Message}\n  " +
-                    $"{e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", ConsoleColor.Red);
+                    $"{e.StackTrace?.Split('\n').FirstOrDefault(x => x.Contains(":line "))?.Split(Path.DirectorySeparatorChar).Last().Replace(":", ", ")}", ConsoleColor.Red);
                 Saver.SaveToLog(e.ToString());
             }
             finally
             {
-                typingState.Dispose();
+                typingState?.Dispose();
                 lock (commandExecutionLock)
                 {
                     concurrentCommandExecutions--;

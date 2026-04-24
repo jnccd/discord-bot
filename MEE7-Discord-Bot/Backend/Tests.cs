@@ -14,7 +14,7 @@ namespace MEE7.Backend
     public class Tests
     {
         private delegate void TestHandler();
-        private static event TestHandler OnTest;
+        private static event TestHandler? OnTest;
 
         public static void Run(int index)
         {
@@ -38,8 +38,10 @@ namespace MEE7.Backend
             // 1 - Video Playing
             () => {
                 string videoPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + MultiMediaHelper.DownloadVideoFromYouTube("https://www.youtube.com/watch?v=Y15Pkxk99h0");
-                ISocketAudioChannel channel = Program.GetChannelFromID(479951814217826305) as ISocketAudioChannel;
-                IAudioClient client = channel.ConnectAsync().Result;
+                ISocketAudioChannel? channel = Program.GetChannelFromID(479951814217826305) as ISocketAudioChannel;
+                IAudioClient? client = channel?.ConnectAsync().Result;
+                if (client == null || channel == null)
+                    return;
                 MultiMediaHelper.SendAudioAsync(client, videoPath).Wait();
                 channel.DisconnectAsync().Wait();
             },

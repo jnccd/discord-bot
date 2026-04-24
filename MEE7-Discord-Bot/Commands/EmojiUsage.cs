@@ -13,7 +13,7 @@ namespace MEE7.Commands
         public EmojiUsage() : base("emojiUsage", "Which emojis are actually used on this server?", false, true)
         {
             Program.OnConnected += OnConnected;
-            Program.OnNonCommandMessageRecieved += OnNonCommandMessageRecieved;
+            Program.OnNonCommandMessageReceived += OnNonCommandMessageRecieved;
         }
 
         public void OnConnected()
