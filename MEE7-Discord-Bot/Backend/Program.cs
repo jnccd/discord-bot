@@ -7,6 +7,7 @@ using MEE7.Configuration;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using ConnectionState = Discord.ConnectionState;
 using Environment = System.Environment;
 
 namespace MEE7
@@ -28,14 +30,14 @@ namespace MEE7
         static readonly string runConfig = "Release";
 #endif
 
-        static string buildDate;
+        static string? buildDate;
         static int clearYcoords;
         static bool exitedNormally = false;
 
-        static ISocketMessageChannel CurrentChannel;
+        static ISocketMessageChannel? CurrentChannel;
         static readonly int AutoSaveIntervalInMinutes = 60;
         public static Random RDM { get; private set; } = new Random();
-        public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar;
+        public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? throw new Exception("Where the hell am I?")) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
 
@@ -49,8 +51,8 @@ namespace MEE7
 #endif
         public static readonly bool logToDiscord = true;
         public static readonly string instanceIdentifier = "" + Environment.OSVersion + Environment.TickCount64 + Environment.CurrentDirectory;
-        public static readonly string logStartupMessagePräfix = "new instance who dis?";
-        public static readonly string logStartupMessage = logStartupMessagePräfix + " I am here: " + instanceIdentifier;
+        public static readonly string logStartupMessagePrefix = "new instance who dis?";
+        public static readonly string logStartupMessage = logStartupMessagePrefix + " I am here: " + instanceIdentifier;
 
         // Client 
         static DiscordSocketConfig discordSocketConfig = new()
@@ -62,32 +64,32 @@ namespace MEE7
         public static DiscordSocketClient? Client { get { return client; } }
         public static bool ClientReady { get; private set; }
 
-        static readonly string exitlock = "";
+        static readonly string exitLock = "";
 
-        private static SocketUser pmaster;
-        public static SocketUser Master
+        private static SocketUser? pMaster;
+        public static SocketUser? Master
         {
-            get { return pmaster; }
+            get { return pMaster; }
             set
             {
-                if (pmaster == null)
-                    pmaster = value;
+                if (pMaster == null)
+                    pMaster = value;
                 else
                     throw new FieldAccessException("The Master may only be set once!");
             }
         }
 
         public delegate void ConnectedHandler();
-        public static event ConnectedHandler OnConnected;
+        public static event ConnectedHandler? OnConnected;
         public delegate void ExitHandler();
-        public static event ExitHandler OnExit;
+        public static event ExitHandler? OnExit;
 
         // --- Main ---------------------------------------------------------------------------------------------------------
-        static void Main()
+        static async Task Main()
         {
             try
             {
-                ExecuteBot();
+                await ExecuteBot();
             }
             catch (Exception ex)
             {
@@ -106,15 +108,15 @@ namespace MEE7
             }
         }
 
-        static void ExecuteBot()
+        static async Task ExecuteBot()
         {
             StartUp();
 
             if (!RunningOnCI)
-                try { HandleConsoleCommandsLoop(); }
-                catch { CILimbo(); }
+                try { await HandleConsoleCommandsLoop(); }
+                catch { await CILimbo(); }
             else
-                CILimbo();
+                await CILimbo();
 
             BeforeClose();
         }
@@ -189,7 +191,7 @@ namespace MEE7
             Task.Run(() => ConnectionChecker.StartReconnectLoop());
 
             Task.Run(() => BootTwitterModule());
-            OnConnected.InvokeParallel();
+            OnConnected?.InvokeParallel();
         }
         static void LoadBuildDate()
         {
@@ -205,6 +207,9 @@ namespace MEE7
         }
         static void SetClientEvents()
         {
+            if (client == null)
+                throw new Exception("Where muh client??");
+
             client.Log += Client_Log;
             client.Ready += Client_Ready;
             client.MessageReceived += MessageReceived;
@@ -397,10 +402,10 @@ namespace MEE7
             {
                 try
                 {
-                    Command commandInstance = (Command)Activator.CreateInstance(commandTypes[i]);
-                    if (commandInstance.CommandLine.Contains(" ") || commandInstance.Prefix.Contains(" "))
+                    Command? commandInstance = (Command?)Activator.CreateInstance(commandTypes[i]);
+                    if (commandInstance == null || commandInstance.CommandLine.Contains(" ") || commandInstance.Prefix.Contains(' ') == true)
                         throw new IllegalCommandException($"Commands and Prefixes mustn't contain spaces!\n" +
-                            $"On command: \"{commandInstance.Prefix}{commandInstance.CommandLine}\" in {commandInstance}");
+                            $"On command: \"{commandInstance?.Prefix}{commandInstance?.CommandLine}\" in {commandInstance}");
                     commandsList.Add(commandInstance);
                 }
                 catch
@@ -423,7 +428,7 @@ namespace MEE7
                 //client.SetGameAsync($"{Prefix}help [DEBUG-MODE]", "", ActivityType.Listening).Wait();
             }
             else
-                client.SetGameAsync($"{Prefix}help", "", ActivityType.Listening).Wait();
+                client?.SetGameAsync($"{Prefix}help", "", ActivityType.Listening).Wait();
         }
         static void BuildHelpMenu()
         {
@@ -470,7 +475,7 @@ namespace MEE7
         }
 
 
-        static void HandleConsoleCommandsLoop()
+        static async Task HandleConsoleCommandsLoop()
         {
             PrintConsoleStartup();
 
@@ -478,7 +483,7 @@ namespace MEE7
             {
                 string input = "";
                 if (RunningOnCI)
-                    CILimbo();
+                    await CILimbo();
                 else
                     try
                     {
@@ -490,12 +495,12 @@ namespace MEE7
                             if (stdinData == '\n')
                                 break;
 
-                            Task.Delay(100).Wait();
+                            await Task.Delay(100);
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message); CILimbo();
+                        Console.WriteLine(e.Message); await CILimbo();
                     }
 
                 if (input == "exit")
@@ -510,13 +515,15 @@ namespace MEE7
                         else
                             try
                             {
+                                if (Master == null)
+                                    throw new Exception("No Master :(");
                                 SelfmadeMessage m = new SelfmadeMessage
                                 {
                                     Channel = CurrentChannel,
                                     Content = input,
                                     Author = Master
                                 };
-                                Task.Run(() => MessageReceived(m));
+                                await Task.Run(() => MessageReceived(m));
                             }
                             catch (Exception e)
                             {
@@ -585,7 +592,7 @@ namespace MEE7
                         try
                         {
                             string[] splits = input.Split(' ');
-                            IMessage M = null;
+                            IMessage? M = null;
                             bool DeletionComplete = false;
 
                             for (int i = 0; !DeletionComplete; i++)
@@ -612,6 +619,11 @@ namespace MEE7
                     }
                     else if (input == "/PANIKDELETE")
                     {
+                        if (client == null)
+                        {
+                            ConsoleWrapper.WriteLine("No client", ConsoleColor.Red);
+                            continue;
+                        }
                         foreach (ulong ChannelID in Config.Data.ChannelsWrittenOn)
                         {
                             IEnumerable<IMessage> messages = ((ISocketMessageChannel)client.GetChannel(ChannelID)).GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult();
@@ -691,11 +703,16 @@ namespace MEE7
                     }
                     else if (input.StartsWith("/read")) // ChannelID
                     {
+                        if (client == null)
+                        {
+                            ConsoleWrapper.WriteLine("No client", ConsoleColor.Red);
+                            continue;
+                        }
                         string[] split = input.Split(' ');
                         try
                         {
-                            var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
-                            ConsoleWrapper.WriteLine(String.Join("\n", messages.Reverse().Select(x => x.Author + ": " + x.Content)), ConsoleColor.Cyan);
+                            var messages = (GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel)?.GetMessagesAsync(100).FlattenAsync().GetAwaiter().GetResult();
+                            ConsoleWrapper.WriteLine(String.Join("\n", messages?.Reverse().Select(x => x.Author + ": " + x.Content) ?? []), ConsoleColor.Cyan);
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
@@ -704,9 +721,10 @@ namespace MEE7
                         string[] split = input.Split(' ');
                         try
                         {
-                            var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
-                            var messageTo = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[3])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[4])).Result;
-                            message.ModifyAsync(m => m.Content = messageTo.Content);
+                            var message = (IUserMessage?)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel)?.GetMessageAsync(Convert.ToUInt64(split[2])).Result;
+                            var messageTo = (IUserMessage?)(GetChannelFromID(Convert.ToUInt64(split[3])) as ISocketMessageChannel)?.GetMessageAsync(Convert.ToUInt64(split[4])).Result;
+                            if (message != null && messageTo != null)
+                                await message.ModifyAsync(m => m.Content = messageTo.Content);
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
@@ -715,8 +733,8 @@ namespace MEE7
                         string[] split = input.Split(' ');
                         try
                         {
-                            var message = (IUserMessage)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel).GetMessageAsync(Convert.ToUInt64(split[2])).Result;
-                            message.ModifyAsync(m => m.Content = split.Skip(3).Combine(" "));
+                            var message = (IUserMessage?)(GetChannelFromID(Convert.ToUInt64(split[1])) as ISocketMessageChannel)?.GetMessageAsync(Convert.ToUInt64(split[2])).Result;
+                            message?.ModifyAsync(m => m.Content = split.Skip(3).Combine(" "));
                         }
                         catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                     }
@@ -753,36 +771,36 @@ namespace MEE7
                 ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
                 try
                 {
-                    foreach (SocketGuild g in client.Guilds)
+                    foreach (SocketGuild g in client?.Guilds ?? [])
                     {
                         ConsoleWrapper.Write($"  {g.Name}", ConsoleColor.Magenta);
-                        ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client.Guilds.Max(x => x.Name.Length) - g.Name.Length + 2).ToArray())}{g.Id}",
+                        ConsoleWrapper.WriteLine($"{new string(Enumerable.Repeat(' ', client?.Guilds.Max(x => x.Name.Length) ?? 0 - g.Name.Length + 2).ToArray())}{g.Id}",
                             ConsoleColor.White);
                     }
                 }
                 catch { ConsoleWrapper.WriteLine("Error Displaying all servers!", ConsoleColor.Red); }
                 ConsoleWrapper.Write("Default channel is: ");
-                ConsoleWrapper.Write(CurrentChannel, ConsoleColor.Magenta);
+                ConsoleWrapper.Write(CurrentChannel?.ToString() ?? "", ConsoleColor.Magenta);
                 ConsoleWrapper.Write(" on ");
-                ConsoleWrapper.WriteLine(GetGuildFromChannel(CurrentChannel).Name, ConsoleColor.Magenta);
+                ConsoleWrapper.WriteLine(CurrentChannel != null ? GetGuildFromChannel(CurrentChannel).Name : "No current channel!", ConsoleColor.Magenta);
                 ConsoleWrapper.WriteLine("Awaiting your commands: ");
                 clearYcoords = Console.CursorTop;
             }
         }
-        static void CILimbo()
+        static async Task CILimbo()
         {
             while (true)
             {
-                Task.Delay(5000).Wait();
+                await Task.Delay(5000);
             }
         }
 
         static void BeforeClose()
         {
-            lock (exitlock)
+            lock (exitLock)
             {
                 ConsoleWrapper.WriteLine("Closing... Command Exit events are being executed");
-                try { OnExit(); }
+                try { OnExit?.Invoke(); }
                 catch (Exception e) { ConsoleWrapper.WriteLine(e.ToString(), ConsoleColor.Red); }
                 ConsoleWrapper.WriteLine("Closing... Files are being saved");
                 Config.Save();
@@ -836,11 +854,11 @@ namespace MEE7
         // Client Getters / Wrappers
         public static SocketUser GetUserFromId(ulong userId)
         {
-            return client.GetUser(userId);
+            return client?.GetUser(userId) ?? throw new Exception("No client :(");
         }
         public static SocketChannel GetChannelFromID(ulong channelID)
         {
-            return client.GetChannel(channelID);
+            return client?.GetChannel(channelID) ?? throw new Exception("No client :(");
         }
         public static SocketGuild GetGuildFromChannel(IChannel channel)
         {
@@ -848,19 +866,19 @@ namespace MEE7
         }
         public static SocketSelfUser GetSelf()
         {
-            return client.CurrentUser;
+            return client?.CurrentUser ?? throw new Exception("No client :(");
         }
         public static SocketGuild[] GetGuilds()
         {
-            return client.Guilds.ToArray();
+            return client?.Guilds.ToArray() ?? throw new Exception("No client :(");
         }
         public static SocketGuild GetGuildFromID(ulong guildID)
         {
-            return client.GetGuild(guildID);
+            return client?.GetGuild(guildID) ?? throw new Exception("No client :(");
         }
         public static void SetStatus(UserStatus usa)
         {
-            client.SetStatusAsync(usa);
+            client?.SetStatusAsync(usa);
         }
         public static ulong OwnID
         {
@@ -873,7 +891,7 @@ namespace MEE7
         public static bool IsInReleaseMode() => runConfig == "Release";
 
         // Execute BeforeClose before closing
-        static ConsoleEventDelegate handler;
+        static ConsoleEventDelegate? handler;
         static bool ConsoleEventCallback(int eventType)
         {
             if (eventType == 2 && !exitedNormally)

@@ -225,7 +225,7 @@ namespace MEE7
             if (message.Channel.Id == logChannel)
                 Task.Run(() =>
                 {
-                    if (message.Content.StartsWith(Program.logStartupMessagePräfix) &&
+                    if (message.Content.StartsWith(Program.logStartupMessagePrefix) &&
                         message.Content != Program.logStartupMessage)
                         Program.Exit(0);
                 });
@@ -295,7 +295,7 @@ namespace MEE7
                         if (min < Math.Min(4, split[0].Length - 1))
                         {
                             if (commands[minIndex].CommandLine != "9ball")
-                                DiscordNETWrapper.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine + 
+                                DiscordNETWrapper.SendText("I don't know that command, but " + commands[minIndex].Prefix + commands[minIndex].CommandLine +
                                     " is pretty close:", message.Channel).Wait();
                             ExecuteCommand(commands[minIndex], message);
                         }
