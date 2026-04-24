@@ -19,9 +19,7 @@ public static class ConnectionChecker
     {
         try
         {
-            Program.Client?.StopAsync().Wait();
-            Program.Client?.LogoutAsync().Wait();
-            Program.Login();
+            Program.InitClient();
             Console.WriteLine($"{DateTime.Now:T} Reconnected! Current state is {Program.Client?.ConnectionState}");
         }
         catch (Exception ex)

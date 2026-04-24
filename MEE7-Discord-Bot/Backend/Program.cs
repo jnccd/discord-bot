@@ -151,26 +151,20 @@ namespace MEE7
             }
 
             LoadBuildDate();
-
-            client = new DiscordSocketClient(discordSocketConfig);
-            SetClientEvents();
-
-            Login();
-
             CreateCommandInstances();
 
-            while (!ClientReady || client.ConnectionState != ConnectionState.Connected) { Thread.Sleep(50); }
+            InitClient();
 
             SetState();
 
-            CurrentChannel = (ISocketMessageChannel)client.GetChannel(473991188974927884);
+            CurrentChannel = (ISocketMessageChannel?)client?.GetChannel(473991188974927884);
             Thread.Sleep(1000);
 
             ulong masterId = 300699566041202699;
             ulong.TryParse(Environment.GetEnvironmentVariable(masterEnvVar), out ulong parsedMasterId);
             if (parsedMasterId != 0)
                 masterId = parsedMasterId;
-            Master = client.GetUser(masterId);
+            Master = client?.GetUser(masterId);
 
             var logMessageChannel = (IMessageChannel)GetChannelFromID(logChannel);
             if (logMessageChannel != null)
@@ -192,6 +186,21 @@ namespace MEE7
 
             Task.Run(() => BootTwitterModule());
             OnConnected?.InvokeParallel();
+        }
+        public static void InitClient()
+        {
+            if (client != null)
+            {
+                client.StopAsync().Wait();
+                client.LogoutAsync().Wait();
+                client.Dispose();
+            }
+            client = new DiscordSocketClient(discordSocketConfig);
+            SetClientEvents();
+
+            Login();
+
+            while (!ClientReady || client.ConnectionState != ConnectionState.Connected) { Thread.Sleep(50); }
         }
         static void LoadBuildDate()
         {
