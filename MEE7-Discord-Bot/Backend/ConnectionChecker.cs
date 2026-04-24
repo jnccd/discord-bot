@@ -11,8 +11,9 @@ namespace MEE7.Backend;
 
 public static class ConnectionChecker
 {
-    static readonly int ReconnecterIntervalInMinutes = 10;
+    static readonly int ReconnecterCheckIntervalInMinutes = 10;
     static readonly ulong ConnectionCheckChannelId = 1496889462955966535;
+    static readonly int ReconnecterForceReconnectIntervalInMinutes = 120;
 
     static void Reconnect()
     {
@@ -31,20 +32,34 @@ public static class ConnectionChecker
 
     public static void StartReconnectLoop()
     {
+        Program.Client?.Log += (LogMessage msg) =>
+           {
+               if (msg.Exception.GetType() == typeof(Discord.WebSocket.GatewayReconnectException) || msg.Message.Contains("Discord.WebSocket.GatewayReconnectException"))
+               {
+                   Console.WriteLine($"{DateTime.Now:T} GatewayReconnectException! Current state is {Program.Client?.ConnectionState}");
+                   Reconnect();
+               }
+               return Task.CompletedTask;
+           };
+
         Task.Run(() =>
         {
             Thread.CurrentThread.Name = "Reconnecter";
             Console.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
 
-            Program.Client?.Log += (LogMessage msg) =>
+            while (true)
             {
-                if (msg.Exception.GetType() == typeof(Discord.WebSocket.GatewayReconnectException) || msg.Message.Contains("Discord.WebSocket.GatewayReconnectException"))
-                {
-                    Console.WriteLine($"{DateTime.Now:T} GatewayReconnectException! Current state is {Program.Client?.ConnectionState}");
-                    Reconnect();
-                }
-                return Task.CompletedTask;
-            };
+                Task.Delay(ReconnecterForceReconnectIntervalInMinutes * 60000).Wait();
+
+                Console.WriteLine($"{DateTime.Now:T} Force Reconnecting");
+                Reconnect();
+            }
+        });
+
+        Task.Run(() =>
+        {
+            Thread.CurrentThread.Name = "Reconnecter";
+            Console.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
 
             while (true)
             {
@@ -74,7 +89,7 @@ public static class ConnectionChecker
                     Reconnect();
                 }
 
-                Task.Delay(ReconnecterIntervalInMinutes * 60000).Wait();
+                Task.Delay(ReconnecterCheckIntervalInMinutes * 60000).Wait();
             }
         });
     }
