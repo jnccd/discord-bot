@@ -26,7 +26,7 @@ public static class ConnectionChecker
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {Program.Client?.ConnectionState}\nError: {ex.Message}");
+            Console.WriteLine($"{DateTime.Now:T} Reconnect failed! Current state is {Program.Client?.ConnectionState}\nError: {ex}");
         }
     }
 
@@ -80,7 +80,7 @@ public static class ConnectionChecker
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex.Message}");
+                    Console.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex}");
                 }
 
                 // Reconnect if necessary
