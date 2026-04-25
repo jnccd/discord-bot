@@ -55,18 +55,18 @@ public static class ConnectionChecker
             }
         });
 
-        Task.Run(() =>
-        {
-            Thread.CurrentThread.Name = "Signal Sender";
-            ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
+        // Task.Run(() =>
+        // {
+        //     Thread.CurrentThread.Name = "Signal Sender";
+        //     ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
 
-            while (true)
-            {
-                Task.Delay(60000).Wait();
+        //     while (true)
+        //     {
+        //         Task.Delay(60000).Wait();
 
-                Program.MainThread.Interrupt();
-            }
-        });
+        //         Program.MainThread.Interrupt();
+        //     }
+        // });
 
         Task.Run(() =>
         {
