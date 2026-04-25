@@ -40,6 +40,7 @@ namespace MEE7
         public static readonly string ExePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? throw new Exception("Where the hell am I?")) + Path.DirectorySeparatorChar;
         public static bool RunningOnCI { get; private set; }
         public static bool RunningOnLinux { get; private set; }
+        public static Thread MainThread { get; private set; } = Thread.CurrentThread;
 
         private static readonly string logChannelEnvVar = "BotLogChannel";
         private static readonly string masterEnvVar = "BotMaster";
@@ -99,7 +100,7 @@ namespace MEE7
                     try { Console.WriteLine("Config Save Error: " + e); } catch { }
                 }
 
-                try { ConsoleWrapper.WriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace); }
+                try { Console.WriteLine("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace); }
                 catch { }
 
                 try { Saver.SaveToLog("Error Message: " + ex.Message + "\nStack Trace: " + ex.StackTrace); } catch { }
@@ -112,11 +113,12 @@ namespace MEE7
         {
             StartUp();
 
-            if (!RunningOnCI)
+            _ = Task.Run(async () =>
+            {
                 try { await HandleConsoleCommandsLoop(); }
-                catch { await CILimbo(); }
-            else
-                await CILimbo();
+                catch (Exception e) { ConsoleWrapper.WriteLine($"Console command loop crashed! {e}", ConsoleColor.Red); }
+            });
+            await CILimbo();
 
             BeforeClose();
         }
@@ -501,7 +503,7 @@ namespace MEE7
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        ConsoleWrapper.WriteLine(e.Message);
                         await CILimbo();
                     }
 
