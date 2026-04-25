@@ -8,7 +8,7 @@ namespace MEE7.Backend.HelperFunctions
 
         public static void WriteLine(object text, ConsoleColor Color)
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -27,11 +27,11 @@ namespace MEE7.Backend.HelperFunctions
                     if (!Program.RunningOnLinux)
                         Console.Write("$");
                 }
-            }
+            });
         }
         public static void WriteLine(object text)
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -51,11 +51,11 @@ namespace MEE7.Backend.HelperFunctions
                     }
                     catch { }
                 }
-            }
+            });
         }
         public static void WriteLineAndDiscordLog(object text)
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -67,13 +67,13 @@ namespace MEE7.Backend.HelperFunctions
                     if (!Program.RunningOnLinux)
                         Console.Write("$");
                 }
-            }
+            });
 
             LogToDiscordIfEnabled(text);
         }
         public static void WriteLineAndDiscordLog(object text, ConsoleColor Color)
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -92,13 +92,13 @@ namespace MEE7.Backend.HelperFunctions
                     if (!Program.RunningOnLinux)
                         Console.Write("$");
                 }
-            }
+            });
 
             LogToDiscordIfEnabled(text);
         }
         public static void Write(object text, ConsoleColor Color)
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.Write(text);
@@ -111,11 +111,11 @@ namespace MEE7.Backend.HelperFunctions
                 Console.ForegroundColor = Color;
                 Console.Write(text);
                 Console.ForegroundColor = ConsoleColor.White;
-            }
+            });
         }
         public static void Write(object text)
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.Write(text);
@@ -125,7 +125,7 @@ namespace MEE7.Backend.HelperFunctions
                         Console.CursorLeft = 0;
                     Console.Write(text);
                 }
-            }
+            });
         }
 
         public static void LogToDiscordIfEnabled(object msg)

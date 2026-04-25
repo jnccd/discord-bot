@@ -325,11 +325,11 @@ namespace MEE7
             try
             {
                 typingState = message.Channel.EnterTypingState();
-                lock (commandExecutionLock)
+                Helper.Lock(commandExecutionLock, 1000, () =>
                 {
                     concurrentCommandExecutions++;
                     UpdateWorkState();
-                }
+                });
 
                 Saver.SaveUser(message.Author.Id);
                 command.Execute(message);
@@ -359,11 +359,11 @@ namespace MEE7
             finally
             {
                 typingState?.Dispose();
-                lock (commandExecutionLock)
+                Helper.Lock(commandExecutionLock, 1000, () =>
                 {
                     concurrentCommandExecutions--;
                     UpdateWorkState();
-                }
+                });
             }
         }
     }

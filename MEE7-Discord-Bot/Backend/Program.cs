@@ -769,7 +769,7 @@ namespace MEE7
         }
         static void PrintConsoleStartup()
         {
-            lock (ConsoleWrapper.lockject)
+            Helper.Lock(ConsoleWrapper.lockject, 1000, () =>
             {
                 Console.CursorLeft = 0;
                 ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
@@ -789,7 +789,7 @@ namespace MEE7
                 ConsoleWrapper.WriteLine(CurrentChannel != null ? GetGuildFromChannel(CurrentChannel).Name : "No current channel!", ConsoleColor.Magenta);
                 ConsoleWrapper.WriteLine("Awaiting your commands: ");
                 clearYcoords = Console.CursorTop;
-            }
+            });
         }
         static async Task Limbo()
         {
@@ -805,7 +805,7 @@ namespace MEE7
 
         static void BeforeClose()
         {
-            lock (exitLock)
+            Helper.Lock(exitLock, 1000, () =>
             {
                 ConsoleWrapper.WriteLine("Closing... Command Exit events are being executed");
                 try { OnExit?.Invoke(); }
@@ -821,7 +821,7 @@ namespace MEE7
                 client?.LogoutAsync().Wait();
 
                 exitedNormally = true;
-            }
+            });
         }
         // ------------------------------------------------------------------------------------------------------------------
 

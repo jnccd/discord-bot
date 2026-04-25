@@ -25,11 +25,13 @@ namespace MEE7.Configuration
         {
             get
             {
-                lock (lockject)
+                ConfigData? re = null;
+                Helper.Lock(lockject, 1000, () =>
                 {
                     UnsavedChanges = true;
-                    return data;
-                }
+                    re = data;
+                });
+                return re;
             }
             set
             {
@@ -57,7 +59,7 @@ namespace MEE7.Configuration
         }
         public static void Save()
         {
-            lock (lockject)
+            Helper.Lock(lockject, 1000, () =>
             {
                 if (File.Exists(configPath))
                     File.Copy(configPath, configBackupPath, true);
@@ -67,7 +69,7 @@ namespace MEE7.Configuration
                     DiscordNETWrapper.SendFile(configPath, (IMessageChannel)Program.GetChannelFromID(DiscordConfigChannelID), DiscordConfigMessage).Wait();
 
                 UnsavedChanges = false;
-            }
+            });
         }
         public static void Load()
         {

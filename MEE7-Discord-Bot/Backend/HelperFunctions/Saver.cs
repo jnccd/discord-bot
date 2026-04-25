@@ -41,7 +41,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void SaveToLog(string message)
         {
-            lock (LogFileLock)
+            Helper.Lock(LogFileLock, 1000, () =>
             {
                 using (StreamWriter sw = File.AppendText(LogPath))
                 {
@@ -51,7 +51,7 @@ namespace MEE7.Backend.HelperFunctions
                     sw.WriteLine(message);
                     sw.WriteLine("=============End=============");
                 }
-            }
+            });
         }
     }
 }
