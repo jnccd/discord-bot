@@ -133,7 +133,7 @@ namespace MEE7.Backend.HelperFunctions
             if (Program.logToDiscord)
                 try
                 {
-                    _ = DiscordNETWrapper.SendText(msg.ToString(), Program.logChannel);
+                    _ = DiscordNETWrapper.SendText(msg.ToString() ?? "Null Message", Program.logChannel);
                 }
                 catch { }
         }
