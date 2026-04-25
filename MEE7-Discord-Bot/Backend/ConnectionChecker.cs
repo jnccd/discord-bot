@@ -50,7 +50,7 @@ public static class ConnectionChecker
             {
                 Task.Delay(ReconnecterForceReconnectIntervalInMinutes * 60000).Wait();
 
-                ConsoleWrapper.WriteLine($"{DateTime.Now:T} Force Reconnecting");
+                Console.WriteLine($"{DateTime.Now:T} Force Reconnecting");
                 Task.Run(Reconnect);
             }
         });
@@ -92,7 +92,7 @@ public static class ConnectionChecker
                 }
                 catch (Exception ex)
                 {
-                    ConsoleWrapper.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex}");
+                    Console.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex}");
                 }
 
                 // Reconnect if necessary
