@@ -118,7 +118,7 @@ namespace MEE7
                 try { await HandleConsoleCommandsLoop(); }
                 catch (Exception e) { ConsoleWrapper.WriteLine($"Console command loop crashed! {e}", ConsoleColor.Red); }
             });
-            await CILimbo();
+            await Limbo();
 
             BeforeClose();
         }
@@ -494,7 +494,7 @@ namespace MEE7
             {
                 string input = "";
                 if (RunningOnCI)
-                    await CILimbo();
+                    await Limbo();
                 else
                     try
                     {
@@ -504,7 +504,7 @@ namespace MEE7
                     catch (Exception e)
                     {
                         ConsoleWrapper.WriteLine(e.Message);
-                        await CILimbo();
+                        await Limbo();
                     }
 
                 if (input == "exit")
@@ -791,11 +791,15 @@ namespace MEE7
                 clearYcoords = Console.CursorTop;
             }
         }
-        static async Task CILimbo()
+        static async Task Limbo()
         {
             while (true)
             {
-                await Task.Delay(5000);
+                try
+                {
+                    await Task.Delay(int.MaxValue);
+                }
+                catch (ThreadInterruptedException) { }
             }
         }
 
