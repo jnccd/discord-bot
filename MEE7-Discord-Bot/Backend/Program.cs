@@ -772,7 +772,7 @@ namespace MEE7
         }
         static void PrintConsoleStartup()
         {
-            Helper.Lock(ConsoleWrapper.lockject, 1000, () =>
+            Helper.TimedLock(ConsoleWrapper.lockject, 1000, () =>
             {
                 Console.CursorLeft = 0;
                 ConsoleWrapper.WriteLine("Active on the following Servers: ", ConsoleColor.White);
@@ -808,7 +808,7 @@ namespace MEE7
 
         static void BeforeClose()
         {
-            Helper.Lock(exitLock, 1000, () =>
+            Helper.TimedLock(exitLock, 1000, () =>
             {
                 ConsoleWrapper.WriteLine("Closing... Command Exit events are being executed");
                 try { OnExit?.Invoke(); }

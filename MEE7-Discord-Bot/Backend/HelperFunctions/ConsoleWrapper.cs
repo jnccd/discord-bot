@@ -8,7 +8,7 @@ namespace MEE7.Backend.HelperFunctions
 
         public static void WriteLine(object text, ConsoleColor Color)
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -31,7 +31,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void WriteLine(object text)
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -55,7 +55,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void WriteLineAndDiscordLog(object text)
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -73,7 +73,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void WriteLineAndDiscordLog(object text, ConsoleColor Color)
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
@@ -98,7 +98,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void Write(object text, ConsoleColor Color)
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.Write(text);
@@ -115,7 +115,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void Write(object text)
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (Program.RunningOnCI)
                     Console.Write(text);

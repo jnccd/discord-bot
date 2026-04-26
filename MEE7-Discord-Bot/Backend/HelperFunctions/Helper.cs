@@ -17,10 +17,11 @@ namespace MEE7.Backend.HelperFunctions
 {
     public static class Helper
     {
-        public static void Lock(object @lock, int timeoutMs, Action eitherWayAction) => Lock(@lock, timeoutMs, eitherWayAction, eitherWayAction);
-        public static void Lock(object @lock, int timeoutMs, Action inLockAction, Action onTimeout)
+        public static void TimedLock(object @lock, int timeoutMs, Action eitherWayAction) => TimedLock(@lock, timeoutMs, eitherWayAction, eitherWayAction);
+        public static void TimedLock(object @lock, int timeoutMs, Action inLockAction, Action onTimeout)
         {
             bool lockTaken = false;
+            string outerStackTrace = new StackTrace().ToString();
 
             try
             {
@@ -37,7 +38,7 @@ namespace MEE7.Backend.HelperFunctions
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in Helper.Lock: {ex}");
+                Console.WriteLine($"Error in Helper.Lock: {outerStackTrace}\n{ex}");
             }
             finally
             {

@@ -325,7 +325,7 @@ namespace MEE7
             try
             {
                 typingState = message.Channel.EnterTypingState();
-                Helper.Lock(commandExecutionLock, 1000, () =>
+                Helper.TimedLock(commandExecutionLock, 1000, () =>
                 {
                     concurrentCommandExecutions++;
                     UpdateWorkState();
@@ -359,7 +359,7 @@ namespace MEE7
             finally
             {
                 typingState?.Dispose();
-                Helper.Lock(commandExecutionLock, 1000, () =>
+                Helper.TimedLock(commandExecutionLock, 1000, () =>
                 {
                     concurrentCommandExecutions--;
                     UpdateWorkState();

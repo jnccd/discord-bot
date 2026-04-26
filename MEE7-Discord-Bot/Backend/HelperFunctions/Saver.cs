@@ -41,7 +41,7 @@ namespace MEE7.Backend.HelperFunctions
         }
         public static void SaveToLog(string message)
         {
-            Helper.Lock(LogFileLock, 1000, () =>
+            Helper.TimedLock(LogFileLock, 1000, () =>
             {
                 using (StreamWriter sw = File.AppendText(LogPath))
                 {

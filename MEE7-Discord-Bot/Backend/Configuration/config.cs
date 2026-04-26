@@ -26,7 +26,7 @@ namespace MEE7.Configuration
             get
             {
                 ConfigData? re = null;
-                Helper.Lock(lockject, 1000, () =>
+                Helper.TimedLock(lockject, 1000, () =>
                 {
                     UnsavedChanges = true;
                     re = data;
@@ -59,7 +59,7 @@ namespace MEE7.Configuration
         }
         public static void Save()
         {
-            Helper.Lock(lockject, 1000, () =>
+            Helper.TimedLock(lockject, 1000, () =>
             {
                 if (File.Exists(configPath))
                     File.Copy(configPath, configBackupPath, true);
