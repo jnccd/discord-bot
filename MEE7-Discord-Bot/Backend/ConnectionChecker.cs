@@ -41,19 +41,19 @@ public static class ConnectionChecker
             return Task.CompletedTask;
         };
 
-        Task.Run(() =>
-        {
-            Thread.CurrentThread.Name = "Reconnecter";
-            ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
+        // Task.Run(() =>
+        // {
+        //     Thread.CurrentThread.Name = "Reconnecter";
+        //     ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
 
-            while (true)
-            {
-                Task.Delay(ReconnecterForceReconnectIntervalInMinutes * 60000).Wait();
+        //     while (true)
+        //     {
+        //         Task.Delay(ReconnecterForceReconnectIntervalInMinutes * 60000).Wait();
 
-                Console.WriteLine($"{DateTime.Now:T} Force Reconnecting");
-                Task.Run(Reconnect);
-            }
-        });
+        //         Console.WriteLine($"{DateTime.Now:T} Force Reconnecting");
+        //         Task.Run(Reconnect);
+        //     }
+        // });
 
         // Task.Run(() =>
         // {
