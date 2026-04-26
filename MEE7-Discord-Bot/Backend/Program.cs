@@ -193,9 +193,13 @@ namespace MEE7
         {
             if (client != null)
             {
-                client.StopAsync().Wait();
-                client.LogoutAsync().Wait();
-                client.Dispose();
+                Task.Run(async () =>
+                {
+                    await client.StopAsync();
+                    await client.LogoutAsync();
+                    await client.DisposeAsync();
+                });
+                Task.Delay(500).Wait();
             }
             client = new DiscordSocketClient(discordSocketConfig);
             SetClientEvents();
