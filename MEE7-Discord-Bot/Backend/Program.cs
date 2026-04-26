@@ -157,8 +157,6 @@ namespace MEE7
 
             InitClient();
 
-            SetState();
-
             CurrentChannel = (ISocketMessageChannel?)client?.GetChannel(473991188974927884);
             Thread.Sleep(1000);
 
@@ -205,6 +203,8 @@ namespace MEE7
             SetClientEvents();
 
             Login();
+
+            SetState();
 
             while (!ClientReady || client.ConnectionState != ConnectionState.Connected) { Thread.Sleep(50); }
         }
