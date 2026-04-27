@@ -12,20 +12,24 @@ namespace MEE7.Backend.HelperFunctions
             {
                 if (Program.RunningOnCI)
                     Console.WriteLine(text);
-                else
+                else if (Program.RunningOnLinux)
                 {
-                    if (!Program.RunningOnLinux)
-                        try
-                        {
-                            if (Console.CursorLeft == 1)
-                                Console.CursorLeft = 0;
-                        }
-                        catch { }
                     Console.ForegroundColor = Color;
                     Console.WriteLine(text);
                     Console.ForegroundColor = ConsoleColor.White;
-                    if (!Program.RunningOnLinux)
-                        Console.Write("$");
+                }
+                else
+                {
+                    try
+                    {
+                        if (Console.CursorLeft == 1)
+                            Console.CursorLeft = 0;
+                    }
+                    catch { }
+                    Console.ForegroundColor = Color;
+                    Console.WriteLine(text);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("$");
                 }
             });
         }
@@ -33,7 +37,7 @@ namespace MEE7.Backend.HelperFunctions
         {
             Helper.TimedLock(lockject, 1000, () =>
             {
-                if (Program.RunningOnCI)
+                if (Program.RunningOnCI || Program.RunningOnLinux)
                     Console.WriteLine(text);
                 else
                 {
@@ -44,55 +48,19 @@ namespace MEE7.Backend.HelperFunctions
                     }
                     catch { }
                     Console.WriteLine(text);
-                    try
-                    {
-                        if (!Program.RunningOnLinux)
-                            Console.Write("$");
-                    }
-                    catch { }
+                    Console.Write("$");
                 }
             });
         }
         public static void WriteLineAndDiscordLog(object text)
         {
-            Helper.TimedLock(lockject, 1000, () =>
-            {
-                if (Program.RunningOnCI)
-                    Console.WriteLine(text);
-                else
-                {
-                    if (Console.CursorLeft == 1)
-                        Console.CursorLeft = 0;
-                    Console.WriteLine(text);
-                    if (!Program.RunningOnLinux)
-                        Console.Write("$");
-                }
-            });
+            WriteLine(text);
 
             LogToDiscordIfEnabled(text);
         }
         public static void WriteLineAndDiscordLog(object text, ConsoleColor Color)
         {
-            Helper.TimedLock(lockject, 1000, () =>
-            {
-                if (Program.RunningOnCI)
-                    Console.WriteLine(text);
-                else
-                {
-                    if (!Program.RunningOnLinux)
-                        try
-                        {
-                            if (Console.CursorLeft == 1)
-                                Console.CursorLeft = 0;
-                        }
-                        catch { }
-                    Console.ForegroundColor = Color;
-                    Console.WriteLine(text);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    if (!Program.RunningOnLinux)
-                        Console.Write("$");
-                }
-            });
+            WriteLine(text, Color);
 
             LogToDiscordIfEnabled(text);
         }
@@ -102,22 +70,27 @@ namespace MEE7.Backend.HelperFunctions
             {
                 if (Program.RunningOnCI)
                     Console.Write(text);
+                else if (Program.RunningOnLinux)
+                {
+                    Console.ForegroundColor = Color;
+                    Console.Write(text);
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
                 else
                 {
-
+                    if (Console.CursorLeft == 1)
+                        Console.CursorLeft = 0;
+                    Console.ForegroundColor = Color;
+                    Console.Write(text);
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
-                if (Console.CursorLeft == 1)
-                    Console.CursorLeft = 0;
-                Console.ForegroundColor = Color;
-                Console.Write(text);
-                Console.ForegroundColor = ConsoleColor.White;
             });
         }
         public static void Write(object text)
         {
             Helper.TimedLock(lockject, 1000, () =>
             {
-                if (Program.RunningOnCI)
+                if (Program.RunningOnCI || Program.RunningOnLinux)
                     Console.Write(text);
                 else
                 {

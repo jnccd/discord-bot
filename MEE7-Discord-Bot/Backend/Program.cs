@@ -399,12 +399,12 @@ namespace MEE7
                 try
                 {
                     ConsoleWrapper.WriteLine($"Wrong token: {Environment.GetEnvironmentVariable("BotToken")}");
-                    client?.LoginAsync(TokenType.Bot, Config.Data.BotToken).Wait();
+                    client?.LoginAsync(TokenType.Bot, Config.Data?.BotToken).Wait();
                     client?.StartAsync().Wait();
                 }
                 catch (Exception e2)
                 {
-                    ConsoleWrapper.WriteLine($"Wrong token: {Config.Data.BotToken}");
+                    ConsoleWrapper.WriteLine($"Wrong token: {Config.Data?.BotToken}");
                     ConsoleWrapper.WriteLine($"Wrong Bot Tokens!\n\n{e1}\n{e2}");
                     Environment.Exit(0);
                 }
@@ -489,7 +489,6 @@ namespace MEE7
             });
         }
 
-
         static async Task HandleConsoleCommandsLoop()
         {
             PrintConsoleStartup();
@@ -502,7 +501,8 @@ namespace MEE7
                 else
                     try
                     {
-                        input = Console.ReadLine() ?? "";
+                        using var reader = new StreamReader(Console.OpenStandardInput());
+                        input = await reader.ReadLineAsync() ?? "";
                     }
                     catch (Exception e)
                     {

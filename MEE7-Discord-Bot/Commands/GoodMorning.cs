@@ -33,7 +33,7 @@ namespace MEE7.Commands
             DiscordNETWrapper.SendText("Good Morning!", message.Channel.Id).Wait();
         }
 
-        void RunNotificationLoop()
+        async void RunNotificationLoop()
         {
             Thread.CurrentThread.Name = "Good Morning Notification Loop";
 
@@ -41,10 +41,10 @@ namespace MEE7.Commands
             {
                 try
                 {
-                    string postId = GetPostId();
-                    if (!string.IsNullOrWhiteSpace(postId) && postId != Config.Data.lastGoodMorningPostId)
+                    string postId = await GetPostId();
+                    if (!string.IsNullOrWhiteSpace(postId) && postId != Config.Data?.lastGoodMorningPostId)
                     {
-                        Config.Data.lastGoodMorningPostId = postId;
+                        Config.Data?.lastGoodMorningPostId = postId;
                         Config.Save();
                         DiscordNETWrapper.SendText($"https://www.kkinstagram.com/p/{postId}/", goodMorningChannelId).Wait();
                     }
@@ -58,17 +58,17 @@ namespace MEE7.Commands
             }
         }
 
-        public string GetPostId()
+        public async Task<string> GetPostId()
         {
             ConsoleWrapper.WriteLine("Getting post id...");
             int timeoutMs = 17000;
             string command = $"eval $(dbus-launch --sh-syntax) && chromium --headless --no-sandbox --disable-gpu --dump-dom --virtual-time-budget={timeoutMs - 2000} https://www.instagram.com/fire.scoop/";
             ConsoleWrapper.WriteLine("command: " + command);
-            string html = command.GetShellOutAsync(timeoutMs).Result;
-            ConsoleWrapper.WriteLine("html: " + new string(html.Take(1200).ToArray()));
+            string html = await command.GetShellOutAsync(timeoutMs);
+            Console.WriteLine("html: " + new string(html.Take(1200).ToArray()));
 
             string postId = html.GetEverythingBetween("href=\"/fire.scoop/reel/", "/\"");
-            ConsoleWrapper.WriteLine("postId: " + postId);
+            Console.WriteLine("postId: " + postId);
 
             return postId;
         }
