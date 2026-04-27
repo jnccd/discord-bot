@@ -12,7 +12,7 @@ namespace MEE7.Backend;
 
 public static class ConnectionChecker
 {
-    static readonly int ReconnecterCheckIntervalInMinutes = 10;
+    static readonly int ReconnecterCheckIntervalInMinutes = 4;
     static readonly ulong ConnectionCheckChannelId = 1496889462955966535;
     static readonly int ReconnecterForceReconnectIntervalInMinutes = 120;
 
@@ -48,7 +48,7 @@ public static class ConnectionChecker
         Task.Run(() =>
         {
             Thread.CurrentThread.Name = "Reconnecter";
-            ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
+            ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker Reconnecter startup");
 
             while (true)
             {
@@ -59,51 +59,43 @@ public static class ConnectionChecker
             }
         });
 
-        // Task.Run(() =>
-        // {
-        //     Thread.CurrentThread.Name = "Signal Sender";
-        //     ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
-
-        //     while (true)
-        //     {
-        //         Task.Delay(60000).Wait();
-
-        //         Program.MainThread.Interrupt();
-        //     }
-        // });
-
         Task.Run(() =>
         {
             Thread.CurrentThread.Name = "Reconnect Checker";
-            ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker startup");
+            ConsoleWrapper.WriteLine($"{DateTime.Now:T} ConnectionChecker Checker startup");
 
             while (true)
             {
+                Task.Delay(ReconnecterCheckIntervalInMinutes * 60000).Wait();
+
                 // Check what message sending does
-                // try
-                // {
-                //     DiscordNETWrapper.SendText($"Test Message", ConnectionCheckChannelId).Wait();
-                //     IEnumerable<IMessage> messages = ((ISocketMessageChannel?)Program.Client?.GetChannel(ConnectionCheckChannelId))?.GetMessagesAsync(int.MaxValue).FlattenAsync().GetAwaiter().GetResult() ?? [];
-                //     //ConsoleWrapper.WriteLine($"{DateTime.Now:T} Got {messages.Count()} message(s)!");
-                //     foreach (IMessage m in messages)
-                //     {
-                //         if (m.Author.Id == Program.Client?.CurrentUser.Id)
-                //             m.DeleteAsync().Wait();
-                //     }
-                // }
-                // catch (Exception ex)
-                // {
-                //     Console.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex}");
-                // }
+                try
+                {
+                    DiscordNETWrapper.SendText($"Test Message", ConnectionCheckChannelId).Wait();
+                    IEnumerable<IMessage> messages = ((ISocketMessageChannel?)Program.Client?.GetChannel(ConnectionCheckChannelId))?.GetMessagesAsync().FlattenAsync().GetAwaiter().GetResult() ?? [];
+                    if (messages.Count() == 0)
+                        throw new Exception("Where muh message??");
+                    //ConsoleWrapper.WriteLine($"{DateTime.Now:T} Got {messages.Count()} message(s)!");
+                    foreach (IMessage m in messages)
+                    {
+                        if (m.Author.Id == Program.Client?.CurrentUser.Id)
+                            m.DeleteAsync().Wait();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{DateTime.Now:T} Sending test message failed! \nError: {ex}");
+                    Reconnect();
+                    continue;
+                }
 
                 // Reconnect if necessary
                 if (Program.Client?.ConnectionState != ConnectionState.Connected)
                 {
                     ConsoleWrapper.WriteLine($"{DateTime.Now:T} Connection State is {Program.Client?.ConnectionState}, initiating reconnect");
                     Reconnect();
+                    continue;
                 }
-
-                Task.Delay(ReconnecterCheckIntervalInMinutes * 60000).Wait();
             }
         });
     }
