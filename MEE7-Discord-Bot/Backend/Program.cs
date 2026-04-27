@@ -502,7 +502,8 @@ namespace MEE7
                 else
                     try
                     {
-                        input = Console.ReadLine() ?? "";
+                        using var reader = new StreamReader(Console.OpenStandardInput());
+                        input = await reader.ReadLineAsync() ?? "";
                     }
                     catch (Exception e)
                     {
