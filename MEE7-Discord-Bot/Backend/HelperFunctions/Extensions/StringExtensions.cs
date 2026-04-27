@@ -342,8 +342,8 @@ namespace MEE7.Backend.HelperFunctions
                     process.Kill();
 
                 // Combine output and error
-                string output = await outputTask;
-                string error = await errorTask;
+                string output = await outputTask.ConfigureAwait(false);
+                string error = await errorTask.ConfigureAwait(false);
 
                 return output + error;
             }
