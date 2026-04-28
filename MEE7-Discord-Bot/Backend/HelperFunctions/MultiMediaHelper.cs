@@ -7,7 +7,6 @@ using SkiaSharp;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using static MEE7.Commands.Edit.Edit;
@@ -288,8 +287,8 @@ namespace MEE7.Backend.HelperFunctions
                 var bitmap = new SKBitmap(
                     frameInfo.FrameRect.Width,
                     frameInfo.FrameRect.Height,
-                    SKColorType.Rgba8888,
-                    SKAlphaType.Premul
+                    info.ColorType,
+                    frameInfo.AlphaType
                 );
 
                 // Decode the frame
