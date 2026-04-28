@@ -176,7 +176,7 @@ namespace MEE7.Backend.HelperFunctions
 
             var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
 
-            var bitmap = new SKBitmap(frameInfo.FrameRect.Width, frameInfo.FrameRect.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+            var bitmap = new SKBitmap(frameInfo.FrameRect.Width, frameInfo.FrameRect.Height, codec.Info.ColorType, frameInfo.AlphaType);
 
             // Decode the specific frame into the bitmap
             var opts = new SKCodecOptions(frameIndex);
@@ -204,7 +204,7 @@ namespace MEE7.Backend.HelperFunctions
 
                 var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
 
-                var bitmap = new SKBitmap(frameInfo.FrameRect.Width, frameInfo.FrameRect.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+                var bitmap = new SKBitmap(frameInfo.FrameRect.Width, frameInfo.FrameRect.Height, codec.Info.ColorType, frameInfo.AlphaType);
 
                 // Decode the specific frame into the bitmap
                 var opts = new SKCodecOptions(frameIndex);
@@ -236,8 +236,8 @@ namespace MEE7.Backend.HelperFunctions
                 var bitmap = new SKBitmap(
                     codec.Info.Width,
                     codec.Info.Height,
-                    SKColorType.Rgba8888,
-                    SKAlphaType.Premul
+                    codec.Info.ColorType,
+                    codec.Info.AlphaType
                 );
 
                 // Decode the image into the bitmap
@@ -253,7 +253,7 @@ namespace MEE7.Backend.HelperFunctions
             GifEngine ge = new GifEngine(new ImageSharpImageLibrary());
             using var creator = ge.CreateGif(s, -1);
             for (int i = 0; i < gif.Item1.Length; i++)
-                using (var image = Image.LoadPixelData<Rgba32>(gif.Item1[i].Bytes, gif.Item1[i].Width, gif.Item1[i].Height))
+                using (var image = Image.LoadPixelData<Rgba32>(MultiMediaHelper.ConvertColorType(gif.Item1[i], SKColorType.Rgba8888).Bytes, gif.Item1[i].Width, gif.Item1[i].Height))
                     creator.AddFrame(BitmapConverter.Convert(image), gif.Item2[i], GifQuality.Bit8);
         }
         public static void SaveBitmaps(SKBitmap[] bitmaps, Stream s, int delay = 33)
@@ -261,7 +261,7 @@ namespace MEE7.Backend.HelperFunctions
             GifEngine ge = new GifEngine(new ImageSharpImageLibrary());
             using var creator = ge.CreateGif(s, -1);
             for (int i = 0; i < bitmaps.Length; i++)
-                using (var image = Image.LoadPixelData<Rgba32>(bitmaps[i].Bytes, bitmaps[i].Width, bitmaps[i].Height))
+                using (var image = Image.LoadPixelData<Rgba32>(MultiMediaHelper.ConvertColorType(bitmaps[i], SKColorType.Rgba8888).Bytes, bitmaps[i].Width, bitmaps[i].Height))
                     creator.AddFrame(BitmapConverter.Convert(image), delay, GifQuality.Bit8);
         }
         public static Gif LoadGifFromUrl(string gifUrl)
@@ -302,6 +302,25 @@ namespace MEE7.Backend.HelperFunctions
             }
 
             return new Gif(bitmaps, timings);
+        }
+        public static SKBitmap ConvertColorType(SKBitmap originalBitmap, SKColorType newColorType)
+        {
+            // Create a new bitmap with the desired color type
+            var newBitmap = new SKBitmap(
+                originalBitmap.Width,
+                originalBitmap.Height,
+                newColorType,
+                originalBitmap.AlphaType
+            );
+
+            // Copy the pixels from the original to the new bitmap
+            using (var sourcePixels = originalBitmap.PeekPixels())
+            using (var destPixels = newBitmap.PeekPixels())
+            {
+                sourcePixels.ReadPixels(newBitmap.Info, destPixels.GetPixels(), destPixels.RowBytes, 0, 0);
+            }
+
+            return newBitmap;
         }
     }
 }
