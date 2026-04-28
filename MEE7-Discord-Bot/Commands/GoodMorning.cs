@@ -2,14 +2,10 @@ using Discord;
 using MEE7.Backend;
 using MEE7.Backend.HelperFunctions;
 using MEE7.Configuration;
-using PuppeteerSharp;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace MEE7.Commands
 {
