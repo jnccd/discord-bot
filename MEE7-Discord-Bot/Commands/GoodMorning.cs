@@ -12,16 +12,19 @@ namespace MEE7.Commands
     class GoodMorning : Command
     {
 #if DEBUG
+        private const bool enabled = false;
         private const int updateIntervalMin = 1;
         private const ulong goodMorningChannelId = 500759857205346304;
 #else
+        private const bool enabled = true;
         private const int updateIntervalMin = 3 * 60;
         private const ulong goodMorningChannelId = 479951853766049803;
 #endif
 
         public GoodMorning() : base("goodMorning", "Wishes you a good morning", false, true)
         {
-            Program.OnConnected += () => Task.Factory.StartNew(RunNotificationLoop);
+            if (enabled)
+                Program.OnConnected += () => Task.Factory.StartNew(RunNotificationLoop);
         }
 
         public override void Execute(IMessage message)
