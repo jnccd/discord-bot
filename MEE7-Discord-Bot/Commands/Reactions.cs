@@ -36,7 +36,9 @@ namespace MEE7.Commands
                 new Reaction("Oh my gaaaa", "Send this if oh my gaaaaa.", (message) => {
                     DiscordNETWrapper.SendText("https://youtu.be/UnktCDi-BVs?t=9", message.Channel).Wait(); }),
                 new Reaction("heh", "Send this if heh.", (message) => {
-                    DiscordNETWrapper.SendText("https://pbs.twimg.com/media/DuPdNCOV4AA20F6?format=jpg&name=small", message.Channel).Wait(); })
+                    DiscordNETWrapper.SendText("https://pbs.twimg.com/media/DuPdNCOV4AA20F6?format=jpg&name=small", message.Channel).Wait(); }),
+                new Reaction("i know right", "Send this if you know right.", (message) => {
+                    DiscordNETWrapper.SendText("https://youtu.be/d-FcS0EEnYY?si=wnS00V28ivCedtip&t=95", message.Channel).Wait(); })
             };
         }
 
